@@ -1,0 +1,3 @@
+index:
+   path: /api/v1/
+   controller: App\Controller\DefaultController::index

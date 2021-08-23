@@ -1,0 +1,12 @@
+
+let CoreUI = {
+
+    init: function(){
+
+    }
+
+}
+
+$(()=>{
+    CoreUI.init;
+});

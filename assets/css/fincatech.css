@@ -1,0 +1,35 @@
+.card-dashboard {
+  min-height: 170px;
+  border-radius: 15px;
+  background: #ededed;
+  -webkit-box-shadow: 20px 20px 60px #c9c9c9,  -20px -20px 60px #ffffff;
+          box-shadow: 20px 20px 60px #c9c9c9,  -20px -20px 60px #ffffff;
+}
+
+.icono-marcaagua {
+  position: absolute;
+  opacity: 0.2;
+  display: block;
+  right: 15px;
+  bottom: 15px;
+}
+
+.card-dashboard h1 {
+  font-size: 40px !important;
+  font-weight: 500;
+}
+
+.card .card-title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.card {
+  border-radius: 15px;
+}
+
+.shadow-neumorphic {
+  box-shadow: 20px 20px 60px #c9c9c9, -20px -20px 60px #ffffff;
+  -webkit-box-shadow: 20px 20px 60px #c9c9c9, -20px -20px 60px #ffffff;
+}
+/*# sourceMappingURL=fincatech.css.map */
