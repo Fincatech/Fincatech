@@ -12,3 +12,4 @@ define("DELETE_FISICO", "F");
 define("RELACION_INSIDE", "INS");
 define("RELACION_OUTSIDE", "OUT");
 define('RELACION_INVERSA', 'INV');
+define('RELACION_CUSTOM', "CUSTOM");

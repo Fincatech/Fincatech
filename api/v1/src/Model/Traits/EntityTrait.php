@@ -73,6 +73,19 @@ trait EntityTrait{
         return $this->entityData;
     }
 
+    /**
+     * Obtiene una entidad cualquiera mediante el par campo-valor indicado en los parámetros
+     * @param $entity String. Nombre de la entidad
+     * @param $field String. Nombre del campo que se va a utilizar para la consulta
+     * @param $value String. Valor que se va a utilizar para la búsqueda
+     */
+    public function getSingleEntityByField($entity, $field, $value)
+    {
+        $resultData = $this->repositorio->queryRaw("select * from $entity where $field = $value");
+        $this->execute(false);
+        return $this->entityData;    
+    }
+
     /** Devuelve el tipo de eliminación de la entidad principal */
     public function getTipoEliminacionEntidadPrincipal()
     {
@@ -99,7 +112,8 @@ trait EntityTrait{
                    foreach($this->entityRelations as $relacion)
                    {
                        $valor = $this->entityData[$this->mainEntity][$x][$relacion->targetColumn];
-                       
+                       $relationQuery = null;
+
                        //  Generamos la query para la relación y nos traemos los datos contra la entidad principal
                        //  Comprobamos primero el tipo de relación, si es desde la entidad principal hacia fuera o a la inversa
                        switch($relacion->relationType)
@@ -132,29 +146,54 @@ trait EntityTrait{
                                break;
                            case RELACION_INVERSA:
                                //  INVERSA
-                               $relationQuery = "
-                               select 
-                                   rel.* 
-                               from 
-                                   " . $relacion->table . " rel
-                               where 
-                                   rel." . $relacion->targetColumn . " = " . $this->entityData[$this->mainEntity][$x][$relacion->sourceColumn];
+                               if ( !is_null($this->entityData[$this->mainEntity][$x][$relacion->sourceColumn]) && $this->entityData[$this->mainEntity][$x][$relacion->sourceColumn] != "")
+                               {
+                                    $relationQuery = "
+                                    select 
+                                        rel.* 
+                                    from 
+                                        " . $relacion->table . " rel
+                                    where 
+                                        rel." . $relacion->targetColumn . " = " . $this->entityData[$this->mainEntity][$x][$relacion->sourceColumn];
+                               }
 
                                break;
+                            //  TODO se utiliza para poder especificar los alias para salir del estándar
+                            case RELACION_CUSTOM:
+                                if ( !is_null($this->entityData[$this->mainEntity][$x][$relacion->sourceColumn]) && $this->entityData[$this->mainEntity][$x][$relacion->sourceColumn] != "")
+                                {
+                                    $relationQuery = "
+                                    select 
+                                        rel.* 
+                                    from 
+                                        " . $relacion->table . " rel
+                                    where 
+                                        rel." . $relacion->targetColumn . " = " . $this->entityData[$this->mainEntity][$x][$relacion->sourceColumn];
+                                }
+                                break;
                        }
 
                        if($relacion->relationType != RELACION_INVERSA)
                            $relationQuery .= $this->getFormatedKeyValue($relacion->fieldType, $valor);
 
+
+                       //   Ejecutamos la consulta
+                       if( !is_null($relationQuery) )
+                       {
+                           $resultado = $this->repositorio->queryRaw($relationQuery);
+                       }else{
+                           $resultado = null;
+                       }
+
                        if(!$deb)
                        {
-                           $this->entityData[$this->mainEntity][$x][$relacion->table] = $this->mapMysqliResultsToObject($this->repositorio->queryRaw($relationQuery));
+                          // echo $relationQuery . '<br>';
+                          $this->entityData[$this->mainEntity][$x][$relacion->table] = $this->mapMysqliResultsToObject( $resultado );
                        }else{
                            echo $relationQuery . '<br>';
                        }
 
                    }
-
 
                }
 

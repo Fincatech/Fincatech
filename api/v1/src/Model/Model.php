@@ -2,6 +2,7 @@
 
 namespace HappySoftware\Model;
 
+use Fincatech\Controller\FrontController;
 use HappySoftware\Controller\HelperController;
 use HappySoftware\Controller\Traits\ConfigTrait;
 
@@ -19,7 +20,7 @@ use HappySoftware\Model\Traits\TableTrait;
 use Fincatech\Model\UsuariosModel;
 use HappySoftware\Entity\DatabaseHelper\Relations;
 
-class Model{
+class Model extends FrontController{
     
     use ConfigTrait, CrudTrait, DatabaseTrait, EntityTrait, SchemaTrait, TableTrait, UtilsTrait;
 
@@ -82,7 +83,7 @@ class Model{
     /**
      * Inicializa el modelo
      */
-    protected function InitModel($entity = null, $params = null, $tablasSchema = null)
+    public function InitModel($entity = null, $params = null, $tablasSchema = null)
     {
 
         global $database;
