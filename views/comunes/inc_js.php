@@ -10,11 +10,12 @@
 <!-- DATATABLES -->
 <link rel="stylesheet" type="text/css" href="<?php echo ASSETS_JS; ?>vendor/datatables/datatables.min.css">
 <script src="<?php echo ASSETS_JS; ?>vendor/datatables/datatables.js"></script>
+<script src="<?php echo ASSETS_JS; ?>vendor/moment/moment.js"></script>
 
 
 <!-- FINCATECH APP COMPONENTS -->
-<script type="text/javascript" src="<?php echo ASSETS_JS; ?>api.js"></script>
-<script type="text/javascript" src="<?php echo ASSETS_JS; ?>core.js"></script>
-<script type="text/javascript" src="<?php echo ASSETS_JS; ?>coreui.js"></script>
+<script type="text/javascript" src="<?php echo ASSETS_JS; ?>api.js?v=<?php echo time(); ?>"></script>
+<script type="text/javascript" src="<?php echo ASSETS_JS; ?>core.js?v=<?php echo time(); ?>"></script>
+<script type="text/javascript" src="<?php echo ASSETS_JS; ?>coreui.js?v=<?php echo time(); ?>"></script>
 
 <script type="text/javascript" src="<?php echo ASSETS_JS; ?>app.js"></script>

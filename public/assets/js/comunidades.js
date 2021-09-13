@@ -3,10 +3,20 @@ let comunidadesCore = {
     comunidades: Object(),
     comunidad: Object(),
 
-    init: function()
+    init: async function()
     {
         //  Bindeamos los eventos de los diferentes botones de comunidades
         this.events();
+
+        //  Comprobamos si se está cargando el listado
+        if(core.actionModel == "list" && core.model.toLowerCase() == "comunidad")
+        {
+
+            //  Recuperamos el listado de comunidades
+            await comunidadesCore.listadoDashboard();
+            await comunidadesCore.renderMenuLateral();
+        }
+
     },
 
     // Gestión de eventos
@@ -99,24 +109,48 @@ let comunidadesCore = {
      */
     renderTabla: async function()
     {
-        if($('#listadoComunidades').length)
+        if($('#listadoComunidad').length)
         {
             //  Cargamos el listado de comunidades
             CoreUI.tableData.init();
-            CoreUI.tableData.addColumn("codigo");
-            CoreUI.tableData.addColumn("nombre");
-                var html = '<a href="mailto:data[emailcontacto]" class="pl-1 pr-1">data[emailcontacto]</a>';
-            CoreUI.tableData.addColumn(null, html);
-            CoreUI.tableData.addColumn("telefono");
-            CoreUI.tableData.addColumn("nombre");
-            CoreUI.tableData.addColumn("nombre");
-            CoreUI.tableData.addColumn("nombre");
+            //  Código
+            CoreUI.tableData.addColumn("codigo","COD");
+            //  Nombre
+            CoreUI.tableData.addColumn("nombre", "NOMBRE");
+
+            //  Administrador
+                var html = `<a href="${baseURL}administrador/data:usuarioId$" class="pl-1 pr-1">data:usuario.nombre$</a>`;
+                CoreUI.tableData.addColumn(null, "ADMINISTRADOR", html);
+
+            //  Email
+                var html = '<a href="mailto:data:emailcontacto$" class="pl-1 pr-1">data:emailcontacto$</a>';
+                CoreUI.tableData.addColumn(null, "EMAIL", html);
+
+            //  Teléfono
+            CoreUI.tableData.addColumn("telefono", "TELEFONO");
+
+            //  Documentos pendientes de subir
+            CoreUI.tableData.addColumn("nombre", "doc pend. de subir");
+
+            //  Pendientes de verificar
+            CoreUI.tableData.addColumn("nombre", "doc pend. de verificar");
+
+            //  Fecha de alta
+                var html = 'data:created$';
+                CoreUI.tableData.addColumn(null, "Fecha alta", html);
+
+            // Estado
+                var html = 'data:estado$';
+                CoreUI.tableData.addColumn(null, "Estado", html);
+
             //  Columna de acciones
-                var html = '<a href="javascript:void(0);" class="btnVerComunidad pl-1 pr-1" data-id="data[id]" data-nombre="data[nombre]"><i data-feather="eye" class="text-info"></i></a>';
-                    html += '<a href="comunidad/data[id]" class="btnEditarComunidad pl-1 pr-1" data-id="data[id]" data-nombre="data[nombre]"><i data-feather="edit" class="text-success"></i></a>';
-                    html += '<a href="javascript:void(0);" class="btnEliminarComunidad pl-1 pr-1" data-id="data[id]" data-nombre="data[nombre]"><i data-feather="trash-2" class="text-danger"></i>';
-                CoreUI.tableData.addColumn(null, html);
-            CoreUI.tableData.render("listadoComunidades", "Comunidad", "comunidad/list");
+                var html = '<ul class="nav justify-content-center">';
+                    html += '<li class="nav-item"><a href="javascript:void(0);" class="btnVerComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="eye" class="text-info img-fluid"></i></a></li>';
+                    html += `<li class="nav-item"><a href="${baseURL}comunidad/data:id$" class="btnEditarComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid"></i></a></li>`;
+                    html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid"></i></li></ul>';
+                CoreUI.tableData.addColumn(null, "", html);
+
+            CoreUI.tableData.render("listadoComunidad", "Comunidad", "comunidad/list");
         }
 
     },
@@ -124,7 +158,6 @@ let comunidadesCore = {
     /** Recupera el listado de comunidades en el dashboard */
     listadoDashboard: async function()
     {
-
         await comunidadesCore.getAll().then(async (data)=>{
                $('.statscomunidades .total').html(comunidadesCore.comunidades.total);
                this.renderTabla();
@@ -164,4 +197,4 @@ let comunidadesCore = {
 
 $(()=>{
     comunidadesCore.init();
-})
+});

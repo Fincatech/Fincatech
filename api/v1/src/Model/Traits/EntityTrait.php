@@ -86,6 +86,13 @@ trait EntityTrait{
         return $this->entityData;    
     }
 
+    public function getEntityByField($entity, $field, $value)
+    {
+        $this->queryToExecute = "select * from $entity where $field = $value";
+        $this->execute(false);
+        return $this->entityData;    
+    }
+
     /** Devuelve el tipo de eliminación de la entidad principal */
     public function getTipoEliminacionEntidadPrincipal()
     {

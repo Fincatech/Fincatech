@@ -2,6 +2,7 @@
 
 namespace Fincatech\Controller;
 
+// Sustituir Model por el nombre del modelo real. Ej: UsuarioModel
 use Fincatech\Model\Model;
 
 class ExampleController extends FrontController{

@@ -28,13 +28,38 @@ class MainController{
         return $this->userRol;
     }
 
+    /** Obtiene la url a la que debe dirigir */
+    public function composeURLController($controllerName)
+    {
+        $urlDestino = $controllerName;
+        //$urlDestino = $this->getController();
+        return $urlDestino;
+
+    }
+
+    public function getAction()
+    {
+        return $this->controllerAction;
+    }
+
+    public function getId()
+    {
+        return $this->_id;
+    }
+
+    /**
+     * Devuelve el nombre del controlador
+     */
     public function getController()
     {
         return $this->controllerName;
     }
+
+    /** Establece el nombre del controlador, la acción y el ID */
     public function setController($value)
     {
         $controllerInfo = explode("/", $value);
+
         //  El primer parámetro es el nombre del controlador
         $this->controllerName = $controllerInfo[0];
 
@@ -45,13 +70,17 @@ class MainController{
             if(is_numeric($controllerInfo[1]))
             {
                 $this->_id = $controllerInfo[1];
+                $this->controllerAction = "get";
             }else{
                 $this->_id = null;
                 $this->controllerAction = $controllerInfo[1];
             }
+        }else{
+            //  Cargamos el listado correspondiente siempre que no sea el dashboard
+            $this->controllerAction = "list";
         }
 
-        $this->controllerName = $value;
+        // $this->controllerName = $value;
         return $this;
 
     }
@@ -59,16 +88,16 @@ class MainController{
     public function Run()
     {
         $this->setController( $_GET['route'] );
-        
+        // die('Acción: ' . $this->controllerAction);
         //  Comprobamos la seguridad
         $resultValidation = $this->checkSecurity();
         $userData = $resultValidation['data']->userData;
+
         if($resultValidation['status'] === true)
         {
             $this->userRol = $userData->role;
             $this->getController();
             $this->InitView();
-            //$this->renderView();
             //die('Tiene acceso');
         }else{
             die('no tiene acceso');

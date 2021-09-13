@@ -53,18 +53,18 @@ class Comunidad extends EntityHelper{
         //     'relationType' => RELACION_INVERSA
         // ]);
 
-        // //  Entidad comunidad
-        // $this->relations[] = $this->addRelation([
-        //     'table' => 'comunidad',
-        //     //  Columna de la entidad que se está relacionando con la entidad principal
-        //     'sourceColumn' =>'usuarioId',
-        //     //  Columna de la entidad principal con la que se va a relacionar
-        //     'targetColumn' => 'id',
-        //     'fieldType' => 'int',
-        //     'deleteMode' => DELETE_FISICO,
-        //     //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
-        //     'relationType' => RELACION_OUTSIDE
-        // ]);
+        //  Entidad Usuario
+        $this->relations[] = $this->addRelation([
+            'table' => 'usuario',
+            //  Columna de la entidad que se está relacionando con la entidad principal
+            'sourceColumn' =>'usuarioId',
+            //  Columna de la entidad principal con la que se va a relacionar
+            'targetColumn' => 'id',
+            'fieldType' => 'int',
+            'readOnly' => true,
+            //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
+            'relationType' => RELACION_INVERSA
+        ]);
 
     }
 

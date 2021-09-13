@@ -47,6 +47,21 @@ class FrontController{
     /**
      * Instancia un controller por su nombre dentro de la variable context del Front Controller
      */
+    public function InitController($controllerName, $params = null)
+    {
+        $controllerName = ucfirst($controllerName).'Controller';
+        $controllerInstance = __NAMESPACE__ . '\\'. $controllerName;
+
+        //  Incluimos el fichero
+        include(ABSPATH.'src/Controller/'.$controllerName.'.php');
+
+        //  Instanciamos el controller
+        $this->$controllerName = new $controllerInstance($params);
+    }
+
+    /**
+     * Instancia un controller por su nombre dentro de la variable context del Front Controller
+     */
     private function InstantiateController($controllerName, $params = null)
     {
         $controllerName = ucfirst($controllerName).'Controller';

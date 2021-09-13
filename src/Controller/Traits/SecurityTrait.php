@@ -46,12 +46,22 @@ trait SecurityTrait{
                 'id' => 1,
                 'login' => 'admin',
                 'email' => 'admin@fincatech.es',
-                'role' => 'ROLE_ADMINFINCAS'
+                'role' => 'ROLE_SUDO'
             ]
         );        
 
         return $tokenContent;
 
     }
+
+    /*
+        ROLE_SUDO
+        ROLE_ADMIN
+        ROLE_DPD
+        ROLE_REVDOC
+        ROLE_ADMINFINCAS
+        ROLE_CONTRATISTA
+        ROLE_EMPLEADO
+    */
 
 }

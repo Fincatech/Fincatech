@@ -17,6 +17,7 @@ class NotasInformativasModel extends \HappySoftware\Model\Model{
 
     public function __construct($params = null)
     {
+    
         //  Inicializamos la entidad
         $this->InitEntity( $this->entidad );
 

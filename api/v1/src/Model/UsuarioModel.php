@@ -25,6 +25,13 @@ class UsuarioModel extends \HappySoftware\Model\Model{
 
     }
 
+    public function ListByRolId($rolId)
+    {
+        $datos = parent::getEntityByField("Usuario", "rolId", $rolId);
+        $datos['total'] = count($datos["Usuario"]);
+        return $datos;
+    }
+
     // /** Recupera todos los registros */
     // public function List($params = null)
     // {

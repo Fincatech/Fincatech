@@ -15,6 +15,6 @@
 
 </head>
 
-<body>
+<body hs-model="<?php echo ucfirst($App->getController()) ?>" hs-action="<?php echo $App->getAction() ?>" hs-model-id="<?php echo $App->getId(); ?>">
 
 	<div class="wrapper">

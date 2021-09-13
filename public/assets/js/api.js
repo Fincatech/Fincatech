@@ -5,9 +5,8 @@ let apiFincatech =
 
     init: function()
     {
-        let _this = this;
-        _this.baseUrlEndpoint = config.baseURLEndpoint;
-        console.log(apiFincatech.baseUrlEndpoint);
+        apiFincatech.baseUrlEndpoint = config.baseURLEndpoint;
+        // console.log(apiFincatech.baseUrlEndpoint);
     },
 
     procesarError: function(mensaje)

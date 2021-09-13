@@ -47,6 +47,28 @@ trait UtilsTrait{
         }
     }
 
+    protected function filterResults($datos, $entity, $key, $value)
+    {
+
+        if(is_array($datos))
+        {  
+            $x = 0;
+            foreach ($datos[$entity] as $index => $object) 
+            {
+                if($object[$key] != $value)
+                {
+                    unset($datos[$entity][$index]);
+                    // array_splice($datos, $x);
+                }
+                $x++;
+            }
+        }
+        $datosTmp = $datos[$entity];
+        // $datos[$entity] = [];
+        // $datos[$entity] = [$datosTmp];
+        return $datos;
+    }
+
     /** Convierte los resultados devueltos por la conexión MySQLi a un objeto
      * @param $results MySQLi Object. Conjunto de registros que se va a mapear
      * @return Array Array asociativo con los resultados obtenidos. Null si está vacío el conjunto de resultados

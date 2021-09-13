@@ -1,3 +1,58 @@
+@charset "UTF-8";
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css");
+/* TABLA DE LISTDOS */
+.dataTable {
+  border: 1px solid #afafaf;
+  border-radius: 10px;
+}
+
+.dataTables_length select {
+  border-radius: 10px;
+}
+
+.dataTables_length {
+  font-size: 12px;
+  text-transform: uppercase;
+  padding-left: 15px;
+}
+
+.dataTables_wrapper div.dataTables_info {
+  font-size: 12px;
+  padding-left: 5px;
+  text-transform: uppercase;
+}
+
+table .tbody td {
+  font-family: 'Quicksand';
+}
+
+.dataTables_paginate .previous a {
+  border-radius: 50px 0px 0px 50px !important;
+}
+
+.dataTables_paginate a {
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.dataTables_wrapper .row:first-child {
+  margin-bottom: 15px;
+}
+
+.dataTable thead {
+  text-transform: uppercase;
+  font-family: "Dosis";
+  font-size: 14px;
+}
+
+table td {
+  font-weight: 300;
+}
+
+a:hover {
+  text-decoration: none !important;
+}
+
 .card-dashboard {
   min-height: 170px;
   border-radius: 15px;
@@ -21,7 +76,8 @@
 
 .card .card-title {
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 700 !important;
+  font-family: "Dosis";
 }
 
 .card {
@@ -29,7 +85,141 @@
 }
 
 .shadow-neumorphic {
-  box-shadow: 10px 10px 40px #c9c9c9, -10px -10px 40px #ffffff;
-  -webkit-box-shadow: 10px 10px 40px #c9c9c9, -10px -10px 40px #ffffff;
+  -webkit-box-shadow: 4px 4px 10px #c9c9c9, -4px -4px 10px #ffffff;
+  box-shadow: 4px 4px 10px #c9c9c9, -4px -4px 10px #ffffff;
+}
+
+.icono-menu.activo * {
+  color: white !important;
+  font-weight: 700 !important;
+}
+
+/** Iconos de menú */
+.icono-boton-menu {
+  height: 30px;
+}
+
+.icono-menu .titulo {
+  font-size: 14px;
+}
+
+.icono-menu .total {
+  font-size: 12px;
+}
+
+.icono-menu {
+  cursor: pointer;
+  min-height: initial;
+  -webkit-transition: all 400ms ease-in-out;
+  transition: all 400ms ease-in-out;
+  -webkit-box-shadow: -4px -4px 10px #e6e6e6, 4px 4px 10px #e6e6e6;
+          box-shadow: -4px -4px 10px #e6e6e6, 4px 4px 10px #e6e6e6;
+  border: 1px solid #e0e0e0 !important;
+}
+
+.icono-menu:hover {
+  -webkit-transform: scale(0.9);
+          transform: scale(0.9);
+}
+
+.icono-menu.activo {
+  border: 4px solid #ffffff !important;
+  background: #a5dc86;
+}
+
+.start-100 {
+  left: 100% !important;
+}
+
+.space-between {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.content {
+  padding: 15px !important;
+}
+
+.card-dashboard.icono-menu {
+  max-height: 100px;
+  min-height: 75px;
+}
+
+/** Formularios */
+.form-data .input-group input {
+  border-left: 0;
+}
+
+.form-data .input-group-text {
+  border-radius: 10px 0px 0px 10px;
+  border-color: #f9f9f9 !important;
+  border-width: 0px !important;
+  z-index: 1;
+  border-right: 0 !important;
+  background: white !important;
+}
+
+.form-data input[type="text"] {
+  -webkit-box-shadow: inset 4px 4px 10px #dadada;
+  box-shadow: inset 4px 4px 10px #dadada;
+  border-color: white !important;
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+.form-data label {
+  text-transform: uppercase;
+  padding-bottom: 5px;
+  color: #757575;
+}
+
+label {
+  display: inline-block;
+}
+
+/** Tabla listado **/
+td.p-0.text-center li {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+td.p-0.text-center {
+  width: 90px;
+}
+
+.btn.shadow:hover {
+  -webkit-transform: scale(0.95);
+          transform: scale(0.95);
+  -webkit-box-shadow: -2px 1px 11px 0px #565656 !important;
+          box-shadow: -2px 1px 11px 0px #565656 !important;
+  border: 1px solid white;
+  border-radius: 50rem !important;
+}
+
+.btn.shadow {
+  -webkit-transition: all 350ms ease-in;
+  transition: all 350ms ease-in;
+  text-transform: uppercase;
+}
+
+.shadow-inset {
+  -webkit-box-shadow: inset 4px 4px 10px #dadada;
+  box-shadow: inset 4px 4px 10px #dadada;
+}
+
+/** Listado general **/
+.card .card-header.headerListado {
+  -webkit-box-shadow: 4px 4px 20px lightgrey;
+          box-shadow: 4px 4px 20px lightgrey;
+  margin-bottom: 25px;
+  border-radius: 10px 10px 0px 0px !important;
 }
 /*# sourceMappingURL=fincatech.css.map */

@@ -61,6 +61,7 @@ class Usuario extends EntityHelper{
             //  Columna de la entidad principal con la que se va a relacionar
             'targetColumn' => 'id',
             'fieldType' => 'int',
+            'readOnly' => true,
             'deleteMode' => DELETE_FISICO,
             //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
             'relationType' => RELACION_OUTSIDE

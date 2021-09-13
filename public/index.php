@@ -1,9 +1,9 @@
 <?php
     define( 'ABSPATH', dirname(dirname( __FILE__ )) . '/' );
 
-    define('PROTOCOL',(!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS'] == 'on')) ? 'https://' : 'http://',true);
+    define('PROTOCOL',(!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS'] == 'on')) ? 'https://' : 'http://');
     define('DOMAIN',$_SERVER['HTTP_HOST']);
-    define('ROOT_URL', preg_replace("/\/$/",'',PROTOCOL.DOMAIN.str_replace(array('\\',"index.php","index.html"), '', dirname(htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES))),1).'/',true);// Remove backslashes for Windows compatibility
+    define('ROOT_URL', preg_replace("/\/$/",'',PROTOCOL.DOMAIN.str_replace(array('\\',"index.php","index.html"), '', dirname(htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES))),1).'/');// Remove backslashes for Windows compatibility
 
 //  Cargamos composer y sus dependencias
     require_once(ABSPATH . "vendor/autoload.php");

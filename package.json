@@ -6,12 +6,15 @@
   "author": "Óscar <oscar@happysoftware.es>",
   "license": "MIT",
   "dependencies": {
+    "bootstrap-icons": "^1.5.0",
+    "bootstrap-select": "^1.13.18",
     "datatables.net-bs5": "^1.10.25",
     "datatables.net-buttons-bs5": "^1.7.1",
     "datatables.net-responsive-bs5": "^2.2.9",
     "izimodal": "^1.5.1",
     "jquery": "^3.6.0",
     "jszip": "^3.7.1",
+    "moment": "^2.29.1",
     "pdfmake": "^0.2.2",
     "sweetalert2": "^11.0.11"
   }

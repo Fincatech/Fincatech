@@ -68,6 +68,7 @@ trait CrudTrait{
      */
     public function Delete($id, $entityObject = null)
     {
+
         //$moveToHistorial = $this->getEntity()->tipoEliminacion == HIS
         $this->getRepositorio()->deleteSingle($this->mainEntity, $id, $this->getEntity()->moveToHistorial, $this->getEntity()->primaryKey, true);
 

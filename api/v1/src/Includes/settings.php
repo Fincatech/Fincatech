@@ -5,6 +5,8 @@
 // Configuración general
 global $appSettings;
 
+$appSettings["env"] = [];
+
 $appSettings = [
     'env' => "dev", // Admite: "dev" para desarrollo o "prod" para producción
     //  Configuración auxiliar para la base de datos

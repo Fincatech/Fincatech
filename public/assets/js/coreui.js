@@ -1,3 +1,5 @@
+// const { ajaxPrefilter } = require("jquery");
+
 let CoreUI = {
 
     init: function(){
@@ -97,10 +99,10 @@ let CoreUI = {
         },  
         
         /** Extrae el campo que se va a mapear */
-        extractFields: function(valor, data)
+        extractFields: function(valor, datos)
         {
-            let inicioPatron = "data[";
-            let finalPatron = "]";
+            let inicioPatron = "data:";
+            let finalPatron = "$";
             var posInicial = 0;
             
             posInicial = valor.indexOf(inicioPatron);
@@ -109,32 +111,70 @@ let CoreUI = {
             {
                 if(posInicial >= 0)
                 {
+
                     //  Encontramos el cierre
-                    posFinal = valor.indexOf(finalPatron, posInicial + 1);
+                    posFinal = valor.indexOf(finalPatron, posInicial + inicioPatron.length + 1);
 
                     if(posFinal > 0)
                     {
+
                         campo = valor.substring(posInicial + inicioPatron.length, posFinal);
+                        // console.log('Campo: ' + campo);
+
+                        //  Comprobamos si es una subentidad buscando el .
+                        if(campo.indexOf(".") > 0)
+                        {
+                            definicion = campo.split(".");
+                            valorCampo = datos[ definicion[0] ][0]
+                            valorCampo = valorCampo[definicion[1]];
+                        }else{
+
+                            valorCampo = datos[campo];
+                            switch(campo)
+                            {
+                                case "created":
+                                   valorCampo = moment(valorCampo).locale('es').format('L');
+                                   break;
+                                case "estado":
+                                    switch(valorCampo)
+                                    {
+                                        case "H":
+                                            valorCampo = '<span class="badge rounded-pill bg-warning d-block pt-2 pb-2">Histórico</span>';
+                                            break;
+                                        case "A":
+                                            valorCampo = '<span class="badge rounded-pill bg-success d-block pt-2 pb-2">Alta</span>';
+                                            break;
+                                        case "B":
+                                            valorCampo = '<span class="badge rounded-pill bg-danger d-block pt-2 pb-2">Baja</span>';
+                                            break;
+
+                                    }
+                                    break;
+                            }
+                        }
+
+
                         var find = inicioPatron + campo + finalPatron;
-                        var re = new RegExp(find, 'g');
-                        //valor = valor.replace(re, data[`${campo}`]);
-                        valor = valor.replace(find, data[`${campo}`]);
-                       // console.log(valor);
+                        // console.log("Valor obtenido: " + valorCampo);
+                        valor = valor.replace(find, valorCampo);
+                        // console.log("Reemplazo: " + valor);
                     }
                 }
-                posInicial = valor.indexOf(inicioPatron, posInicial + 1);
+                posInicial = valor.indexOf(inicioPatron, posInicial  + inicioPatron.length + 1);
             }
-            //console.log(valor);
+
+            // console.log("");
             return valor;
         },
 
         /** Añade la definición de una columna */
-        addColumn: function(nombre, renderHTML)
+        addColumn: function(nombre, titulo, renderHTML )
         {
+
             var columna = {};
             if(renderHTML !== undefined && renderHTML.length > 0)
             {
-                columna = {"data": null,
+                columna = {"title": titulo, "data": null,
                     render: function(data, type, row, meta){
                         html = renderHTML;
                         field = "codigo";
@@ -145,7 +185,7 @@ let CoreUI = {
                     }
                 };
             }else{
-                columna = {"data": nombre, "render":null};
+                columna = {"data": nombre, "render":null, "title":titulo};
             }
 
             this.columns.push(columna);
@@ -154,6 +194,7 @@ let CoreUI = {
         /** Renderiza la tabla */
         render: function(id, entity, endpoint, allColumns)
         {
+            // console.log(this.columns.length);
             CoreUI.tableData.init();
             if(allColumns === true)
             {
@@ -170,7 +211,11 @@ let CoreUI = {
                     "url": config.baseURLEndpoint + endpoint,
                     "dataSrc": "data." + entity 
                 },
-                "columns": this.columns,
+                "columns": this.columns,  
+                "columnDefs": [{
+                    "targets": this.columns.length -1,
+                    "className": "p-0 text-center"
+                }],
                 "drawCallback": function(settings){
                     feather.replace();
                 }
