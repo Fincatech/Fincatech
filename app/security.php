@@ -6,23 +6,24 @@ define("JWT_SECRET_KEY", 'U_97$5TwNA3N8$qYV4vKK_#k');
 
 define("security", [
         "ROLE_SUDO"=>[
-            "dashboard"=>"sudo",
+            "folder"=>"sudo",
             "titulo" => "Súper Admin",
             "menulateral"=> false,
             "js"=>[
                 "comunidades",
                 "administrador",
                 "usuario",
+                "spa",
                 "sudo"
             ]            
         ],
         "ROLE_ADMIN"=>[
-            "dashboard"=>"admin",
+            "folder"=>"admin",
             "titulo" => "Admin",
             "menulateral"=> false
         ],
         "ROLE_DPD"=>[
-            "dashboard"=>"dpd",
+            "folder"=>"dpd",
             "titulo" => "Control documental DPD",
             "menulateral"=> false,
             "js"=>[
@@ -32,12 +33,12 @@ define("security", [
             ] 
         ],
         "ROLE_REVDOC"=>[
-            "dashboard"=>"revdoc",
+            "folder"=>"revdoc",
             "titulo" => "Revisión documental",
             "menulateral"=> false
         ],
         "ROLE_ADMINFINCAS"=>[
-            "dashboard"=>"adminfincas",
+            "folder"=>"adminfincas",
             "titulo" => "",
             "menulateral"=> true,
             "js"=>[
@@ -46,10 +47,10 @@ define("security", [
             ]
         ],
         "ROLE_CONTRATISTA"=>[
-            "dashboard"=>"contratista"
+            "folder"=>"contratista"
         ],
         "ROLE_EMPLEADO"=>[
-            "dashboard"=>"empleado",
+            "folder"=>"empleado",
             "menulateral"=> false
         ]
     ]

@@ -13,3 +13,6 @@ define("RELACION_INSIDE", "INS");
 define("RELACION_OUTSIDE", "OUT");
 define('RELACION_INVERSA', 'INV');
 define('RELACION_CUSTOM', "CUSTOM");
+
+define("ORDER_BY_ASC", "ASC");
+define("ORDER_BY_DESC", "DESC");

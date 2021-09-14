@@ -46,7 +46,7 @@ class UsuarioController extends FrontController{
     }
 
     /** Devuelve la lista de administradores de fincas */
-    public function ListAdministradoresFincas()
+    public function ListAdministradoresFincas($params = null)
     {
         $datos = $this->UsuarioModel->ListByRolId(5);
         // $datos = $this->UsuarioModel->getEntityByField("Usuario", "rolId", 5);

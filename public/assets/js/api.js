@@ -132,12 +132,25 @@ let apiFincatech =
         });
     },
 
-    post:function()
+    /** Llamada POST al restful api */
+    post: async function(endpoint, datosPost)
     {
-
+        return await $.ajax({
+            url: apiFincatech.baseUrlEndpoint + endpoint ,
+            method: "POST",
+            data: datosPost,
+            success: function(respuesta)
+            {
+                return respuesta;
+            },
+            error: function()
+            {
+                apiFincatech.procesarError('Error de endpoint');
+            }
+        });
     },
 
-    update:function()
+    update:function(endpoint, datosPut, id)
     {
 
     }

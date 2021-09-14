@@ -51,7 +51,7 @@
                         </div>
                         <div class="col-12 col-md-5">
                             <label for="provincia"><i class="bi bi-geo-alt pr-2"></i>Provincia</label>
-                            <select id="provincia" name="provincia" class="select-data custom-select form-control selectpicker" data-live-search="true" hs-entity="Provincia" hs-field="Nombre" hs-value="Id"></select>
+                            <select id="provinciaid" name="provinciaid" class="select-data custom-select data form-control selectpicker" data-live-search="true" hs-entity="Comunidad" hs-field="provinciaid" hs-list-entity="Provincia" hs-list-field="Nombre" hs-list-value="Id"></select>
                         </div>                        
                     </div> 
                     <!-- Teléfono y e-mail -->
@@ -62,7 +62,7 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="email"><i class="bi bi-envelope pr-2"></i>E-Mail</label>              
-                                <input type="text" class="form-control data text-center" id="email" name="email" placeholder="example@fincatech.es"  hs-entity="Comunidad" hs-field="email" required>
+                                <input type="text" class="form-control data text-center" id="email" name="email" placeholder="example@fincatech.es"  hs-entity="Comunidad" hs-field="emailcontacto" required>
                         </div>                       
 
                     </div>                    

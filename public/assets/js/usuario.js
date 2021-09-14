@@ -5,6 +5,7 @@ let usuarioCore = {
 
     init: async function()
     {
+
         //  Bindeamos los eventos de los diferentes botones de administradores
         usuarioCore.events();
 
@@ -100,7 +101,7 @@ let usuarioCore = {
             CoreUI.tableData.addColumn("nombre", "NOMBRE");
 
             //  Rol
-                var html = 'data:usuarioRol.rol$';
+                var html = 'data:rol.nombre$';
                 CoreUI.tableData.addColumn(null, "ROL", html);
 
             CoreUI.tableData.addColumn("cif", "CIF");

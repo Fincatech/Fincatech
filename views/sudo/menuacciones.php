@@ -13,7 +13,7 @@
                     <?php $App->renderBotonMenu("Contratos", "contrato/list", "sudo-contrato", null, "card-checklist"); ?>
                 </div>
                 <div class="col-6 col-sm-4 col-lg-3  col-xl-2 col-xxl">
-                    <?php $App->renderBotonMenu("CTs", "contrato/list", "sudo-contrato", null, "file-text"); ?>
+                    <?php $App->renderBotonMenu("Centros de Trabajo", "centrotrabajo/list", "sudo-contrato", null, "file-text"); ?>
                 </div>									
                 <div class="col-6 col-sm-4 col-lg-3  col-xl-2 col-xxl">
                     <?php $App->renderBotonMenu("Usuarios", "usuario/list", "sudo-usuario", null, "person-lines-fill"); ?>
@@ -24,6 +24,9 @@
                 <div class="col-12 col-sm-4 col-lg-3  col-xl-2 col-xxl">
                     <?php $App->renderBotonMenu("Facturación", "facturacion/list", "sudo-facturacion", null, "bank"); ?>
                 </div>      
+                <div class="col-12 col-sm-4 col-lg-3  col-xl-2 col-xxl">
+                    <?php $App->renderBotonMenu("Spa", "spa/list", "sudo-spa", null, "shield-check"); ?>
+                </div>                 
             </div>     
         </div>
     </div>

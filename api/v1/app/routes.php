@@ -146,7 +146,7 @@ return function (App $app) {
         $frontController = new $frontControllerName();
         $frontController->Init($params['controller']);
         $queryString = $request->getQueryParams();
-
+        
         $response->getBody()->write( $frontController->List($queryString) );
 
         return $response;  

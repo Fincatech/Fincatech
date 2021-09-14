@@ -7,15 +7,15 @@ use HappySoftware\Entity\EntityHelper;
 use HappySoftware\Entity\DatabaseHelper;
 use HappySoftware\Entity\DatabaseHelper\Relations;
 
-class Provincia extends EntityHelper{
+class Spa extends EntityHelper{
 
-    private $tableName = 'Provincia';
+    private $tableName = 'spa';
     public $primaryKey = 'id';
     public $tipoEliminacion = DELETE_FISICO;
     public $moveToHistorial = false;
-    public $orderBy = "nombre";
-    public $orderType = ORDER_BY_ASC;
-
+    public $orderBy = null;
+    public $orderType = null;
+    
     /**
      * @var bool
      * Indica si se puede devolver el schema

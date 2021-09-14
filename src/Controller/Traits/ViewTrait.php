@@ -49,12 +49,12 @@ trait ViewTrait{
         $includeFile = ABSPATH.'views/';
         
         //  Incluimos las opciones de menú a las que tiene acceso según su rol de usuario
-        include(ABSPATH . 'views/' . security[$this->getUserRol()]['dashboard'] . '/menuacciones.php');
+        include(ABSPATH . 'views/' . security[$this->getUserRol()]['folder'] . '/menuacciones.php');
 
         //  Comprobamos qué vista es la que hay que renderizar
         if($this->controllerName == "dashboard")
         {
-            $includeFile .= security[$this->getUserRol()]['dashboard'] . '/dashboard';
+            $includeFile .= security[$this->getUserRol()]['folder'] . '/dashboard';
         }else{
 
             switch($this->getAction())
@@ -123,7 +123,7 @@ trait ViewTrait{
         if( $this->renderMenuLateral())
         {
             //  Menú lateral
-            require_once(ABSPATH.'views/' . security[$this->getUserRol()]['dashboard'] . '/menulateral.php');
+            require_once(ABSPATH.'views/' . security[$this->getUserRol()]['folder'] . '/menulateral.php');
         }
 
         //  Contenedor de la aplicación
@@ -153,7 +153,7 @@ trait ViewTrait{
     /** Incluye un fichero JS */
     public function addJS($nombre, $version)
     {
-        echo '<script type="text/javascript" src="'. ASSETS_JS . $nombre . (APPENV=="dev" ? "" : "min") . '.js?v='.$version.'"></script>';
+        echo '<script type="text/javascript" src="'. ASSETS_JS . $nombre . (APPENV=="dev" ? "" : "min") . '.js?v='.$version.'"></script>' . PHP_EOL;
     }
 
     /** Incluye un fichero CSS */

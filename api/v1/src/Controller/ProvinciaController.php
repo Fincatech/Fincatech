@@ -42,7 +42,7 @@ class ProvinciaController extends FrontController{
 
     public function List($params = null)
     {
-       return $this->ProvinciaModel->List();
+       return $this->ProvinciaModel->List($params);
     }
 
 }

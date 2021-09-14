@@ -8,8 +8,34 @@ class EntityHelper{
 
     private $entityRelations = [];
 
+    private $_orderBy = null;
+    private $_orderType = null;
+
     public function __construct()
     {
+    }
+
+    public function setOrderType($value)
+    {
+        $this->_orderType = $value;
+        return $this;
+    }
+    public function getOrderType()
+    {
+        return $this->_orderType;
+    }
+
+    /** Establece el orden por defecto */
+    public function setOrderBy($value)
+    {
+        $this->_orderBy = $value;
+        return $this;
+    }
+
+    /** Obtiene el valor por defecto */
+    public function getOrderBy()
+    {
+        return $this->_orderBy;
     }
 
     public function InitEntity()

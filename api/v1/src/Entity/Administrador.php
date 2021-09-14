@@ -7,15 +7,15 @@ use HappySoftware\Entity\EntityHelper;
 use HappySoftware\Entity\DatabaseHelper;
 use HappySoftware\Entity\DatabaseHelper\Relations;
 
-class Comunidad extends EntityHelper{
+class Administrador extends EntityHelper{
 
-    private $tableName = 'comunidad';
+    private $tableName = 'usuario';
     public $primaryKey = 'id';
     public $tipoEliminacion = DELETE_FISICO;
-    public $moveToHistorial = false;
-
+    public $moveToHistorial = true;
     public $orderBy = "nombre";
     public $orderType = ORDER_BY_ASC;
+
 
     /**
      * @var bool
@@ -28,7 +28,6 @@ class Comunidad extends EntityHelper{
 
     public function __construct()
     {
-
         //  Inicializamos el entity helper
         $this->InitEntity();
 
@@ -40,33 +39,34 @@ class Comunidad extends EntityHelper{
     /** Establece las relaciones de entidades con esta entidad */
     private function setRelations()
     {       
-        // //  Entidad usuario_roles
-        // $this->relations[] = $this->addRelation([
-        //     'table' => 'usuarioRol',
-        //     //  Columna de la entidad que se está relacionando con la entidad principal
-        //     'sourceColumn' =>'rolId',
-        //     //  Columna de la entidad principal con la que se va a relacionar
-        //     'targetColumn' => 'id',
-        //     'fieldType' => 'int',
-        //     'canReturnSchema' => false,
-        //     'readOnly' => true,
-        //     //  Indica si se debe eliminar el registro relacionado o no
-        //     'deleteOnCascade' => false,
-        //     //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
-        //     'relationType' => RELACION_INVERSA
-        // ]);
-
-        //  Entidad Usuario
+        //  Entidad usuario_roles
         $this->relations[] = $this->addRelation([
-            'table' => 'usuario',
+            'table' => 'rol',
             //  Columna de la entidad que se está relacionando con la entidad principal
-            'sourceColumn' =>'usuarioId',
+            'sourceColumn' =>'rolid',
+            //  Columna de la entidad principal con la que se va a relacionar
+            'targetColumn' => 'id',
+            'fieldType' => 'int',
+            'canReturnSchema' => false,
+            'readOnly' => true,
+            //  Indica si se debe eliminar el registro relacionado o no
+            'deleteOnCascade' => false,
+            //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
+            'relationType' => RELACION_INVERSA
+        ]);
+
+        //  Entidad comunidad
+        $this->relations[] = $this->addRelation([
+            'table' => 'comunidad',
+            //  Columna de la entidad que se está relacionando con la entidad principal
+            'sourceColumn' =>'usuarioid',
             //  Columna de la entidad principal con la que se va a relacionar
             'targetColumn' => 'id',
             'fieldType' => 'int',
             'readOnly' => true,
+            'deleteMode' => DELETE_FISICO,
             //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
-            'relationType' => RELACION_INVERSA
+            'relationType' => RELACION_OUTSIDE
         ]);
 
     }

@@ -134,22 +134,48 @@ trait CrudTrait{
     /**
      * Obtiene todos los registros para una entidad
      */
-    public function getAll($mainAlias = null, $criteria = null)
+    public function getAll($mainAlias = null, $params = null)
     {
         // Primero nos traemos los datos de la entidad principal teniendo en cuenta los criterios de selección que pudiera tener
         $this->queryToExecute = "select * from " . $this->mainEntity . " ";
 
-        if(!is_null($criteria))
+        //  Comprobamos si hay establecido orden
+            $orderBy = (isset($params['orderby']) ? $params['orderby'] : null);
+            $orderByType = (isset($params['order']) ? $params['order'] : null);
+
+        //  Validación de propiedad del tipo de orden definido en el querystring
+        if(!is_null($orderBy) && !is_null($orderByType) )
         {
-            if(isset($criteria['start']) && isset($criteria['length']))
+            $this->queryToExecute .= " order by $orderBy $orderByType ";
+        }else{
+            //  Validación de propiedad del tipo de orden en la definición de la entidad
+            if( isset($this->entity->orderBy) )
             {
-                $this->queryToExecute .= " limit " . $criteria['start'] . "," . ($criteria['start'] + $criteria['length']);
+                if( !is_null($this->entity->orderBy) )
+                    $this->queryToExecute .= " order by " . $this->entity->orderBy . " ";
+
+                if( isset($this->entity->orderType) )
+                {
+                    $this->queryToExecute .= ( is_null($this->entity->orderType) ? "" : $this->entity->orderType);
+                }else{
+                    //  Por defecto es ASC
+                    $this->queryToExecute .= " " . ORDER_BY_ASC;
+                }
+                
             }
         }
+
+        //  Parámetros de paginación
+            $limitStart = (isset($params['start']) ? $params['start'] : null);
+            $limitLength = (isset($params['length']) ? $params['length'] : null);
+
+        if(!is_null($limitStart) && !is_null($limitLength))
+            $this->queryToExecute .= " limit " . $params['start'] . "," . ($params['start'] + $params['length']);
 
         $this->execute(true,false);
 
         // TODO: Si tiene criterios para acotar, los establecemos
+
         $this->entityData['total'] = $this->getTotalRows("select * from " . $this->mainEntity . " ");
         $this->entityData['filtered'] = $this->getTotalRows($this->queryToExecute);
         return $this->entityData;

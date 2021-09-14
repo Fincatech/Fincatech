@@ -11,9 +11,7 @@ class AdministradorController extends FrontController{
 
     public function __construct($params = null)
     {
-        $this->InitController('Usuario', $params);
         $this->InitModel('Administrador', $params);
-        $this->InitModel('Usuario', $params);
     }
 
     public function Create($entidadPrincipal, $datos)
@@ -46,7 +44,9 @@ class AdministradorController extends FrontController{
     /** Devuelve el listado de administradores */
     public function List($params = null)
     {
-        $datos = $this->UsuarioController->ListAdministradoresFincas();
+        $this->InitController('Usuario', $params);
+        $this->InitModel('Usuario', $params);
+        $datos = $this->UsuarioController->ListAdministradoresFincas($params);
         return $datos;
     }
 

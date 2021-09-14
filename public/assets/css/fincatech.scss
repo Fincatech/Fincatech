@@ -156,7 +156,8 @@ a:hover{
     background: white !important;
 }
 
-.form-data input[type="text"] {
+.form-data input[type="text"],
+.form-data input[type="password"] {
     -webkit-box-shadow: inset 4px 4px 10px #dadada;
     box-shadow: inset 4px 4px 10px #dadada;
     border-color: white !important;

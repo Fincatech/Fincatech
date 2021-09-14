@@ -5,6 +5,8 @@ let administradorCore = {
 
     init: async function()
     {
+
+        
         //  Bindeamos los eventos de los diferentes botones de administradores
         administradorCore.events();
 
@@ -13,6 +15,8 @@ let administradorCore = {
         {
             //  Recuperamos el listado de administradores
             await administradorCore.listadoDashboard();
+        }else if( core.model.toLowerCase() == "administrador" && core.actionModel != "list"){
+            core.model = "Usuario";
         }
 
     },
@@ -146,7 +150,7 @@ let administradorCore = {
             result = JSON.parse(data);
             responseStatus = result.status;
             responseData = result.data;
-            administradorCore.comunidad = responseData.Comunidad[0];
+            administradorCore.administrador = responseData.Usuario[0];
             console.log(administradorCore.comunidad);
             return administradorCore.comunidad;
         });

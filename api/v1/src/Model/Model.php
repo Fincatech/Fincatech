@@ -140,17 +140,25 @@ class Model extends FrontController{
      */
     private function execute($relations = true, $includeSchema = false)
     {
-        $resultData = $this->repositorio->queryRaw( $this->queryToExecute );
-        $this->entityData[$this->mainEntity] = [];
-        $this->entityData[$this->mainEntity] = $this->mapMysqliResultsToObject($resultData);
-        
-        //  Obtiene las relaciones de la entidad principal si las hay
-        if($relations)
-            $this->getDataRelations($includeSchema);
+        try{
 
-        if($includeSchema == true)
-            $this->getSchemaEntity();
+            $resultData = $this->repositorio->queryRaw( $this->queryToExecute );
+            // error_log("Query: " . $this->queryToExecute,0);
+// die($this->queryToExecute);
+            $this->entityData[$this->mainEntity] = [];
+        //   die('2');  
+            $this->entityData[$this->mainEntity] = $this->mapMysqliResultsToObject($resultData);
+            //  Obtiene las relaciones de la entidad principal si las hay
+            if($relations)
+                $this->getDataRelations($includeSchema);
 
+            if($includeSchema == true)
+                $this->getSchemaEntity();
+
+        }catch(Exception $ex)
+        {
+            die($ex->getMessage());
+        }
     }
 
     /** Devuelve el número total de registros de una entidad */

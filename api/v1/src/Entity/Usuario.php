@@ -13,6 +13,9 @@ class Usuario extends EntityHelper{
     public $primaryKey = 'id';
     public $tipoEliminacion = DELETE_FISICO;
     public $moveToHistorial = true;
+    public $orderBy = "nombre";
+    public $orderType = ORDER_BY_ASC;
+
 
     /**
      * @var bool
@@ -39,9 +42,9 @@ class Usuario extends EntityHelper{
     {       
         //  Entidad usuario_roles
         $this->relations[] = $this->addRelation([
-            'table' => 'usuarioRol',
+            'table' => 'rol',
             //  Columna de la entidad que se está relacionando con la entidad principal
-            'sourceColumn' =>'rolId',
+            'sourceColumn' =>'rolid',
             //  Columna de la entidad principal con la que se va a relacionar
             'targetColumn' => 'id',
             'fieldType' => 'int',
@@ -57,7 +60,7 @@ class Usuario extends EntityHelper{
         $this->relations[] = $this->addRelation([
             'table' => 'comunidad',
             //  Columna de la entidad que se está relacionando con la entidad principal
-            'sourceColumn' =>'usuarioId',
+            'sourceColumn' =>'usuarioid',
             //  Columna de la entidad principal con la que se va a relacionar
             'targetColumn' => 'id',
             'fieldType' => 'int',

@@ -13,7 +13,9 @@ class Example extends EntityHelper{
     public $primaryKey = 'id';
     public $tipoEliminacion = DELETE_FISICO;
     public $moveToHistorial = false;
-
+    public $orderBy = null;
+    public $orderType = null;
+    
     /**
      * @var bool
      * Indica si se puede devolver el schema
