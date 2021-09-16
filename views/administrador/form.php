@@ -14,6 +14,13 @@
 
                 <form class="form-data form-floating" autocomplete="off">
                     <input autocomplete="new-password" name="hidden" type="text" style="display:none;">
+                    <!-- Estado del usuario -->
+                    <div class="form-group row mb-2 justify-content-end">
+                        <div class="col-12 col-md-2 text-left">
+                            <label for="estado"><i class="bi bi-geo-alt pr-2"></i>Estado</label>
+                            <select id="estado" name="estado" class="select-data data custom-select form-control selectpicker" data-live-search="true" hs-entity="Usuario" hs-field="estado" hs-list-entity="Estado" hs-list-field="nombre" hs-list-value="sId"></select>
+                        </div>
+                    </div>                    
                     <!-- Código y CIF -->
                     <div class="form-group row mb-2">
                         <div class="col-12 col-md-2 text-left">

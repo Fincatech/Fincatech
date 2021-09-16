@@ -11,7 +11,7 @@ let spaCore = {
         //  Comprobamos si se está cargando el listado
         if(core.actionModel == "list" && core.model.toLowerCase() == "spa")
         {
-            // await spaCore.listadoDashboard();
+           await spaCore.listadoDashboard();
         }
 
     },
@@ -27,36 +27,15 @@ let spaCore = {
 
         $('body').on(core.helper.clickEventType, '.btnEliminarSpa', (evt)=>{
             evt.stopImmediatePropagation();
-            spaCore.eliminarSpa( $(evt.currentTarget).attr('data-id'), $(evt.currentTarget).attr('data-nombre') );
+            spaCore.eliminar( $(evt.currentTarget).attr('data-id'), $(evt.currentTarget).attr('data-nombre') );
         });
 
     },
 
     /** Elimina una comunidad previa confirmación */
-    eliminarSpa: function(id, nombre)
+    eliminar: function(id, nombre)
     {
-        Swal.fire({
-            title:`¿Desea eliminar el spa:<br>${nombre}?`,
-            text: "Se va a eliminar el SPA y toda la información asociada",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Eliminar',
-            cancelButtonText: 'Cancelar'
-          }).then((result) => {
-            if (result.isConfirmed) {
-                //  Llamamos al endpoint de eliminar
-                apiFincatech.delete("spa", idComunidad).then((result) =>{
-                    Swal.fire(
-                        'Spa eliminado correctamente',
-                        '',
-                        'success'
-                      );
-                      $('#listadoSpa').DataTable().ajax.reload();
-                });
-            }
-        });
+        core.Modelo.Delete("spa", id, nombre, "listadoSpa");
     },
 
     /** TODO: Muestra un modal con la info de la comunidad */
@@ -73,7 +52,7 @@ let spaCore = {
             apiFincatech.getView("modals", "spa/modal_info").then((resultHTML)=>{
 
                 result = CoreUI.Utils.parse(resultHTML, spaCore.spa);
-                CoreUI.Modals.show('modalInfoSpa', result, spaCore.spa.nombre);
+                CoreUI.Modal.GetHTML('modalInfoSpa', result, spaCore.spa.nombre);
                 // Swal.fire({
                 //     title:`${spaCore.comunidad.nombre}`,
                 //     html: result,
@@ -94,16 +73,22 @@ let spaCore = {
             //  Cargamos el listado de comunidades
             CoreUI.tableData.init();
             //  Código
-            CoreUI.tableData.addColumn("codigo","COD");
+            CoreUI.tableData.addColumn("cif","CIF");
+
             //  Nombre
             CoreUI.tableData.addColumn("nombre", "NOMBRE");
 
-            //  Administrador
-                var html = `<a href="${baseURL}administrador/data:usuarioId$" class="pl-1 pr-1">data:usuario.nombre$</a>`;
-                CoreUI.tableData.addColumn(null, "ADMINISTRADOR", html);
+            //  Persona de contacto
+            CoreUI.tableData.addColumn("personacontacto", "PERSONA DE CONTACTO");
+
+            //  Localidad
+            CoreUI.tableData.addColumn("localidad", "Localidad");
+
+            //  Localidad
+            CoreUI.tableData.addColumn("provincia[0].Nombre", "Provincia");
 
             //  Email
-                var html = '<a href="mailto:data:emailcontacto$" class="pl-1 pr-1">data:emailcontacto$</a>';
+                var html = '<a href="mailto:data:email$" class="pl-1 pr-1">data:email$</a>';
                 CoreUI.tableData.addColumn(null, "EMAIL", html);
 
             //  Teléfono
@@ -120,7 +105,7 @@ let spaCore = {
                     html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarSpa d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid"></i></li></ul>';
                 CoreUI.tableData.addColumn(null, "", html);
 
-            CoreUI.tableData.render("listadoComunidad", "Comunidad", "comunidad/list");
+            CoreUI.tableData.render("listadoSpa", "Spa", "spa/list");
         }
 
     },

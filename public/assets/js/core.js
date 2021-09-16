@@ -29,19 +29,15 @@ let core =
 
     core.Events();
 
-    // if(core.actionModel == "get" || core.actionModel == "add")
-    // {
-    //   await core.Forms.init();
-    // }
-
   },
 
   Events: function()
   {
-    //  Botón de guardar
-    $("body").on(core.helper.clickEventType, ".btnSaveData", function(){
-      core.Forms.Save();
-    });
+      //  Botón de guardar
+      $("body").on(core.helper.clickEventType, ".btnSaveData", function(){
+        core.Forms.Save();
+      });
+
   },
 
   helper:
@@ -56,30 +52,6 @@ let core =
           $(el).parent().append(el);
       });
     }
-
-  },
-
-  Modal:{
-  
-    /** Muestra un modal de ok */
-    Success: function(texto)
-    {
-      Swal.fire(
-          `${texto}`,
-          '',
-          'success'
-        );    
-    },
-
-    /** Muestra un modal de error */
-    Error: function(texto)
-    {
-          Swal.fire(
-          `${texto}`,
-          '',
-          'error'
-        );  
-    },
 
   },
 
@@ -155,8 +127,8 @@ let core =
           var entidad = $(this).attr('hs-entity') ;
           var campo = $(this).attr('hs-field') ;
 
-          console.log( "Entidad: " + entidad );
-          console.log( "Field: " + campo );
+          // console.log( "Entidad: " + entidad );
+          // console.log( "Field: " + campo );
 
           var valor = core.Modelo.entity[ entidad ][0][campo];
 
@@ -197,19 +169,27 @@ let core =
           if(entity == modeloPrincipal)
           {
 
+            console.log('Map Data');
+            console.log('Acción del modelo: ' + core.actionModel + ' - ' + core.modelId);
+
             if(fieldName != "id")
               core.Forms.data[fieldName] = $(this).val();
 
           }else{
 
-            if(fieldName != "id")
-              core.Forms.data[entity][fieldName] = $(this).val();
+            // if(fieldName != "id")
+            //   core.Forms.data[entity][fieldName] = $(this).val();
 
           }
 
         });
 
-        console.log( JSON.stringify(core.Forms.data) );
+        //  Si se está actualizando se mapea el ID
+        if( core.actionModel == 'get' && core.Forms.data['id'] != '')
+        {
+          console.log("ID: " + core.modelId);
+          core.Forms.data['id'] = core.modelId;
+        }        
 
     },
 
@@ -248,51 +228,22 @@ let core =
       var idSave = $("body").attr("hs-model-id");
       var actionSave = $("body").attr("hs-action");
 
-      if(idSave != "" && actionSave == "get")
-      {
-          //  Actualización de registro
-      }
-
-      //  Creación 
-      if(idSave == "" && actionSave == "add")
-      {
         //  Reiniciamos la información a enviar
         core.Forms.data = {};
 
         //  Mapeamos los datos para poder enviar la info
         core.Forms.mapDataToSave();
 
-        await apiFincatech.post(`${entidadSave}/create`, JSON.stringify(core.Forms.data)).then(async (data) =>
+        //  Comprobamos la acción del modelo
+        switch(actionSave)
         {
-
-            var htmlOutput = "";
-            var result = JSON.parse(data);
-            responseData = result.data;
-
-            console.log('Resultado inserción: ' + responseData);
-
-            if(responseData.status.response == "ok")
-            {
-
-              var idInsercion = responseData.id;
-
-              $("body").attr("hs-action", "get");
-              $("body").attr("hs-id", idInsercion);
-
-              Modal.Success("El SPA ha sido dado de alta satisfactoriamente");
-
-            }else{
-
-              //  TODO: Ver cuál es el error en el json
-              Modal.Error("No se ha podido guardar por el siguiente motivo:<br><br>" + responseData.status.response);
-
-            }
-
-
-        });
-      }
-
-
+          case 'get':
+              core.Modelo.Update(core.model, idSave, core.Forms.data);
+              break;
+          case 'add':
+              core.Modelo.Insert(core.model, core.Forms.data );
+              break;
+        }
 
     },
 
@@ -318,7 +269,115 @@ let core =
         responseData = result.data;
         // console.log(responseData);
       });
-    }
+    },
+
+    /**
+     * Inserta un registro en la base de datos mediante restful api
+     * @param {*} entidadSave 
+     * @param {*} postData 
+     */
+    Insert: async function(entidadSave, postData)
+    {
+      await apiFincatech.post(`${entidadSave}/create`, JSON.stringify(postData)).then(async (response) =>
+      {
+
+          var responseData = JSON.parse(response);
+
+          // console.log('Resultado inserción1: ' + responseData.data);
+          // console.log('Resultado inserción2: ' + responseData.status);
+          // console.log('Result status: ' + responseData.status);
+
+          if(responseData.status['response'] == "ok")
+          {
+
+            var idInsercion = responseData.id;
+
+            $("body").attr("hs-action", "get");
+            $("body").attr("hs-model-id", idInsercion);
+
+            core.actionModel = "get";
+            core.modelId = idInsercion;
+
+            CoreUI.Modal.Success("El registro se ha creado correctamente");
+
+          }else{
+
+            //  TODO: Ver cuál es el error en el json
+            Modal.Error("No se ha podido guardar por el siguiente motivo:<br><br>" + responseData.status.response);
+
+          }
+
+      });
+    },
+
+    /**
+     * Elimina un registro de la base de datos y toda la posible información relacionada
+     * @param {*} endpoint Nombre del endpoint
+     * @param {*} id ID del registro que se va a eliminar
+     * @param {*} nombre Nombre para mostrar en el modal
+     * @param {*} nombreListadoDOM Nombre del objeto de listado
+     * @param {*} titulo (opcional) Título del modal
+     * @param {*} mensaje (opcional) Mensaje del modal
+     */
+    Delete: async function(endpoint, id, nombre, nombreListadoDOM, titulo = null, mensaje = null)
+    {
+        //  TODO: Posibilidad de personalizar título y mensaje
+        Swal.fire({
+            title:`¿Desea eliminar el registro y toda la información relacionada?`,
+            text: `${nombre}`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Eliminar',
+            cancelButtonText: 'Cancelar'
+          }).then((result) => {
+            if (result.isConfirmed) {
+                //  Llamamos al endpoint de eliminar
+                apiFincatech.delete(endpoint, id).then((result) =>{
+                    Swal.fire(
+                        'Registro eliminado correctamente',
+                        '',
+                        'success'
+                      );
+                      $(`#${nombreListadoDOM}`).DataTable().ajax.reload();
+                });
+            }
+        });
+    },
+
+    /**
+     * Actualiza el modelo de la entidad deseada
+     * @param {*} endpoint 
+     * @param {*} id 
+     * @param {*} jsonPostData 
+     */
+    Update: async function(endpoint, id, jsonPostData)
+    {
+
+        await apiFincatech.put(`${endpoint}/${id}`, JSON.stringify(jsonPostData)).then(async (response) =>
+        {
+
+            var responseData = JSON.parse(response);
+
+            // console.log('Resultado inserción1: ' + responseData.data);
+            // console.log('Resultado inserción2: ' + responseData.status);
+            // console.log('Result status: ' + responseData.status);
+
+            if(responseData.status['response'] == "ok")
+            {
+
+              CoreUI.Modal.Success("El registro se ha actualizado correctamente");
+
+            }else{
+
+              //  TODO: Ver cuál es el error en el json
+              Modal.Error("No se ha podido guardar por el siguiente motivo:<br><br>" + responseData.status.response);
+
+            }
+
+        });
+    },
 
 
   }

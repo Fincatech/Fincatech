@@ -38,35 +38,23 @@ class Spa extends EntityHelper{
 
     /** Establece las relaciones de entidades con esta entidad */
     private function setRelations()
-    {       
-        // //  Entidad usuario_roles
-        // $this->relations[] = $this->addRelation([
-        //     'table' => 'usuarioRol',
-        //     //  Columna de la entidad que se está relacionando con la entidad principal
-        //     'sourceColumn' =>'rolId',
-        //     //  Columna de la entidad principal con la que se va a relacionar
-        //     'targetColumn' => 'id',
-        //     'fieldType' => 'int',
-        //     'canReturnSchema' => false,
-        //     'readOnly' => true,
-        //     //  Indica si se debe eliminar el registro relacionado o no
-        //     'deleteOnCascade' => false,
-        //     //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
-        //     'relationType' => RELACION_INVERSA
-        // ]);
-
-        // //  Entidad comunidad
-        // $this->relations[] = $this->addRelation([
-        //     'table' => 'comunidad',
-        //     //  Columna de la entidad que se está relacionando con la entidad principal
-        //     'sourceColumn' =>'usuarioId',
-        //     //  Columna de la entidad principal con la que se va a relacionar
-        //     'targetColumn' => 'id',
-        //     'fieldType' => 'int',
-        //     'deleteMode' => DELETE_FISICO,
-        //     //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
-        //     'relationType' => RELACION_OUTSIDE
-        // ]);
+    {   
+            
+        //  Entidad provincia
+        $this->relations[] = $this->addRelation([
+            'table' => 'provincia',
+            //  Columna de la entidad que se está relacionando con la entidad principal
+            'sourceColumn' =>'provinciaid',
+            //  Columna de la entidad con la que se va a relacionar
+            'targetColumn' => 'id',
+            'fieldType' => 'int',
+            'canReturnSchema' => false,
+            'readOnly' => true,
+            //  Indica si se debe eliminar el registro relacionado o no
+            'deleteOnCascade' => false,
+            //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
+            'relationType' => RELACION_INVERSA
+        ]);
 
     }
 

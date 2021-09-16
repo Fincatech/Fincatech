@@ -498,7 +498,7 @@ class DatabaseCore {
 			}else{
 				$queryDelete .= " id=" . $id;
 			}
-die($queryDelete);
+
 			if($this->enlaceBBDD->query($queryDelete)){
 				return true;
 			}else{
@@ -702,7 +702,7 @@ die($queryDelete);
 			}
 		}		
 		$sql = "SHOW TABLE STATUS FROM " . $this->esquemaBBDD . " LIKE '" . $tabla . "'";
-		
+// die($sql);
 		$datos = $this->enlaceBBDD->query($sql);
 
 		if($datos){

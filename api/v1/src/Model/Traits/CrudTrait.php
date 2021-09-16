@@ -11,14 +11,19 @@ trait CrudTrait{
     {
         if($this->isInsertAction())
         {
+            $this->constructInsertSQL();
+            // die($this->getSQL());
             //  Ejecutamos sobre la propiedad SQL
-            $this->repositorio->queryRaw( $this->constructInsertSQL() );
+            $this->repositorio->queryRaw( $this->getSQL() );
             $data['id'] = $this->repositorio->getLastID($this->getEntidad()) - 1;
+
+            //  TODO: Debemos comprobar si hay fichero adjunto para poder realizar la subida de los ficheros y generar
+            //  los registros correspondientes en base de datos para poder actualizar la tabla de relación de ficheros
+
             return $data;
         }else{
             //  Ejecutamos sobre la propiedad SQL
             $this->repositorio->queryRaw( $this->constructUpdateSQL() );
-            //$data['id'] = $this->repositorio->getLastID($this->getEntidad());
             return [];
         }
 
@@ -30,6 +35,8 @@ trait CrudTrait{
     */
     public function Create($entidadPrincipal, $data)
     {
+        // print_r($data);
+
         $this->setEntidad($entidadPrincipal);
 
         //  Recuperamos el esquema de la entidad y sus entidades relacionadas
@@ -40,6 +47,9 @@ trait CrudTrait{
 
         //  Recuperamos todos los valores del post que hemos recibido
         $this->processJSONPostData($data);
+
+        // print_r($this->fields);
+        // die();
 
         //  Auditoría
         $this->addField("created", "now()");
@@ -52,6 +62,7 @@ trait CrudTrait{
     /** Convierte el JSON del post a un array asociativo arreglando los valores */
     private function processJSONPostData($data)
     {
+
         //  Recuperamos todos los valores del post que hemos recibido
         foreach($data as $key => $value)
         {
@@ -59,7 +70,8 @@ trait CrudTrait{
                 $value = $this->fixFieldValue($key, $value);
                 $this->addField($key, $value);
 
-        }    
+        }  
+          
     }
 
     //  CRUD METHODS
@@ -110,6 +122,7 @@ trait CrudTrait{
     {
 
         $this->setEntidad($entidadPrincipal);
+
         //  Recuperamos el esquema de la entidad y sus entidades relacionadas
         $this->getSchemaEntity();        
 

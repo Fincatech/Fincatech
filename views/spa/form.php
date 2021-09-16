@@ -22,7 +22,7 @@
                         </div>
                         <div class="col-12 col-md-4">
                             <label for="emailcontacto"><i class="bi bi-envelope pr-2"></i>E-Mail de contacto</label>              
-                            <input type="text" class="form-control data text-left" id="emailcontacto" name="emailcontacto" maxlength="255" placeholder="example@fincatech.es"  hs-entity="Spa" hs-field="emailcontacto" required>
+                            <input type="text" class="form-control data text-left" id="email" name="email" maxlength="255" placeholder="example@fincatech.es"  hs-entity="Spa" hs-field="email" required>
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="nombre"><i class="bi bi-person pr-2"></i>SPA</label>

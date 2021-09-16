@@ -150,6 +150,31 @@ trait DatabaseTrait{
         return $this;
     }
 
+    /** Devuelve el valor entre comillado según tipo */
+    private function getFormatedKeyValue($tipo, $valor)
+    {
+        $tipo = trim(strtolower($tipo));
+
+        if($tipo == "string" || $tipo == "varchar" || $tipo == "char" || $tipo == "text" ||
+            $tipo == "datetime" || $tipo == "date")
+        {
+            //  Para los campos de fecha hay que comprobar que si viene vacío o null hay que establecer la fecha de hoy
+            if(($valor == '' || $valor == null) && ($tipo == "datetime" || $tipo == "date") )
+            {
+                return "null";
+            }
+
+            return "'" . $this->getRepositorio()::PrepareDBString($valor) ."' ";
+        }else{
+            if($valor == "")
+            {
+                return "null";
+            }else{
+                return $valor;
+            }
+        }
+    }
+
     /**
      * Arregla el valor del dato para meterle comillas en el caso que sea un string ya que por el post json no lo sabemos
      */

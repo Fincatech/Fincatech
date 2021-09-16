@@ -11,7 +11,7 @@ let apiFincatech =
 
     procesarError: function(mensaje)
     {
-
+        CoreUI.Modal.Error(mensaje);
     },
 
     procesarRespuesta:function(respuesta)
@@ -21,7 +21,7 @@ let apiFincatech =
         {
             return respuesta;
         }else{
-            console.log('error de endpoint: ' + respuesta.mensaje);
+            CoreUI.Modal.error('error de endpoint: ' + respuesta.mensaje);
         }
     },
 
@@ -53,42 +53,14 @@ let apiFincatech =
 
     },
 
-    // /** Devuelve la vista solicitada con los datos que se envían por post */
-    // getView: async function(entidad, vista, datos, elementoDestino, paginacion = false, numeropagina = 0 )
-    // {
-
-    //     datosVista = {
-    //         'viewfolder': entidad,
-    //         'view' : vista,
-    //         'entidad' : datos,
-    //         'paginacion': paginacion,
-    //         'numeropagina': numeropagina
-    //     }; 
-
-    //     return await $.ajax({
-    //         url: apiFincatech.baseUrlEndpoint + 'getview',
-    //         type: "POST",
-    //         data: JSON.stringify(datosVista),
-    //         success: function(respuesta)
-    //         {
-    //             $(`${elementoDestino}`).html(respuesta);
-    //         },
-    //         error: function()
-    //         {
-    //             apiFincatech.procesarError('Error de endpoint');
-    //         }
-    //     });
-
-    // },
-
     /** Lanza una petición GET al webservice y devuelve los datos en formato JSON
      * @param endpoint String Nombre del endpoint que se va a consultar
      */
-    get: async function(endpoint)
+    get: async function(entity)
     {
         // https://es.stackoverflow.com/questions/3582/diferencias-entre-ajax-anidadas-y-promises
         return await $.ajax({
-            url: apiFincatech.baseUrlEndpoint + endpoint,
+            url: apiFincatech.baseUrlEndpoint + entity,
             success: function(respuesta)
             {
                 apiFincatech.response = respuesta.data;
@@ -103,11 +75,17 @@ let apiFincatech =
             },
             error: function()
             {
-                console.log('Error de endpoint');
+                apiFincatech.procesarError('Error de endpoint');
             }
         });
     },
 
+    /**
+     * Lanza una petición de tipo DELETE al webservice
+     * @param {*} entity Nombre de la entidad
+     * @param {*} id ID de la entidad que se quiere eliminar
+     * @returns 
+     */
     delete: async function(entity, id)
     {
         return await $.ajax({
@@ -127,17 +105,18 @@ let apiFincatech =
             },
             error: function()
             {
-                console.log('Error de endpoint');
+                apiFincatech.procesarError('Error de endpoint');
             }
         });
     },
 
     /** Llamada POST al restful api */
-    post: async function(endpoint, datosPost)
+    post: async function(entity, datosPost)
     {
         return await $.ajax({
-            url: apiFincatech.baseUrlEndpoint + endpoint ,
+            url: apiFincatech.baseUrlEndpoint + entity ,
             method: "POST",
+            contentType: "application/json; charset=utf-8",
             data: datosPost,
             success: function(respuesta)
             {
@@ -150,9 +129,28 @@ let apiFincatech =
         });
     },
 
-    update:function(endpoint, datosPut, id)
+    /**
+     * Llamada PUT al websrevice
+     * @param {*} endpoint 
+     * @param {*} datosPut 
+     * @returns 
+     */
+    put: async function(entity, datosPut)
     {
-
+        return await $.ajax({
+            url: apiFincatech.baseUrlEndpoint + entity ,
+            method: "PUT",
+            contentType: "application/json; charset=utf-8",
+            data: datosPut,
+            success: function(respuesta)
+            {
+                return respuesta;
+            },
+            error: function()
+            {
+                apiFincatech.procesarError('Error de endpoint');
+            }
+        });
     }
 
 }

@@ -155,7 +155,7 @@ class Model extends FrontController{
             if($includeSchema == true)
                 $this->getSchemaEntity();
 
-        }catch(Exception $ex)
+        }catch(\Exception $ex)
         {
             die($ex->getMessage());
         }

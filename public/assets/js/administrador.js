@@ -5,7 +5,6 @@ let administradorCore = {
 
     init: async function()
     {
-
         
         //  Bindeamos los eventos de los diferentes botones de administradores
         administradorCore.events();
@@ -40,28 +39,7 @@ let administradorCore = {
     /** Elimina una comunidad previa confirmación */
     eliminar: function(id, nombre)
     {
-        Swal.fire({
-            title:`¿Desea eliminar el administrador: <br>${nombre}?`,
-            text: "Se va a eliminar el administrador y toda la información asociada",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Eliminar',
-            cancelButtonText: 'Cancelar'
-          }).then((result) => {
-            if (result.isConfirmed) {
-                //  Llamamos al endpoint de eliminar
-                apiFincatech.delete("administrador", id).then((result) =>{
-                    Swal.fire(
-                        'Administrador eliminado correctamente',
-                        '',
-                        'success'
-                      );
-                      $('#listadoAdministrador').DataTable().ajax.reload();
-                });
-            }
-        });
+        core.Modelo.Delete("administrador", id, nombre, "listadoAdministrador");
     },
 
     /** TODO: Muestra un modal con la info de la comunidad */
@@ -79,12 +57,7 @@ let administradorCore = {
 
                 result = CoreUI.Utils.parse(resultHTML, administradorCore.comunidad);
                 console.log(result);
-                CoreUI.Modals.show('modalInfoComunidad', result, administradorCore.comunidad.nombre);
-                // Swal.fire({
-                //     title:`${administradorCore.comunidad.nombre}`,
-                //     html: result,
-                //     customClass: 'modal-lg'
-                // })
+                CoreUI.Modal.GetHTML('modalInfoComunidad', result, administradorCore.comunidad.nombre);
             });
 
         });
@@ -110,10 +83,11 @@ let administradorCore = {
                 CoreUI.tableData.addColumn(null, "EMAIL", html);
 
             //  Teléfono
-            CoreUI.tableData.addColumn("telefono", "TELEFONO");
+                CoreUI.tableData.addColumn("telefono", "TELEFONO");
 
             //  Comunidades
-            CoreUI.tableData.addColumn("nombre", "Comunidades");
+                var html = '';
+                CoreUI.tableData.addColumn(null, "Comunidades", html);
 
             // Estado
                 var html = 'data:estado$';

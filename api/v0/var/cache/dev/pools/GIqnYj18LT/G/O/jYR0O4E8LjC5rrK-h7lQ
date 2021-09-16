@@ -1,0 +1,3 @@
+<?php //App%255CEntity%255CEntityHelper%2523getSerializedEntity
+
+return [PHP_INT_MAX, []];

@@ -172,7 +172,7 @@ let CoreUI = {
         {
 
             var columna = {};
-            if(renderHTML !== undefined && renderHTML.length > 0)
+            if(renderHTML !== undefined)
             {
                 columna = {"title": titulo, "data": null,
                     render: function(data, type, row, meta){
@@ -225,9 +225,9 @@ let CoreUI = {
 
     },
 
-    Modals: {
+    Modal: {
 
-        show: function(id, html, titulo, texto)
+        GetHTML: function(id, html, titulo, texto)
         {
             if($('body .'+id).length)
             {
@@ -238,6 +238,26 @@ let CoreUI = {
 
             feather.replace();
             $('body .' + id).modal('show');
+        },
+
+        /** Muestra un modal de ok */
+        Success: function(texto)
+        {
+        Swal.fire(
+            `${texto}`,
+            '',
+            'success'
+            );    
+        },
+
+        /** Muestra un modal de error */
+        Error: function(texto)
+        {
+            Swal.fire(
+            `${texto}`,
+            '',
+            'error'
+            );  
         },
 
     }

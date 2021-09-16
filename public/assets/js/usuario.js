@@ -37,28 +37,7 @@ let usuarioCore = {
     /** Elimina una comunidad previa confirmación */
     eliminar: function(id, nombre)
     {
-        Swal.fire({
-            title:`¿Desea eliminar el usuario: <br>${nombre}?`,
-            text: "Se va a eliminar el usuario y toda la información asociada",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Eliminar',
-            cancelButtonText: 'Cancelar'
-          }).then((result) => {
-            if (result.isConfirmed) {
-                //  Llamamos al endpoint de eliminar
-                apiFincatech.delete("administrador", id).then((result) =>{
-                    Swal.fire(
-                        'Usuario eliminado correctamente',
-                        '',
-                        'success'
-                      );
-                      $('#listadoUsuario').DataTable().ajax.reload();
-                });
-            }
-        });
+        core.Modelo.Delete("usuario", id, nombre, "listadoUsuario");
     },
 
     /** TODO: Muestra un modal con la info de la comunidad */
@@ -76,7 +55,7 @@ let usuarioCore = {
 
                 result = CoreUI.Utils.parse(resultHTML, usuarioCore.comunidad);
                 console.log(result);
-                CoreUI.Modals.show('modalInfoComunidad', result, usuarioCore.comunidad.nombre);
+                CoreUI.Modal.GetHTML('modalInfoComunidad', result, usuarioCore.comunidad.nombre);
                 // Swal.fire({
                 //     title:`${usuarioCore.comunidad.nombre}`,
                 //     html: result,

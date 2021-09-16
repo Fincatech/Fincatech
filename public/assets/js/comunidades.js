@@ -30,36 +30,37 @@ let comunidadesCore = {
 
         $('body').on(core.helper.clickEventType, '.btnEliminarComunidad', (evt)=>{
             evt.stopImmediatePropagation();
-            comunidadesCore.eliminarComunidad( $(evt.currentTarget).attr('data-id'), $(evt.currentTarget).attr('data-nombre') );
+            comunidadesCore.eliminar( $(evt.currentTarget).attr('data-id'), $(evt.currentTarget).attr('data-nombre') );
         });
 
     },
 
     /** Elimina una comunidad previa confirmación */
-    eliminarComunidad: function(idComunidad, nombreComunidad)
+    eliminar: function(id, nombre)
     {
-        Swal.fire({
-            title:`¿Desea eliminar la comunidad:<br>${nombreComunidad}?`,
-            text: "Se va a eliminar la comunidad y toda la información asociada",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Eliminar',
-            cancelButtonText: 'Cancelar'
-          }).then((result) => {
-            if (result.isConfirmed) {
-                //  Llamamos al endpoint de eliminar
-                apiFincatech.delete("comunidad", idComunidad).then((result) =>{
-                    Swal.fire(
-                        'Comunidad eliminada correctamente',
-                        '',
-                        'success'
-                      );
-                      $('#listadoComunidades').DataTable().ajax.reload();
-                });
-            }
-        });
+        core.Modelo.Delete("comunidad", id, nombre, "listadoComunidades");
+        // Swal.fire({
+        //     title:`¿Desea eliminar la comunidad:<br>${nombreComunidad}?`,
+        //     text: "Se va a eliminar la comunidad y toda la información asociada",
+        //     icon: 'question',
+        //     showCancelButton: true,
+        //     confirmButtonColor: '#3085d6',
+        //     cancelButtonColor: '#d33',
+        //     confirmButtonText: 'Eliminar',
+        //     cancelButtonText: 'Cancelar'
+        //   }).then((result) => {
+        //     if (result.isConfirmed) {
+        //         //  Llamamos al endpoint de eliminar
+        //         apiFincatech.delete("comunidad", idComunidad).then((result) =>{
+        //             Swal.fire(
+        //                 'Comunidad eliminada correctamente',
+        //                 '',
+        //                 'success'
+        //               );
+        //               $('#listadoComunidades').DataTable().ajax.reload();
+        //         });
+        //     }
+        // });
     },
 
     /** TODO: Muestra un modal con la info de la comunidad */
@@ -77,7 +78,7 @@ let comunidadesCore = {
 
                 result = CoreUI.Utils.parse(resultHTML, comunidadesCore.comunidad);
                 console.log(result);
-                CoreUI.Modals.show('modalInfoComunidad', result, comunidadesCore.comunidad.nombre);
+                CoreUI.Modal.GetHTML('modalInfoComunidad', result, comunidadesCore.comunidad.nombre);
                 // Swal.fire({
                 //     title:`${comunidadesCore.comunidad.nombre}`,
                 //     html: result,
