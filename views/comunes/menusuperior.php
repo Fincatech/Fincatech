@@ -22,7 +22,7 @@
                 </a>
             </li>
             <!-- Notificaciones -->
-            <li class="nav-item dropdown">
+            <!-- <li class="nav-item dropdown">
                 <a class="nav-icon dropdown-toggle" href="#" id="alertsDropdown" data-toggle="dropdown">
                     <div class="position-relative">
                         <i class="align-middle" data-feather="bell"></i>
@@ -86,7 +86,8 @@
                         <a href="#" class="text-muted">Show all notifications</a>
                     </div>
                 </div>
-            </li>
+            </li> -->
+            <?php $App->renderView('componentes/notificaciones/notificacionesmenu.php'); ?>
             <!-- Mensajes: Consultas al DPD -->
             <li class="nav-item dropdown">
                 <a class="nav-icon dropdown-toggle" href="#" id="messagesDropdown" data-toggle="dropdown">
@@ -155,6 +156,7 @@
                     </div>
                 </div>
             </li>
+
             <!-- Perfil y acciones principales -->
             <li class="nav-item dropdown">
 
@@ -170,7 +172,7 @@
                     <a class="dropdown-item" href="#"><i class="align-middle mr-1" data-feather="eye"></i> SPA Asignado</a>
                     <a class="dropdown-item" href="#"><i class="align-middle mr-1" data-feather="users"></i> RGPD Empleados</a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#"><i class="align-middle mr-1" data-feather="folder-plus"></i> Cargar comunidades desde plantilla</a>
+                    <a class="dropdown-item btnCargarComunidadesExcel" href="javascript:void(0);"><i class="align-middle mr-1" data-feather="folder-plus"></i> Cargar comunidades desde plantilla</a>
                     <a class="dropdown-item" href="pages-settings.html"><i class="align-middle mr-1" data-feather="settings"></i> Preferencias</a>
                     <a class="dropdown-item" href="#"><i class="align-middle mr-1" data-feather="help-circle"></i> Ayuda</a>
                     <div class="dropdown-divider"></div>

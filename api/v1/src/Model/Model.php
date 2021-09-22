@@ -73,6 +73,11 @@ class Model extends FrontController{
 
     public $usuarios;
 
+    public function Test()
+    {
+        echo 'TestModel',PHP_EOL;
+    }
+
     public function __construct()
     {
         $this->entityHelper = new \HappySoftware\Entity\EntityHelper();
@@ -80,6 +85,11 @@ class Model extends FrontController{
         $this->InitModel();
     }
     
+    public function getRepositorio()
+    {
+        return $this->repositorio;
+    }
+
     /**
      * Inicializa el modelo
      */
@@ -133,6 +143,17 @@ class Model extends FrontController{
     {
         return $this;
     }
+
+    /**
+    * Ejecuta una consulta sobre el repositorio previamente construida
+    */
+    public function query($sqlToExecute)
+    {
+        $resultData = $this->repositorio->queryRaw( $sqlToExecute );
+        return $this->mapMysqliResultsToObject($resultData);
+    }
+
+    // TODO: Método de ejecución segura pasando por parámetro un array con los valores y campos
 
     /**
      * Ejecuta una consulta sobre el repositorio

@@ -2,20 +2,20 @@
 
     <div class="col-12 d-flex">
 
-        <div class="card flex-fill shadow-neumorphic p-3">
+        <div class="card flex-fill shadow-neumorphic pl-3 pb-3 pt-2 pr-3">
 
-            <div class="card-header pl-0">
+            <div class="card-header pl-1 mb-2">
 
                 <h5 class="card-title mb-0"><i data-feather="<?php echo $iconoAccion; ?>"></i> <span class="titulo">Usuario</span></h5>
 
             </div>
     
-            <div class="card-body">
+            <div class="card-body shadow-inset rounded-lg border mb-1 border-white">
 
                 <form class="form-data form-floating">
 
                     <!-- Estado del usuario -->
-                    <div class="form-group row mb-2 justify-content-end">
+                    <div class="form-group row mb-2">
                         <div class="col-12 col-md-2 text-left">
                             <label for="estado"><i class="bi bi-geo-alt pr-2"></i>Estado</label>
                             <select id="estado" name="estado" class="select-data data custom-select form-control selectpicker" data-live-search="true" hs-entity="Usuario" hs-field="estado" hs-list-entity="Estado" hs-list-field="nombre" hs-list-value="sId"></select>

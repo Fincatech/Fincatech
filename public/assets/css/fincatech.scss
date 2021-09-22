@@ -77,7 +77,7 @@ a:hover{
 
 .card .card-title {
     font-size: 20px;
-    font-weight: 700 !important;
+    font-weight: 700;
     font-family: "Dosis";
 }
 
@@ -157,6 +157,7 @@ a:hover{
 }
 
 .form-data input[type="text"],
+.form-data input[type="email"],
 .form-data input[type="password"] {
     -webkit-box-shadow: inset 4px 4px 10px #dadada;
     box-shadow: inset 4px 4px 10px #dadada;
@@ -206,4 +207,27 @@ td.p-0.text-center {
     margin-bottom: 25px;
     // background-color: #586f4b;
     border-radius: 10px 10px 0px 0px !important;
+}
+
+.list-group-flush > .list-group-item {
+    border: 0 !important;
+    border-radius: 0 !important;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+.list-group-item {
+    border-radius: 0;
+}
+
+.list-group-item.active {
+    background-color: #1ccbe626 !important;
+    border-color: #000000 !important;
+    color: black !important;
+    font-size: 0.9rem;
+}
+
+body.swal2-shown > [aria-hidden="true"] {
+  transition: 0.1s filter;
+  filter: blur(10px);
 }

@@ -22,6 +22,27 @@ return function (App $app) {
         return $response;
     });    
 
+    //  Seguridad de la aplicación
+    $app->post('/checklogin', function(Request $request, Response $response, array $params ): Response
+    {
+
+        $data = $request->getParsedBody();
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        //  Instanciamos el controller del login
+        $frontController->Init( 'login', $data );
+$body= file_get_contents("php://input"); 
+// $body = $request->getBody();
+$data = json_decode($body, true);
+        $response->getBody()->write( $frontController->context->checkLogin( $data ) );
+        
+        return $response;
+
+    });  
+
     //  Renderizado de vistas
     $app->post('/getview', function(Request $request, Response $response, array $params ): Response
     {

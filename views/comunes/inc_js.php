@@ -7,11 +7,24 @@
 <script src="<?php echo ASSETS; ?>vendor/node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
 <link rel="stylesheet" href="<?php echo ASSETS; ?>vendor/node_modules/sweetalert2/dist/sweetalert2.min.css">
 
+<!-- Dropzone -->
+<script type="text/javascript" src="<?php echo ASSETS_JS; ?>vendor/dropzone/dist/min/dropzone.min.js"></script>
+<link rel="stylesheet" href="<?php echo ASSETS_JS; ?>vendor/dropzone/dist/min/dropzone.min.css">
+
+<!-- Bootstrap select picker -->
+
+
 <!-- DATATABLES -->
 <link rel="stylesheet" type="text/css" href="<?php echo ASSETS_JS; ?>vendor/datatables/datatables.min.css">
 <script src="<?php echo ASSETS_JS; ?>vendor/datatables/datatables.js"></script>
+
+<!-- Moment -->
 <script src="<?php echo ASSETS_JS; ?>vendor/moment/moment.js"></script>
 
+<!-- Select desplegable -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <!-- FINCATECH APP COMPONENTS -->
 <script type="text/javascript" src="<?php echo ASSETS_JS; ?>api.js?v=<?php echo time(); ?>"></script>

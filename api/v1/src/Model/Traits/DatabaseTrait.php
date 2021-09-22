@@ -59,9 +59,6 @@ trait DatabaseTrait{
     {
         //  Recorremos todo el objeto y vamos asignando los valores
 
-        //  Añadimos los nombres y valores de los campos
-        //$this->builder( implode(",", array_keys($this->fields)) );
-
         foreach($this->fields as $key=>$value)
         {
             $this->builder($key . "=" . $value . ", ");

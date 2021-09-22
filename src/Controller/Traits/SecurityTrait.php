@@ -10,17 +10,18 @@ trait SecurityTrait{
     {
         
         $tokenContent = $this->createDebToken();
+        $tokenContent = "";
         $tokenJWT = JWT::encode($tokenContent, JWT_SECRET_KEY);
 
         $validation = [];
-        $validation['status'] = "";
-        $validation['error'] = "";
-        $validation['data'] = null;
+        // $validation['status'] = "";
+        // $validation['error'] = "";
+        // $validation['data'] = null;
 
         try{
             $dataObject = JWT::decode($tokenJWT, JWT_SECRET_KEY, array('HS256'));
-            $validation['data'] = $dataObject;
             $validation['status'] = true;
+            $validation['data'] = $dataObject;
         }catch(\Firebase\JWT\SignatureInvalidException $e){
             $validation['status'] = false;
             $validation['error'] = "invalidkey";
@@ -36,7 +37,7 @@ trait SecurityTrait{
     public function createDebToken()
     {
         $currentTime = time();
-        $limitTime = $currentTime + 3600;
+        $limitTime = $currentTime - 3600;
 
         //  Para debug
         $tokenContent = array(

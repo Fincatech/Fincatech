@@ -9,12 +9,12 @@
                 <div class="col-6 col-sm-4 col-lg-3  col-xl-2 col-xxl">
                     <?php $App->renderBotonMenu("Comunidades", "comunidad/list", "sudo-comunidades", null, "building"); ?>
                 </div>
-                <div class="col-6 col-sm-4 col-lg-3  col-xl-2 col-xxl">
+                <!-- <div class="col-6 col-sm-4 col-lg-3  col-xl-2 col-xxl">
                     <?php $App->renderBotonMenu("Contratos", "contrato/list", "sudo-contrato", null, "card-checklist"); ?>
-                </div>
-                <div class="col-6 col-sm-4 col-lg-3  col-xl-2 col-xxl">
+                </div> -->
+                <!-- <div class="col-6 col-sm-4 col-lg-3  col-xl-2 col-xxl">
                     <?php $App->renderBotonMenu("Centros de Trabajo", "centrotrabajo/list", "sudo-contrato", null, "file-text"); ?>
-                </div>									
+                </div>									 -->
                 <div class="col-6 col-sm-4 col-lg-3  col-xl-2 col-xxl">
                     <?php $App->renderBotonMenu("Usuarios", "usuario/list", "sudo-usuario", null, "person-lines-fill"); ?>
                 </div>

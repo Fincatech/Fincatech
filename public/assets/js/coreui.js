@@ -139,13 +139,16 @@ let CoreUI = {
                                     switch(valorCampo)
                                     {
                                         case "H":
-                                            valorCampo = '<span class="badge rounded-pill bg-warning d-block pt-2 pb-2">Histórico</span>';
+                                            valorCampo = '<span class="badge rounded-pill bg-secondary d-block pt-2 pb-2">Histórico</span>';
                                             break;
                                         case "A":
                                             valorCampo = '<span class="badge rounded-pill bg-success d-block pt-2 pb-2">Alta</span>';
                                             break;
                                         case "B":
                                             valorCampo = '<span class="badge rounded-pill bg-danger d-block pt-2 pb-2">Baja</span>';
+                                            break;
+                                        case "P":
+                                            valorCampo = '<span class="badge rounded-pill bg-warning d-block pt-2 pb-2">Pendiente</span>';
                                             break;
 
                                     }

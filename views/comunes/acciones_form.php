@@ -1,4 +1,4 @@
-<div class="form-group row mb-2 mt-4 justify-content-center">
+<div class="form-group row mt-4 justify-content-center">
     <div class="col-md-3 col-12 text-center p-3 shadow-inset rounded-pill border-light border-2">
         <div class="row">
             <div class="col-6 pr-1">

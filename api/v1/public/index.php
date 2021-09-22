@@ -13,7 +13,7 @@ use Slim\Factory\ServerRequestCreatorFactory;
 require __DIR__ . '/../src/autoload.php';
 require __DIR__ . '/../vendor/autoload.php';
 
-$controller = new \Fincatech\Controller\FrontController();
+// $controller = new \Fincatech\Controller\FrontController();
 
 // Instantiate PHP-DI ContainerBuilder
 $containerBuilder = new ContainerBuilder();

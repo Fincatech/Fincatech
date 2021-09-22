@@ -76,7 +76,7 @@ a:hover {
 
 .card .card-title {
   font-size: 20px;
-  font-weight: 700 !important;
+  font-weight: 700;
   font-family: "Dosis";
 }
 
@@ -168,6 +168,7 @@ a:hover {
 }
 
 .form-data input[type="text"],
+.form-data input[type="email"],
 .form-data input[type="password"] {
   -webkit-box-shadow: inset 4px 4px 10px #dadada;
   box-shadow: inset 4px 4px 10px #dadada;
@@ -222,5 +223,32 @@ td.p-0.text-center {
           box-shadow: 4px 4px 20px lightgrey;
   margin-bottom: 25px;
   border-radius: 10px 10px 0px 0px !important;
+}
+
+.list-group-flush > .list-group-item {
+  border: 0 !important;
+  border-radius: 0 !important;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.list-group-item {
+  border-radius: 0;
+}
+
+.list-group-item.active {
+  background-color: #1ccbe626 !important;
+  border-color: #000000 !important;
+  color: black !important;
+  font-size: 0.9rem;
+}
+
+body.swal2-shown > [aria-hidden="true"] {
+  -webkit-transition: 0.1s -webkit-filter;
+  transition: 0.1s -webkit-filter;
+  transition: 0.1s filter;
+  transition: 0.1s filter, 0.1s -webkit-filter;
+  -webkit-filter: blur(10px);
+          filter: blur(10px);
 }
 /*# sourceMappingURL=fincatech.css.map */

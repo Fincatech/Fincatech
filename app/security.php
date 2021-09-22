@@ -52,6 +52,11 @@ define("security", [
         "ROLE_EMPLEADO"=>[
             "folder"=>"empleado",
             "menulateral"=> false
+        ],
+        "ROLE_LOGIN"=>[
+            "folder"=>"login",
+            "menulateral"=> false,
+            "titulo" => "Login Fincatech"
         ]
     ]
 );

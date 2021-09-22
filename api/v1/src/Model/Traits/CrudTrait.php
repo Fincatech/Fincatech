@@ -60,7 +60,7 @@ trait CrudTrait{
     }
 
     /** Convierte el JSON del post a un array asociativo arreglando los valores */
-    private function processJSONPostData($data)
+    public function processJSONPostData($data)
     {
 
         //  Recuperamos todos los valores del post que hemos recibido
@@ -183,11 +183,12 @@ trait CrudTrait{
             $limitLength = (isset($params['length']) ? $params['length'] : null);
 
         if(!is_null($limitStart) && !is_null($limitLength))
-            $this->queryToExecute .= " limit " . $params['start'] . "," . ($params['start'] + $params['length']);
+            $this->queryToExecute .= " limit " . $params['start'] . "," . $params['length'];
+            // $this->queryToExecute .= " limit " . $params['start'] . "," . ($params['start'] + $params['length']);
+
+        // die($this->queryToExecute);
 
         $this->execute(true,false);
-
-        // TODO: Si tiene criterios para acotar, los establecemos
 
         $this->entityData['total'] = $this->getTotalRows("select * from " . $this->mainEntity . " ");
         $this->entityData['filtered'] = $this->getTotalRows($this->queryToExecute);

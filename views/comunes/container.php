@@ -1,8 +1,8 @@
 <div class="main">
 
     <?php 
+if(!$App->getController() === 'ROLE_LOGIN'): 
         // Incluímos la barra superior 
-        
         include_once('menusuperior.php'); ?>
 
     <main class="content">
@@ -22,7 +22,11 @@
         </div>
         
     </main>
+    
+<?php   else: 
+            $App->getContainerView();
+        endif; 
 
-    <?php include_once('footer.php'); ?>
+        include_once('footer.php'); ?>
 
 </div>

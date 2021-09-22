@@ -17,7 +17,7 @@ class FrontController{
      * @var Controller
      */
     public $context;
-    public $model;
+    protected $model;
     public $helperModel;
 
     /**
@@ -27,21 +27,21 @@ class FrontController{
     public $jsonPostData;
 
     public function __construct()
-    {}
+    {
+        require_once ABSPATH .'src/Includes/database/mysqlcore.php';
+    }
 
     /**
      * Inicializa el objeto Controller
      */
     public function Init($controllerName, $params = null)
     {
-
-        require_once ABSPATH .'src/Includes/database/mysqlcore.php';
         //  Instancia del trait de configuración
         //  TODO: Auto incluir todos los traits en función del controlador que se llama
         $this->InstantiateHelperModel();
         $this->InstantiateController($controllerName, $params);
         $this->InstantiateEntityObject();
-        
+
     }
 
     /**
@@ -94,8 +94,9 @@ class FrontController{
         include_once(ABSPATH.'src/Entity/SchemaEntity.php'); 
     }
 
-    private function InstantiateHelperModel()
+    public function InstantiateHelperModel()
     {
+
         //  Instanciamos el helpermodel
         include_once(ABSPATH.'src/Model/Model.php');
         $this->model = new Model();

@@ -113,11 +113,12 @@ let apiFincatech =
     /** Llamada POST al restful api */
     post: async function(entity, datosPost)
     {
+    console.log('api post: ' + datosPost);
         return await $.ajax({
             url: apiFincatech.baseUrlEndpoint + entity ,
             method: "POST",
             contentType: "application/json; charset=utf-8",
-            data: datosPost,
+            data: JSON.stringify(datosPost),
             success: function(respuesta)
             {
                 return respuesta;

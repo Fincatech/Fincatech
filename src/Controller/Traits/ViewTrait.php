@@ -7,8 +7,7 @@ trait ViewTrait{
     public function InitView()
     {
         //  Hay que comprobar donde está el usuario
-
-        $this->renderView();
+        $this->renderAppView();
     }
 
     public function renderActionButtons()
@@ -52,44 +51,50 @@ trait ViewTrait{
         include(ABSPATH . 'views/' . security[$this->getUserRol()]['folder'] . '/menuacciones.php');
 
         //  Comprobamos qué vista es la que hay que renderizar
-        if($this->controllerName == "dashboard")
+        switch($this->controllerName)
         {
-            $includeFile .= security[$this->getUserRol()]['folder'] . '/dashboard';
-        }else{
+            case 'dashboard':
+                $includeFile .= security[$this->getUserRol()]['folder'] . '/dashboard';
+                break;
+            case 'login':
+                $includeFile .= '/login/login';
+                break;
+            default:
 
-            switch($this->getAction())
-            {
-                case "get":
-                    $iconoAccion = "edit";
-                    $includeFile .= $this->getController() . '/form';
-                    break;
-                case "add":
-                    $iconoAccion = "plus-square";
-                    $includeFile .= $this->getController() . '/form';
-                    break;
-                default:
-                    $iconoAccion = "list";
-                    $App->renderTable("listado" . ucfirst($this->getController()), ucfirst($this->getController()), []); 
-                    //$App->renderTable("listadoComunidades", "comunidad", ["Codigo", "Nombre comunidad", "E-mail", "Teléfono", "Doc verificados", "Doc pendientes de subir", "Doc pendientes de verificar", ""]); 
-                    $includeFile .= "componentes/listado/listado";
-                    break;
-            }
-
-            if($this->getAction() == 'get')
-            {
-                //  Form
-                // $includeFile .= $this->getController() . '/form';
-            }else{
-                //  Listado
-                //DEBUG: 
+                switch($this->getAction())
+                {
+                    case "get":
+                        $iconoAccion = "edit";
+                        $includeFile .= $this->getController() . '/form';
+                        break;
+                    case "add":
+                        $iconoAccion = "plus-square";
+                        $includeFile .= $this->getController() . '/form';
+                        break;
+                    default:
+                        $iconoAccion = "list";
+                        $App->renderTable("listado" . ucfirst($this->getController()), ucfirst($this->getController()), []); 
+                        $includeFile .= "componentes/listado/listado";
+                        break;
+                }
                 
-                // TODO: Hay que meter esta configuración para el controller
-                //  de esa forma, simplemente hay que rellenar la info en el settings
-                //  y nos olvidamos de tener que montar un controller por cada entidad
-                //  ya que la idea es que venga todo informado desde el back
-                //  y dejar automatizado al máximo posible todo
-                // $includeFile .= "componentes/listado/listado";
-            }
+                // if($this->getAction() == 'get')
+                // {
+                //     //  Form
+                //     // $includeFile .= $this->getController() . '/form';
+                // }else{
+                //     //  Listado
+                //     //DEBUG: 
+                    
+                //     // TODO: Hay que meter esta configuración para el controller
+                //     //  de esa forma, simplemente hay que rellenar la info en el settings
+                //     //  y nos olvidamos de tener que montar un controller por cada entidad
+                //     //  ya que la idea es que venga todo informado desde el back
+                //     //  y dejar automatizado al máximo posible todo
+                //     // $includeFile .= "componentes/listado/listado";
+                // }
+
+                break;
         }
         
         // echo('Controller: ' . $this->getController() . 
@@ -108,13 +113,39 @@ trait ViewTrait{
         include(ABSPATH.'views/componentes/boton/icono_boton_menu.php');
     }
 
+    public function renderView($viewName, $executeView = false)
+    {
+    
+        global $appSettings;
+        global $App;
+
+        try{
+
+            //  Validamos que exista la vista
+            $viewRoute = ABSPATH.'views/'.$viewName;
+            if(!file_exists($viewRoute))
+            {
+                throw new \Exception('Vista no encontrada');
+            }else{
+                include($viewRoute);
+            }
+
+        }catch(\Exception $ex){
+
+            die('Vista no encontrada');
+
+        }
+
+    }
+
     /** Renderiza la vista en función del controller */
-    public function renderView()
+    public function renderAppView()
     {
         global $appSettings;
         global $App;
 
         $rol = $this->getUserRol();
+        //  Si no está autenticado renderizamos la vista del login
 
         //  Apertura de página, metas y varios
         include_once(ABSPATH.'views/comunes/header.php');
@@ -128,6 +159,7 @@ trait ViewTrait{
 
         //  Contenedor de la aplicación
         include_once(ABSPATH.'views/comunes/container.php');     
+
 
         //  Incluimos todos los js configurados para la vista
         $this->addJSModulesByRole();

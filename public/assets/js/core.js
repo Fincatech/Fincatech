@@ -3,6 +3,15 @@ let clickEventType = ((document.ontouchstart!==null)?'click':'touchstart');
 let environment = 'd';
 let baseURL = '/fincatech/';
 
+let Constantes = {
+
+   CargaComunidades: `
+   <p class="text-center mb-0 mt-1"><i class="bi bi-file-earmark-arrow-up" style="font-size:60px;"></i></p>
+   <h2 class="swal2-title" id="swal2-title" style="display: block;">Carga automática de comunidades</h2>
+   <p class="mt-3" style="font-size: 14px;">Seleccione el fichero excel desde el que desea realizar la carga de comunidades de forma automática</p>
+   <p style="font-size: 14px;">Sólo se permiten ficheros con extensión xls o xlsx</p>`
+}
+
 let core =
 {
   model: null,
@@ -16,15 +25,23 @@ let core =
     core.actionModel = $("body").attr("hs-action");
     core.modelId = $("body").attr("hs-model-id");
 
-    switch(core.actionModel)
+    if(core.model === 'Login' || core.model === 'Register')
     {
-      case "get":
-      case "add":
-        await core.Forms.init();
-        break;
-      case "list":
-        await core.Modelo.getAll();
-        break;
+      //  Inicializamos la capa de seguridad
+          core.Security.init();
+    }else{
+    
+      switch(core.actionModel)
+      {
+        case "get":
+        case "add":
+          await core.Forms.init();
+          break;
+        case "list":
+          await core.Modelo.getAll();
+          break;
+      }    
+
     }
 
     core.Events();
@@ -36,6 +53,41 @@ let core =
       //  Botón de guardar
       $("body").on(core.helper.clickEventType, ".btnSaveData", function(){
         core.Forms.Save();
+      });
+
+      //  Carga de comunidades
+      $('body').on(core.helper.clickEventType, '.btnCargarComunidadesExcel', async function()
+      {
+        const { value: file } = await Swal.fire({
+          // title: 'Carga automática de comunidades',
+          html: Constantes.CargaComunidades,
+          footer: '<a href="javascript:void(0);"><i class="bi bi-file-earmark-arrow-down"></i> Descargue la plantilla desde este enlace</a>',
+          showCancelButton: true,
+          grow: 'row',
+          confirmButtonColor: '#28a745',
+          cancelButtonColor: '#dc3545',
+          cancelButtonText: 'Cancelar',
+          confirmButtonText: 'Procesar',
+          reverseButtons: true,
+          showCloseButton: true,
+          input: 'file',
+          inputAttributes: {
+            'accept': 'image/*',
+            'aria-label': 'Upload your profile picture'
+          }
+        })
+
+        if (file) {
+          const reader = new FileReader()
+          reader.onload = (e) => {
+            Swal.fire({
+              title: 'Your uploaded picture',
+              imageUrl: e.target.result,
+              imageAlt: 'The uploaded picture'
+            })
+          }
+          reader.readAsDataURL(file)
+        }
       });
 
   },
@@ -88,6 +140,9 @@ let core =
 
           });
 
+            $('.selectpicker').select2({
+              theme: 'bootstrap4',
+            });
         }
 
         // Si hay un id informado recuperamos la entidad desde el endpoint
@@ -147,7 +202,18 @@ let core =
           }
 
         });
+
+            //  Inicializamos el selectpicker
+            $('.selectpicker').select2({
+              theme: 'bootstrap4',
+            });
+            // $('.selectpicker').each(function()
+            // {
+            //   $(this).trigger('change');
+            // });
+
       }
+
 
 
     },
@@ -158,27 +224,45 @@ let core =
 
         core.Forms.data = {};
 
-        var modeloPrincipal = $("body").attr("hs-model");
-
         //  Recorremos todos los campos del formulario
         $("body .form-data .data").each(function(){
         
           var fieldName = $(this).attr("hs-field");
           var entity = $(this).attr("hs-entity");
 
-          if(entity == modeloPrincipal)
+          if(entity == core.model)
           {
+            // console.log('Acción del modelo: ' + core.actionModel + ' - ' + core.modelId);
 
-            console.log('Map Data');
-            console.log('Acción del modelo: ' + core.actionModel + ' - ' + core.modelId);
+            //TODO: MEJORAR LA LÓGICA METIÉNDOLO EN UN SWITCH PARA EL TIPO DE INPUT
 
             if(fieldName != "id")
+            {
               core.Forms.data[fieldName] = $(this).val();
+            }
+
+            if( $(this).is('select'))
+            {
+              console.log('Es un combo!');
+              console.log('Valor del select: ' + $(this).val());
+            }
+
+            if( $(this).attr('type') === 'checkbox')
+            {
+              if( $(this).is(':checked'))
+              {
+                core.Forms.data[fieldName] = $(this).val();
+              }else{
+                core.Forms.data[fieldName] = '';
+              }
+
+            }
+
 
           }else{
 
-            // if(fieldName != "id")
-            //   core.Forms.data[entity][fieldName] = $(this).val();
+            if(fieldName != "id")
+              core.Forms.data[entity][fieldName] = $(this).val();
 
           }
 
@@ -186,10 +270,7 @@ let core =
 
         //  Si se está actualizando se mapea el ID
         if( core.actionModel == 'get' && core.Forms.data['id'] != '')
-        {
-          console.log("ID: " + core.modelId);
-          core.Forms.data['id'] = core.modelId;
-        }        
+          core.Forms.data['id'] = core.modelId;  
 
     },
 
@@ -206,6 +287,26 @@ let core =
             var htmlOutput = "";
             var result = JSON.parse(data);
             responseData = result.data;
+
+            //  Comprobamos si el valor viene de una entidad asociada a la entidad principal
+            //  Para eso buscamos si hay un . en el string del keyField
+            if(keyField.indexOf('.') >= 0)
+            {
+              //  Actualizamos el valor de entidad para coger la que corresponde a la relación
+              var entidadSeleccionada = keyField.split(".");
+              entidad = entidadSeleccionada[0];
+              keyField = entidadSeleccionada[1];
+            }
+
+            //  Comprobamos lo mismo pero para el campo valor
+            //  TODO: Evaluar si debe ir dentro del for por el hecho de ser un valor y no el key 
+            if(keyValue.indexOf('.') >= 0)
+            {
+              //  Actualizamos el valor de entidad para coger la que corresponde a la relación
+              var entidadSeleccionada = keyValue.split(".");
+              entidad = entidadSeleccionada[0];
+              keyValue = entidadSeleccionada[1];
+            }
 
             // console.log('El: ' + responseData[entidad][][keyValue]);
             for(x = 0; x < responseData[entidad].length; x++)
@@ -238,10 +339,10 @@ let core =
         switch(actionSave)
         {
           case 'get':
-              core.Modelo.Update(core.model, idSave, core.Forms.data);
+              core.Modelo.Update(core.model.toLowerCase(), idSave, core.Forms.data);
               break;
           case 'add':
-              core.Modelo.Insert(core.model, core.Forms.data );
+              core.Modelo.Insert(core.model.toLowerCase(), core.Forms.data );
               break;
         }
 
@@ -250,7 +351,22 @@ let core =
     /** Valida el formulario y devuelve la respuesta correspondiente */
     Validate: function()
     {
-    
+      var result = true;
+
+      if( $('body .form-required').length == 0)
+        return true;
+
+      //  Recorre todos los elementos del dom que sean susceptibles de ser validados
+      $('body .form-required').each(function()
+      {
+        if($(this).val() == '')
+        {
+          result = false;
+        }
+      });
+
+      return result;
+
     },
 
   },
@@ -267,7 +383,6 @@ let core =
         result = JSON.parse(data);
         responseStatus = result.status;
         responseData = result.data;
-        // console.log(responseData);
       });
     },
 
@@ -290,7 +405,7 @@ let core =
           if(responseData.status['response'] == "ok")
           {
 
-            var idInsercion = responseData.id;
+            var idInsercion = responseData.data['id'];
 
             $("body").attr("hs-action", "get");
             $("body").attr("hs-model-id", idInsercion);
@@ -380,9 +495,46 @@ let core =
     },
 
 
+  },
+
+  Security: {
+
+      init: function(){
+        this.events();
+        core.model = 'Login';
+      },
+
+      events: function(){
+        $('body').on(core.helper.clickEventType, '.btnAuthenticate', function(e)
+        {
+          //  Validamos los campos obligatorios
+              if( core.Forms.Validate() )
+              {
+                core.Forms.mapDataToSave();
+                core.Security.checkLogin( core.Forms.data );
+              }else{
+                CoreUI.Modal.Error("Debe proporcionar todos los datos obligatorios");
+              }
+        });
+      },
+
+      /** Comprueba el login contra el endpoint según los datos proporcionados */
+      checkLogin: async function( datos )
+      {
+        //  Comprobamos contra el endpoint de login si el usuario tiene acceso
+            await apiFincatech.post('checklogin', datos ).then( response => {
+            
+              //  Comprobamos la respuesta
+              CoreUI.Modal.Success('argo ha hesho');
+            });
+        //  En caso contrario mostramos el mensaje de error devuelto por el api
+
+      }
+
   }
 
 };
+
 
 //  Inicialización del core
 $(function(){

@@ -88,19 +88,33 @@ class MainController{
     public function Run()
     {
         $this->setController( $_GET['route'] );
-        // die('Acción: ' . $this->controllerAction);
+
         //  Comprobamos la seguridad
         $resultValidation = $this->checkSecurity();
         $userData = $resultValidation['data']->userData;
 
-        if($resultValidation['status'] === true)
+        // print_r($resultValidation);
+        // print_r($userData);
+        // die();
+
+        if($resultValidation['status'] === true && !empty($resultValidation['data']))
         {
             $this->userRol = $userData->role;
             $this->getController();
             $this->InitView();
             //die('Tiene acceso');
         }else{
-            die('no tiene acceso');
+
+            if($this->getController() === 'login')
+            {
+                $this->userRol = 'ROLE_LOGIN';
+                $this->InitView();
+            
+            }else{
+                MainController::redirectToLogin();
+                exit;
+            }
+
         }
 
         //  Obtenemos el nombre del controlador que se va a utilizar
@@ -119,7 +133,8 @@ class MainController{
 
     public static function redirectToLogin()
     {
-        
+        header('Location: ' . ROOT_URL . 'login');
+        die();
     }
 
 

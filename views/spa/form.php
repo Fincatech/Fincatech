@@ -2,15 +2,15 @@
 
     <div class="col-12 d-flex">
 
-        <div class="card flex-fill shadow-neumorphic p-3">
+        <div class="card flex-fill shadow-neumorphic pl-3 pb-3 pt-2 pr-3">
 
-            <div class="card-header pl-0">
+            <div class="card-header pl-1 mb-2">
 
                 <h5 class="card-title mb-0"><i data-feather="<?php echo $iconoAccion; ?>"></i> <span class="titulo">Spa</span></h5>
 
             </div>
     
-            <div class="card-body">
+            <div class="card-body shadow-inset rounded-lg border mb-1 border-white">
 
                 <form class="form-data form-floating" autocomplete="off">
                     <input autocomplete="new-password" name="hidden" type="text" style="display:none;">
@@ -18,7 +18,7 @@
                     <div class="form-group row mb-2">
                         <div class="col-12 col-md-2 text-left">
                             <label for="cif" class="pl-0"><i class="bi bi-credit-card-2-front pr-2"></i>CIF*</label>
-                            <input type="text" class="form-control data text-center" id="cif" name="cif" maxlength="20" placeholder="CIF/NIF"  hs-entity="Spa" hs-field="cif" required>
+                            <input type="text" class="form-control data text-center text-uppercase" id="cif" name="cif" maxlength="20" placeholder="CIF/NIF"  hs-entity="Spa" hs-field="cif" required>
                         </div>
                         <div class="col-12 col-md-4">
                             <label for="emailcontacto"><i class="bi bi-envelope pr-2"></i>E-Mail de contacto</label>              
