@@ -38,7 +38,8 @@ let core =
           await core.Forms.init();
           break;
         case "list":
-          await core.Modelo.getAll();
+          if(core.model != 'Dashboard')
+            await core.Modelo.getAll();
           break;
       }    
 
@@ -50,6 +51,12 @@ let core =
 
   Events: function()
   {
+      //  Logout
+      $("body").on(core.helper.clickEventType, ".btnLogout", function()
+      {
+        core.Security.logout();
+      });
+
       //  Botón de guardar
       $("body").on(core.helper.clickEventType, ".btnSaveData", function(){
         core.Forms.Save();
@@ -536,6 +543,22 @@ let core =
           }
         });        
         
+      },
+
+      /** Logout del sistema */
+      logout: async function()
+      {
+          await apiFincatech.get('logout' ).then( response => {
+              respuesta = JSON.parse(response);
+              if(respuesta.data.logout == 'ok')
+              {
+                //  Logout correcto
+                CoreUI.Modal.Success('La sesión se ha cerrado correctamente', 'Fincatech', function(){
+                  window.location.href = baseURL + 'login';
+                });
+              }
+
+          });
       },
 
       /** Comprueba el login contra el endpoint según los datos proporcionados */

@@ -22,6 +22,24 @@ return function (App $app) {
         return $response;
     });    
 
+    /**
+     * Recupera el schema para una entidad y sus posibles entidades relacionadas
+     */
+    $app->get('/logout', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('login');
+
+        $response->getBody()->write( $frontController->context->logout() );
+
+        return $response;  
+
+    });
+
     //  Seguridad de la aplicación
     $app->post('/checklogin', function(Request $request, Response $response, array $params ): Response
     {
@@ -34,9 +52,10 @@ return function (App $app) {
         $frontController = new $frontControllerName();
         //  Instanciamos el controller del login
         $frontController->Init( 'login', $data );
-$body= file_get_contents("php://input"); 
-// $body = $request->getBody();
-$data = json_decode($body, true);
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
         $response->getBody()->write( $frontController->context->checkLogin( $data ) );
         
         return $response;

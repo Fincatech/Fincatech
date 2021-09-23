@@ -94,11 +94,17 @@ let comunidadesCore = {
         $('.navComunidades').append('<li class="sidebar-header">Comunidades</li>');
         comunidadesCore.comunidades.forEach( function(valor, indice, array){
             var html = `<li class="sidebar-item">
-                        <a class="sidebar-link" href="comunidad/${valor['id']}">
-                            <img src="public/assets/img/icon_edificio.png" class="img-responsive feather">
-                            <span class="align-middle pl-3">${valor['codigo']} - ${valor['nombre']}</span>
-                        </a>
-                    </li>`;
+                            <a class="sidebar-link" href="/fincatech/comunidad/${valor['id']}">
+                                <div class="row">
+                                    <div class="col-2">
+                                        <img src="/fincatech/public/assets/img/icon_edificio.png" class="img-responsive feather">
+                                    </div>
+                                    <div class="col-10">
+                                        <span class="align-middle">${valor['codigo']} - ${valor['nombre']}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>`;
             $('.navComunidades').append(html);
             
         });
@@ -119,9 +125,9 @@ let comunidadesCore = {
             //  Nombre
             CoreUI.tableData.addColumn("nombre", "NOMBRE");
 
-            //  Administrador
-                var html = `<a href="${baseURL}administrador/data:usuarioId$" class="pl-1 pr-1">data:usuario.nombre$</a>`;
-                CoreUI.tableData.addColumn(null, "ADMINISTRADOR", html);
+            // //  Administrador
+            //     var html = `<a href="${baseURL}administrador/data:usuarioId$" class="pl-1 pr-1">data:usuario.nombre$</a>`;
+            //     CoreUI.tableData.addColumn(null, "ADMINISTRADOR", html);
 
             //  Email
                 var html = '<a href="mailto:data:emailcontacto$" class="pl-1 pr-1">data:emailcontacto$</a>';

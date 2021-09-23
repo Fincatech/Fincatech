@@ -14,9 +14,15 @@
 
                     <div class="list-group list-group-flush" role="tablist">
                         <a class="list-group-item list-group-item-action active" data-toggle="list" href="#datos" role="tab" aria-selected="true"><i class="bi bi-archive mr-2"></i> Datos</a>
-                        <a class="list-group-item list-group-item-action" data-toggle="list" href="#documentos" role="tab" aria-selected="false"><i class="bi bi-folder-check mr-2"></i> Documentación</a>
-                        <a class="list-group-item list-group-item-action" data-toggle="list" href="#empresa" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> Empresas / Empleados</a>
+                        <a class="list-group-item list-group-item-action" data-toggle="list" href="#documentos" role="tab" aria-selected="false"><i class="bi bi-folder-check mr-2"></i> Documentos</a>
+                        <a class="list-group-item list-group-item-action" data-toggle="list" href="#empresa" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> CAE</a>
+                        <a class="list-group-item list-group-item-action" data-toggle="list" href="#dpd" role="tab" aria-selected="false"><i class="bi bi-chat-right-text"></i> DPD</a>
+                        <a class="list-group-item list-group-item-action disabled" data-toggle="list" href="#maquinaria" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> Maquinaria<br>Químicos</a>
+                        <a class="list-group-item list-group-item-action disabled" data-toggle="list" href="#rgpd" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> RGPD</a>
+                        <a class="list-group-item list-group-item-action disabled" data-toggle="list" href="#controlhorario" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> Control horario</a>
+                        <?php if ($App->isSudo()) : ?>
                         <a class="list-group-item list-group-item-action btnCargarComunidadesExcel" href="javascript:void(0);" role="tab" aria-selected="false"><i class="bi bi-file-earmark-spreadsheet mr-2"></i> Cargar desde archivo</a>
+                        <?php endif; ?>
                     </div>
                     
                 </div>
@@ -55,7 +61,7 @@
 
                                         <!-- Código de comunidad -->
                                         <div class="col-12 col-md-2">
-                                            <label for="codigo" class="pl-0"><i class="bi bi-key-fill pr-2"></i>Código comunidad*</label>
+                                            <label for="codigo" class="pl-0"><i class="bi bi-key-fill pr-2"></i>Código*</label>
                                                 <input type="text" class="form-control data text-center" id="codigo" name="codigo" hs-entity="Comunidad" hs-field="codigo" required>
                                         </div>
 
@@ -66,10 +72,13 @@
                                         </div>  
 
                                         <!-- Administrador asignado -->
+                                        <!-- Sólo pueden los sudo -->
+                                        <?php if( $App->isSudo() ): ?>
                                         <div class="col-12 col-md-8">
                                             <label for="usuarioId"><i class="bi bi-person-fill pr-2"></i>Administrador asignado</label>
                                             <select id="usuarioId" name="usuarioId" class="select-data custom-select data form-control selectpicker" data-live-search="true" hs-entity="Comunidad" hs-field="usuarioId" hs-list-entity="Administrador" hs-list-field="Usuario.nombre" hs-list-value="Usuario.id"></select>
                                         </div>                 
+                                        <?php endif; ?>
 
                                     </div>
 

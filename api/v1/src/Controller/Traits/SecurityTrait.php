@@ -6,6 +6,11 @@ use Firebase\JWT\JWT;
 
 trait SecurityTrait{
 
+    public function getJWTUserData()
+    {
+        return $this->checkSecurity();
+    }
+
     /** Comprueba si un usuario está autenticado en el sistema */
     public function checkSecurity()
     {

@@ -1,7 +1,6 @@
 <?php
 
 //  Define los puntos de acceso según el tipo de perfil de usuario
-
 define("JWT_SECRET_KEY", 'U_97$5TwNA3N8$qYV4vKK_#k');
 
 define("security", [
@@ -39,7 +38,7 @@ define("security", [
         ],
         "ROLE_ADMINFINCAS"=>[
             "folder"=>"adminfincas",
-            "titulo" => "",
+            "titulo" => "Administrador de fincas",
             "menulateral"=> true,
             "js"=>[
                 "dashboard",

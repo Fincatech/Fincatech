@@ -4,7 +4,7 @@
                 <div class="col-12 d-flex">
                     <div class="w-100">
                         <div class="row">
-                            <div class="col-sm-12 col-md-2">
+                            <div class="col">
                                 <div class="card card-dashboard statscomunidades">
                                     <div class="card-body">
                                         <img src="<?php echo ASSETS_IMG; ?>icon_comunidad_dashboard.png" class="img-responsive icono-marcaagua" />
@@ -17,7 +17,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-sm-2">
+                            <div class="col">
                                 <div class="card card-dashboard">
                                     <div class="card-body">
                                         <img src="<?php echo ASSETS_IMG; ?>check-square.png" class="img-responsive icono-marcaagua" />
@@ -29,7 +29,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col">
                                 <div class="card card-dashboard">
                                     <div class="card-body">
                                         <img src="<?php echo ASSETS_IMG; ?>alert-triangle.png" class="img-responsive icono-marcaagua" />
@@ -41,7 +41,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col">
                                 <div class="card card-dashboard">
                                     <div class="card-body">
                                         <img src="<?php echo ASSETS_IMG; ?>alert-triangle.png" class="img-responsive icono-marcaagua" />
@@ -53,7 +53,7 @@
                                     </div>
                                 </div>
                             </div>									
-                            <div class="col-sm-2">
+                            <!-- <div class="col-sm-2">
                                 <div class="card card-dashboard">
                                     <div class="card-body">
                                         <h5 class="card-title mb-4">Lorem ipsum</h5>
@@ -63,13 +63,12 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
 
             </div>
-
             <!-- Listado de comunidades -->
             <div class="row">
 
@@ -83,8 +82,13 @@
 
                         </div>
                         
-                        <div class="listadoComunidadesDashboard">
-                            <?php $App->renderTable("listadoComunidades", "comunidad", ["Código", "Nombre comunidad", "E-mail", "Teléfono", "Documentos verificados", "Documentos pendientes de subir", "Documentos pendientes de verificar", "Acciones"]); ?>
+                        <div class="listado pl-3 pr-3 pb-3">
+
+                            <table class="table table-hover my-0 hs-tabla" name="listadoComunidad" id="listadoComunidad" data-model="comunidad">
+                                <thead class="thead"></thead>
+                                <tbody class="tbody"></tbody>
+                            </table>
+
                         </div>
 
                     </div>
@@ -92,3 +96,4 @@
                 </div>
 
             </div>
+            

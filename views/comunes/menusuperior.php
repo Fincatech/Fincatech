@@ -176,7 +176,7 @@
                     <a class="dropdown-item" href="pages-settings.html"><i class="align-middle mr-1" data-feather="settings"></i> Preferencias</a>
                     <a class="dropdown-item" href="#"><i class="align-middle mr-1" data-feather="help-circle"></i> Ayuda</a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">Cerrar sesión</a>
+                    <a class="dropdown-item btnLogout" href="javascript:void(0);">Cerrar sesión</a>
                 </div>
 
             </li>

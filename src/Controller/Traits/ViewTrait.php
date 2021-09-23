@@ -21,7 +21,9 @@ trait ViewTrait{
     {
         global $appSettings;
         global $App;
-
+//         echo $this->getUserRol();
+//         print_r(security[$this->getUserRol()]);
+// die(security[$this->getUserRol()]['menulateral']);
         return ( security[$this->getUserRol()]['menulateral'] == true );
     }
 
@@ -51,7 +53,7 @@ trait ViewTrait{
         include(ABSPATH . 'views/' . security[$this->getUserRol()]['folder'] . '/menuacciones.php');
 
         //  Comprobamos qué vista es la que hay que renderizar
-        switch($this->controllerName)
+        switch(strtolower($this->controllerName))
         {
             case 'dashboard':
                 $includeFile .= security[$this->getUserRol()]['folder'] . '/dashboard';
@@ -60,7 +62,6 @@ trait ViewTrait{
                 $includeFile .= '/login/login';
                 break;
             default:
-
                 switch($this->getAction())
                 {
                     case "get":
@@ -145,6 +146,7 @@ trait ViewTrait{
         global $App;
 
         $rol = $this->getUserRol();
+
         //  Si no está autenticado renderizamos la vista del login
 
         //  Apertura de página, metas y varios
@@ -154,12 +156,11 @@ trait ViewTrait{
         if( $this->renderMenuLateral())
         {
             //  Menú lateral
-            require_once(ABSPATH.'views/' . security[$this->getUserRol()]['folder'] . '/menulateral.php');
+            require_once(ABSPATH.'views/' . security[$rol]['folder'] . '/menulateral.php');
         }
 
         //  Contenedor de la aplicación
         include_once(ABSPATH.'views/comunes/container.php');     
-
 
         //  Incluimos todos los js configurados para la vista
         $this->addJSModulesByRole();

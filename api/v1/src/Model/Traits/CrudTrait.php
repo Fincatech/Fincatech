@@ -152,6 +152,17 @@ trait CrudTrait{
         // Primero nos traemos los datos de la entidad principal teniendo en cuenta los criterios de selección que pudiera tener
         $this->queryToExecute = "select * from " . $this->mainEntity . " ";
 
+        //  TODO: Tenemos que extraer el ID del usuario y el ROL ya que si no es SUDO
+        //  hay que acotar por usuario
+
+        //  Comprobamos el rol que tiene el usuario
+        //  FIX: ¿ES LA MANERA CORRECTA DE COMPROBAR O LO PODEMOS AUTOMATIZAR?
+            $userData = get_object_vars( $this->getJWTUserData()['data']->userData );
+            if($userData['role'] == 'ROLE_ADMINFINCAS')
+            {
+                // $this->queryToExecute .= " where usuarioId = " . $userData['id'] . " ";
+            }
+
         //  Comprobamos si hay establecido orden
             $orderBy = (isset($params['orderby']) ? $params['orderby'] : null);
             $orderByType = (isset($params['order']) ? $params['order'] : null);

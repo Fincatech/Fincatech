@@ -23,6 +23,12 @@ class MainController{
         require_once(ABSPATH."src/Controller/Traits/SecurityTrait.php");
     }
 
+    /** Comprueba si el usuario autenticado es de tipo sudo */
+    public function isSudo()
+    {
+        return ( $this->getUserRol() == 'ROLE_SUDO' );
+    }
+
     public function getUserRol()
     {
         return $this->userRol;
@@ -80,6 +86,12 @@ class MainController{
             $this->controllerAction = "list";
         }
 
+        //  Comprobamos si está en el dashboard y además es un administrador de fincas
+        if($this->getController() == 'dashboard')
+        {
+            $this->controllerAction = '';
+        }
+
         // $this->controllerName = $value;
         return $this;
 
@@ -95,11 +107,16 @@ class MainController{
         }
 
         //  Comprobamos la seguridad
+        if(!$this->isLogged() && $this->getController() != 'login')
+        {
+            MainController::redirectToLogin();
+        }
+
         $resultValidation = $this->checkSecurity();
-        $userData = $resultValidation['data']->userData;
 
         if($resultValidation['status'] === true && !empty($resultValidation['data']))
         {
+            $userData = $resultValidation['data']->userData;
             $this->userRol = $userData->role;
             $this->getController();
             $this->InitView();

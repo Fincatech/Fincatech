@@ -7,13 +7,12 @@ use HappySoftware\Entity\EntityHelper;
 use HappySoftware\Entity\DatabaseHelper;
 use HappySoftware\Entity\DatabaseHelper\Relations;
 
-class Comunidad extends EntityHelper{
+class Requerimiento extends EntityHelper{
 
-    private $tableName = 'comunidad';
+    private $tableName = 'requerimientos';
     public $primaryKey = 'id';
     public $tipoEliminacion = DELETE_FISICO;
     public $moveToHistorial = false;
-
     public $orderBy = "nombre";
     public $orderType = ORDER_BY_ASC;
 
@@ -56,31 +55,15 @@ class Comunidad extends EntityHelper{
         //     'relationType' => RELACION_INVERSA
         // ]);
 
-        //  Entidad Usuario
+        //  Entidad Ficheros comunes
         $this->relations[] = $this->addRelation([
-            'table' => 'usuario',
+            'table' => 'ficheroscomunes',
             //  Columna de la entidad que se está relacionando con la entidad principal
-            'sourceColumn' =>'usuarioId',
+            'sourceColumn' =>'id',
             //  Columna de la entidad principal con la que se va a relacionar
-            'targetColumn' => 'id',
+            'targetColumn' => 'idfichero',
             'fieldType' => 'int',
-            'readOnly' => true,
-            //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
-            'relationType' => RELACION_INVERSA
-        ]);
-
-        //  Empresas asociadas a la comunidad
-        $this->relations[] = $this->addRelation([
-            'table' => 'view_empresascomunidad',
-            'alias' => 'empresascomunidad',
-            //  Columna de la entidad que se está relacionando con la entidad principal
-            'sourceColumn' =>'idcomunidad',
-            //  Columna de la entidad principal con la que se va a relacionar
-            'targetColumn' => 'id',
-            'fieldType' => 'int',
-            'readOnly' => true,
-            'canReturnSchema' => false,
-            'deleteOnCascade' => false,
+            'deleteMode' => DELETE_FISICO,
             //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
             'relationType' => RELACION_OUTSIDE
         ]);

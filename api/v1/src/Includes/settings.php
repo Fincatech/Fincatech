@@ -5,6 +5,8 @@
 // Configuración general
 global $appSettings;
 
+define("JWT_SECRET_KEY", 'U_97$5TwNA3N8$qYV4vKK_#k');
+
 $appSettings["env"] = [];
 
 $appSettings = [

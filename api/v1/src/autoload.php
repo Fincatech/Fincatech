@@ -8,6 +8,8 @@ require_once ABSPATH .'src/Includes/database/mysqlcore.php';
 //  Trait de configuración TODO: Parametrizar y automatizar esta parte
 require_once ABSPATH . 'src/Controller/Traits/ConfigTrait.php';
 require_once ABSPATH . 'src/Controller/Traits/EntityTrait.php';
+require_once ABSPATH . 'src/Controller/Traits/SecurityTrait.php';
+require_once ABSPATH . 'src/Controller/Traits/FilesTrait.php';
 
 //  Traits del modelo
 require_once ABSPATH . 'src/Model/Traits/DatabaseTrait.php';

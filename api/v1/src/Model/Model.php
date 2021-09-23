@@ -5,6 +5,8 @@ namespace HappySoftware\Model;
 use Fincatech\Controller\FrontController;
 use HappySoftware\Controller\HelperController;
 use HappySoftware\Controller\Traits\ConfigTrait;
+use HappySoftware\Controller\Traits\FilesTrait;
+use HappySoftware\Controller\Traits\SecurityTrait;
 
 use HappySoftware\Database\DatabaseCore;
 
@@ -23,6 +25,7 @@ use HappySoftware\Entity\DatabaseHelper\Relations;
 class Model extends FrontController{
     
     use ConfigTrait, CrudTrait, DatabaseTrait, EntityTrait, SchemaTrait, TableTrait, UtilsTrait;
+    use SecurityTrait, FilesTrait;
 
     /** Namespace del proyecto enlazado */
     //private $nameSpace;

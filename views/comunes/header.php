@@ -15,6 +15,14 @@
 
 </head>
 
-<body hs-model="<?php echo ucfirst($App->getController()) ?>" hs-action="<?php echo $App->getAction() ?>" hs-model-id="<?php echo $App->getId(); ?>">
+<?php
+
+    $bodyModel = ucfirst($App->getController());
+    $bodyAction = $App->getAction();
+    $bodyModelId = $App->getId();
+
+?>
+
+<body hs-model="<?php echo $bodyModel ?>" hs-action="<?php echo $bodyAction ?>" hs-model-id="<?php echo $bodyModelId; ?>">
 
 	<div class="wrapper">
