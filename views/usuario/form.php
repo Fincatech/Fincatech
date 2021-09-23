@@ -12,7 +12,7 @@
     
             <div class="card-body shadow-inset rounded-lg border mb-1 border-white">
 
-                <form class="form-data form-floating">
+                <form class="form-data form-floating" autocomplete="off">
 
                     <!-- Estado del usuario -->
                     <div class="form-group row mb-2">

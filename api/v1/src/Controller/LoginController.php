@@ -16,9 +16,11 @@ class LoginController extends FrontController{
 
     public function checkLogin($params)
     {
+        
         $userName = $this->model->getRepositorio()::PrepareDBString( $params['email'] );
         $userPassword = $this->model->getRepositorio()::PrepareDBString( $params['password'] );
         $userRemember = $this->model->getRepositorio()::PrepareDBString( $params['recordar'] );
+
         $sql = "
             SELECT 
                 u.id, u.nombre, u.email, u.rolid, concat('ROLE_',r.alias) as rol

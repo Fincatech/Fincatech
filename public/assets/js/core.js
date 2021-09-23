@@ -502,6 +502,13 @@ let core =
       init: function(){
         this.events();
         core.model = 'Login';
+        if($('#email').length)
+          $('#email').focus();
+
+        $('#email').val('');
+        $('#password').val('');
+        $('form').attr('autocomplete', 'off');
+        $('input').attr('autocomplete', 'off');
       },
 
       events: function(){
@@ -516,6 +523,19 @@ let core =
                 CoreUI.Modal.Error("Debe proporcionar todos los datos obligatorios");
               }
         });
+
+        $("input").keyup(function(event) {
+          if (event.key === 13) {
+              $(".btnAuthenticate").trigger('click');
+          }else if (event.keyIdentifier === 13)
+          {
+            $(".btnAuthenticate").trigger('click');
+          }else if (event.keyCode === 13)
+          {
+            $(".btnAuthenticate").trigger('click');
+          }
+        });        
+        
       },
 
       /** Comprueba el login contra el endpoint según los datos proporcionados */
@@ -523,9 +543,18 @@ let core =
       {
         //  Comprobamos contra el endpoint de login si el usuario tiene acceso
             await apiFincatech.post('checklogin', datos ).then( response => {
-            
-              //  Comprobamos la respuesta
-              CoreUI.Modal.Success('argo ha hesho');
+              respuesta = JSON.parse(response);
+              if(respuesta.data.check === false)
+              {
+                //  Login erróneo
+                CoreUI.Modal.Error("El e-mail y/o contraseña proporcionada es incorrecto");
+              }else{
+                //  Login correcto
+                CoreUI.Modal.Success('Login Correcto', 'Fincatech', function(){
+                  window.location.href = 'dashboard';
+                });
+              }
+
             });
         //  En caso contrario mostramos el mensaje de error devuelto por el api
 
@@ -537,7 +566,10 @@ let core =
 
 
 //  Inicialización del core
-$(function(){
+$(function()
+{
+
     apiFincatech.init();
     core.init();
+
 });

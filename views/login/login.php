@@ -23,15 +23,15 @@
 										<img src="assets/img/avatars/avatar.jpg" alt="Charles Hall" class="img-fluid rounded-circle" width="132" height="132" />
 									</div>
 
-									<form class="form-data">
-
+									<form class="form-data" id="formLogin" name="formLogin" autocomplete="off">
+										<input autocomplete="new-password" type="text" style="display:none;">
 										<div class="mb-3">
 											<label class="form-label">Email</label>
-											<input class="form-control form-control-lg form-required data" type="email" hs-entity="Login" hs-field="email" hs-error-msg="" name="email" placeholder="Login de acceso" required />
+											<input autocomplete="off" class="form-control form-control-lg form-required data no-autofill" id="email" type="email" hs-entity="Login" hs-field="email" hs-error-msg="" name="email" placeholder="Login de acceso" required />
 										</div>
 										<div class="mb-3">
 											<label class="form-label">Password</label>
-											<input class="form-control form-control-lg form-required data" type="password" hs-entity="Login" hs-field="password" hs-error-msg="" name="password" placeholder="Contraseña" required />
+											<input id="password" class="form-control form-control-lg form-required data" type="password" hs-entity="Login" hs-field="password" hs-error-msg="" name="password" placeholder="Contraseña" required />
 											<small>
                                                 <a href="pages-reset-password.html">Has olvidado la contraseña?</a>
                                             </small>
@@ -43,7 +43,7 @@
                                             </label>
 										</div>
 										<div class="text-center mt-3">
-											<a href="javascript:void(0);" class="btn btn-lg btn-primary btnAuthenticate">Entrar</a>
+											<button type="button" class="btn btn-lg btn-primary btnAuthenticate">Entrar</button>
 											<!-- <button type="submit" class="btn btn-lg btn-primary">Sign in</button> -->
 										</div>
 									</form>

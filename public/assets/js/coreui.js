@@ -244,13 +244,19 @@ let CoreUI = {
         },
 
         /** Muestra un modal de ok */
-        Success: function(texto)
+        Success: function(texto, titulo, callback)
         {
-        Swal.fire(
-            `${texto}`,
-            '',
-            'success'
-            );    
+            Swal.fire({
+                text: `${texto}`,
+                title: titulo,
+                icon: 'success',
+                showCancelButton: false
+            }).then( (result) => {
+                if(result.isConfirmed && callback !== undefined)
+                {
+                    callback();
+                }
+            });    
         },
 
         /** Muestra un modal de error */

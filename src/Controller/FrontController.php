@@ -87,22 +87,22 @@ class MainController{
 
     public function Run()
     {
-        $this->setController( $_GET['route'] );
+        if(empty($_GET['route']))
+        {
+            $this->setController( 'login' );
+        }else{
+            $this->setController( $_GET['route'] );
+        }
 
         //  Comprobamos la seguridad
         $resultValidation = $this->checkSecurity();
         $userData = $resultValidation['data']->userData;
-
-        // print_r($resultValidation);
-        // print_r($userData);
-        // die();
 
         if($resultValidation['status'] === true && !empty($resultValidation['data']))
         {
             $this->userRol = $userData->role;
             $this->getController();
             $this->InitView();
-            //die('Tiene acceso');
         }else{
 
             if($this->getController() === 'login')
@@ -133,7 +133,7 @@ class MainController{
 
     public static function redirectToLogin()
     {
-        header('Location: ' . ROOT_URL . 'login');
+        header('Location: ' . HOME_URL . 'login');
         die();
     }
 

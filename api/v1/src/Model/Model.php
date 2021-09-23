@@ -150,6 +150,11 @@ class Model extends FrontController{
     public function query($sqlToExecute)
     {
         $resultData = $this->repositorio->queryRaw( $sqlToExecute );
+
+        //  Validamos que haya datos
+        if(!$resultData)
+            return null;
+
         return $this->mapMysqliResultsToObject($resultData);
     }
 
