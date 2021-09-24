@@ -14,7 +14,7 @@
 
                 <form class="form-data form-floating" autocomplete="off">
                     <input autocomplete="new-password" name="hidden" type="text" style="display:none;">
-                    <input type="hidden" name="rolid" value="5">
+                    <input type="hidden" hs-entity="Usuario" hs-field="rolid" class="data" name="rolid" value="5">
                     <!-- Estado del usuario -->
                     <div class="form-group row mb-2 justify-content-end">
                         <div class="col-12 col-md-2 text-left">
@@ -26,7 +26,7 @@
                     <div class="form-group row mb-2">
                         <div class="col-12 col-md-2 text-left">
                             <label for="cif" class="pl-0"><i class="bi bi-credit-card-2-front pr-2"></i>CIF*</label>
-                            <input type="text" class="form-control data text-center text-uppercase" id="cif" name="cif" placeholder="00.000.000-X"  hs-entity="Usuario" hs-field="cif" required>
+                            <input type="text" class="form-control data text-center text-uppercase" id="cif" name="cif" placeholder="00.000.000-X" hs-entity="Usuario" hs-field="cif" required>
                         </div>
                         <div class="col-12 col-md-4">
                             <label for="emailcontacto"><i class="bi bi-envelope pr-2"></i>E-Mail de contacto / Login</label>              

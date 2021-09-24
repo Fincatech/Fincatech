@@ -24,5 +24,10 @@
 ?>
 
 <body hs-model="<?php echo $bodyModel ?>" hs-action="<?php echo $bodyAction ?>" hs-model-id="<?php echo $bodyModelId; ?>">
-
+<div class="loading">
+    <div class="spinner-border text-warning mr-2" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+    <p class="text-white">Cargando...</p>
+</div>
 	<div class="wrapper">

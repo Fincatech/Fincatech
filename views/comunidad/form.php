@@ -16,7 +16,7 @@
                         <a class="list-group-item list-group-item-action active" data-toggle="list" href="#datos" role="tab" aria-selected="true"><i class="bi bi-archive mr-2"></i> Datos</a>
                         <a class="list-group-item list-group-item-action" data-toggle="list" href="#documentos" role="tab" aria-selected="false"><i class="bi bi-folder-check mr-2"></i> Documentos</a>
                         <a class="list-group-item list-group-item-action" data-toggle="list" href="#empresa" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> CAE</a>
-                        <a class="list-group-item list-group-item-action" data-toggle="list" href="#dpd" role="tab" aria-selected="false"><i class="bi bi-chat-right-text"></i> DPD</a>
+                        <a class="list-group-item list-group-item-action" data-toggle="list" href="#dpd" role="tab" aria-selected="false"><i class="bi bi-chat-right-text mr-2"></i> DPD</a>
                         <a class="list-group-item list-group-item-action disabled" data-toggle="list" href="#maquinaria" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> Maquinaria<br>Químicos</a>
                         <a class="list-group-item list-group-item-action disabled" data-toggle="list" href="#rgpd" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> RGPD</a>
                         <a class="list-group-item list-group-item-action disabled" data-toggle="list" href="#controlhorario" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> Control horario</a>

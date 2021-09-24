@@ -6,6 +6,8 @@ ADD COLUMN `password` VARCHAR(40) NULL AFTER `rolid`;
 
 ####### 23/09/2021
 
+
+
 CREATE TABLE `fincatech`.`comunidadempresa` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `idcomunidad` INT(11) NULL,
@@ -36,3 +38,16 @@ VIEW `view_empresascomunidad` AS
         ((`comunidadempresa` `ce`
         LEFT JOIN `comunidad` `c` ON ((`ce`.`idcomunidad` = `c`.`id`)))
         LEFT JOIN `empresa` `e` ON ((`e`.`id` = `ce`.`idempresa`)))
+
+ALTER TABLE `fincatech`.`informevaloracionseguimiento` 
+ADD COLUMN `usercreate` INT(11) NULL AFTER `estado`;
+
+ALTER TABLE `fincatech`.`tipopuestoempleado` 
+ADD COLUMN `usercreate` INT(11) NULL AFTER `nombre`;
+
+ALTER TABLE `fincatech`.`tiposinstalacion` 
+ADD COLUMN `usercreate` INT(11) NULL AFTER `nombre`;
+
+ALTER TABLE `fincatech`.`usuario` 
+ADD COLUMN `movil` VARCHAR(20) NULL AFTER `telefono`;
+

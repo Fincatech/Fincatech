@@ -195,7 +195,12 @@ class Model extends FrontController{
     {
         $resultData = $this->repositorio->queryRaw ( "select count(*) as total from (" . $entity . ") tabla ");
         $result = $this->mapMysqliResultsToObject($resultData);
-        return $result[0]['total'];
+        if(!$result)
+        {
+            return 0;
+        }else{
+            return $result[0]['total'];
+        }
     }
 
     /**

@@ -177,12 +177,13 @@ let CoreUI = {
             var columna = {};
             if(renderHTML !== undefined)
             {
-                columna = {"title": titulo, "data": null,
+                columna = {
+                    "title": titulo, 
+                    "data": null,
                     render: function(data, type, row, meta){
                         html = renderHTML;
                         field = "codigo";
                         html = CoreUI.tableData.extractFields(html, data);
-                        //html = html.replace("{data.id}", data[`${field}`]);
                         feather.replace();
                         return html;
                     }
@@ -205,7 +206,7 @@ let CoreUI = {
             }
 
             //  Cargamos el listado de comunidades
-            $(`#${id}`).DataTable({
+            window['table' + id] = $(`#${id}`).DataTable({
                 "serverSide": true,
                 "select": true,
                 "retrieve": true,
@@ -224,13 +225,29 @@ let CoreUI = {
                 }
             });
 
+            //  Suscripción al evento del click
+            $(`#${id}`).on('click', 'tr > td', function (e) 
+            {
+                console.log($(this));
+                if($(this).html().indexOf('accionesTabla') > 0)
+                {
+                    console.log('Ha clicado en acciones');
+                }else{
+                    var data = window['table' + id].row( this ).data();
+                    //  Redirigimos a la pantalla correspondiente que está basada en el endpoint
+                    //  quitando "list" ya que es el endpoint que se utiliza para el listado ajax
+                    window.location.href = baseURL + endpoint.toLowerCase().replace('list', data.id);
+                }
+
+            } );
+
         }        
 
     },
 
     Modal: {
 
-        GetHTML: function(id, html, titulo, texto)
+        GetHTML: function(id, html, titulo, texto, callback)
         {
             if($('body .'+id).length)
             {
@@ -260,7 +277,7 @@ let CoreUI = {
         },
 
         /** Muestra un modal de error */
-        Error: function(texto)
+        Error: function(texto, titulo, callback)
         {
             Swal.fire(
             `${texto}`,

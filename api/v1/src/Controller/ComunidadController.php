@@ -3,8 +3,12 @@ namespace Fincatech\Controller;
 
 
 use Fincatech\Model\ComunidadModel;
+use HappySoftware\Controller\HelperController;
+use HappySoftware\Controller\Traits\SecurityTrait;
 
 class ComunidadController extends FrontController{
+
+    use SecurityTrait;
 
     private $comunidadModel;
 
@@ -16,6 +20,10 @@ class ComunidadController extends FrontController{
     public function Create($entidadPrincipal, $datos)
     {
         //  Llamamos al método de crear
+        //  Si no está informado, cogemos el usuario autenticado en el sistema
+        if(!isset($datos['usuarioId']))
+            $datos['usuarioId'] = $this->getLoggedUserId();
+            
         return $this->ComunidadModel->Create($entidadPrincipal, $datos);
     }
 

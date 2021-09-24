@@ -83,7 +83,10 @@ return function (App $app) {
     $app->post('/{controller}/create', function(Request $request, Response $response, array $params ): Response
     {
 
-        $data = $request->getParsedBody();
+        // $data = $request->getParsedBody();
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
 
         // Instanciamos el controller principal
         $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';

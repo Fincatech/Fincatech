@@ -1,0 +1,4 @@
+Listado de bugs y fixes
+
+FIX 001: En los botones de acción de formulario, al volver debería meter un history.back ya que en el perfil de administrador de fincas vuelve al   dashboard pero no lo hace correctamente, la url es "comunidad"
+

@@ -165,15 +165,17 @@
                 </a>
 
                 <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-toggle="dropdown">
-                    <img src="<?php echo ASSETS_IMG; ?>avatars/avatar.jpg" class="avatar img-fluid rounded mr-1" alt="Oscar Rodríguez" /> <span class="text-dark">Óscar Rodríguez</span>
+                    <!-- <img src="<?php //echo ASSETS_IMG; ?>avatars/avatar.jpg" class="avatar img-fluid rounded mr-1" alt="Oscar Rodríguez" />--><i class="bi bi-person-circle" style="font-size:20px;"></i> <span class="text-dark">Óscar Rodríguez</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right">
-                    <a class="dropdown-item" href="pages-profile.html"><i class="align-middle mr-1" data-feather="user"></i> Perfil</a>
-                    <a class="dropdown-item" href="#"><i class="align-middle mr-1" data-feather="eye"></i> SPA Asignado</a>
-                    <a class="dropdown-item" href="#"><i class="align-middle mr-1" data-feather="users"></i> RGPD Empleados</a>
+                    <a class="dropdown-item disabled" href="pages-profile.html"><i class="align-middle mr-1" data-feather="user"></i> Perfil</a>
+                    <a class="dropdown-item disabled" href="#"><i class="align-middle mr-1" data-feather="eye"></i> SPA Asignado</a>
+                    <a class="dropdown-item disabled" href="#"><i class="align-middle mr-1" data-feather="users"></i> RGPD Empleados</a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item btnCargarComunidadesExcel" href="javascript:void(0);"><i class="align-middle mr-1" data-feather="folder-plus"></i> Cargar comunidades desde plantilla</a>
-                    <a class="dropdown-item" href="pages-settings.html"><i class="align-middle mr-1" data-feather="settings"></i> Preferencias</a>
+                    <?php if($App->isSudo()): ?>
+                        <a class="dropdown-item btnCargarComunidadesExcel" href="javascript:void(0);"><i class="align-middle mr-1" data-feather="folder-plus"></i> Cargar comunidades desde plantilla</a>
+                    <?php endif; ?>
+                    <a class="dropdown-item disabled" href="pages-settings.html"><i class="align-middle mr-1" data-feather="settings"></i> Preferencias</a>
                     <a class="dropdown-item" href="#"><i class="align-middle mr-1" data-feather="help-circle"></i> Ayuda</a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item btnLogout" href="javascript:void(0);">Cerrar sesión</a>

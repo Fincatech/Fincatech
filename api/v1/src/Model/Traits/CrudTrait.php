@@ -12,7 +12,9 @@ trait CrudTrait{
         if($this->isInsertAction())
         {
             $this->constructInsertSQL();
+
             // die($this->getSQL());
+
             //  Ejecutamos sobre la propiedad SQL
             $this->repositorio->queryRaw( $this->getSQL() );
             $data['id'] = $this->repositorio->getLastID($this->getEntidad()) - 1;
@@ -37,16 +39,16 @@ trait CrudTrait{
     {
         // print_r($data);
 
-        $this->setEntidad($entidadPrincipal);
+            $this->setEntidad($entidadPrincipal);
 
         //  Recuperamos el esquema de la entidad y sus entidades relacionadas
-        $this->getSchemaEntity();
+            $this->getSchemaEntity();
 
         //  Preparamos el builder de SQL
-        $this->createInsert($entidadPrincipal);
+            $this->createInsert($entidadPrincipal);
 
         //  Recuperamos todos los valores del post que hemos recibido
-        $this->processJSONPostData($data);
+            $this->processJSONPostData($data);
 
         // print_r($this->fields);
         // die();
@@ -149,18 +151,26 @@ trait CrudTrait{
      */
     public function getAll($mainAlias = null, $params = null)
     {
+
         // Primero nos traemos los datos de la entidad principal teniendo en cuenta los criterios de selección que pudiera tener
         $this->queryToExecute = "select * from " . $this->mainEntity . " ";
 
-        //  TODO: Tenemos que extraer el ID del usuario y el ROL ya que si no es SUDO
-        //  hay que acotar por usuario
+        //  Comprobamos el destino del listado
+        $isSelect = false;
+        if(isset($params['target']))
+        {
+            $isSelect = ($params['target'] == 'cbo' ? true : false);
+        }
 
         //  Comprobamos el rol que tiene el usuario
         //  FIX: ¿ES LA MANERA CORRECTA DE COMPROBAR O LO PODEMOS AUTOMATIZAR?
             $userData = get_object_vars( $this->getJWTUserData()['data']->userData );
             if($userData['role'] == 'ROLE_ADMINFINCAS')
             {
-                // $this->queryToExecute .= " where usuarioId = " . $userData['id'] . " ";
+                //  Hay que comprobar si el tipo de listado es de un select o bien de una entidad
+                //       ya que si no intenta hacer el acotado y eso no es correcto
+                if(!$isSelect )
+                    $this->queryToExecute .= " where usuarioId = " . $userData['id'] . " ";
             }
 
         //  Comprobamos si hay establecido orden
@@ -168,26 +178,26 @@ trait CrudTrait{
             $orderByType = (isset($params['order']) ? $params['order'] : null);
 
         //  Validación de propiedad del tipo de orden definido en el querystring
-        if(!is_null($orderBy) && !is_null($orderByType) )
-        {
-            $this->queryToExecute .= " order by $orderBy $orderByType ";
-        }else{
-            //  Validación de propiedad del tipo de orden en la definición de la entidad
-            if( isset($this->entity->orderBy) )
+            if(!is_null($orderBy) && !is_null($orderByType) )
             {
-                if( !is_null($this->entity->orderBy) )
-                    $this->queryToExecute .= " order by " . $this->entity->orderBy . " ";
-
-                if( isset($this->entity->orderType) )
+                $this->queryToExecute .= " order by $orderBy $orderByType ";
+            }else{
+                //  Validación de propiedad del tipo de orden en la definición de la entidad
+                if( isset($this->entity->orderBy) )
                 {
-                    $this->queryToExecute .= ( is_null($this->entity->orderType) ? "" : $this->entity->orderType);
-                }else{
-                    //  Por defecto es ASC
-                    $this->queryToExecute .= " " . ORDER_BY_ASC;
+                    if( !is_null($this->entity->orderBy) )
+                        $this->queryToExecute .= " order by " . $this->entity->orderBy . " ";
+
+                    if( isset($this->entity->orderType) )
+                    {
+                        $this->queryToExecute .= ( is_null($this->entity->orderType) ? "" : $this->entity->orderType);
+                    }else{
+                        //  Por defecto es ASC
+                        $this->queryToExecute .= " " . ORDER_BY_ASC;
+                    }
+                    
                 }
-                
             }
-        }
 
         //  Parámetros de paginación
             $limitStart = (isset($params['start']) ? $params['start'] : null);
@@ -195,7 +205,6 @@ trait CrudTrait{
 
         if(!is_null($limitStart) && !is_null($limitLength))
             $this->queryToExecute .= " limit " . $params['start'] . "," . $params['length'];
-            // $this->queryToExecute .= " limit " . $params['start'] . "," . ($params['start'] + $params['length']);
 
         // die($this->queryToExecute);
 

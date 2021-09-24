@@ -42,14 +42,19 @@ trait DatabaseTrait{
         //  Añadimos los nombres de los campos
         $this->builder( implode(",", array_keys($this->fields)) );
 
-        $this->builder( ") values (" );
+        $this->builder( ", usercreate) values (" );
 
         //  Añadimos los valores de los campos
-        $this->builder( implode(",", $this->fields) . ")");
+        $this->builder( implode(",", $this->fields) );
+
+        $userCreateId = $this->getLoggedUserId(); //get_object_vars( $this->getJWTUserData()['data']->userData )['id'];
+
+        //  Añadimos el usuario para la auditoria
+        $this->builder( ',' . $userCreateId . ')' );
 
         // Establecemos la sentencia para ejecutar
         $this->setSQL( $this->sqlBuilder );
-
+//  die($this->getSQL());
         //  Devolvemos la sentencia creada
         return $this->getSQL();
     }

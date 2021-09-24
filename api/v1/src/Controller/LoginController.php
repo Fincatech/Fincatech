@@ -24,7 +24,6 @@ class LoginController extends FrontController{
 
     public function checkLogin($params)
     {
-        
         $userName = $this->model->getRepositorio()::PrepareDBString( $params['email'] );
         $userPassword = $this->model->getRepositorio()::PrepareDBString( $params['password'] );
         $userRemember = $this->model->getRepositorio()::PrepareDBString( $params['recordar'] );
@@ -36,19 +35,25 @@ class LoginController extends FrontController{
                 usuario u,
                 rol r
             WHERE
-                u.email = '$userName'
+                (u.email = '$userName' or u.emailcontacto = '$userName')
                     AND u.password = MD5('$userPassword')
                     AND r.id = u.rolid
                     and u.estado = 'A'
         ";
 
         $resultado = false;
-
         $result = $this->model->query($sql);
-
+        
         $data = [];
         $JWTToken = null;
 
+        //  Por defecto establecemos expire a time - 1 minuto 
+        //  de esa manera si no hay validación de usuario se borra la cookie y destruimos
+        //  cualquier sesión previa
+        $expire = time() - 3600;
+
+        // print_r($result);
+        // die($sql);
         if(is_array($result))
         {
             if(count($result) > 0)

@@ -78,7 +78,17 @@
 
                         <div class="card-header">
 
-                            <h5 class="card-title mb-0"><i data-feather="list"></i> Comunidades</h5>
+                            <div class="row">
+
+                                <div class="col-12 col-md-9">
+                                    <h5 class="card-title mb-0"><i data-feather="list"></i> Comunidades</h5>
+                                </div>
+                                <div class="col-12 col-md-3 text-right">
+                                    <a href="comunidad/add" class="btn btn-outline-secondary text-uppercase rounded-pill shadow pl-2 pr-4"><i class="bi bi-plus-circle pr-3"></i> AÑADIR COMUNIDAD</a>
+                                </div>
+                            </div>
+
+
 
                         </div>
                         

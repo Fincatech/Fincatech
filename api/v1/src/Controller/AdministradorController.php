@@ -17,6 +17,12 @@ class AdministradorController extends FrontController{
     public function Create($entidadPrincipal, $datos)
     {
         //  Llamamos al método de crear
+        //  Tenemos que generar un salt aleatorio y una pass por defecto
+        //$datos['salt'] = md5(time());
+        $datos['salt'] = '';
+        //  TODO: Implementarlo en el formulario de administrador
+        $datos['password'] = md5('12345');
+
         return $this->AdministradorModel->Create($entidadPrincipal, $datos);
     }
 

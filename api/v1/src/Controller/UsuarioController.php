@@ -16,6 +16,16 @@ class UsuarioController extends FrontController{
 
     public function Create($entidadPrincipal, $datos)
     {
+        //  TODO: Generamos su salt aleatorio para luego el login para aplicar otro método
+        //  de encriptación más seguro
+            $datos['salt'] = '';
+
+        //  Si no viene informada la contraseña creamos una por defecto
+            if(!isset($datos['password']))
+            {
+                $datos['password'] = md5('12345');
+            }
+
         //  Llamamos al método de crear
         return $this->UsuarioModel->Create($entidadPrincipal, $datos);
     }

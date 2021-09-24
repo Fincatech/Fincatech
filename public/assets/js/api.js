@@ -37,16 +37,20 @@ let apiFincatech =
             'numeropagina': numeropagina
         }; 
 
+        $('.loading').show();
+
         return await $.ajax({
             url: apiFincatech.baseUrlEndpoint + 'getview',
             method: "POST",
             data: datosVista,
             success: function(respuesta)
             {
+                $('.loading').hide();
                 $(`${elementoDestino}`).html(respuesta);
             },
             error: function()
             {
+                $('.loading').hide();
                 apiFincatech.procesarError('Error de endpoint');
             }
         });
@@ -58,13 +62,16 @@ let apiFincatech =
      */
     get: async function(entity)
     {
+
+        $('.loading').show();
+
         // https://es.stackoverflow.com/questions/3582/diferencias-entre-ajax-anidadas-y-promises
         return await $.ajax({
             url: apiFincatech.baseUrlEndpoint + entity,
             success: function(respuesta)
             {
                 apiFincatech.response = respuesta.data;
-
+                $('.loading').hide();
                 if(respuesta.status=='error')
                 {
                     return 'error';
@@ -88,12 +95,15 @@ let apiFincatech =
      */
     delete: async function(entity, id)
     {
+        $('.loading').show();
+
         return await $.ajax({
             url: apiFincatech.baseUrlEndpoint + entity + "/" + id,
             type: 'delete',
             success: function(respuesta)
             {
                 apiFincatech.response = respuesta.data;
+                $('.loading').hide();
 
                 if(respuesta.status=='error')
                 {
@@ -101,10 +111,10 @@ let apiFincatech =
                 }else{
                     return JSON.stringify(respuesta);
                 }
-                 
             },
             error: function()
             {
+                $('.loading').hide();
                 apiFincatech.procesarError('Error de endpoint');
             }
         });
@@ -113,18 +123,21 @@ let apiFincatech =
     /** Llamada POST al restful api */
     post: async function(entity, datosPost)
     {
-    console.log('api post: ' + datosPost);
+        $('.loading').show();
+
         return await $.ajax({
             url: apiFincatech.baseUrlEndpoint + entity ,
             method: "POST",
             contentType: "application/json; charset=utf-8",
-            data: JSON.stringify(datosPost),
+            data: datosPost,
             success: function(respuesta)
             {
+                $('.loading').hide();
                 return respuesta;
             },
             error: function()
             {
+                $('.loading').hide();
                 apiFincatech.procesarError('Error de endpoint');
             }
         });
@@ -138,6 +151,9 @@ let apiFincatech =
      */
     put: async function(entity, datosPut)
     {
+
+        $('.loading').show();
+
         return await $.ajax({
             url: apiFincatech.baseUrlEndpoint + entity ,
             method: "PUT",
@@ -145,10 +161,12 @@ let apiFincatech =
             data: datosPut,
             success: function(respuesta)
             {
+                $('.loading').hide();
                 return respuesta;
             },
             error: function()
             {
+                $('.loading').hide();
                 apiFincatech.procesarError('Error de endpoint');
             }
         });

@@ -22,6 +22,7 @@ trait UtilsTrait{
         return $this->repositorio;
     }
 
+    /** Filtra los resultados según el campo y valor deseado para una entidad */
     protected function filterResults($datos, $entity, $key, $value)
     {
 
@@ -63,6 +64,10 @@ trait UtilsTrait{
                 $arrayResults[] = $row;
             }
         }
+
+        //  FIX: Mirar a ver si es mejor devolver un array cuando solo tiene un registro
+        //       o bien detectar si es un listado o un registro único
+        //       o bien detectar si es la entidad principal para no asignarlo como array
 
         return $arrayResults;
 

@@ -288,7 +288,7 @@ let core =
         $("body #" + elementoDOM).html("");
 
         //  Recuperamos los registros que correspondan según la entidad
-        await apiFincatech.get(`${entidad}/list`).then(async (data) =>
+        await apiFincatech.get(`${entidad}/list?target=cbo`).then(async (data) =>
         {
 
             var htmlOutput = "";
@@ -565,7 +565,7 @@ let core =
       checkLogin: async function( datos )
       {
         //  Comprobamos contra el endpoint de login si el usuario tiene acceso
-            await apiFincatech.post('checklogin', datos ).then( response => {
+            await apiFincatech.post('checklogin', JSON.stringify(datos) ).then( response => {
               respuesta = JSON.parse(response);
               if(respuesta.data.check === false)
               {

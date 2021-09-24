@@ -11,6 +11,12 @@ trait SecurityTrait{
         return $this->checkSecurity();
     }
 
+    public function getLoggedUserId()
+    {
+        $usuarioId = get_object_vars( $this->getJWTUserData()['data']->userData )['id'];
+        return $usuarioId;
+    }
+
     /** Comprueba si un usuario está autenticado en el sistema */
     public function checkSecurity()
     {
