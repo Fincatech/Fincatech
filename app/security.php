@@ -9,11 +9,12 @@ define("security", [
             "titulo" => "Súper Admin",
             "menulateral"=> false,
             "js"=>[
-                "comunidades",
                 "administrador",
-                "usuario",
+                "comunidades",
+                "empresa",
                 "spa",
-                "sudo"
+                "sudo",
+                "usuario",
             ]            
         ],
         "ROLE_ADMIN"=>[
@@ -26,9 +27,10 @@ define("security", [
             "titulo" => "Control documental DPD",
             "menulateral"=> false,
             "js"=>[
-                "dashboard",
-                "comunidades",
                 "dpd",
+                "empresa",
+                "notasinformativas",
+                "requerimiento",
             ] 
         ],
         "ROLE_REVDOC"=>[
@@ -42,7 +44,11 @@ define("security", [
             "menulateral"=> true,
             "js"=>[
                 "dashboard",
-                "comunidades"
+                "comunidades",
+                "dpd",
+                "empresa",
+                "notasinformativas",
+                "documental",
             ]
         ],
         "ROLE_CONTRATISTA"=>[

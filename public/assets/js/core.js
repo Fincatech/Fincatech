@@ -2,6 +2,7 @@
 let clickEventType = ((document.ontouchstart!==null)?'click':'touchstart');
 let environment = 'd';
 let baseURL = '/fincatech/';
+var role = null;
 
 let Constantes = {
 
@@ -11,6 +12,7 @@ let Constantes = {
    <p class="mt-3" style="font-size: 14px;">Seleccione el fichero excel desde el que desea realizar la carga de comunidades de forma automática</p>
    <p style="font-size: 14px;">Sólo se permiten ficheros con extensión xls o xlsx</p>`
 }
+
 
 let core =
 {
@@ -114,6 +116,72 @@ let core =
 
   },
 
+  /** Módulo de gestión de ficheros */
+  Files:{
+  
+    Fichero: Object(),
+    file: null,
+
+    init: async function()
+    {
+        core.Files.Fichero.entidad = null;
+        core.Files.Fichero.entidadId = null;
+        core.Files.Fichero.nombre = null;
+        core.Files.Fichero.base64 = null;
+        core.Files.events();
+    },
+
+    events: function()
+    {
+      if(!$('#ficheroadjuntar').length)
+        return;
+
+      const fileInput = document.getElementById('ficheroadjuntar')
+      // fileInput.addEventListener('change', readFichero, false);;
+
+      fileInput.addEventListener('change', (e) => {
+
+          // get a reference to the file
+          const file = e.target.files[0];
+          if(file !== undefined)
+          {
+            console.log(file);
+            // encode the file using the FileReader API
+            const reader = new FileReader();
+            reader.onloadend = () => {
+
+                // use a regex to remove data url part
+                const base64String = reader.result;
+                //.result
+                //     .replace('data:', '')
+                //     .replace(/^.+,/, '');
+
+                core.Files.Fichero.base64 = base64String;
+                core.Files.Fichero.entidad = core.model;
+
+                var fullPath = document.getElementById('ficheroadjuntar').value;
+                if (fullPath) {
+                    var startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath.lastIndexOf('\\') : fullPath.lastIndexOf('/'));
+                    var filename = fullPath.substring(startIndex);
+                    if (filename.indexOf('\\') === 0 || filename.indexOf('/') === 0) {
+                        filename = filename.substring(1);
+                    }
+                    core.Files.Fichero.nombre = filename;
+                    console.log('Nombre: ' + filename);
+                }          
+            };
+            reader.readAsDataURL(file);
+          }else{
+            core.Files.Fichero.base64 = '';
+            core.Files.Fichero.nombre = '';
+          }  
+
+      });
+
+    },
+
+  },
+
   /** Formularios de datos */
   Forms:
   {
@@ -134,6 +202,7 @@ let core =
 
           $("body .form-data .select-data").each(function()
           {
+              var insertarOpcionSeleccionar = false;
 
               var entidadCombo = $(this).attr("hs-list-entity");
               var keyField = $(this).attr("hs-list-field");
@@ -143,13 +212,19 @@ let core =
               var keyOriginField = $(this).attr("hs-field");
               var keyOriginValue = $(this).attr("hs-value");
 
-              core.Forms.getSelectData( entidadCombo, keyField, keyValue, keyOriginField, keyOriginValue, elDOM );
+              if($(this).attr('hs-seleccionar') !== undefined)
+              {
+                insertarOpcionSeleccionar = $(this).attr('hs-seleccionar');              
+              }
+
+              core.Forms.getSelectData( entidadCombo, keyField, keyValue, keyOriginField, keyOriginValue, elDOM, insertarOpcionSeleccionar );
 
           });
 
-            $('.selectpicker').select2({
-              theme: 'bootstrap4',
-            });
+          $('.selectpicker').select2({
+            theme: 'bootstrap4',          
+          });
+
         }
 
         // Si hay un id informado recuperamos la entidad desde el endpoint
@@ -189,31 +264,50 @@ let core =
           var entidad = $(this).attr('hs-entity') ;
           var campo = $(this).attr('hs-field') ;
 
-          // console.log( "Entidad: " + entidad );
-          // console.log( "Field: " + campo );
-
           var valor = core.Modelo.entity[ entidad ][0][campo];
 
           //  Leemos el modelo y el nombre del campo del que se va a recuperar la información
           //  y mapeamos el valor obtenido en el fetch
 
-          // console.log( core.Modelo.entity[ entidad ] );
+          //  FIXME: Arregla el if para evitar tantas anidaciones
           if($(this).hasClass("select-data"))
           {
             //  Leemos el id
             var id = $(this).attr("id");
             //  Validamos que exista el valor en el modelo antes de mapear
-            $(`#${id} option[value=${valor}]`).attr('selected','selected');
+            if(id !== undefined && id !== -1)
+            {
+              $(`#${id} option[value=${valor}]`).attr('selected','selected');
+            }else{
+            
+            }
           }else{
-            $(this).val( valor );
+
+            //  ¿ Es un checkbox ? 
+            if($(this).hasClass("form-check-input"))
+            {
+              console.log('Valor checkbox campo : ' + campo + ' - ' +  valor);
+              if(valor == 1)
+              {
+                console.log('Intentando checar')  ;
+                $(this).attr('checked', true);
+              }else{
+              console.log('Intentando checar false')  ;
+                $(this).attr('checked', false);
+              }
+            }else{
+              $(this).val( valor );
+            }
+
           }
 
         });
 
             //  Inicializamos el selectpicker
             $('.selectpicker').select2({
-              theme: 'bootstrap4',
+              theme: 'bootstrap4',           
             });
+
             // $('.selectpicker').each(function()
             // {
             //   $(this).trigger('change');
@@ -250,17 +344,19 @@ let core =
 
             if( $(this).is('select'))
             {
-              console.log('Es un combo!');
-              console.log('Valor del select: ' + $(this).val());
+              if($(this).val() == null || $(this).val() == '')
+              {
+                core.Forms.data[fieldName] = -1;
+              }
             }
 
-            if( $(this).attr('type') === 'checkbox')
+            if( $(this).is('checkbox') || $(this).attr('type') == 'checkbox')
             {
               if( $(this).is(':checked'))
               {
-                core.Forms.data[fieldName] = $(this).val();
+                core.Forms.data[fieldName] = 1;
               }else{
-                core.Forms.data[fieldName] = '';
+                core.Forms.data[fieldName] = 0;
               }
 
             }
@@ -282,7 +378,7 @@ let core =
     },
 
     /** Carga los datos en el combo especificado y la entidad que se va a recuperar */
-    getSelectData: async function(entidad, keyField, keyValue, keyOriginField, keyOriginValue, elementoDOM)
+    getSelectData: async function(entidad, keyField, keyValue, keyOriginField, keyOriginValue, elementoDOM, insertarOpcionSeleccionar)
     {
         //  Vaciamos el combo
         $("body #" + elementoDOM).html("");
@@ -315,6 +411,9 @@ let core =
               keyValue = entidadSeleccionada[1];
             }
 
+            htmlOutput = '<option value="-1" disabled selected="selected">SELECCIONE UNA OPCIÓN</option>';
+            $("body #" + elementoDOM).append(htmlOutput);
+
             // console.log('El: ' + responseData[entidad][][keyValue]);
             for(x = 0; x < responseData[entidad].length; x++)
             {
@@ -323,6 +422,10 @@ let core =
                 htmlOutput = `<option value="${valueId}">${value}</option>`;
                 $("body #" + elementoDOM).append(htmlOutput);
             }
+
+            $('body #' + elementoDOM).select2({
+              theme: 'bootstrap4'
+            });
 
         });
 
@@ -383,13 +486,20 @@ let core =
     entity: Object(),
     schema: Object(),
 
-    getAll: async function()
+    getAll: async function(params)
     {
-      await apiFincatech.get(`${core.model.toLowerCase()}/list`).then(async (data)=>
+      var data = {};
+      if(params !== undefined && params !== null)
+      {
+        data = params;
+      }
+      // await apiFincatech.get(`${core.model.toLowerCase()}/list`).then(async (data)=>
+      await apiFincatech.post(`${core.model.toLowerCase()}/list`, data).then(async (data)=>
       {
         result = JSON.parse(data);
         responseStatus = result.status;
         responseData = result.data;
+      }).catch(function(error){
       });
     },
 
@@ -400,7 +510,7 @@ let core =
      */
     Insert: async function(entidadSave, postData)
     {
-      await apiFincatech.post(`${entidadSave}/create`, JSON.stringify(postData)).then(async (response) =>
+      await apiFincatech.post(`${entidadSave}/create`, postData).then(async (response) =>
       {
 
           var responseData = JSON.parse(response);
@@ -443,10 +553,10 @@ let core =
      */
     Delete: async function(endpoint, id, nombre, nombreListadoDOM, titulo = null, mensaje = null)
     {
-        //  TODO: Posibilidad de personalizar título y mensaje
+        //  CHECKME: Posibilidad de personalizar título y mensaje
         Swal.fire({
-            title:`¿Desea eliminar el registro y toda la información relacionada?`,
-            text: `${nombre}`,
+            title: (titulo == null ? `¿Desea eliminar el registro y toda la información relacionada?` : titulo),
+            text:  (mensaje == null ? `${nombre}` : mensaje),
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -477,7 +587,7 @@ let core =
     Update: async function(endpoint, id, jsonPostData)
     {
 
-        await apiFincatech.put(`${endpoint}/${id}`, JSON.stringify(jsonPostData)).then(async (response) =>
+        await apiFincatech.put(`${endpoint}/${id}`, jsonPostData).then(async (response) =>
         {
 
             var responseData = JSON.parse(response);
@@ -565,7 +675,7 @@ let core =
       checkLogin: async function( datos )
       {
         //  Comprobamos contra el endpoint de login si el usuario tiene acceso
-            await apiFincatech.post('checklogin', JSON.stringify(datos) ).then( response => {
+            await apiFincatech.post('checklogin', datos ).then( response => {
               respuesta = JSON.parse(response);
               if(respuesta.data.check === false)
               {
@@ -583,7 +693,8 @@ let core =
 
       }
 
-  }
+  },
+
 
 };
 

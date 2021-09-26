@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+define('ROOT_DIR', dirname(dirname(dirname(dirname(__FILE__)))));
+
 use App\Application\Handlers\HttpErrorHandler;
 use App\Application\Handlers\ShutdownHandler;
 use App\Application\ResponseEmitter\ResponseEmitter;

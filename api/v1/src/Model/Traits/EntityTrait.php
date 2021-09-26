@@ -125,6 +125,8 @@ trait EntityTrait{
                        //  Comprobamos primero el tipo de relación, si es desde la entidad principal hacia fuera o a la inversa
                        switch($relacion->relationType)
                        {
+                            //  Busca en la tabla relacionada estableciendo la relación entre
+                            //  sourcecolumn (Campo de la entidad principal) y targetcolumn (Campo de la Tabla que se va a relacionar)
                            case RELACION_INSIDE:
                                //  inside
                                $relationQuery = "
@@ -191,7 +193,7 @@ trait EntityTrait{
                        }else{
                            $resultado = null;
                        }
-
+// $deb=true;
                        if(!$deb)
                        {
                           // echo $relationQuery . '<br>';

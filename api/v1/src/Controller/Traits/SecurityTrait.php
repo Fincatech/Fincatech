@@ -11,6 +11,12 @@ trait SecurityTrait{
         return $this->checkSecurity();
     }
 
+    public function getLoggedUserRole()
+    {
+        $usuarioRol = get_object_vars( $this->getJWTUserData()['data']->userData )['role'];
+        return $usuarioRol;
+    }
+
     public function getLoggedUserId()
     {
         $usuarioId = get_object_vars( $this->getJWTUserData()['data']->userData )['id'];

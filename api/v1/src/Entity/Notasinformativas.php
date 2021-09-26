@@ -7,7 +7,7 @@ use HappySoftware\Entity\EntityHelper;
 use HappySoftware\Entity\DatabaseHelper;
 use HappySoftware\Entity\DatabaseHelper\Relations;
 
-class NotasInformativas extends EntityHelper{
+class Notasinformativas extends EntityHelper{
 
     private $tableName = 'notasinformativas';
     public $primaryKey = 'id';

@@ -109,6 +109,8 @@ let CoreUI = {
 
             while(posInicial >= 0)
             {
+                valorCampo = 'N/D';
+
                 if(posInicial >= 0)
                 {
 
@@ -125,61 +127,91 @@ let CoreUI = {
                         if(campo.indexOf(".") > 0)
                         {
                             definicion = campo.split(".");
-                            valorCampo = datos[ definicion[0] ][0]
-                            valorCampo = valorCampo[definicion[1]];
-                        }else{
-
-                            valorCampo = datos[campo];
-                            switch(campo)
+                            if( datos[ definicion[0] ][0] !== undefined)
                             {
-                                case "created":
-                                   valorCampo = moment(valorCampo).locale('es').format('L');
-                                   break;
-                                case "estado":
-                                    switch(valorCampo)
-                                    {
-                                        case "H":
-                                            valorCampo = '<span class="badge rounded-pill bg-secondary d-block pt-2 pb-2">Histórico</span>';
-                                            break;
-                                        case "A":
-                                            valorCampo = '<span class="badge rounded-pill bg-success d-block pt-2 pb-2">Alta</span>';
-                                            break;
-                                        case "B":
-                                            valorCampo = '<span class="badge rounded-pill bg-danger d-block pt-2 pb-2">Baja</span>';
-                                            break;
-                                        case "P":
-                                            valorCampo = '<span class="badge rounded-pill bg-warning d-block pt-2 pb-2">Pendiente</span>';
-                                            break;
-
-                                    }
+                                valorCampo = datos[ definicion[0] ][0]
+                                valorCampo = valorCampo[definicion[1]];                            
+                            }
+                        }else{
+                            if( datos[campo] !== undefined)
+                            {
+                                valorCampo = datos[campo];
+                                switch(campo)
+                                {
+                                    case "created":
+                                    valorCampo = moment(valorCampo).locale('es').format('L');
                                     break;
+                                    case "estado":
+                                        switch(valorCampo)
+                                        {
+                                            case "H":
+                                                valorCampo = '<span class="badge rounded-pill bg-secondary d-block pt-2 pb-2">Histórico</span>';
+                                                break;
+                                            case "A":
+                                                valorCampo = '<span class="badge rounded-pill bg-success d-block pt-2 pb-2">Alta</span>';
+                                                break;
+                                            case "B":
+                                                valorCampo = '<span class="badge rounded-pill bg-danger d-block pt-2 pb-2">Baja</span>';
+                                                break;
+                                            case "P":
+                                                valorCampo = '<span class="badge rounded-pill bg-warning d-block pt-2 pb-2">Pendiente</span>';                                        
+                                        }
+                                        break;
+                                    case "solucionado":
+                                        switch(valorCampo)
+                                        {
+                                            case '0':
+                                                valorCampo = '<span class="badge rounded-pill bg-danger d-block pt-2 pb-2">Pendiente</span>';
+                                                break;
+                                            case '1':
+                                                valorCampo = '<span class="badge rounded-pill bg-success d-block pt-2 pb-2">Solucionada</span>';
+                                                break;                                        
+                                        }
+                                        break;
+                                    case "activado":
+                                        switch(valorCampo)
+                                        {
+                                            case '0':
+                                                valorCampo = '<span class="badge rounded-pill bg-danger d-block pt-2 pb-2">No activo</span>';
+                                                break;
+                                            case '1':
+                                                valorCampo = '<span class="badge rounded-pill bg-success d-block pt-2 pb-2">Activado</span>';
+                                                break;                                        
+                                        }
+                                        break;                                        
+                                }
                             }
                         }
 
 
                         var find = inicioPatron + campo + finalPatron;
                         // console.log("Valor obtenido: " + valorCampo);
-                        valor = valor.replace(find, valorCampo);
+                        valor = valor.replace(find, valorCampo );
                         // console.log("Reemplazo: " + valor);
                     }
                 }
+
                 posInicial = valor.indexOf(inicioPatron, posInicial  + inicioPatron.length + 1);
+
             }
 
-            // console.log("");
-            return valor;
+            // console.log(valor);
+            return  (valor == '' ? 'N/D': valor) ;
         },
 
         /** Añade la definición de una columna */
-        addColumn: function(nombre, titulo, renderHTML )
+        addColumn: function(nombre, titulo, renderHTML, clase, widthColumn )
         {
 
             var columna = {};
-            if(renderHTML !== undefined)
+
+            if(renderHTML !== undefined && renderHTML !== null)
             {
                 columna = {
                     "title": titulo, 
                     "data": null,
+                    "width": widthColumn,
+                    "className": clase,
                     render: function(data, type, row, meta){
                         html = renderHTML;
                         field = "codigo";
@@ -189,10 +221,11 @@ let CoreUI = {
                     }
                 };
             }else{
-                columna = {"data": nombre, "render":null, "title":titulo};
+                columna = {"data": nombre, "width": widthColumn, "render":null, "title":titulo};
             }
 
             this.columns.push(columna);
+
         },
 
         /** Renderiza la tabla */
@@ -208,6 +241,7 @@ let CoreUI = {
             //  Cargamos el listado de comunidades
             window['table' + id] = $(`#${id}`).DataTable({
                 "serverSide": true,
+                "autoWidth": true,
                 "select": true,
                 "retrieve": true,
                 "paging": true,
@@ -225,21 +259,24 @@ let CoreUI = {
                 }
             });
 
-            //  Suscripción al evento del click
-            $(`#${id}`).on('click', 'tr > td', function (e) 
+            //  Suscripción al evento del click salvo que la tabla no sea clicable
+            if( !$(`#${id}`).hasClass('no-clicable') )
             {
-                console.log($(this));
-                if($(this).html().indexOf('accionesTabla') > 0)
+                $(`#${id}`).on('click', 'tr > td', function (e) 
                 {
-                    console.log('Ha clicado en acciones');
-                }else{
-                    var data = window['table' + id].row( this ).data();
-                    //  Redirigimos a la pantalla correspondiente que está basada en el endpoint
-                    //  quitando "list" ya que es el endpoint que se utiliza para el listado ajax
-                    window.location.href = baseURL + endpoint.toLowerCase().replace('list', data.id);
-                }
+                    console.log($(this));
+                    if($(this).html().indexOf('accionesTabla') > 0)
+                    {
+                        console.log('Ha clicado en acciones');
+                    }else{
+                        var data = window['table' + id].row( this ).data();
+                        //  Redirigimos a la pantalla correspondiente que está basada en el endpoint
+                        //  quitando "list" ya que es el endpoint que se utiliza para el listado ajax
+                        window.location.href = baseURL + endpoint.toLowerCase().replace('list', data.id);
+                    }
 
-            } );
+                });
+            }
 
         }        
 
@@ -258,6 +295,17 @@ let CoreUI = {
 
             feather.replace();
             $('body .' + id).modal('show');
+        },
+
+        CustomHTML: async function(texto, titulo, callback, modalWidth)
+        {
+            await Swal.fire({
+                html: `${texto}`,
+                title: titulo,
+                showCancelButton: false,
+                showConfirmButton: false,
+                width: (modalWidth == '' ? '32rem' : modalWidth)
+            });  
         },
 
         /** Muestra un modal de ok */
@@ -279,11 +327,17 @@ let CoreUI = {
         /** Muestra un modal de error */
         Error: function(texto, titulo, callback)
         {
-            Swal.fire(
-            `${texto}`,
-            '',
-            'error'
-            );  
+            Swal.fire({
+                text: `${texto}`,
+                title: '',
+                icon: 'error',
+                showCancelButton: false
+            }).then( (result) =>{
+                if(result.isConfirmed && callback !== undefined)
+                {
+                    callback();
+                }
+            });  
         },
 
     }

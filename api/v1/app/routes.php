@@ -164,7 +164,7 @@ return function (App $app) {
     $app->post('/{controller}/list', function(Request $request, Response $response, array $params ): Response
     {
 
-        $data = $request->getParsedBody();
+        // $data = $request->getParsedBody();
 
         // Instanciamos el controller principal
         $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
@@ -172,7 +172,10 @@ return function (App $app) {
         $frontController = new $frontControllerName();
         $frontController->Init($params['controller']);
 
-        $response->getBody()->write( $frontController->GetTable($data) );
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        $response->getBody()->write( $frontController->List($data) );
         return $response;
 
     });

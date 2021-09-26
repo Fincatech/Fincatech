@@ -4,14 +4,14 @@ namespace Fincatech\Model;
 
 use Fincatech\Entity\NotasInformativas;
 
-class NotasInformativasModel extends \HappySoftware\Model\Model{
+class NotasinformativasModel extends \HappySoftware\Model\Model{
 
-    private $entidad = 'NotasInformativas';
+    private $entidad = 'Notasinformativas';
 
     private $tablasSchema = array("notasinformativas");
 
     /**
-     * @var \Fincatech\Entity\NotasInformativas
+     * @var \Fincatech\Entity\Notasinformativas
      */
     public $notasinformativas;
 

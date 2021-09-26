@@ -21,12 +21,6 @@ trait DatabaseTrait{
     /** Return SQL Created */
     public function getSQL()
     {
-        if($this->sqlBuilder != "")
-        {
-            //  Comprobamos si es un update o un insert
-
-        }
-
         return $this->sqlToExecute;
     }
 
@@ -54,7 +48,7 @@ trait DatabaseTrait{
 
         // Establecemos la sentencia para ejecutar
         $this->setSQL( $this->sqlBuilder );
-//  die($this->getSQL());
+
         //  Devolvemos la sentencia creada
         return $this->getSQL();
     }
@@ -63,11 +57,8 @@ trait DatabaseTrait{
     private function constructUpdateSQL()
     {
         //  Recorremos todo el objeto y vamos asignando los valores
-
         foreach($this->fields as $key=>$value)
-        {
             $this->builder($key . "=" . $value . ", ");
-        }
         
         // Arreglo para quitar la última coma
         $this->sqlBuilder = substr($this->sqlBuilder, 0,-2);
@@ -77,8 +68,6 @@ trait DatabaseTrait{
 
         // Establecemos la sentencia para ejecutar
         $this->setSQL( $this->sqlBuilder );
-
-        //die($this->getSQL());
 
         //  Devolvemos la sentencia creada
         return $this->getSQL();
@@ -168,7 +157,7 @@ trait DatabaseTrait{
 
             return "'" . $this->getRepositorio()::PrepareDBString($valor) ."' ";
         }else{
-            if($valor == "")
+            if($valor === '')
             {
                 return "null";
             }else{

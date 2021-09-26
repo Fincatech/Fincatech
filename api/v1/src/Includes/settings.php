@@ -19,6 +19,10 @@ $appSettings = [
     'project' => [
         'namespace' => '\Fincatech\\'
     ],
+    //  Configuración de la ruta de almacén de ficheros
+    'storage' => [
+        'path' => '/public/storage/',
+    ],
     //  Configuración para el deploy directo en el servidor
     'deploy' => [
         'ftp' => [

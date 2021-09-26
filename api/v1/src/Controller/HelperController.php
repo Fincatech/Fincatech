@@ -2,6 +2,8 @@
 
 namespace HappySoftware\Controller;
 
+use Firebase\JWT\JWT;
+
 class HelperController{
 
     public static function successResponse($data, $codeResponse = 200)

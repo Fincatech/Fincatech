@@ -6,10 +6,21 @@ use Firebase\JWT\JWT;
 
 trait SecurityTrait{
 
+    public function getJWTUserData()
+    {
+        return $this->checkSecurity();
+    }
+
     public function getLoggedUserId()
     {
         $usuarioId = get_object_vars( $this->getJWTUserData()['data']->userData )['id'];;
         return $usuarioId;
+    }
+
+    public function getLoggedUserRole()
+    {
+        $usuarioRol = get_object_vars( $this->getJWTUserData()['data']->userData )['role'];
+        return $usuarioRol;
     }
 
     /** Comprueba si un usuario está autenticado en el sistema */

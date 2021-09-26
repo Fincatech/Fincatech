@@ -39,23 +39,8 @@ class Requerimiento extends EntityHelper{
     /** Establece las relaciones de entidades con esta entidad */
     private function setRelations()
     {       
-        // //  Entidad usuario_roles
-        // $this->relations[] = $this->addRelation([
-        //     'table' => 'usuarioRol',
-        //     //  Columna de la entidad que se está relacionando con la entidad principal
-        //     'sourceColumn' =>'rolId',
-        //     //  Columna de la entidad principal con la que se va a relacionar
-        //     'targetColumn' => 'id',
-        //     'fieldType' => 'int',
-        //     'canReturnSchema' => false,
-        //     'readOnly' => true,
-        //     //  Indica si se debe eliminar el registro relacionado o no
-        //     'deleteOnCascade' => false,
-        //     //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
-        //     'relationType' => RELACION_INVERSA
-        // ]);
 
-        //  Entidad Ficheros comunes
+        //  Fichero
         $this->relations[] = $this->addRelation([
             'table' => 'ficheroscomunes',
             //  Columna de la entidad que se está relacionando con la entidad principal
@@ -63,10 +48,42 @@ class Requerimiento extends EntityHelper{
             //  Columna de la entidad principal con la que se va a relacionar
             'targetColumn' => 'idfichero',
             'fieldType' => 'int',
+            'readOnly' => true,
+            'canReturnSchema' => false,
             'deleteMode' => DELETE_FISICO,
             //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
             'relationType' => RELACION_OUTSIDE
         ]);
+
+        //  Comunidad asociada
+        $this->relations[] = $this->addRelation([
+            'table' => 'comunidad',
+            //  Columna de la entidad que se está relacionando con la entidad principal
+            'sourceColumn' =>'id',
+            //  Columna de la entidad principal con la que se va a relacionar
+            'targetColumn' => 'idcomunidad',
+            'fieldType' => 'int',
+            'readOnly' => true,
+            'canReturnSchema' => false,
+            'deleteMode' => DELETE_FISICO,
+            //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
+            'relationType' => RELACION_OUTSIDE
+        ]);
+
+        //  Tipo de requerimiento
+        $this->relations[] = $this->addRelation([
+            'table' => 'requerimientotipo',
+            //  Columna de la entidad que se está relacionando con la entidad principal
+            'sourceColumn' =>'idrequerimientotipo',
+            //  Columna de la entidad principal con la que se va a relacionar
+            'targetColumn' => 'id',
+            'fieldType' => 'int',
+            'readOnly' => true,
+            'canReturnSchema' => false,
+            'deleteMode' => DELETE_FISICO,
+            //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
+            'relationType' => RELACION_INVERSA
+        ]);        
 
     }
 

@@ -11,6 +11,7 @@ let apiFincatech =
 
     procesarError: function(mensaje)
     {
+        $('.loading').hide();
         CoreUI.Modal.Error(mensaje);
     },
 
@@ -114,7 +115,6 @@ let apiFincatech =
             },
             error: function()
             {
-                $('.loading').hide();
                 apiFincatech.procesarError('Error de endpoint');
             }
         });
@@ -124,6 +124,12 @@ let apiFincatech =
     post: async function(entity, datosPost)
     {
         $('.loading').show();
+
+        //  Si tiene fichero adjuntado adjuntamos el objeto
+        if(core.Files.Fichero.base64 != '')
+            datosPost.fichero = core.Files.Fichero;
+
+        datosPost = JSON.stringify(datosPost);
 
         return await $.ajax({
             url: apiFincatech.baseUrlEndpoint + entity ,
@@ -137,7 +143,6 @@ let apiFincatech =
             },
             error: function()
             {
-                $('.loading').hide();
                 apiFincatech.procesarError('Error de endpoint');
             }
         });
@@ -154,6 +159,12 @@ let apiFincatech =
 
         $('.loading').show();
 
+        //  Si tiene fichero adjuntado adjuntamos el objeto
+        if(core.Files.Fichero.base64 != '')
+            datosPut.fichero = core.Files.Fichero;
+
+        datosPut = JSON.stringify(datosPut);
+
         return await $.ajax({
             url: apiFincatech.baseUrlEndpoint + entity ,
             method: "PUT",
@@ -166,7 +177,6 @@ let apiFincatech =
             },
             error: function()
             {
-                $('.loading').hide();
                 apiFincatech.procesarError('Error de endpoint');
             }
         });

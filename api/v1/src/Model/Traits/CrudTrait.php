@@ -13,15 +13,9 @@ trait CrudTrait{
         {
             $this->constructInsertSQL();
 
-            // die($this->getSQL());
-
             //  Ejecutamos sobre la propiedad SQL
             $this->repositorio->queryRaw( $this->getSQL() );
             $data['id'] = $this->repositorio->getLastID($this->getEntidad()) - 1;
-
-            //  TODO: Debemos comprobar si hay fichero adjunto para poder realizar la subida de los ficheros y generar
-            //  los registros correspondientes en base de datos para poder actualizar la tabla de relación de ficheros
-
             return $data;
         }else{
             //  Ejecutamos sobre la propiedad SQL
@@ -47,8 +41,21 @@ trait CrudTrait{
         //  Preparamos el builder de SQL
             $this->createInsert($entidadPrincipal);
 
+        //  Si hay fichero, guardamos el mismo en el almacén y quitamos la info del $data
+        //  para evitar problemas a la hora de guardar los datos
+        //  Comprobamos si hay fichero adjuntado a la petición
+            $ficheroId = $this->getFileInfoFromPostData($data);
+
+            if( $ficheroId != null)
+            {
+                $data['idfichero'] = $ficheroId;
+             
+            }
+            unset($data['fichero']);
+
         //  Recuperamos todos los valores del post que hemos recibido
             $this->processJSONPostData($data);
+
 
         // print_r($this->fields);
         // die();
@@ -66,14 +73,16 @@ trait CrudTrait{
     {
 
         //  Recuperamos todos los valores del post que hemos recibido
+        // echo 'processJSONPostData----' . PHP_EOL;
         foreach($data as $key => $value)
         {
+                // echo 'Key: ' . $key . " - Value: " . $value . PHP_EOL . '<br>';
                 //  Validamos que exista la propiedad en la tabla
                 $value = $this->fixFieldValue($key, $value);
                 $this->addField($key, $value);
-
         }  
           
+        // echo 'FIN processJSONPostData----' . PHP_EOL;
     }
 
     //  CRUD METHODS
@@ -126,14 +135,23 @@ trait CrudTrait{
         $this->setEntidad($entidadPrincipal);
 
         //  Recuperamos el esquema de la entidad y sus entidades relacionadas
-        $this->getSchemaEntity();        
+            $this->getSchemaEntity();        
 
         //  Preparamos el builder de SQL
-        $this->createUpdate($entidadPrincipal);
+            $this->createUpdate($entidadPrincipal);
+
+        //  Comprobamos si hay fichero adjuntado a la petición
+            $ficheroId = $this->getFileInfoFromPostData($data);
+
+            if( $ficheroId != null)
+            {
+                $data['idfichero'] = $ficheroId;
+            }
+            unset($data['fichero']);
 
         //  Recuperamos todos los valores del post que hemos recibido
-        $this->processJSONPostData($data);        
- 
+            $this->processJSONPostData($data);
+
         //  Guardamos
         return $this->Save();
     }
@@ -152,15 +170,24 @@ trait CrudTrait{
     public function getAll($mainAlias = null, $params = null)
     {
 
-        // Primero nos traemos los datos de la entidad principal teniendo en cuenta los criterios de selección que pudiera tener
-        $this->queryToExecute = "select * from " . $this->mainEntity . " ";
+        //  Parámetros aceptados en params
+        /*
+            filter[{campo1:valor}]
+            searchby[campo, valorBusqueda]
+            orderby = campo
+            order = tipo de ordenación: ASC | DESC
+        */
+
+        //  Primero nos traemos los datos de la entidad principal teniendo en cuenta los criterios de selección que pudiera tener
+            $this->queryToExecute = "select * from " . $this->mainEntity . " ";
 
         //  Comprobamos el destino del listado
-        $isSelect = false;
-        if(isset($params['target']))
-        {
-            $isSelect = ($params['target'] == 'cbo' ? true : false);
-        }
+            $isSelect = false;
+
+            if(isset($params['target']))
+            {
+                $isSelect = ($params['target'] == 'cbo' ? true : false);
+            }
 
         //  Comprobamos el rol que tiene el usuario
         //  FIX: ¿ES LA MANERA CORRECTA DE COMPROBAR O LO PODEMOS AUTOMATIZAR?
@@ -170,8 +197,38 @@ trait CrudTrait{
                 //  Hay que comprobar si el tipo de listado es de un select o bien de una entidad
                 //       ya que si no intenta hacer el acotado y eso no es correcto
                 if(!$isSelect )
-                    $this->queryToExecute .= " where usuarioId = " . $userData['id'] . " ";
+                {
+                    // TOFIX: Hay que quitar el harcode este
+                    if($this->mainEntity == 'Comunidad')
+                    {
+                        $this->queryToExecute .= " where usuarioId = " . $userData['id'] . " ";
+                    }else{
+                        $this->queryToExecute .= " where usercreate = " . $userData['id'] . " ";
+                    }
+                
+                }
             }
+
+        //  Comprobamos si tiene algún filtro establecido para acotar campos
+        /*
+            filter[{campo1:valor}]
+            filterfield = campo
+            filtervalue = valorBusqueda
+            search = valor a buscar ?¿
+            orderby = campo
+            order = tipo de ordenación: ASC | DESC
+        */
+
+        //  FIXME: Arreglar esta búsqueda ya que puede dar error
+        //  NOTE: Habría que montar vistas para los listados
+        if(isset($params['filterfield']) && isset($params['filtervalue']))
+        {
+            if(strpos($this->queryToExecute, "where") >= 0)
+                $this->queryToExecute .= " AND ";
+
+            $this->queryToExecute .= ' ' . $params['filterfield'] . ' = ' . $params['filtervalue'] . " ";
+            
+        }
 
         //  Comprobamos si hay establecido orden
             $orderBy = (isset($params['orderby']) ? $params['orderby'] : null);
@@ -203,8 +260,8 @@ trait CrudTrait{
             $limitStart = (isset($params['start']) ? $params['start'] : null);
             $limitLength = (isset($params['length']) ? $params['length'] : null);
 
-        if(!is_null($limitStart) && !is_null($limitLength))
-            $this->queryToExecute .= " limit " . $params['start'] . "," . $params['length'];
+            if(!is_null($limitStart) && !is_null($limitLength))
+                $this->queryToExecute .= " limit " . $params['start'] . "," . $params['length'];
 
         // die($this->queryToExecute);
 
@@ -212,6 +269,7 @@ trait CrudTrait{
 
         $this->entityData['total'] = $this->getTotalRows("select * from " . $this->mainEntity . " ");
         $this->entityData['filtered'] = $this->getTotalRows($this->queryToExecute);
+
         return $this->entityData;
 
     }
