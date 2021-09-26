@@ -193,7 +193,7 @@ trait EntityTrait{
                        }else{
                            $resultado = null;
                        }
-// $deb=true;
+                       
                        if(!$deb)
                        {
                           // echo $relationQuery . '<br>';

@@ -178,10 +178,21 @@ trait CrudTrait{
             order = tipo de ordenación: ASC | DESC
         */
 
-        //  Primero nos traemos los datos de la entidad principal teniendo en cuenta los criterios de selección que pudiera tener
-            $this->queryToExecute = "select * from " . $this->mainEntity . " ";
+        //  Comprobamos si los datos se recuperan desde la entidad principal o por el contrario
+        //  hay que recuperar la información de una vista
+            $this->queryToExecute = "select * from ";
+            if(isset($params['view']))
+            {
+                $this->queryToExecute .= $params['view'] . " ";        
+            }else{
+                $this->queryToExecute .= $this->mainEntity . " ";        
+            }
+
+        //  Nos traemos los datos de la entidad principal teniendo en cuenta los criterios de selección 
+        //  que pudiera tener
 
         //  Comprobamos el destino del listado
+        //  $isSelect significa que es para un combo 
             $isSelect = false;
 
             if(isset($params['target']))

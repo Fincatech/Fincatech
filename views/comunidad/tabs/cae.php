@@ -14,9 +14,16 @@
                     
                             <div class="card-body shadow-inset rounded-lg border mb-1 border-white">
 
-                                <form class="form-data form-floating">
+                                <div class="row">
 
-                                </form>
+                                    <div class="col-12 col-md-6">
+
+                                        <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoEmpresa" id="listadoEmpresa" data-model="empresa">
+                                            <thead class="thead"></thead>
+                                            <tbody class="tbody"></tbody>
+                                        </table>
+
+                                    </div>
 
                             </div>
 
