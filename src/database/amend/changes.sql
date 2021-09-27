@@ -128,3 +128,5 @@ CHANGE COLUMN `caduca` `caduca` TINYINT(1) NULL DEFAULT '0' ;
 ALTER TABLE `fincatech`.`comunidadempresa` 
 ADD COLUMN `usercreate` INT(11) NULL AFTER `created`;
 
+##########################################################################################
+## 27/09/2021
