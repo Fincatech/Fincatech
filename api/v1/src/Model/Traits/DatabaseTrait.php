@@ -33,6 +33,13 @@ trait DatabaseTrait{
     /** Devuelve la sentencia de insert formada para poder ejecutarse */
     private function constructInsertSQL()
     {
+
+        // if($this->getEntidad() == 'empleadoempresa')
+        // {
+        //     print_r($this->fields);
+        //     die('3s');
+        // }
+
         //  Añadimos los nombres de los campos
         $this->builder( implode(",", array_keys($this->fields)) );
 
@@ -50,6 +57,11 @@ trait DatabaseTrait{
         $this->setSQL( $this->sqlBuilder );
 
         //  Devolvemos la sentencia creada
+        if($this->getEntidad() == 'empleadoempresa')
+        {
+            // print_r($this->fields);
+            // die($this->getSQL());
+        } 
         return $this->getSQL();
     }
 
@@ -155,7 +167,13 @@ trait DatabaseTrait{
                 return "null";
             }
 
-            return "'" . $this->getRepositorio()::PrepareDBString($valor) ."' ";
+            if($valor == 'now()')
+            {
+                return $valor;
+            }else{
+                return "'" . $this->getRepositorio()::PrepareDBString($valor) ."' ";
+            }
+
         }else{
             if($valor === '')
             {

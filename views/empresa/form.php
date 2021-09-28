@@ -73,6 +73,23 @@
 
                     </div>                    
 
+                    <!-- Si es una edición y además es sudo, listamos los empleados de la empresa -->
+                    <?php if($App->getAction() == 'get' && $App->getUserRol() == 'ROLE_SUDO'): ?>
+                    <div class="form-group row mb-2 mt-3">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-title">Empleados asociados a la empresa</div>
+                                <div class="card-body p-0">
+                                    <table class="table table-hover my-0 hs-tabla w-100" name="listadoEmpleadosEmpresa" id="listadoEmpleadosEmpresa" data-model="empleado">
+                                        <thead class="thead"></thead>
+                                        <tbody class="tbody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <?php endif; ?>
                     <?php $App->renderActionButtons(); ?>
 
                 </form>

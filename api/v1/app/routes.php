@@ -199,6 +199,40 @@ return function (App $app) {
 
     });
 
+    $app->get('/empleado/{id}/empresas', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Empleado');
+
+        $id = $params['id'];
+
+        $response->getBody()->write( $frontController->context->ListEmpresasByEmpleadoId($id) );
+
+        return $response;  
+
+    });
+
+    $app->get('/empresa/{id}/empleados', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Empleado');
+
+        $idEmpresa = $params['id'];
+
+        $response->getBody()->write( $frontController->context->ListEmpleadosByEmpresaId($idEmpresa) );
+
+        return $response;  
+
+    });
+
     //  Punto de entrada para get con ID
     $app->get('/{controller}/{id:[0-9]+}', function (Request $request, Response $response, array $params)
     {

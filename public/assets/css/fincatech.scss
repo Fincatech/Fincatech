@@ -10,24 +10,48 @@ textarea:focus, input:focus{
     -webkit-box-shadow: inset 4px 4px 10px #dadada !important;
 }
 
+span.select2-dropdown.select2-dropdown--below {
+    box-shadow: 7px 7px 12px #989898;
+    border-radius: 0px 0px 10px 10px;
+}
+.select2-container--bootstrap4 .select2-results__option--highlighted, .select2-container--bootstrap4 .select2-results__option--highlighted.select2-results__option[aria-selected="true"] {
+    color: #fff;
+    background-color: rgb(100, 150, 200 / 50%) !important;
+}
+.select2-results__option--disabled {
+    background-color: #ccfbc4;
+    font-weight: 700;
+    text-align: center;
+    border-bottom: 1px solid #a2ca9b;
+    border-top: 1px solid #a2ca9b;
+}
+
 /* Capa loading */
-.loading{
-    position:fixed;
+.loading {
+    position: fixed;
     height: 100%;
     width: 100%;
-    left:0;
-    top:0;
-    bottom:0;
+    left: 0;
+    top: 0;
+    bottom: 0;
     background-color: rgba(255, 255, 255, 0.75);
+    -webkit-animation: 300ms all ease-in-out;
     animation: 300ms all ease-in-out;
-    display: none;
     z-index: 999999999999999;
+    align-items: center;
+    justify-content: center;
+    display: flex;
 }
 
 /* TABLA DE LISTDOS */
 .dataTable {
     border: 1px solid #afafaf;
     border-radius: 10px;
+}
+
+.dataTable th {
+    background: #F3F0D7 !important;
+    // color: white;
 }
 
 .dataTables_length select {
@@ -230,11 +254,26 @@ td.p-0.text-center {
 }
 
 /** Listado general **/
+// .card .card-header.headerListado {
+//     box-shadow: 4px 4px 20px lightgrey;
+//     margin-bottom: 25px;
+//     // background-color: #586f4b;
+//     border-radius: 10px 10px 0px 0px !important;
+// }
+.card {
+    border: 3px solid #cee5d0;
+}
 .card .card-header.headerListado {
-    box-shadow: 4px 4px 20px lightgrey;
+    -webkit-box-shadow: 0px 5px 8px #c7c7c7;
+    box-shadow: 0px 5px 8px #c7c7c7;
     margin-bottom: 25px;
-    // background-color: #586f4b;
     border-radius: 10px 10px 0px 0px !important;
+}
+.table>:not(caption)>*>* {
+    border-bottom: 0 !important;
+}
+.card .headerListado {
+    background-color: #cee5d078;
 }
 
 .list-group-flush > .list-group-item {

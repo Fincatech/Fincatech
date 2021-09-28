@@ -6,7 +6,7 @@ use HappySoftware\Database\DatabaseCore;
 
 trait CrudTrait{
 
-    //  método de guardar entidad en bbdd
+    /** Método de guardar entidad en bbdd */
     public function Save()
     {
         if($this->isInsertAction())
@@ -31,8 +31,13 @@ trait CrudTrait{
     */
     public function Create($entidadPrincipal, $data)
     {
-        // print_r($data);
 
+        //  Hay que inicializar los campos por si se van a procesar entidades relacionadas
+            $this->fields = [];
+
+        //  TODO:   Evaluar si recorremos cada una de las subentidades
+        //          o bien lo hacemos de forma independiente en el controller
+        //          En el controller sería lo suyo para obtener el ID retornado de la inserción
             $this->setEntidad($entidadPrincipal);
 
         //  Recuperamos el esquema de la entidad y sus entidades relacionadas
@@ -56,15 +61,11 @@ trait CrudTrait{
         //  Recuperamos todos los valores del post que hemos recibido
             $this->processJSONPostData($data);
 
-
-        // print_r($this->fields);
-        // die();
-
         //  Auditoría
-        $this->addField("created", "now()");
+            $this->addField("created", "now()");
 
         //  Ejecutamos sobre la propiedad SQL
-        return $this->Save();
+            return $this->Save();
 
     }
 
@@ -84,8 +85,11 @@ trait CrudTrait{
           
         // echo 'FIN processJSONPostData----' . PHP_EOL;
     }
+    
+    ////////////////////////////////////
+    /////////  CRUD METHODS  ///////////
+    ////////////////////////////////////
 
-    //  CRUD METHODS
     /**
      * Elimina una entidad de la base de datos
      */

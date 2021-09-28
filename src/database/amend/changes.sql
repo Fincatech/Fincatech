@@ -130,3 +130,43 @@ ADD COLUMN `usercreate` INT(11) NULL AFTER `created`;
 
 ##########################################################################################
 ## 27/09/2021
+
+ALTER TABLE `fincatech`.`empleado` 
+ADD COLUMN `localidad` VARCHAR(100) NULL AFTER `idlocalidad`,
+ADD COLUMN `provinciaid` INT(11) NULL AFTER `localidad`;
+
+ALTER TABLE `fincatech`.`empleado` 
+CHANGE COLUMN `codigopostal` `codpostal` VARCHAR(5) NULL DEFAULT NULL ;
+
+
+ALTER TABLE `fincatech`.`empleado` 
+ADD COLUMN `telefono` VARCHAR(20) NULL AFTER `email`;
+
+CREATE 
+VIEW `view_empleadosempresa` AS
+    SELECT 
+        `e`.`id` AS `id`,
+        `e`.`idempleado` AS `idempleado`,
+        `e`.`idempresa` AS `idempresa`,
+        `epl`.`nombre` AS `nombre`,
+        `epl`.`numerodocumento` AS `numerodocumento`,
+        `epl`.`localidad` AS `localidad`,
+        `epl`.`email` AS `email`,
+        `epl`.`telefono` AS `telefono`,
+        `epl`.`estado` AS `estado`,
+        `tpe`.`nombre` AS `puesto`,
+        `emp`.`razonsocial` AS `razonsocial`,
+        `e`.`fechaalta` AS `fechaalta`,
+        `epl`.`created` AS `created`
+    FROM
+        (((`empleadoempresa` `e`
+        LEFT JOIN `empleado` `epl` ON ((`epl`.`id` = `e`.`idempleado`)))
+        LEFT JOIN `empresa` `emp` ON ((`emp`.`id` = `e`.`idempresa`)))
+        LEFT JOIN `tipopuestoempleado` `tpe` ON ((`tpe`.`id` = `epl`.`idtipopuestoempleado`)));
+
+ALTER TABLE `fincatech`.`empleado` 
+CHANGE COLUMN `tipodocumento` `tipodocumento` VARCHAR(1) NULL DEFAULT 'N' ;        
+
+ALTER TABLE `fincatech`.`empleadoempresa` 
+CHANGE COLUMN `fechaalta` `fechaalta` DATETIME NULL DEFAULT NULL ,
+CHANGE COLUMN `fechabaja` `fechabaja` DATETIME NULL DEFAULT NULL ;

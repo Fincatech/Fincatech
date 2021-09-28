@@ -66,6 +66,7 @@ let CoreUI = {
                     },
                     "processing": "Procesando...",
                     "search": "Buscar:",
+                    "searching": true,
                     "searchPlaceholder": "Término de búsqueda",
                     "zeroRecords": "No se encontraron resultados",
                     "emptyTable": "Ningún dato disponible en esta tabla",
@@ -229,7 +230,7 @@ let CoreUI = {
         },
 
         /** Renderiza la tabla */
-        render: function(id, entity, endpoint, allColumns)
+        render: function(id, entity, endpoint, allColumns, _paging = true, _search = true)
         {
             // console.log(this.columns.length);
             CoreUI.tableData.init();
@@ -238,13 +239,14 @@ let CoreUI = {
                 //  Nos traemos la definición de la entidad para poder generar las columnas de la tabla
             }
 
-            //  Cargamos el listado de comunidades
+            //  Cargamos el listad
             window['table' + id] = $(`#${id}`).DataTable({
                 "serverSide": true,
                 "autoWidth": true,
                 "select": true,
                 "retrieve": true,
-                "paging": true,
+                "paging": _paging,
+                "searching": _search,
                 ajax: {
                     "url": config.baseURLEndpoint + endpoint,
                     "dataSrc": "data." + entity 

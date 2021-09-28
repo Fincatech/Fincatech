@@ -12,6 +12,8 @@ define("security", [
                 "administrador",
                 "comunidades",
                 "empresa",
+                "empleado",
+                "requerimiento",
                 "spa",
                 "sudo",
                 "usuario",
@@ -29,6 +31,7 @@ define("security", [
             "js"=>[
                 "dpd",
                 "empresa",
+                "empleado",
                 "notasinformativas",
                 "requerimiento",
             ] 
@@ -47,8 +50,10 @@ define("security", [
                 "comunidades",
                 "dpd",
                 "empresa",
+                "empleado",
                 "notasinformativas",
                 "documental",
+                "requerimiento"
             ]
         ],
         "ROLE_CONTRATISTA"=>[

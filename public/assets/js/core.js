@@ -319,6 +319,21 @@ let core =
 
     },
 
+    /** Devuelve el valor de un campo según su tipo */
+    getValueByTipoCampo: function(e)
+    {
+        //  Comprueba si es un select
+            if( e.is('select'))
+              return ( (e.val() == null || e.val() == '') ? -1 : e.val() ); 
+
+        //  Comprueba si es un checkbox
+            if( e.is('checkbox') || e.attr('type') == 'checkbox')
+              return ( e.is(':checked') ? 1 : 0 );
+
+        //  Si es otro tipo de campo devuelve el valor directamente
+            return e.val();  
+    },
+
     /** Mapea la información de la pantalla a la propiedad data para guardar */
     mapDataToSave: function()
     {
@@ -330,42 +345,33 @@ let core =
         
           var fieldName = $(this).attr("hs-field");
           var entity = $(this).attr("hs-entity");
+          var entityRelated = null;
 
-          if(entity == core.model)
+          if( $(this).attr("hs-entity-related") !== undefined && 
+              $(this).attr("hs-entity-related") !== null )
           {
-            // console.log('Acción del modelo: ' + core.actionModel + ' - ' + core.modelId);
+            entityRelated = $(this).attr("hs-entity-related");
+          }
 
-            //TODO: MEJORAR LA LÓGICA METIÉNDOLO EN UN SWITCH PARA EL TIPO DE INPUT
-
+          if( (entity == core.model) && entityRelated == null)
+          {
+            
             if(fieldName != "id")
-            {
               core.Forms.data[fieldName] = $(this).val();
-            }
 
-            if( $(this).is('select'))
-            {
-              if($(this).val() == null || $(this).val() == '')
-              {
-                core.Forms.data[fieldName] = -1;
-              }
-            }
-
-            if( $(this).is('checkbox') || $(this).attr('type') == 'checkbox')
-            {
-              if( $(this).is(':checked'))
-              {
-                core.Forms.data[fieldName] = 1;
-              }else{
-                core.Forms.data[fieldName] = 0;
-              }
-
-            }
-
+            core.Forms.data[fieldName] = core.Forms.getValueByTipoCampo( $(this) );
 
           }else{
 
             if(fieldName != "id")
-              core.Forms.data[entity][fieldName] = $(this).val();
+            {
+              //  Si la entidad no existe, debemos inicializar
+              if( core.Forms.data[entityRelated] === undefined )
+                core.Forms.data[entityRelated] = {};
+
+              core.Forms.data[entityRelated][fieldName] = core.Forms.getValueByTipoCampo( $(this) );
+
+            }
 
           }
 
@@ -381,7 +387,7 @@ let core =
     getSelectData: async function(entidad, keyField, keyValue, keyOriginField, keyOriginValue, elementoDOM, insertarOpcionSeleccionar)
     {
         //  Vaciamos el combo
-        $("body #" + elementoDOM).html("");
+            $("body #" + elementoDOM).html("");
 
         //  Recuperamos los registros que correspondan según la entidad
         await apiFincatech.get(`${entidad}/list?target=cbo`).then(async (data) =>
@@ -452,6 +458,7 @@ let core =
               core.Modelo.Update(core.model.toLowerCase(), idSave, core.Forms.data);
               break;
           case 'add':
+              console.log(core.Forms.data);
               core.Modelo.Insert(core.model.toLowerCase(), core.Forms.data );
               break;
         }
@@ -705,5 +712,5 @@ $(function()
 
     apiFincatech.init();
     core.init();
-
+    $('.loading').hide();
 });

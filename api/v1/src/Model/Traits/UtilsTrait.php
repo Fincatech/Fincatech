@@ -49,7 +49,7 @@ trait UtilsTrait{
      * @param $results MySQLi Object. Conjunto de registros que se va a mapear
      * @return Array Array asociativo con los resultados obtenidos. Null si está vacío el conjunto de resultados
      */
-    private function mapMysqliResultsToObject($results)
+    public function mapMysqliResultsToObject($results)
     {
 
         $arrayResults = [];
@@ -61,6 +61,7 @@ trait UtilsTrait{
         {
             while($row = mysqli_fetch_assoc($results))
             {
+
                 $arrayResults[] = $row;
             }
         }

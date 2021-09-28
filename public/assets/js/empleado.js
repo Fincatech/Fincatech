@@ -1,5 +1,5 @@
 
-let empresaCore = {
+let empleadoCore = {
 
     Empresa: Object(),
     empresa: Object(),
@@ -9,34 +9,38 @@ let empresaCore = {
 
         this.events();
 
-        if($('#listadoEmpresa').length)
+        if($('#listadoEmpleado').length)
         {
-            empresaCore.renderTabla();
+            empleadoCore.renderTabla();
         }else{
             // core.Files.init();
             // core.Files.Fichero.entidadId = core.modelId;        
         }
 
-        //  Comprobamos si hay que renderizar el listado de empleados por empresa
-        empresaCore.renderTablaEmpleados(core.modelId);
-
+        empleadoCore.renderTablaEmpresasEmpleado(core.modelId);
     },
 
     events: async function()
     {   
-        $('body').on(core.helper.clickEventType, '.btnEliminarEmpresa', (evt)=>{
+
+        // $('body').on(core.helper.clickEventType, '.btnSaveData', (evt)=>{
+        //     evt.stopImmediatePropagation();
+        //     // empleadoCore.eliminar( $(evt.currentTarget).attr('data-id'), $(evt.currentTarget).attr('data-nombre') );
+        // });
+
+        $('body').on(core.helper.clickEventType, '.btnEliminarEmpleado', (evt)=>{
             evt.stopImmediatePropagation();
-            empresaCore.eliminar( $(evt.currentTarget).attr('data-id'), $(evt.currentTarget).attr('data-nombre') );
+            empleadoCore.eliminar( $(evt.currentTarget).attr('data-id'), $(evt.currentTarget).attr('data-nombre') );
         });
     },
 
     /** Elimina una comunidad previa confirmación */
     eliminar: function(id, nombre)
     {
-        core.Modelo.Delete("empresa", id, nombre, "listadoEmpresa");
+        core.Modelo.Delete("empleado", id, nombre, "listadoEmpleado");
         Swal.fire({
-            title:`¿Desea eliminar la empressa:<br>${nombre}?`,
-            text: "Se va a eliminar la empresa y toda la información asociada",
+            title:`¿Desea eliminar el empleado:<br>${nombre}?`,
+            text: "Se va a eliminar el empleado y toda la información asociada",
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -46,13 +50,13 @@ let empresaCore = {
           }).then((result) => {
             if (result.isConfirmed) {
                 //  Llamamos al endpoint de eliminar
-                apiFincatech.delete("empresa", id).then((result) =>{
+                apiFincatech.delete("empleado", id).then((result) =>{
                     Swal.fire(
-                        'Empresas eliminada correctamente',
+                        'Empleado eliminado correctamente',
                         '',
                         'success'
                       );
-                      $('#listadoEmpresa').DataTable().ajax.reload();
+                      $('#listadoEmpleado').DataTable().ajax.reload();
                 });
             }
         });
@@ -63,44 +67,52 @@ let empresaCore = {
      */
     renderTabla: async function()
     {
-        if($('#listadoEmpresa').length)
+        if($('#listadoEmpleado').length)
         {
 
+            //  Cargamos el listado de comunidades
             CoreUI.tableData.init();
 
-            //  Razón social
-            CoreUI.tableData.addColumn("razonsocial","Nombre", null, 'text-left');
+            // //  Fecha de creación
+            //     var html = 'data:created$';
+            //     CoreUI.tableData.addColumn(null, "Fecha", html, 'text-center');
+
+            //  Nombre y apellidos
+            CoreUI.tableData.addColumn("nombre","Nombre", null, 'text-left');
 
             //  CIF
-            CoreUI.tableData.addColumn("cif", "CIF", null, 'text-justify');
+            CoreUI.tableData.addColumn("numerodocumento", "DNI/NIE", null, 'text-left');
+
+            //  Dirección
+            CoreUI.tableData.addColumn("direccion", "Dirección", null, 'text-left');
 
             //  Email
             CoreUI.tableData.addColumn("email", "EMAIL", null, 'text-left');
 
-            //  Email
+            //  Teléfono
             CoreUI.tableData.addColumn("telefono", "TELEFONO", null, 'text-left');
-
-            //  Persona de contacto
-            CoreUI.tableData.addColumn("personacontacto", "Persona de contacto", null, 'text-left');
 
             //  Localidad
             CoreUI.tableData.addColumn("localidad", "Localidad", null, 'text-left');
 
+            // Estado
+                var html = 'data:estado$';
+                CoreUI.tableData.addColumn(null, "Estado", html);
+
             //  Columna de acciones
                 var html = '<ul class="nav justify-content-center accionesTabla">';
-                    html += `<li class="nav-item"><a href="${baseURL}empresa/data:id$" class="btnEditarEmpresa d-inline-block" data-id="data:id$" data-nombre="data:razonsocial$"><i data-feather="edit" class="text-success img-fluid"></i></a></li>`;
-                    html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarEmpresa d-inline-block" data-id="data:id$" data-nombre="data:razonsocial$"><i data-feather="trash-2" class="text-danger img-fluid"></i></li></ul>';
+                    html += `<li class="nav-item"><a href="${baseURL}empleado/data:id$" class="btnEditarEmpleado d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid"></i></a></li>`;
+                    html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarEmpleado d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid"></i></li></ul>';
                 CoreUI.tableData.addColumn(null, "", html);
 
-                // $('#listadoEmpresa').addClass('no-clicable');
-                CoreUI.tableData.render("listadoEmpresa", "Empresa", "empresa/list");
+                // $('#listadoEmpleado').addClass('no-clicable');
+                CoreUI.tableData.render("listadoEmpleado", "Empleado", "empleado/list");
         }
     },
 
-    renderTablaEmpleados: async function(idempresa)
+    renderTablaEmpresasEmpleado: async function(idempleado)
     {
-    
-        if($('#listadoEmpleadosEmpresa').length)
+        if($('#listadoEmpresasEmpleado').length)
         {
             // //  Fecha de creación
             //     var html = 'data:created$';
@@ -140,13 +152,13 @@ let empresaCore = {
                 // var html = 'data:created$';
                 // CoreUI.tableData.addColumn(null, "Fecha", html, 'text-center');
 
-            CoreUI.tableData.render("listadoEmpleadosEmpresa", "Empleados", `empresa/${idempresa}/empleados`, false, false, false);
+            CoreUI.tableData.render("listadoEmpresasEmpleado", "Empresasempleado", `empleado/${idempleado}/empresas`, false, false, false);
         }
+    },
 
-    }
 
 }
 
 $(()=>{
-    empresaCore.init();
+    empleadoCore.init();
 });
