@@ -6,7 +6,7 @@
 
             <div class="card-header pl-1 mb-2">
 
-                <h5 class="card-title mb-0"><i data-feather="<?php echo $iconoAccion; ?>"></i> <span class="titulo">Empresa</span></h5>
+                <h5 class="card-title mb-0"><i data-feather="<?php echo $iconoAccion; ?>"></i> <span class="titulo titulo-modulo">Empresa</span></h5>
 
             </div>
     
@@ -26,7 +26,7 @@
                     <div class="form-group row mb-2">
                         <div class="col-12 col-md-2 text-left">
                             <label for="cif" class="pl-0"><i class="bi bi-credit-card-2-front pr-2"></i>CIF*</label>
-                            <input type="text" class="form-control data text-center form-required" id="cif" name="cif" placeholder="CIF"  hs-entity="Empresa" hs-field="cif" required>
+                            <input type="text" maxlength="20" class="form-control data text-center form-required" id="cif" name="cif" placeholder="CIF"  hs-entity="Empresa" hs-field="cif" required>
                         </div>
                         <div class="col-12 col-md-10 text-left">
                             <label for="razonsocial"><i class="bi bi-person pr-2"></i>Nombre / Razón social</label>              
@@ -38,7 +38,7 @@
                     <div class="form-group row mb-2">
                         <div class="col-12">
                             <label for="direccion"><i class="bi bi-map pr-2"></i>Dirección</label>                        
-                                <input type="text" class="form-control data" id="direccion" name="direccion" placeholder="Calle Buenos Aires, 1"  hs-entity="Empresa" hs-field="direccion" required>
+                                <input type="text" class="form-control data" id="direccion" name="direccion" placeholder="Dirección" maxlength="255" hs-entity="Empresa" hs-field="direccion" required>
                         </div>
                     </div> 
 
@@ -46,11 +46,11 @@
                     <div class="form-group row mb-2">
                         <div class="col-12 col-md-2">
                             <label for="codpostal"><i class="bi bi-mailbox pr-2"></i>Código postal</label>
-                            <input type="text" class="form-control data text-center" id="codpostal" name="codpostal" placeholder="28936"  hs-entity="Empresa" hs-field="codpostal">
+                            <input type="text" maxlength="5" class="form-control data text-center" id="codpostal" name="codpostal" placeholder="Código Postal"  hs-entity="Empresa" hs-field="codpostal">
                         </div>
                         <div class="col-12 col-md-5">
                             <label for="localidad"><i class="bi bi-geo-alt pr-2"></i>Localidad</label>
-                                <input type="text" class="form-control data" id="localidad" name="localidad" placeholder="Móstoles"  hs-entity="Empresa" hs-field="localidad" required>
+                                <input type="text" class="form-control data" id="localidad" name="localidad" placeholder="Localidad" maxlength="100"  hs-entity="Empresa" hs-field="localidad" required>
                         </div>
                         <div class="col-12 col-md-5">
                             <label for="provincia"><i class="bi bi-geo-alt pr-2"></i>Provincia</label>
@@ -63,13 +63,18 @@
 
                         <div class="col-12 col-md-2">
                             <label for="telefono"><i class="bi bi-phone pr-2"></i>Teléfono</label>                          
-                            <input type="text" class="form-control data text-center" id="telefono" name="telefono" placeholder="Teléfono"  hs-entity="Empresa" hs-field="telefono">
+                            <input type="text" class="form-control data text-center" id="telefono" name="telefono" placeholder="Teléfono" maxlength="20" hs-entity="Empresa" hs-field="telefono">
                         </div>
 
-                        <div class="col-12 col-md-10">
+                        <div class="col-12 col-md-5">
                             <label for="email"><i class="bi bi-envelope pr-2"></i>Email</label>                          
-                            <input type="text" class="form-control data text-left" id="email" name="email" placeholder="Email"  hs-entity="Empresa" hs-field="email">
+                            <input type="text" maxlength="255" class="form-control data text-left" id="email" name="email" placeholder="Email" hs-entity="Empresa" hs-field="email">
                         </div>                     
+
+                        <div class="col-12 col-md-5">
+                            <label for="email"><i class="bi bi-person-badge pr-2"></i>Persona de contacto</label>                          
+                            <input type="text" maxlength="255" class="form-control data text-left" id="personacontacto" name="personacontacto" placeholder="Nombre persona de contacto" hs-entity="Empresa" hs-field="personacontacto">
+                        </div> 
 
                     </div>                    
 
@@ -78,8 +83,12 @@
                     <div class="form-group row mb-2 mt-3">
                         <div class="col-12">
                             <div class="card">
-                                <div class="card-title">Empleados asociados a la empresa</div>
-                                <div class="card-body p-0">
+                                <div class="card-title mb-0 mt-3">
+                                    <div class="alert alert-warning m-0 justify-content-center rounded shadow-neumorphic" role="alert">
+                                        <p class="m-0 p-3 text-uppercase">Empleados asociados a la empresa</p>
+                                    </div>
+                                </div>
+                                <div class="card-body pl-0 pr-0">
                                     <table class="table table-hover my-0 hs-tabla w-100" name="listadoEmpleadosEmpresa" id="listadoEmpleadosEmpresa" data-model="empleado">
                                         <thead class="thead"></thead>
                                         <tbody class="tbody"></tbody>

@@ -170,3 +170,42 @@ CHANGE COLUMN `tipodocumento` `tipodocumento` VARCHAR(1) NULL DEFAULT 'N' ;
 ALTER TABLE `fincatech`.`empleadoempresa` 
 CHANGE COLUMN `fechaalta` `fechaalta` DATETIME NULL DEFAULT NULL ,
 CHANGE COLUMN `fechabaja` `fechabaja` DATETIME NULL DEFAULT NULL ;
+
+############ 28092021
+
+ALTER TABLE `fincatech`.`empresa` 
+ADD COLUMN `estado` VARCHAR(1) NULL AFTER `codpostal`,
+CHANGE COLUMN `codigopostal` `codpostal` VARCHAR(5) NULL DEFAULT NULL ;
+
+ALTER TABLE `fincatech`.`usuario` 
+ADD COLUMN `idspa` INT(11) NULL AFTER `estado`;
+
+CREATE TABLE `fincatech`.`tiposservicios` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(40) NULL,
+  `precio` FLOAT NULL,
+  `preciocomunidad` FLOAT NULL,
+  `retorno` FLOAT NULL,
+  `created` DATETIME NULL,
+  `usercreate` INT(11) NULL,
+  PRIMARY KEY (`id`));
+
+INSERT INTO `fincatech`.`tiposservicios` (`nombre`) VALUES ('CAE');
+INSERT INTO `fincatech`.`tiposservicios` (`nombre`) VALUES ('RGPD');
+INSERT INTO `fincatech`.`tiposservicios` (`nombre`) VALUES ('PRL');
+INSERT INTO `fincatech`.`tiposservicios` (`nombre`) VALUES ('Instalaciones');
+INSERT INTO `fincatech`.`tiposservicios` (`nombre`) VALUES ('Certificados Digitales');
+
+update fincatech.tiposservicios set precio = 0, preciocomunidad = 0, retorno = 0;
+
+CREATE TABLE `fincatech`.`comunidadservicioscontratados` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `idcomunidad` INT(11) NULL,
+  `idservicio` INT(11) NULL,
+  `precio` FLOAT NULL,
+  `preciocomunidad` FLOAT NULL,
+  `retorno` FLOAT NULL,
+  `usercreate` INT(11) NULL,
+  `created` DATETIME NULL,
+  PRIMARY KEY (`id`));
+

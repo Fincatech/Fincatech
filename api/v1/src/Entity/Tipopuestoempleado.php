@@ -13,8 +13,8 @@ class Tipopuestoempleado extends EntityHelper{
     public $primaryKey = 'id';
     public $tipoEliminacion = DELETE_FISICO;
     public $moveToHistorial = false;
-    public $orderBy = null;
-    public $orderType = null;
+    public $orderBy = 'nombre';
+    public $orderType = ORDER_BY_ASC;
     
     /**
      * @var bool

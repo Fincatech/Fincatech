@@ -125,6 +125,7 @@ let administradorCore = {
             responseStatus = result.status;
             responseData = result.data;
             administradorCore.administrador = responseData.Usuario[0];
+            administradorCore.administrador['password'] = '';
             console.log(administradorCore.comunidad);
             return administradorCore.comunidad;
         });

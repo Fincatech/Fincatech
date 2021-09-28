@@ -16,15 +16,18 @@ class UsuarioController extends FrontController{
 
     public function Create($entidadPrincipal, $datos)
     {
-        //  TODO: Generamos su salt aleatorio para luego el login para aplicar otro método
-        //  de encriptación más seguro
-            $datos['salt'] = '';
+        $datos['salt'] = '';
 
-        //  Si no viene informada la contraseña creamos una por defecto
-            if(!isset($datos['password']))
-            {
-                $datos['password'] = md5('12345');
-            }
+        //  TODO: Implementarlo en el formulario de administrador
+        if( $datos['password'] === '')
+        {
+            $datos['password'] = md5('123456');
+        }else{
+            $datos['password'] = md5( $datos['password'] );
+        }
+
+        // FIXME: Arreglar el e-mail de contacto ya que no se debe hacer aquí
+        $datos['email'] = $datos['emailcontacto'];
 
         //  Llamamos al método de crear
         return $this->UsuarioModel->Create($entidadPrincipal, $datos);
@@ -32,6 +35,19 @@ class UsuarioController extends FrontController{
 
     public function Update($entidadPrincipal, $datos, $usuarioId)
     {
+        $datos['salt'] = '';
+
+        //  TODO: Implementarlo en el formulario de administrador
+        if( $datos['password'] === '')
+        {
+            $datos['password'] = md5('123456');
+        }else{
+            $datos['password'] = md5( $datos['password'] );
+        }
+
+        // FIXME: Arreglar el e-mail de contacto ya que no se debe hacer aquí
+        $datos['email'] = $datos['emailcontacto'];
+
         return $this->UsuarioModel->Update($entidadPrincipal, $datos, $usuarioId); 
     }
 

@@ -18,6 +18,11 @@ let empleadoCore = {
         }
 
         empleadoCore.renderTablaEmpresasEmpleado(core.modelId);
+
+        if($('.titulo-modulo').length)
+        {
+            CoreUI.Utils.setTituloPantalla('Empleado','nombre');
+        }
     },
 
     events: async function()
@@ -114,17 +119,8 @@ let empleadoCore = {
     {
         if($('#listadoEmpresasEmpleado').length)
         {
-            // //  Fecha de creación
-            //     var html = 'data:created$';
-            //     CoreUI.tableData.addColumn(null, "Fecha", html, 'text-center');
 
             CoreUI.tableData.init();
-
-            //  Nombre y apellidos
-            CoreUI.tableData.addColumn("nombre","Nombre", null, 'text-left');
-
-            //  CIF
-            CoreUI.tableData.addColumn("numerodocumento", "DNI/NIE", null, 'text-left');
 
             //  Empresa
                 CoreUI.tableData.addColumn("razonsocial", "Empresa", null, 'text-left');
@@ -132,25 +128,15 @@ let empleadoCore = {
             //  Puesto
                 CoreUI.tableData.addColumn("puesto", "Puesto", null, 'text-left');
 
-            //  Email
-                CoreUI.tableData.addColumn("email", "EMAIL", null, 'text-left');
-
-            //  Teléfono
-                CoreUI.tableData.addColumn("telefono", "TELEFONO", null, 'text-left');
-
             //  Fecha de alta
-                CoreUI.tableData.addColumn("fechaalta", "Fecha alta", null, 'text-left');
+                CoreUI.tableData.addColumn("fechaalta", "Fecha alta", null, 'text-center', '80px');
 
             //  Fecha de baja
-                CoreUI.tableData.addColumn("fechabaja", "Fecha baja", null, 'text-left');
+                CoreUI.tableData.addColumn("fechabaja", "Fecha baja", null, 'text-center', '80px');
 
             // Estado
                 var html = 'data:estado$';
-                CoreUI.tableData.addColumn(null, "Estado", html);
-
-            //  Fecha de alta
-                // var html = 'data:created$';
-                // CoreUI.tableData.addColumn(null, "Fecha", html, 'text-center');
+                CoreUI.tableData.addColumn(null, "Estado", html, 'text-center', '90px');
 
             CoreUI.tableData.render("listadoEmpresasEmpleado", "Empresasempleado", `empleado/${idempleado}/empresas`, false, false, false);
         }

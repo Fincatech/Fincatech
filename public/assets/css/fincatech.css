@@ -228,9 +228,10 @@ a:hover {
   background: white !important;
 }
 
-.form-data input[type="text"],
-.form-data input[type="email"],
-.form-data input[type="password"] {
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"] {
   -webkit-box-shadow: inset 4px 4px 10px #dadada;
   box-shadow: inset 4px 4px 10px #dadada;
   border-color: white !important;

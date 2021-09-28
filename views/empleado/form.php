@@ -6,7 +6,7 @@
 
             <div class="card-header pl-1 mb-2">
 
-                <h5 class="card-title mb-0"><i data-feather="<?php echo $iconoAccion; ?>"></i> <span class="titulo">Empleado</span></h5>
+                <h5 class="card-title mb-0"><i data-feather="<?php echo $iconoAccion; ?>"></i> <span class="titulo titulo-modulo">Empleado</span></h5>
 
             </div>
     
@@ -90,8 +90,12 @@
                     <div class="form-group row mb-2">
                         <div class="col-12">
                             <div class="card">
-                                <div class="card-title">Empresas</div>
-                                <div class="card-body">
+                                <div class="card-title mb-0 mt-3">
+                                    <div class="alert alert-warning m-0 justify-content-center rounded shadow-neumorphic" role="alert">
+                                        <p class="m-0 p-3 text-uppercase">Empresas en las que está dado de alta</p>
+                                    </div>
+                                </div>
+                                <div class="card-body pl-0 pr-0">
                                     <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoEmpresasEmpleado" id="listadoEmpresasEmpleado" data-model="Empresasempleado">
                                         <thead class="thead"></thead>
                                         <tbody class="tbody"></tbody>

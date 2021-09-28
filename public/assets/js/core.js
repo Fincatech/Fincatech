@@ -236,6 +236,11 @@ let core =
             core.Modelo.entity[core.model] = JSON.parse(result)["data"][core.model];
             // console.log(core.Modelo.entity[core.model]);
             core.Forms.mapData();
+            if($('#password').length)
+            {
+              $('#password').val('');
+            }
+            
           });
 
         }
@@ -265,54 +270,52 @@ let core =
           var campo = $(this).attr('hs-field') ;
 
           var valor = core.Modelo.entity[ entidad ][0][campo];
-
-          //  Leemos el modelo y el nombre del campo del que se va a recuperar la información
-          //  y mapeamos el valor obtenido en el fetch
-
-          //  FIXME: Arregla el if para evitar tantas anidaciones
-          if($(this).hasClass("select-data"))
+          if( campo != 'password' )
           {
-            //  Leemos el id
-            var id = $(this).attr("id");
-            //  Validamos que exista el valor en el modelo antes de mapear
-            if(id !== undefined && id !== -1)
-            {
-              $(`#${id} option[value=${valor}]`).attr('selected','selected');
-            }else{
-            
-            }
-          }else{
-
-            //  ¿ Es un checkbox ? 
-            if($(this).hasClass("form-check-input"))
-            {
-              console.log('Valor checkbox campo : ' + campo + ' - ' +  valor);
-              if(valor == 1)
+          //  FIXME: Arregla el if para evitar tantas anidaciones
+              if($(this).hasClass("select-data"))
               {
-                console.log('Intentando checar')  ;
-                $(this).attr('checked', true);
+                //  Leemos el id
+                var id = $(this).attr("id");
+                //  Validamos que exista el valor en el modelo antes de mapear
+                if(id !== undefined && id !== -1)
+                {
+                  $(`#${id} option[value=${valor}]`).attr('selected','selected');
+                }else{
+                
+                }
               }else{
-              console.log('Intentando checar false')  ;
-                $(this).attr('checked', false);
+
+                //  ¿ Es un checkbox ? 
+                if($(this).hasClass("form-check-input"))
+                {
+                  console.log('Valor checkbox campo : ' + campo + ' - ' +  valor);
+                  if(valor == 1)
+                  {
+                    console.log('Intentando checar')  ;
+                    $(this).attr('checked', true);
+                  }else{
+                  console.log('Intentando checar false')  ;
+                    $(this).attr('checked', false);
+                  }
+                }else{
+                  $(this).val( valor );
+                }
+
               }
-            }else{
-              $(this).val( valor );
-            }
-
+          }else{
+            $(this).val('');
           }
-
         });
 
             //  Inicializamos el selectpicker
             $('.selectpicker').select2({
               theme: 'bootstrap4',           
             });
-
-            // $('.selectpicker').each(function()
-            // {
-            //   $(this).trigger('change');
-            // });
-
+            $('.selectpicker').each(function()
+            {
+              $(this).trigger('change');
+            });
       }
 
 

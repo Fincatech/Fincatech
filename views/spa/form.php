@@ -6,7 +6,7 @@
 
             <div class="card-header pl-1 mb-2">
 
-                <h5 class="card-title mb-0"><i data-feather="<?php echo $iconoAccion; ?>"></i> <span class="titulo">Spa</span></h5>
+                <h5 class="card-title mb-0"><i data-feather="<?php echo $iconoAccion; ?>"></i> <span class="titulo titulo-modulo">Spa</span></h5>
 
             </div>
     

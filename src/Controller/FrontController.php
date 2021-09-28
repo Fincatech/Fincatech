@@ -29,6 +29,12 @@ class MainController{
         return ( $this->getUserRol() == 'ROLE_SUDO' );
     }
 
+    /** Comprueba si el usuario autenticado es un admin de fincas */
+    public function isAdminFincas()
+    {
+        return ( $this->getUserRol() == 'ROLE_ADMINFINCAS' );
+    }
+
     public function getUserRol()
     {
         return $this->userRol;

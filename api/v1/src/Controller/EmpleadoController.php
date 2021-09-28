@@ -8,6 +8,7 @@ namespace Fincatech\Controller;
 
 // Sustituir Model por el nombre del modelo real. Ej: UsuarioModel
 use Fincatech\Model\EmpleadoModel;
+use HappySoftware\Controller\HelperController;
 
 class EmpleadoController extends FrontController{
 
@@ -68,33 +69,22 @@ class EmpleadoController extends FrontController{
 
     public function List($params = null)
     {
-
-        $data = [];
-        $data = $this->EmpleadoModel->List($params);
-
-print_r($data);
-die();
-        for($x=0; $x <= count($data['Empleado']); $x++)
-        {
-print_r($data['Empleado'][$x]);
-            $data['Empleado'][$x]['empresasempleado'] = $this->EmpleadoModel->ListEmpresasByEmpleadoId($data['Empleado'][$x]['id']);
-        }
-die();        
-        return HelperController::successResponse( $data );
-
+        return $this->EmpleadoModel->List($params) ;
     }
 
+    /** Devuelve el listado de empleados por el id de la empresa */
     public function ListEmpleadosByEmpresaId($idEmpresa)
     {
         $data = [];
-        $data['Empleados'] = $this->EmpleadoModel->ListEmpleadosByEmpresaId($idEmpresa);
+        $data['Empleados'] = $this->EmpleadoModel->GetEmpleadosByEmpresaId($idEmpresa);
         return HelperController::successResponse( $data );
     }
 
+    /** Devuelve el listado de empresas por id de empleado */
     public function ListEmpresasByEmpleadoId($id)
     {
         $data = [];
-        $data['Empresasempleado'] = $this->EmpleadoModel->ListEmpresasByEmpleadoId($id);
+        $data['Empresasempleado'] = $this->EmpleadoModel->GetEmpresasByEmpleadoId($id);
         return HelperController::successResponse( $data );
     }
 

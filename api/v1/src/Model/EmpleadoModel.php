@@ -27,7 +27,7 @@ class EmpleadoModel extends \HappySoftware\Model\Model{
     }
 
     /** Devuelve los empleados asociados a una empresa */
-    public function ListEmpleadosByEmpresaId($idEmpresa)
+    public function GetEmpleadosByEmpresaId($idEmpresa)
     {
         $sql = "select * from view_empleadosempresa where idempresa = " . $idEmpresa;
         return $this->query($sql);
@@ -37,7 +37,7 @@ class EmpleadoModel extends \HappySoftware\Model\Model{
     }
 
     /** Devuelve las empresass asociadas a un empleado */
-    public function ListEmpresasByEmpleadoId($idEmpleado)
+    public function GetEmpresasByEmpleadoId($idEmpleado)
     {
         $sql = "select * from view_empleadosempresa where idempleado = " . $idEmpleado;
 
@@ -51,11 +51,16 @@ class EmpleadoModel extends \HappySoftware\Model\Model{
     }
 
     /** Recupera todos los registros */
-    public function List($params = null)
+    public function List($params = null, $useLoggedUserId = true)
     {
+        $data = [];
+        //return $this->getAll('u', $params);
         $data = parent::List($params);
-        //  Empresa en las que trabaja el usuario
-        
+        // //  Empresa en las que trabaja el usuario
+        for($x=0; $x < count($data['Empleado']); $x++)
+        {
+            $data['Empleado'][$x]['empresasempleado'] = $this->GetEmpresasByEmpleadoId($data['Empleado'][$x]['id']);
+        }
         return $data;
     }
 

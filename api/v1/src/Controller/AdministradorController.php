@@ -23,13 +23,31 @@ class AdministradorController extends FrontController{
         $datos['salt'] = '';
 
         //  TODO: Implementarlo en el formulario de administrador
-        $datos['password'] = md5('12345');
+        if( $datos['password'] === '')
+        {
+            $datos['password'] = md5('123456');
+        }else{
+            $datos['password'] = md5( $datos['password'] );
+        }
+
+        // FIXME: Arreglar el e-mail de contacto ya que no se debe hacer aquí
+        $datos['email'] = $datos['emailcontacto'];
 
         return $this->AdministradorModel->Create($entidadPrincipal, $datos);
     }
 
     public function Update($entidadPrincipal, $datos, $usuarioId)
     {
+        if( $datos['password'] === '')
+        {
+            unset($datos['password']);
+        }else{
+            $datos['password'] = md5( $datos['password'] );
+        }        
+
+        // FIXME: Arreglar el e-mail de contacto ya que no se debe hacer aquí
+        $datos['email'] = $datos['emailcontacto'];
+
         return $this->AdministradorModel->Update($entidadPrincipal, $datos, $usuarioId); 
     }
 

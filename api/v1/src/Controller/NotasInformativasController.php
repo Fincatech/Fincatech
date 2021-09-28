@@ -42,7 +42,7 @@ class NotasinformativasController extends FrontController{
 
     public function List($params = null)
     {
-       return $this->NotasinformativasModel->List($params);
+       return $this->NotasinformativasModel->List($params, false);
     }
 
 }

@@ -20,6 +20,13 @@ let empresaCore = {
         //  Comprobamos si hay que renderizar el listado de empleados por empresa
         empresaCore.renderTablaEmpleados(core.modelId);
 
+        //  Establecemos el título de la pantalla
+        if($('.titulo-modulo').length)
+        {
+            CoreUI.Utils.setTituloPantalla('Empresa','razonsocial');
+        }
+            //$('.titulo-modulo').text(core.Modelo.entity.Empresa[0].razonsocial);
+
     },
 
     events: async function()

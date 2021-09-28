@@ -7,6 +7,7 @@ let CoreUI = {
     },
 
     Utils: {
+
         parse: function(valor, data)
         {
             let inicioPatron = "data[";
@@ -37,6 +38,16 @@ let CoreUI = {
             //console.log(valor);
             return valor;
         },
+
+        setTituloPantalla: function(entidad, campo)
+        {
+            //  Lo primero de todo es comprobar si existe la entidad en el modelo
+            if(core.Modelo.entity[entidad] !== undefined)
+            {
+                $('.titulo-modulo').text(core.Modelo.entity[entidad][0][campo]);
+            }
+        }
+
     },
 
     tableData: {

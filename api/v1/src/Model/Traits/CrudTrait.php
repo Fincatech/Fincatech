@@ -171,7 +171,7 @@ trait CrudTrait{
     /**
      * Obtiene todos los registros para una entidad
      */
-    public function getAll($mainAlias = null, $params = null)
+    public function getAll($mainAlias = null, $params = null, $useLoggedUserId = true)
     {
 
         //  Parámetros aceptados en params
@@ -205,22 +205,27 @@ trait CrudTrait{
             }
 
         //  Comprobamos el rol que tiene el usuario
-        //  FIX: ¿ES LA MANERA CORRECTA DE COMPROBAR O LO PODEMOS AUTOMATIZAR?
+        //  FIXME: ¿ES LA MANERA CORRECTA DE COMPROBAR O LO PODEMOS AUTOMATIZAR?
             $userData = get_object_vars( $this->getJWTUserData()['data']->userData );
+
             if($userData['role'] == 'ROLE_ADMINFINCAS')
             {
                 //  Hay que comprobar si el tipo de listado es de un select o bien de una entidad
                 //       ya que si no intenta hacer el acotado y eso no es correcto
                 if(!$isSelect )
                 {
-                    // TOFIX: Hay que quitar el harcode este
-                    if($this->mainEntity == 'Comunidad')
+                    if($useLoggedUserId)
                     {
-                        $this->queryToExecute .= " where usuarioId = " . $userData['id'] . " ";
-                    }else{
-                        $this->queryToExecute .= " where usercreate = " . $userData['id'] . " ";
-                    }
-                
+
+                        // TOFIX: Hay que quitar el harcode este
+                        if($this->mainEntity == 'Comunidad')
+                        {
+                            $this->queryToExecute .= " where usuarioId = " . $userData['id'] . " ";
+                        }else{
+                            $this->queryToExecute .= " where usercreate = " . $userData['id'] . " ";
+                        }
+
+                    }                
                 }
             }
 
@@ -292,9 +297,9 @@ trait CrudTrait{
     /** Recupera todos los registros
      * @param array $params. Contiene la definición de los filtros establecidos para el listado incluyendo la paginación
      */
-    public function List($params = null)
+    public function List($params = null, $useLoggedUserId = true)
     {
-        return $this->getAll('u', $params);
+        return $this->getAll('u', $params, $useLoggedUserId);
     }
 
 }

@@ -23,7 +23,12 @@ class ComunidadController extends FrontController{
         //  Si no está informado, cogemos el usuario autenticado en el sistema
         if(!isset($datos['usuarioId']))
             $datos['usuarioId'] = $this->getLoggedUserId();
-            
+        
+        //  Si es el usuario sudo el que ha dado de alta la comunidad
+        //  forzamos que se guarde en estado 'A' (Activada) para que lo apruebe el admin del sistema
+        if($this->getLoggedUserRole() == 'ROLE_SUDO')
+            $datos['estado'] = 'A';
+
         return $this->ComunidadModel->Create($entidadPrincipal, $datos);
     }
 

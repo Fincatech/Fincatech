@@ -50,7 +50,10 @@ trait ViewTrait{
         $includeFile = ABSPATH.'views/';
         
         //  Incluimos las opciones de menú a las que tiene acceso según su rol de usuario
-        include(ABSPATH . 'views/' . security[$this->getUserRol()]['folder'] . '/menuacciones.php');
+        if( $this->isLogged() )
+        {
+            include(ABSPATH . 'views/' . security[$this->getUserRol()]['folder'] . '/menuacciones.php');
+        }
 
         //  Comprobamos qué vista es la que hay que renderizar
         switch(strtolower($this->controllerName))

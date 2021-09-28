@@ -6,7 +6,7 @@
 
             <div class="card-header pl-1 mb-2">
 
-                <h5 class="card-title mb-0"><i data-feather="<?php echo $iconoAccion; ?>"></i> <span class="titulo">Usuario</span></h5>
+                <h5 class="card-title mb-0"><i data-feather="<?php echo $iconoAccion; ?>"></i> <span class="titulo titulo-modulo">Usuario</span></h5>
 
             </div>
     
@@ -33,11 +33,11 @@
                         </div>
                         <div class="col-12 col-md-2">
                             <label for="email"><i class="bi bi-key pr-2"></i>Contraseña</label>              
-                            <input type="password" class="form-control data text-left" id="password" name="password" hs-entity="Usuario" hs-field="emailcontacto" maxlength="20" required>                            
+                            <input type="password" class="form-control data text-left" id="password" name="password" hs-entity="Usuario" hs-field="password" maxlength="20" required>                            
                         </div>
                         <div class="col-12 col-md-2">
                             <label for="email"><i class="bi bi-key pr-2"></i>Repetir contraseña</label>              
-                            <input type="password" class="form-control data text-left" id="passwordConfirme" name="passwordConfirme" hs-entity="Usuario" hs-field="emailcontacto" maxlength="20" required>                            
+                            <input type="password" class="form-control data text-left" id="passwordConfirme" name="passwordConfirme" maxlength="20" required>                            
                         </div>  
                         <div class="col-12 col-md-2">
                             <label for="email"><i class="bi bi-key pr-2"></i>ROL / Tipo</label>              
@@ -66,7 +66,7 @@
                         </div>
                         <div class="col-12 col-md-5">
                             <label for="localidad"><i class="bi bi-geo-alt pr-2"></i>Localidad</label>
-                                <input type="text" class="form-control data" id="localidad" name="localidad" placeholder="Móstoles"  hs-entity="Usuario" hs-field="localidad" required>
+                                <input type="text" class="form-control data" id="localidad" name="localidad" placeholder="Localidad"  hs-entity="Usuario" hs-field="localidad" required>
                         </div>
                         <div class="col-12 col-md-5">
                             <label for="provincia"><i class="bi bi-geo-alt pr-2"></i>Provincia</label>
@@ -78,12 +78,12 @@
 
                         <div class="col-12 col-md-2">
                             <label for="telefono"><i class="bi bi-phone pr-2"></i>Teléfono</label>                          
-                            <input type="text" class="form-control data text-center" id="telefono" name="telefono" placeholder="28936"  hs-entity="Usuario" hs-field="telefono">
+                            <input type="text" class="form-control data text-center" maxlength="20"  id="telefono" name="telefono" placeholder="Teléfono"  hs-entity="Usuario" hs-field="telefono">
                         </div>
 
                         <div class="col-12 col-md-2">
                             <label for="telefono"><i class="bi bi-phone pr-2"></i>Móvil</label>                          
-                            <input type="text" class="form-control data text-center" id="movil" name="movil" placeholder="Móvil"  hs-entity="Usuario" hs-field="movil">
+                            <input type="text" class="form-control data text-center" maxlength="20" id="movil" name="movil" placeholder="Móvil"  hs-entity="Usuario" hs-field="movil">
                         </div>                     
 
                     </div>                    
