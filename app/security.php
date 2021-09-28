@@ -14,6 +14,7 @@ define("security", [
                 "empresa",
                 "empleado",
                 "requerimiento",
+                "servicios",
                 "spa",
                 "sudo",
                 "usuario",
@@ -53,7 +54,8 @@ define("security", [
                 "empleado",
                 "notasinformativas",
                 "documental",
-                "requerimiento"
+                "requerimiento",
+                "servicios",
             ]
         ],
         "ROLE_CONTRATISTA"=>[

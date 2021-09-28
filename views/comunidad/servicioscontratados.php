@@ -1,7 +1,7 @@
 <?php    //  Alta / Modificación de servicios sólo si es SUDO 
 if($App->isSudo()):?>
 
-<div class="table-responsive">
+<div class="table-responsive form-servicioscontratados">
     <table class="table">
         <thead>
             <tr>
@@ -15,7 +15,7 @@ if($App->isSudo()):?>
             <tr>
                 <td class="mb-0 pb-0">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="cae">
+                        <input class="form-check-input" type="checkbox" value="1" id="cae">
                         <label class="form-check-label" for="cae">CAE</label>
                     </div>
                 </td>
