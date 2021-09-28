@@ -99,6 +99,14 @@
 
                                     </div>
 
+                                    <!-- Spa -->
+                                    <div class="form-group row mb-4">
+                                        <div class="col-12">
+                                            <label for="nombre"><i class="bi bi-shield-check pr-2"></i>SPA Asignado</label>
+                                            <select id="idspa" name="idspa" class="select-data data custom-select form-control selectpicker" data-live-search="true" hs-entity="Usuario" hs-field="idspa" hs-list-entity="Spa" hs-list-field="nombre" hs-list-value="id"></select>
+                                        </div>
+                                    </div> 
+
                                     <!-- dirección -->
                                     <div class="form-group row mb-2">
                                         <div class="col-12">

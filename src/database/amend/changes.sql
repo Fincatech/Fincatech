@@ -209,3 +209,10 @@ CREATE TABLE `fincatech`.`comunidadservicioscontratados` (
   `created` DATETIME NULL,
   PRIMARY KEY (`id`));
 
+#####################
+ALTER TABLE `fincatech`.`comunidad` 
+ADD COLUMN `idspa` INT(11) NULL AFTER `cif`;
+
+ALTER TABLE `fincatech`.`usuario` 
+DROP COLUMN `idspa`;
+
