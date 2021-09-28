@@ -32,7 +32,7 @@ let serviciosCore = {
 
         var rol = $('body').attr('hs-role');
         var endpointServicios = '';
-        
+
         switch(rol)
         {
             //  Si es un sudo recuperamos el listado de servicios
@@ -44,10 +44,11 @@ let serviciosCore = {
                     {
 
                         case 'add':
-
+                            endpointServicios = 'servicios/list';
                             break;
 
                         case 'get':
+                            endpointServicios = `servicios/${core.modelId}/list`;
                             break;
 
                     }
