@@ -357,7 +357,7 @@ let core =
           }
 
           if( (entity == core.model) && entityRelated == null)
-          {
+          { 
             
             if(fieldName != "id")
               core.Forms.data[fieldName] = $(this).val();
