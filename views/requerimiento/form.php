@@ -100,7 +100,7 @@
                                     <i class="bi bi-cloud-arrow-up text-info" style="font-size: 30px;"></i>
                                 </div>
                                 <div class="col-11 pl-0 align-self-center">
-                                    <input accept=".pdf" class="form-control form-control-sm ficheroadjuntar border-0" hs-fichero-entity="Notasinformativas" id="ficheroadjuntar" type="file">
+                                    <input accept=".pdf, .docx, .doc" class="form-control form-control-sm ficheroadjuntar border-0" hs-fichero-entity="Notasinformativas" id="ficheroadjuntar" type="file">
                                 </div>       
                             </div>
                         </div>

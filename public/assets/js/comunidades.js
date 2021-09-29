@@ -23,6 +23,15 @@ let comunidadesCore = {
     events: function()
     {
 
+        /** Override del método de guardar para poder enganchar los servicios */
+        if(core.model.toLowerCase() == "comunidad")
+        {
+            $('body').on(core.helper.clickEventType, '.btnSaveData', (evt)=>{
+                evt.stopImmediatePropagation();
+                comunidadesCore.guardarComunidad();
+            });    
+        }
+
         $('body').on(core.helper.clickEventType, '.btnVerComunidad', (evt)=>{
             evt.stopImmediatePropagation();
             comunidadesCore.verModalComunidad( $(evt.currentTarget).attr('data-id'), $(evt.currentTarget).attr('data-nombre') );
@@ -33,6 +42,18 @@ let comunidadesCore = {
             comunidadesCore.eliminar( $(evt.currentTarget).attr('data-id'), $(evt.currentTarget).attr('data-nombre') );
         });
 
+    },
+
+    guardarComunidad: function()
+    {   
+        //  Mapeamos los datos iniciales de la comunidad
+            core.Forms.mapDataToSave();
+
+        //  Mapeamos los datos de los servicios contratados
+            serviciosCore.mapServiciosContratados();
+
+        //  Guardamos los datos ya mapeados correctamente
+            core.Forms.Save( true );
     },
 
     /** Elimina una comunidad previa confirmación */
@@ -198,7 +219,136 @@ let comunidadesCore = {
             comunidadesCore.comunidades.total = comunidadesCore.comunidades.length;
         });
 
-    }
+    },
+
+    Import: {
+
+        /**
+         * TODO: Valida que el fichero que se está intentando cargar tenga los campos como en la plantilla
+         */
+        validacionPlantillaComunidades: function()
+        {
+            return true;
+        },
+
+
+        guardarComunidadDesdePlantilla(jsonExcel)
+        {
+            //  Obtenemos el ID del administrador seleccionado
+    
+        },
+    
+        leerPlantillaComunidades: function(xlsxflag)
+        {
+            /*Checks whether the browser supports HTML5*/  
+            if (typeof (FileReader) != "undefined") 
+            {  
+    
+                var readerExcel = new FileReader();  
+    
+                readerExcel.onload = function (e) {  
+    
+                    $('.wrapperProgresoCarga').show();
+
+                    var data = e.target.result;  
+                    /*Converts the excel data in to object*/  
+                    if (xlsxflag) {  
+                        var workbook = XLSX.read(data, { type: 'binary' });  
+                    }  
+                    else {  
+                        var workbook = XLS.read(data, { type: 'binary' });  
+                    }  
+                    /*Gets all the sheetnames of excel in to a variable*/  
+                    var sheet_name_list = workbook.SheetNames;  
+    
+                    var cnt = 0; /*This is used for restricting the script to consider only first sheet of excel*/  
+                    sheet_name_list.forEach(function (y) { /*Iterate through all sheets*/  
+                        /*Convert the cell value to Json*/  
+                        if (xlsxflag) {  
+                            var exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);  
+                        }  
+                        else {  
+                            var exceljson = XLS.utils.sheet_to_row_object_array(workbook.Sheets[y]);  
+                        }  
+
+                        $('.wrapperProgresoCarga .progress-bar').css('width','0%');
+                        $('.wrapperProgresoCarga .progress-bar-striped').html('0%');
+
+                        if (exceljson.length > 0 && cnt == 0) 
+                        {  
+
+                            $('.wrapperProgresoCarga .progresoCarga').html(`(0 de ` + (exceljson.length - 4) + ')');
+                            console.log(exceljson);
+                            //BindTable(exceljson, '#exceltable');  
+                            comunidadesCore.guardarComunidad();
+                        }  
+                    });
+                    
+                    //$('#exceltable').show();  
+                }  
+    
+                if (xlsxflag) {/*If excel file is .xlsx extension than creates a Array Buffer from excel*/  
+                    readerExcel.readAsArrayBuffer($("#ficheroAdjuntarExcel")[0].files[0]);  
+                }  
+                else {  
+                    readerExcel.readAsBinaryString($("#ficheroAdjuntarExcel")[0].files[0]);  
+                }  
+            }else {  
+                alert("Sorry! Your browser does not support HTML5!");  
+            }  
+        },
+    
+        /**
+         * Importa comunidades desde un fichero excel
+         */
+        importarComunidades: function()
+        {
+            //  Comprobamos que el fichero sea un fichero de Excel
+                if(!core.Files.isExcelFile('ficheroAdjuntarExcel'))
+                {
+                    $('.wrapperMensajeErrorCarga .mensaje').html('El fichero no es válido. Seleccione un fichero de formato Excel (xls o xlsx)');
+                    $('.wrapperMensajeErrorCarga').show();
+                    return;
+                }else{
+                    $('.wrapperMensajeErrorCarga').hide();
+                }
+    
+            //  Validamos que haya seleccionado un administrador
+                if( $('#administradorCargaId option:selected').val() == '-1' )
+                {
+                    $('.wrapperMensajeErrorCarga .mensaje').html('Debe seleccionar el administrador al que asignar las comunidades a importar');
+                    $('.wrapperMensajeErrorCarga').show();
+                    return;
+                }
+
+            //  Si es un fichero de Excel debemos validar los campos que trae el fichero
+            //  si no tiene el formato de la plantilla entonces avisamos al usuario que ese fichero no es válido, que se descargue la plantilla
+            //  y volvemos a mostrar el modal de carga automática de comunidades solo si es sudo
+                if(!comunidadesCore.Import.validacionPlantillaComunidades())
+                {
+                    $('.wrapperMensajeErrorCarga .mensaje').html('El fichero no es válido. Utilice la plantilla de Fincatech.');
+                    $('.wrapperMensajeErrorCarga').show();
+                    return;                
+                }
+    
+                var xlsxflag = false; /*Flag for checking whether excel is .xls format or .xlsx format*/  
+                if ($("#ficheroAdjuntarExcel").val().toLowerCase().indexOf(".xlsx") > 0) {  
+                    xlsxflag = true;  
+                } 
+    
+            //  Si el fichero es correcto, ocultamos los wrappers de información y mostramos el de procesando
+                $('.wrapperInformacion').hide();
+                $('.wrapperSelectorAdministrador').hide();
+                $('.wrapperSelectorFichero').hide();
+                $('.wrapperMensajeErrorCarga').hide();
+    
+            //  Intentamos hacer la importación
+                comunidadesCore.Import.leerPlantillaComunidades( xlsxflag );
+    
+        }
+
+    },
+
 
 }
 

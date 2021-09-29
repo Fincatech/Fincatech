@@ -3,14 +3,72 @@ let clickEventType = ((document.ontouchstart!==null)?'click':'touchstart');
 let environment = 'd';
 let baseURL = '/fincatech/';
 var role = null;
+var showingLoadComunidades = false;
 
 let Constantes = {
 
    CargaComunidades: `
-   <p class="text-center mb-0 mt-1"><i class="bi bi-file-earmark-arrow-up" style="font-size:60px;"></i></p>
-   <h2 class="swal2-title" id="swal2-title" style="display: block;">Carga automática de comunidades</h2>
-   <p class="mt-3" style="font-size: 14px;">Seleccione el fichero excel desde el que desea realizar la carga de comunidades de forma automática</p>
-   <p style="font-size: 14px;">Sólo se permiten ficheros con extensión xls o xlsx</p>`
+   <div class="row">
+        <div class="col-12 text-center text-uppercase align-self-center">
+          <p class="m-0" style="display: block; font-size: 18px;"> Carga automática de comunidades</p>
+        </div>
+    </div>
+    <div class="row mb-2 wrapperInformacion">
+      <div class="col-12">
+          <p class="mt-3 text-justify" style="font-size: 14px;">1. Seleccione el administrador de fincas al que asignar las comunidades</p>
+          <p class="mt-3 text-justify" style="font-size: 14px;">2. Seleccione el fichero excel desde el que desea realizar la carga de comunidades de forma automática</p>
+          <p class="m-0 text-center" style="font-size: 14px;">
+            <a href="${baseURL}public/storage/plantilla_comunidades_fincatech.xlsx" target="_blank"><i class="bi bi-file-earmark-arrow-down"></i> Descargue la plantilla desde este enlace</a>
+          </p>
+          <p class="mt-3 text-left text-justify" style="font-size: 14px;">3. Una vez seleccionado, clique sobre el botón PROCESAR</p>
+      </div>
+    </div>
+    <!-- Selector de administrador -->
+    <div class="row mb-4 wrapperSelectorAdministrador">
+      <div class="col-12 text-left"><form>
+      <label for="administradorCargaId" class="mb-2">Seleccione el Administrador</label>
+      <select id="administradorCargaId" name="administradorCargaId" class="custom-select data form-control selectpicker mt-2" data-live-search="true" hs-entity="Administrador" hs-field="usuarioId" hs-list-entity="Administrador" hs-list-field="Usuario.nombre" hs-list-value="Usuario.id"></select></form>
+      </div>  
+    </div>
+
+    <div class="form-group row mb-2 justify-content-center wrapperSelectorFichero">
+      <div class="col-12">  
+          <div class="wrapperFichero row border rounded-lg ml-0 mr-0 mb-0 shadow-inset border-1 pt-3 pb-2">
+              <div class="col-2 align-self-center h-100 text-center">
+                  <i class="bi bi-cloud-arrow-up text-info" style="font-size: 30px;"></i>
+              </div>
+              <div class="col-10 pl-0 align-self-center">
+                  <input accept=".xls, .xlsx" class="form-control form-control-sm ficheroAdjuntarExcel border-0" hs-fichero-entity="Notasinformativas" id="ficheroAdjuntarExcel" type="file">
+              </div>       
+          </div>
+          <span class="pb-3 d-block text-center pt-2" style="font-size: 13px;">Sólo se permiten ficheros con extensión xls o xlsx</span>    
+          
+          <!-- Mensaje de error --> 
+          <div class="wrapperMensajeErrorCarga row text-light p-3" style="display: none; font-size: 14px;">
+              <div class="col-12 bg-danger p-3 rounded shadow-neumorphic">
+                <p class="mensaje"></p>
+              </div>
+          </div>          
+
+          <!-- Botón de iniciar proceso -->
+          <div class="row mt-3">
+            <div class="col-12">
+              <a href="javascript:void(0);" class="btn d-block btn-success bntProcesarImportacion pt-3 pb-3">PROCESAR</a>
+            </div>
+          </div>
+      </div>
+    </div>
+
+    <div class="wrapperProgresoCarga row" style="display: none;">
+      <div class="col-12">
+          <label class="text-center mb-2">Procesando fichero</label>
+          <div class="progress mb-3" style="height: 30px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">Animated</div>
+          </div>
+          <label class="progresoCarga">(n de y procesados)</label>
+      </div>
+    </div>
+    `
 }
 
 
@@ -61,42 +119,55 @@ let core =
 
       //  Botón de guardar
       $("body").on(core.helper.clickEventType, ".btnSaveData", function(){
-        core.Forms.Save();
+        core.Forms.Save( false );
       });
 
       //  Carga de comunidades
       $('body').on(core.helper.clickEventType, '.btnCargarComunidadesExcel', async function()
       {
         const { value: file } = await Swal.fire({
-          // title: 'Carga automática de comunidades',
+          title: '',
           html: Constantes.CargaComunidades,
-          footer: '<a href="javascript:void(0);"><i class="bi bi-file-earmark-arrow-down"></i> Descargue la plantilla desde este enlace</a>',
-          showCancelButton: true,
-          grow: 'row',
-          confirmButtonColor: '#28a745',
-          cancelButtonColor: '#dc3545',
-          cancelButtonText: 'Cancelar',
-          confirmButtonText: 'Procesar',
-          reverseButtons: true,
+          showCancelButton: false,
+          showConfirmButton: false,
+          // grow: 'row',
           showCloseButton: true,
-          input: 'file',
-          inputAttributes: {
-            'accept': 'image/*',
-            'aria-label': 'Upload your profile picture'
-          }
-        })
+          didOpen: function()
+          {
+            //  Indicamos que el file debe ser atachado el del modal que acaba de mostrarse para poder interactura con él
+            showingLoadComunidades = true;
 
-        if (file) {
-          const reader = new FileReader()
-          reader.onload = (e) => {
-            Swal.fire({
-              title: 'Your uploaded picture',
-              imageUrl: e.target.result,
-              imageAlt: 'The uploaded picture'
-            })
+            //  Inicializamos el componente de ficheros
+            core.Files.init();
+
+            //  Cargamos la lista de administradores de fincas disponibles
+            core.Forms.getSelectData( 'Administrador', 'Usuario.nombre', 'Usuario.id', 'usuarioId', $('#administradorCargaId').attr("hs-value"), $('#administradorCargaId').prop("id"), false ).then(()=>{
+              $('#administradorCargaId').select2({
+                dropdownParent: $('.swal2-container')
+              });
+            });
+
+            //  Bindemos el evento del botón procesar importación
+            $('body').on(core.helper.clickEventType, '.bntProcesarImportacion', function()
+            {
+              comunidadesCore.Import.importarComunidades();
+            });
+
           }
-          reader.readAsDataURL(file)
-        }
+
+        });
+
+      //   if (file) {
+      //     const reader = new FileReader()
+      //     reader.onload = (e) => {
+      //       Swal.fire({
+      //         title: 'Your uploaded picture',
+      //         imageUrl: e.target.result,
+      //         imageAlt: 'The uploaded picture'
+      //       })
+      //     }
+      //     reader.readAsDataURL(file)
+      //   }
       });
 
   },
@@ -179,6 +250,20 @@ let core =
       });
 
     },
+
+    isExcelFile: function(idDOMInputFile)
+    {
+
+        var resultado = false;
+        var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xlsx|.xls)$/;  
+        /*Checks whether the file is a valid excel file*/  
+        if (regex.test($(`#${idDOMInputFile}`).val().toLowerCase())) {  
+          return true;
+        }else{
+          return false;
+        }
+
+    }
 
   },
 
@@ -268,8 +353,15 @@ let core =
 
           var entidad = $(this).attr('hs-entity') ;
           var campo = $(this).attr('hs-field') ;
+          var valor = '';
+          // console.log('Entidad: ' + entidad + ' Campo: ' + campo);
+          //  Validamos que el campo venga informado desde el endpoint
+          if(core.Modelo.entity[ entidad ][0][campo] !== undefined)
+          {
+            valor = core.Modelo.entity[ entidad ][0][campo];
+          }
 
-          var valor = core.Modelo.entity[ entidad ][0][campo];
+          //var valor = core.Modelo.entity[ entidad ][0][campo];
           if( campo != 'password' )
           {
           //  FIXME: Arregla el if para evitar tantas anidaciones
@@ -315,6 +407,10 @@ let core =
             $('.selectpicker').each(function()
             {
               $(this).trigger('change');
+            });
+            $('body input[type="number"]').each(function(e)
+            {
+                $(this).val( $(this).attr('value') );
             });
       }
 
@@ -440,8 +536,11 @@ let core =
 
     },
 
-    /** Crea o actualiza un registro */
-    Save: async function()
+    /**
+     * Guarda y mapea los datos para enviar al endpoint
+     * @param {boolean} dataAlreadyMapped Optional. Indica si los datos ya han sido previamente mapeados. De esa forma no vuelve a mapear
+     */
+    Save: async function(dataAlreadyMapped = true)
     {
       //  Comprobamos la acción primero para saber si es un update o una inserción
       var entidadSave = $("body").attr("hs-model");
@@ -449,10 +548,15 @@ let core =
       var actionSave = $("body").attr("hs-action");
 
         //  Reiniciamos la información a enviar
-        core.Forms.data = {};
+        
 
         //  Mapeamos los datos para poder enviar la info
-        core.Forms.mapDataToSave();
+        if(dataAlreadyMapped == false)
+        {
+          console.log('Intenta mapear');
+          core.Forms.data = {};
+          core.Forms.mapDataToSave();
+        }
 
         //  Comprobamos la acción del modelo
         switch(actionSave)
@@ -461,7 +565,6 @@ let core =
               core.Modelo.Update(core.model.toLowerCase(), idSave, core.Forms.data);
               break;
           case 'add':
-              console.log(core.Forms.data);
               core.Modelo.Insert(core.model.toLowerCase(), core.Forms.data );
               break;
         }

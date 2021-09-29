@@ -32,3 +32,7 @@
 <script type="text/javascript" src="<?php echo ASSETS_JS; ?>coreui.js?v=<?php echo time(); ?>"></script>
 
 <script type="text/javascript" src="<?php echo ASSETS_JS; ?>app.js"></script>
+
+<!-- Excel: https://github.com/SheetJS/sheetjs -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.1/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.1/dist/shim.min.js"></script>

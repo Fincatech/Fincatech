@@ -216,3 +216,33 @@ ADD COLUMN `idspa` INT(11) NULL AFTER `cif`;
 ALTER TABLE `fincatech`.`usuario` 
 DROP COLUMN `idspa`;
 
+#########
+
+CREATE OR REPLACE VIEW `view_comunidadservicioscontratados` AS
+    SELECT 
+        `s`.`nombre` AS `nombre`,
+        `cs`.`contratado` AS `contratado`,
+        `s`.`precio` AS `servicioprecioservicio`,
+        `s`.`preciocomunidad` AS `serviciopreciocomunidad`,
+        `s`.`retorno` AS `servicioretorno`,
+        `cs`.`id` AS `idserviciocomunidad`,
+        `cs`.`idcomunidad` AS `idcomunidad`,
+        `cs`.`idservicio` AS `id`,
+        `cs`.`precio` AS `precio`,
+        `cs`.`preciocomunidad` AS `preciocomunidad`,
+        `cs`.`retorno` AS `retorno`,
+        `cs`.`usercreate` AS `usercreate`,
+        `cs`.`created` AS `created`
+    FROM
+        (`tiposservicios` `s`
+        LEFT JOIN `comunidadservicioscontratados` `cs` ON ((`cs`.`idservicio` = `s`.`id`)))
+
+INSERT INTO `fincatech`.`comunidadservicioscontratados` (`idcomunidad`, `idservicio`, `precio`, `preciocomunidad`, `retorno`, `usercreate`, `created`) VALUES ('22', '1', '0', '0', '0', '1', '2021-01-01');
+INSERT INTO `fincatech`.`comunidadservicioscontratados` (`idcomunidad`, `idservicio`, `precio`, `preciocomunidad`, `retorno`, `usercreate`, `created`) VALUES ('22', '2', '0', '0', '0', '1', '2021-01-01');
+INSERT INTO `fincatech`.`comunidadservicioscontratados` (`idcomunidad`, `idservicio`, `precio`, `preciocomunidad`, `retorno`, `usercreate`, `created`) VALUES ('22', '3', '0', '0', '0', '1', '2021-01-01');
+INSERT INTO `fincatech`.`comunidadservicioscontratados` (`idcomunidad`, `idservicio`, `precio`, `preciocomunidad`, `retorno`, `usercreate`, `created`) VALUES ('22', '4', '0', '0', '0', '1', '2021-01-01');
+INSERT INTO `fincatech`.`comunidadservicioscontratados` (`idcomunidad`, `idservicio`, `precio`, `preciocomunidad`, `retorno`, `usercreate`, `created`) VALUES ('22', '5', '0', '0', '0', '1', '2021-01-01');
+
+ALTER TABLE `fincatech`.`comunidadservicioscontratados` 
+ADD COLUMN `contratado` TINYINT(1) NULL DEFAULT 0 AFTER `preciocomunidad`;
+   

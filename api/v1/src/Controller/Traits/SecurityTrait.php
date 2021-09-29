@@ -6,6 +6,18 @@ use Firebase\JWT\JWT;
 
 trait SecurityTrait{
 
+    /** Comprueba si el usuario autenticado es de tipo sudo */
+    public function isSudo()
+    {
+        return ( $this->getLoggedUserRole() == 'ROLE_SUDO' );
+    }
+
+    /** Comprueba si el usuario autenticado es un admin de fincas */
+    public function isAdminFincas()
+    {
+        return ( $this->getLoggedUserRole() == 'ROLE_ADMINFINCAS' );
+    }
+
     public function getJWTUserData()
     {
         return $this->checkSecurity();

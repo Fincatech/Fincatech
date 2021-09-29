@@ -127,7 +127,11 @@ let apiFincatech =
 
         //  Si tiene fichero adjuntado adjuntamos el objeto
         if(core.Files.Fichero.base64 != '')
+        {
+            console.log(core.Files.Fichero);
+            console.log(datosPost);
             datosPost.fichero = core.Files.Fichero;
+        }
 
         datosPost = JSON.stringify(datosPost);
 

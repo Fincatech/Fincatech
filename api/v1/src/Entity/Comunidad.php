@@ -85,21 +85,21 @@ class Comunidad extends EntityHelper{
             'relationType' => RELACION_OUTSIDE
         ]);
 
-        //  Servicios contratados
-        $this->relations[] = $this->addRelation([
-            'table' => 'comunidadservicioscontratados',
-            'alias' => 'servicioscontratados',
-            //  Columna de la entidad que se está relacionando con la entidad principal
-            'sourceColumn' =>'idcomunidad',
-            //  Columna de la entidad principal con la que se va a relacionar
-            'targetColumn' => 'id',
-            'fieldType' => 'int',
-            'readOnly' => true,
-            'canReturnSchema' => false,
-            'deleteOnCascade' => false,
-            //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
-            'relationType' => RELACION_OUTSIDE
-        ]);
+        // //  Servicios contratados
+        // $this->relations[] = $this->addRelation([
+        //     'table' => 'comunidadservicioscontratados',
+        //     'alias' => 'servicioscontratados',
+        //     //  Columna de la entidad que se está relacionando con la entidad principal
+        //     'sourceColumn' =>'idcomunidad',
+        //     //  Columna de la entidad principal con la que se va a relacionar
+        //     'targetColumn' => 'id',
+        //     'fieldType' => 'int',
+        //     'readOnly' => true,
+        //     'canReturnSchema' => false,
+        //     'deleteOnCascade' => false,
+        //     //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
+        //     'relationType' => RELACION_OUTSIDE
+        // ]);
 
         //  Entidad usuario_roles
         $this->relations[] = $this->addRelation([

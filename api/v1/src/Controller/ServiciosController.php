@@ -8,6 +8,7 @@ namespace Fincatech\Controller;
 
 // Sustituir Model por el nombre del modelo real. Ej: UsuarioModel
 use Fincatech\Model\ServiciosModel;
+use HappySoftware\Controller\HelperController;
 
 class ServiciosController extends FrontController{
 

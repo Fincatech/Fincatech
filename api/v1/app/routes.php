@@ -199,6 +199,23 @@ return function (App $app) {
 
     });
 
+    $app->get('/comunidad/{id}/servicioscontratados', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Comunidad');
+
+        $id = $params['id'];
+
+        $response->getBody()->write( $frontController->context->ListServiciosContratadosByComunidadId($id) );
+
+        return $response;  
+
+    });
+
     $app->get('/empleado/{id}/empresas', function (Request $request, Response $response, array $params)
     {
 

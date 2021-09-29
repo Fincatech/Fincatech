@@ -6,12 +6,12 @@ use HappySoftware\Controller\ConfigController;
 use HappySoftware\Controller\HelperController;
 use HappySoftware\Controller\Traits\ConfigTrait;
 use HappySoftware\Controller\Traits\FilesTrait;
-
+use HappySoftware\Controller\Traits\SecurityTrait;
 use HappySoftware\Model\Model;
 
 class FrontController{
 
-    use ConfigTrait, FilesTrait;
+    use ConfigTrait, FilesTrait, SecurityTrait;
 
     /**
      * Hace referencia al controller instanciado por la aplicación desde la llamada del api

@@ -245,6 +245,10 @@ input[type="number"] {
   color: #757575;
 }
 
+.swal2-container span#select2-administradorCargaId-container {
+  font-size: 12px;
+}
+
 label {
   display: inline-block;
 }
