@@ -19,6 +19,7 @@ class ComunidadController extends FrontController{
 
     public function Create($entidadPrincipal, $datos)
     {
+
         //  Llamamos al método de crear
         //  Si no está informado, cogemos el usuario autenticado en el sistema
         if(!isset($datos['usuarioId']))
@@ -110,6 +111,15 @@ class ComunidadController extends FrontController{
     public function ListServiciosContratadosByComunidadId($id)
     {
         return helperController::successResponse( $this->ComunidadModel->ListServiciosContratadosByComunidadId($id) );
+    }
+
+    /** Devuelve el listado de empresas por id de empleado */
+    public function ListComunidadesByAdministradorId($id)
+    {
+        $data = [];
+        $data['ComunidadesAdministrador'] = $this->ComunidadModel->ListComunidadesByAdministradorId($id);
+        $data['total'] = count($data);
+        return HelperController::successResponse( $data );
     }
 
 }

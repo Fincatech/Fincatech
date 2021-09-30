@@ -13,6 +13,7 @@ define("security", [
                 "comunidades",
                 "empresa",
                 "empleado",
+                'informevaloracionseguimiento',
                 "requerimiento",
                 "servicios",
                 "spa",
@@ -33,6 +34,7 @@ define("security", [
                 "dpd",
                 "empresa",
                 "empleado",
+                'informevaloracionseguimiento',                
                 "notasinformativas",
                 "requerimiento",
             ] 
@@ -52,6 +54,7 @@ define("security", [
                 "dpd",
                 "empresa",
                 "empleado",
+                'informevaloracionseguimiento',
                 "notasinformativas",
                 "documental",
                 "requerimiento",

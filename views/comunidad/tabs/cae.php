@@ -18,7 +18,7 @@
 
                                     <div class="col-12 col-md-6">
 
-                                        <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoEmpresa" id="listadoEmpresa" data-model="empresa">
+                                        <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoEmpresaComunidad" id="listadoEmpresaComunidad" data-model="empresa">
                                             <thead class="thead"></thead>
                                             <tbody class="tbody"></tbody>
                                         </table>

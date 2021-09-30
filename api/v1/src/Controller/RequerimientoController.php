@@ -4,6 +4,7 @@ namespace Fincatech\Controller;
 
 // Sustituir Model por el nombre del modelo real. Ej: UsuarioModel
 use Fincatech\Model\RequerimientoModel;
+use HappySoftware\Controller\HelperController;
 
 class RequerimientoController extends FrontController{
 
@@ -49,6 +50,13 @@ class RequerimientoController extends FrontController{
     public function ListRequerimientosComunidad($comunidadId)
     {
         return $this->RequerimientoModel->ListRequerimientosComunidad($comunidadId);
+    }
+
+    public function ListRequerimientoByIdTipo($idTipo)
+    {
+
+        // return helperController::successResponse( $this->RequerimientoModel->List(null, false) );
+        return helperController::successResponse( $this->RequerimientoModel->ListRequerimientoByIdTipo($idTipo) );
     }
 
 

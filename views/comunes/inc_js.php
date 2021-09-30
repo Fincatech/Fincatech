@@ -33,6 +33,9 @@
 
 <script type="text/javascript" src="<?php echo ASSETS_JS; ?>app.js"></script>
 
+<!-- <script type="text/javascript" src="<?php echo ASSETS_JS; ?>vendor/xlsx/dist/xlsx.js?v=<?php echo time(); ?>"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.7.7/xlsx.core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xls/0.7.4-a/xls.core.min.js"></script>
 <!-- Excel: https://github.com/SheetJS/sheetjs -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.1/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.1/dist/shim.min.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.1/dist/xlsx.full.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.1/dist/shim.min.js"></script> -->

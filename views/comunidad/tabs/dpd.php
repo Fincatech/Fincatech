@@ -17,6 +17,8 @@
                             <a href="javascript:void(0);" class="btn btn-outline-secondary text-uppercase rounded-pill shadow pl-2 pr-4 btnCrearConsultaDPD"><i class="bi bi-plus-circle pr-3"></i> CREAR CONSULTA</a>
                         </div>
 
+                    </div>
+
                 </div>
         
                 <div class="card-body shadow-inset rounded-lg border mb-1 border-white">

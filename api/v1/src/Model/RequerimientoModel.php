@@ -40,6 +40,14 @@ class RequerimientoModel extends \HappySoftware\Model\Model{
 
     }
 
+    /** Devuelve un listado de entidad requerimiento por idtipo */
+    public function ListRequerimientoByIdTipo($idTipo)
+    {
+        $data = $this->List(null, false);
+        $data = $this->filterResults($data, 'Requerimiento', 'idrequerimientotipo', $idTipo);
+        return $data;
+    }
+
     // /** Recupera todos los registros */
     // public function List($params = null)
     // {

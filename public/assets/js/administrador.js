@@ -16,6 +16,7 @@ let administradorCore = {
             await administradorCore.listadoDashboard();
         }else if( core.model.toLowerCase() == "administrador" && core.actionModel != "list"){
             core.model = "Usuario";
+            comunidadesCore.renderTablaComunidadesAdministrador(core.modelId);
         }
 
     },

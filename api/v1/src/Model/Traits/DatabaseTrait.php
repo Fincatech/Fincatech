@@ -40,6 +40,16 @@ trait DatabaseTrait{
         //     die('3s');
         // }
 
+       //  si ya viene informado el campo usercreate cogemos el valor y 
+        //  luego lo utilizamos
+        $userCreateId = null;
+        
+        if(isset($this->fields['usercreate']))
+        {
+            $userCreateId = $this->fields['usercreate'];
+            unset($this->fields['usercreate']);
+        }
+
         //  Añadimos los nombres de los campos
         $this->builder( implode(",", array_keys($this->fields)) );
 
@@ -48,7 +58,11 @@ trait DatabaseTrait{
         //  Añadimos los valores de los campos
         $this->builder( implode(",", $this->fields) );
 
-        $userCreateId = $this->getLoggedUserId(); //get_object_vars( $this->getJWTUserData()['data']->userData )['id'];
+        //  Si no viene informado tomamos el del usuario autenticado
+        if(is_null($userCreateId))
+        {
+            $userCreateId = $this->getLoggedUserId(); 
+        }
 
         //  Añadimos el usuario para la auditoria
         $this->builder( ',' . $userCreateId . ')' );
@@ -57,7 +71,7 @@ trait DatabaseTrait{
         $this->setSQL( $this->sqlBuilder );
 
         //  Devolvemos la sentencia creada
-        if($this->getEntidad() == 'empleadoempresa')
+        if($this->getEntidad() == 'comunidad')
         {
             // print_r($this->fields);
             // die($this->getSQL());

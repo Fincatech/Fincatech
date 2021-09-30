@@ -218,7 +218,7 @@ trait CrudTrait{
                     {
 
                         // TOFIX: Hay que quitar el harcode este
-                        if($this->mainEntity == 'Comunidad')
+                        if($this->mainEntity == 'Comunidad' || $this->mainEntity == 'InformeValoracionSeguimiento')
                         {
                             $this->queryToExecute .= " where usuarioId = " . $userData['id'] . " ";
                         }else{

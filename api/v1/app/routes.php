@@ -216,6 +216,23 @@ return function (App $app) {
 
     });
 
+    $app->get('/administrador/{id}/comunidades', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Comunidad');
+
+        $id = $params['id'];
+
+        $response->getBody()->write( $frontController->context->ListComunidadesByAdministradorId($id) );
+
+        return $response;  
+
+    });
+
     $app->get('/empleado/{id}/empresas', function (Request $request, Response $response, array $params)
     {
 
@@ -246,6 +263,19 @@ return function (App $app) {
 
         $response->getBody()->write( $frontController->context->ListEmpleadosByEmpresaId($idEmpresa) );
 
+        return $response;  
+
+    });
+
+    $app->get('/documentacion/basica/list', function (Request $request, Response $response, array $params)
+    {
+        //$frontController = new Fincatech\Controller\FrontController();
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontController = new $frontControllerName();
+        
+        $frontController->Init('Requerimiento');
+
+        $response->getBody()->write( $frontController->context->ListRequerimientoByIdTipo(6)  );
         return $response;  
 
     });

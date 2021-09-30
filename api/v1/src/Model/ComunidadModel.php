@@ -71,6 +71,14 @@ class ComunidadModel extends \HappySoftware\Model\Model{
         return $dataServiciosContratados;
     }
 
+    /** Recupera el listado de comunidades asociadas a un administrador */
+    public function ListComunidadesByAdministradorId($id)
+    {
+        $sql = "select * from comunidad where usuarioid = $id order by nombre asc";
+        $data = $this->query($sql);
+        return $data;  
+    }
+
     /** @Override del método principal para obtener la comunidad */
     public function Get($id)
     {

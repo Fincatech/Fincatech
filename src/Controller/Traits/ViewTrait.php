@@ -21,9 +21,9 @@ trait ViewTrait{
     {
         global $appSettings;
         global $App;
-//         echo $this->getUserRol();
-//         print_r(security[$this->getUserRol()]);
-// die(security[$this->getUserRol()]['menulateral']);
+        //         echo $this->getUserRol();
+        //         print_r(security[$this->getUserRol()]);
+        // die(security[$this->getUserRol()]['menulateral']);
         return ( security[$this->getUserRol()]['menulateral'] == true );
     }
 
@@ -78,7 +78,8 @@ trait ViewTrait{
                     default:
                         $iconoAccion = "list";
                         $App->renderTable("listado" . ucfirst($this->getController()), ucfirst($this->getController()), []); 
-                        $includeFile .= "componentes/listado/listado";
+                        $includeFile .= $this->getListadoRoute();
+                        //$includeFile .= "componentes/listado/listado";
                         break;
                 }
                 
@@ -141,6 +142,22 @@ trait ViewTrait{
         }
 
     }
+
+    /** Valida si existe ya el fichero de listado o bien cogemos el componente por defecto */
+    public function getListadoRoute()
+    {
+        //  Comprobamos si del modelo que se va a recuperar (es decir, el nombre del controller) hay un fichero de listado
+        //  Si no devolvemos el por defecto
+        $ruta = 'componentes/listado/listado';
+
+        if(file_exists(ABSPATH . 'views/' . $this->getController() . '/listado.php'))
+        {
+            $ruta = $this->getController() . '/listado';
+        }
+
+        return $ruta;
+    }
+
 
     /** Renderiza la vista en función del controller */
     public function renderAppView()

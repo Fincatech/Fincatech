@@ -17,6 +17,7 @@ let apiFincatech =
 
     procesarRespuesta:function(respuesta)
     {
+        $('.loading').hide();
         //  Comprobamos si devuelve
         if(respuesta.status == 'ok')
         {
@@ -83,6 +84,7 @@ let apiFincatech =
             },
             error: function()
             {
+                $('.loading').hide();
                 apiFincatech.procesarError('Error de endpoint');
             }
         });
@@ -115,6 +117,7 @@ let apiFincatech =
             },
             error: function()
             {
+                $('.loading').hide();
                 apiFincatech.procesarError('Error de endpoint');
             }
         });
@@ -128,8 +131,8 @@ let apiFincatech =
         //  Si tiene fichero adjuntado adjuntamos el objeto
         if(core.Files.Fichero.base64 != '')
         {
-            console.log(core.Files.Fichero);
-            console.log(datosPost);
+            // console.log(core.Files.Fichero);
+            // console.log(datosPost);
             datosPost.fichero = core.Files.Fichero;
         }
 
@@ -147,6 +150,7 @@ let apiFincatech =
             },
             error: function()
             {
+                $('.loading').hide();
                 apiFincatech.procesarError('Error de endpoint');
             }
         });
@@ -181,6 +185,7 @@ let apiFincatech =
             },
             error: function()
             {
+                $('.loading').hide();
                 apiFincatech.procesarError('Error de endpoint');
             }
         });

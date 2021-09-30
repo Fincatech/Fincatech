@@ -28,10 +28,14 @@
                             <label for="cif" class="pl-0"><i class="bi bi-credit-card-2-front pr-2"></i>CIF*</label>
                             <input type="text" maxlength="20" class="form-control data text-center form-required" id="cif" name="cif" placeholder="CIF"  hs-entity="Empresa" hs-field="cif" required>
                         </div>
-                        <div class="col-12 col-md-10 text-left">
+                        <div class="col-12 col-md-8 text-left">
                             <label for="razonsocial"><i class="bi bi-person pr-2"></i>Nombre / Razón social</label>              
                             <input type="text" class="form-control data text-left form-required" id="razonsocial" name="razonsocial" hs-entity="Empresa" hs-field="razonsocial" maxlength="100" required>
-                        </div>                        
+                        </div> 
+                        <div class="col-12 col-md-2 text-left">
+                            <label for="estado"><i class="bi bi-geo-alt pr-2"></i>Tipo</label>
+                            <select id="idtipoempresa" name="idtipoempresa" class="select-data data custom-select form-control selectpicker" data-live-search="true" hs-entity="Empresa" hs-field="idtipoempresa" hs-list-entity="Empresatipo" hs-list-field="nombre" hs-list-value="id"></select>
+                        </div>
                     </div>
 
                     <!-- dirección -->

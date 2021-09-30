@@ -246,3 +246,16 @@ INSERT INTO `fincatech`.`comunidadservicioscontratados` (`idcomunidad`, `idservi
 ALTER TABLE `fincatech`.`comunidadservicioscontratados` 
 ADD COLUMN `contratado` TINYINT(1) NULL DEFAULT 0 AFTER `preciocomunidad`;
    
+####
+
+ALTER TABLE `fincatech`.`empresa` 
+ADD COLUMN `idtipoempresa` INT(11) NULL AFTER `codpostal`;
+
+CREATE TABLE `fincatech`.`empresatipo` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(20) NULL,
+  PRIMARY KEY (`id`));
+
+INSERT INTO `fincatech`.`empresatipo` (`nombre`) VALUES ('Empresa');
+INSERT INTO `fincatech`.`empresatipo` (`nombre`) VALUES ('Autónomo');
+

@@ -61,11 +61,16 @@ let Constantes = {
 
     <div class="wrapperProgresoCarga row" style="display: none;">
       <div class="col-12">
-          <label class="text-center mb-2">Procesando fichero</label>
+          <label class="text-center mb-2 mt-3">Procesando fichero</label>
           <div class="progress mb-3" style="height: 30px;">
             <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">Animated</div>
           </div>
           <label class="progresoCarga">(n de y procesados)</label>
+          <div class="row mt-3 btnCerrarProceso" style="display: none;">
+            <div class="col-12">
+              <a href="javascript:swal.close();" class="btn btn-success">OK</a>
+            </div>
+          </div>
       </div>
     </div>
     `
@@ -553,11 +558,11 @@ let core =
         //  Mapeamos los datos para poder enviar la info
         if(dataAlreadyMapped == false)
         {
-          console.log('Intenta mapear');
+console.log('dataAlreadymapped false');
           core.Forms.data = {};
           core.Forms.mapDataToSave();
         }
-
+console.log('accion: ' + actionSave);
         //  Comprobamos la acción del modelo
         switch(actionSave)
         {
@@ -565,7 +570,7 @@ let core =
               core.Modelo.Update(core.model.toLowerCase(), idSave, core.Forms.data);
               break;
           case 'add':
-              core.Modelo.Insert(core.model.toLowerCase(), core.Forms.data );
+              core.Modelo.Insert(core.model.toLowerCase(), core.Forms.data, true );
               break;
         }
 
@@ -621,11 +626,13 @@ let core =
      * @param {*} entidadSave 
      * @param {*} postData 
      */
-    Insert: async function(entidadSave, postData)
+    Insert: async function(entidadSave, postData, updateModel = true)
     {
+    console.log('Llega al insert');
+    console.log(`${entidadSave}/create`);
       await apiFincatech.post(`${entidadSave}/create`, postData).then(async (response) =>
       {
-
+  console.log('tiene respuesta');
           var responseData = JSON.parse(response);
 
           // console.log('Resultado inserción1: ' + responseData.data);
@@ -634,17 +641,18 @@ let core =
 
           if(responseData.status['response'] == "ok")
           {
+              if(updateModel)
+              {
+                  var idInsercion = responseData.data['id'];
 
-            var idInsercion = responseData.data['id'];
+                  $("body").attr("hs-action", "get");
+                  $("body").attr("hs-model-id", idInsercion);
 
-            $("body").attr("hs-action", "get");
-            $("body").attr("hs-model-id", idInsercion);
+                  core.actionModel = "get";
+                  core.modelId = idInsercion;
 
-            core.actionModel = "get";
-            core.modelId = idInsercion;
-
-            CoreUI.Modal.Success("El registro se ha creado correctamente");
-
+                  CoreUI.Modal.Success("El registro se ha creado correctamente");              
+              }
           }else{
 
             //  TODO: Ver cuál es el error en el json

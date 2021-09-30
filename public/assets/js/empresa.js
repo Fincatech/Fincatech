@@ -42,7 +42,7 @@ let empresaCore = {
     {
         core.Modelo.Delete("empresa", id, nombre, "listadoEmpresa");
         Swal.fire({
-            title:`¿Desea eliminar la empressa:<br>${nombre}?`,
+            title:`¿Desea eliminar la empresa:<br>${nombre}?`,
             text: "Se va a eliminar la empresa y toda la información asociada",
             icon: 'question',
             showCancelButton: true,
@@ -92,6 +92,10 @@ let empresaCore = {
 
             //  Localidad
             CoreUI.tableData.addColumn("localidad", "Localidad", null, 'text-left');
+
+            //  Persona de contacto
+            CoreUI.tableData.addColumn("empresatipo[0].nombre", "Tipo", null, 'text-left');
+
 
             //  Columna de acciones
                 var html = '<ul class="nav justify-content-center accionesTabla">';

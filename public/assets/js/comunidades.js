@@ -60,28 +60,6 @@ let comunidadesCore = {
     eliminar: function(id, nombre)
     {
         core.Modelo.Delete("comunidad", id, nombre, "listadoComunidades");
-        // Swal.fire({
-        //     title:`¿Desea eliminar la comunidad:<br>${nombreComunidad}?`,
-        //     text: "Se va a eliminar la comunidad y toda la información asociada",
-        //     icon: 'question',
-        //     showCancelButton: true,
-        //     confirmButtonColor: '#3085d6',
-        //     cancelButtonColor: '#d33',
-        //     confirmButtonText: 'Eliminar',
-        //     cancelButtonText: 'Cancelar'
-        //   }).then((result) => {
-        //     if (result.isConfirmed) {
-        //         //  Llamamos al endpoint de eliminar
-        //         apiFincatech.delete("comunidad", idComunidad).then((result) =>{
-        //             Swal.fire(
-        //                 'Comunidad eliminada correctamente',
-        //                 '',
-        //                 'success'
-        //               );
-        //               $('#listadoComunidades').DataTable().ajax.reload();
-        //         });
-        //     }
-        // });
     },
 
     /** TODO: Muestra un modal con la info de la comunidad */
@@ -100,11 +78,6 @@ let comunidadesCore = {
                 result = CoreUI.Utils.parse(resultHTML, comunidadesCore.comunidad);
                 console.log(result);
                 CoreUI.Modal.GetHTML('modalInfoComunidad', result, comunidadesCore.comunidad.nombre);
-                // Swal.fire({
-                //     title:`${comunidadesCore.comunidad.nombre}`,
-                //     html: result,
-                //     customClass: 'modal-lg'
-                // })
             });
 
         });
@@ -146,9 +119,10 @@ let comunidadesCore = {
             //  Nombre
             CoreUI.tableData.addColumn("nombre", "NOMBRE");
 
-            // //  Administrador
-            //     var html = `<a href="${baseURL}administrador/data:usuarioId$" class="pl-1 pr-1">data:usuario.nombre$</a>`;
-            //     CoreUI.tableData.addColumn(null, "ADMINISTRADOR", html);
+            //  Administrador
+            CoreUI.tableData.addColumn("usuario[0].nombre", "Administrador");            
+                // var html = `<a href="${baseURL}administrador/data:usuarioId$" class="pl-1 pr-1">data:usuario.nombre$</a>`;
+                // CoreUI.tableData.addColumn(null, "ADMINISTRADOR", html);
 
             //  Email
                 var html = '<a href="mailto:data:emailcontacto$" class="pl-1 pr-1">data:emailcontacto$</a>';
@@ -179,6 +153,46 @@ let comunidadesCore = {
                 CoreUI.tableData.addColumn(null, "", html);
 
             CoreUI.tableData.render("listadoComunidad", "Comunidad", "comunidad/list");
+        }
+
+    },
+
+    /**
+     * Carga los datos del listado de comunidades en la tabla listadoComunidades
+     */
+    renderTablaComunidadesAdministrador: async function(id)
+    {
+        if($('#listadoComunidadesAdministrador').length)
+        {
+            //  Cargamos el listado de comunidades
+            CoreUI.tableData.init();
+            //  Código
+            CoreUI.tableData.addColumn("codigo","COD");
+            //  Nombre
+            CoreUI.tableData.addColumn("nombre", "NOMBRE");
+
+            //  Email
+                var html = '<a href="mailto:data:emailcontacto$" class="pl-1 pr-1">data:emailcontacto$</a>';
+                CoreUI.tableData.addColumn(null, "EMAIL", html);
+
+            //  Teléfono
+            CoreUI.tableData.addColumn("telefono", "TELEFONO");
+
+            //  Documentos pendientes de subir
+            CoreUI.tableData.addColumn("nombre", "doc pend. de subir");
+
+            //  Pendientes de verificar
+            CoreUI.tableData.addColumn("nombre", "doc pend. de verificar");
+
+            //  Fecha de alta
+                var html = 'data:created$';
+                CoreUI.tableData.addColumn(null, "Fecha alta", html);
+
+            // Estado
+                var html = 'data:estado$';
+                CoreUI.tableData.addColumn(null, "Estado", html);
+
+            CoreUI.tableData.render("listadoComunidadesAdministrador", "ComunidadesAdministrador", `administrador/${id}/comunidades`);
         }
 
     },
@@ -234,12 +248,123 @@ let comunidadesCore = {
 
         guardarComunidadDesdePlantilla(jsonExcel)
         {
+            /*
+                "codpostal": "29680",
+                "presidente": "Presidente nombre",
+                "telefono": "123456789",
+                "emailcontacto": "ejemplo@fincatech.es",
+                "cif": "1R",
+                "cae.contratado": "0",
+                "cae.pvp": "0",
+                "cae.preciocomuidad": "0",
+                "Rgpd.contratado": "1",
+                "Rgpd.pvp": "30",
+                "Rgpd.preciocomunidad": "120",
+                "prl.contratado": "0",
+                "prl.pvp": "0",
+                "prl.preciocomunidad": "0",
+                "instalaciones.contratado": "0",
+                "instalaciones.pvp": "0",
+                "instalaciones.preciocomunidad": "0",
+                "certificadosdigitales.contratado": "0",
+                "Certificadosdigitales.pvp": "0",
+                "certificadosdigitales.preciocomunidad": "0"
+            }
+            */
+
+            var idAdministrador = $('#administradorCargaId option:selected').val();
+            var porcentaje = 0;
+            for(x = 0; x < jsonExcel.length; x++)
+            {
+
+
+                var Comunidad = {};
+                    Comunidad.comunidadservicioscontratados = [];
+
+                var infoServicio = new Object();
+
+                Comunidad.codigo = jsonExcel[x].codigo;
+                Comunidad.cif = jsonExcel[x].cif;
+                Comunidad.codpostal = jsonExcel[x].codpostal;
+                Comunidad.direccion = jsonExcel[x].direccion;
+                Comunidad.nombre = jsonExcel[x].nombre;
+                Comunidad.localidad = jsonExcel[x].localidad;
+                Comunidad.presidente = jsonExcel[x].presidente;
+                Comunidad.telefono = jsonExcel[x].telefono;
+                Comunidad.emailcontacto = jsonExcel[x].emailcontacto;
+                Comunidad.usercreate = idAdministrador;
+                Comunidad.usuarioId = idAdministrador;
+                Comunidad.estado = 'A';
+
+                //  Servicios contratados
+                /* Orden de los servicios: 
+
+                    1: CAE
+                    2: RGPD
+                    3: PRL
+                    4: Instalaciones
+                    5: Certificados digitales
+
+                */
+                // Comunidad.comunidadservicioscontratados[0].idcomunidad = jsonExcel[x].localidad;
+                infoServicio.idservicio = 1;
+                infoServicio.contratado = jsonExcel[x]['cae.contratado'];
+                infoServicio.precio = jsonExcel[x]['cae.pvp'];
+                infoServicio.preciocomunidad = jsonExcel[x]['cae.preciocomunidad'];
+
+                Comunidad.comunidadservicioscontratados.push(infoServicio);
+
+                var infoServicio = new Object();
+                infoServicio.idservicio = 2;
+                infoServicio.contratado = jsonExcel[x]['Rgpd.contratado'];
+                infoServicio.precio = jsonExcel[x]['Rgpd.pvp'];
+                infoServicio.preciocomunidad = jsonExcel[x]['Rgpd.preciocomunidad'];
+                Comunidad.comunidadservicioscontratados.push(infoServicio);
+
+                var infoServicio = new Object();
+                infoServicio.idservicio = 3;
+                infoServicio.contratado = jsonExcel[x]['prl.contratado'];
+                infoServicio.precio = jsonExcel[x]['prl.pvp'];
+                infoServicio.preciocomunidad = jsonExcel[x]['prl.preciocomunidad'];
+                Comunidad.comunidadservicioscontratados.push(infoServicio);
+
+                var infoServicio = new Object();
+                infoServicio.idservicio = 4;
+                infoServicio.contratado = jsonExcel[x]['instalaciones.contratado'];
+                infoServicio.precio = jsonExcel[x]['instalaciones.pvp'];
+                infoServicio.preciocomunidad = jsonExcel[x]['instalaciones.preciocomunidad'];
+                Comunidad.comunidadservicioscontratados.push(infoServicio);
+
+                var infoServicio = new Object();
+                infoServicio.idservicio = 5;
+                infoServicio.contratado = jsonExcel[x]['certificadosdigitales.contratado'];
+                infoServicio.precio = jsonExcel[x]['certificadosdigitales.pvp'];
+                infoServicio.preciocomunidad = jsonExcel[x]['certificadosdigitales.preciocomunidad']; 
+                Comunidad.comunidadservicioscontratados.push(infoServicio);
+
+                //  Generamos la comunidad en base de datos
+                core.Modelo.Insert('comunidad', Comunidad, false);
+                porcentaje = (( x * 100 ) / jsonExcel.length).toFixed(2);
+                $('.wrapperProgresoCarga .progress-bar-striped').attr('aria-valuenow',`${porcentaje}%`);
+                $('.wrapperProgresoCarga .progress-bar-striped').css('width',`${porcentaje}%`);
+                $('.wrapperProgresoCarga .progress-bar-striped').html(`${porcentaje}%`);  
+
+                $('.wrapperProgresoCarga .progresoCarga').html(`(${x} de ` + (jsonExcel.length) + ')');
+
+            }
+
             //  Obtenemos el ID del administrador seleccionado
-    
+            // FIXME: Arreglar el texto para plural y singular
+                $('.wrapperProgresoCarga .progresoCarga').html('(' + jsonExcel.length + ' comunidad(es) importada(s))');
+                $('.btnCerrarProceso').show();
+                $('.wrapperProgresoCarga .progress-bar-striped').attr('aria-valuenow',`100%`);
+                $('.wrapperProgresoCarga .progress-bar-striped').css('width',`100%`);
+                $('.wrapperProgresoCarga .progress-bar-striped').html(`100%`);                  
         },
     
         leerPlantillaComunidades: function(xlsxflag)
         {
+
             /*Checks whether the browser supports HTML5*/  
             if (typeof (FileReader) != "undefined") 
             {  
@@ -276,15 +401,10 @@ let comunidadesCore = {
 
                         if (exceljson.length > 0 && cnt == 0) 
                         {  
-
-                            $('.wrapperProgresoCarga .progresoCarga').html(`(0 de ` + (exceljson.length - 4) + ')');
-                            console.log(exceljson);
-                            //BindTable(exceljson, '#exceltable');  
-                            comunidadesCore.guardarComunidad();
+                            $('.wrapperProgresoCarga .progresoCarga').html(`(0 de ` + (exceljson.length) + ')');
+                            comunidadesCore.Import.guardarComunidadDesdePlantilla(exceljson);
                         }  
                     });
-                    
-                    //$('#exceltable').show();  
                 }  
     
                 if (xlsxflag) {/*If excel file is .xlsx extension than creates a Array Buffer from excel*/  

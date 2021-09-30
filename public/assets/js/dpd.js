@@ -96,7 +96,10 @@ let dpdCore = {
                 </div>
             </div>
         `;
-        CoreUI.Modal.CustomHTML(html,'');
+        CoreUI.Modal.CustomHTML(html,'', function()
+        {
+            dpdCore.renderTabla();
+        });
     },
 
     /**

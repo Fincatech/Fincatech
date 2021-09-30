@@ -62,7 +62,7 @@ let serviciosCore = {
 
         });
 
-        console.log(core.Forms.data['comunidadservicioscontratados']);
+        // console.log(core.Forms.data['comunidadservicioscontratados']);
 
     },
 

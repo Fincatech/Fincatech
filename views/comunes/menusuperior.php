@@ -24,8 +24,22 @@
                     </div>
                 </a>
             </li>
-            <!-- Notas informativas solo si es administrador de fincas -->
+            <!-- Notas informativas, Documentación Básica e Informes de valoración y seguimiento solo si es administrador de fincas -->
             <?php if($App->isAdminFincas()): ?>
+                <li class="nav-item">
+                    <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Documentación básica" href="<?php echo APPFOLDER . "documentacionbasica/basica"; ?>" id="home">
+                        <div class="position-relative">
+                            <i class="bi bi-folder2-open"></i>
+                        </div>
+                    </a>                    
+                </li>                            
+                <li class="nav-item">
+                    <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Informes valoración y seguimiento" href="<?php echo APPFOLDER . "informevaloracionseguimiento/list"; ?>" id="home">
+                        <div class="position-relative">
+                            <i class="bi bi-journal-bookmark"></i>
+                        </div>
+                    </a>                    
+                </li>  
                 <li class="nav-item">
                     <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Notas informativas" title="Notas informativas" href="<?php echo APPFOLDER . "notasinformativas/list"; ?>" id="home">
                         <div class="position-relative">

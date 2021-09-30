@@ -38,7 +38,24 @@ class Empresa extends EntityHelper{
 
     /** Establece las relaciones de entidades con esta entidad */
     private function setRelations()
-    {       
+    {     
+
+            //  Entidad provincia
+        $this->relations[] = $this->addRelation([
+            'table' => 'empresatipo',
+            //  Columna de la entidad que se está relacionando con la entidad principal
+            'sourceColumn' =>'idtipoempresa',
+            //  Columna de la entidad con la que se va a relacionar
+            'targetColumn' => 'id',
+            'fieldType' => 'int',
+            'canReturnSchema' => false,
+            'readOnly' => true,
+            //  Indica si se debe eliminar el registro relacionado o no
+            'deleteOnCascade' => false,
+            //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
+            'relationType' => RELACION_INVERSA
+        ]);
+
     }
 
 }
