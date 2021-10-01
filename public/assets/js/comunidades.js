@@ -291,7 +291,8 @@ let comunidadesCore = {
                 Comunidad.localidad = jsonExcel[x].localidad;
                 Comunidad.presidente = jsonExcel[x].presidente;
                 Comunidad.telefono = jsonExcel[x].telefono;
-                Comunidad.emailcontacto = jsonExcel[x].emailcontacto;
+                Comunidad.emailcontacto = (jsonExcel[x].emailcontacto === undefined ? '' : jsonExcel[x].emailcontacto );
+                Comunidad.ibancomunidad = jsonExcel[x].ibancomunidad;
                 Comunidad.usercreate = idAdministrador;
                 Comunidad.usuarioId = idAdministrador;
                 Comunidad.estado = 'A';
@@ -308,39 +309,41 @@ let comunidadesCore = {
                 */
                 // Comunidad.comunidadservicioscontratados[0].idcomunidad = jsonExcel[x].localidad;
                 infoServicio.idservicio = 1;
-                infoServicio.contratado = jsonExcel[x]['cae.contratado'];
-                infoServicio.precio = jsonExcel[x]['cae.pvp'];
-                infoServicio.preciocomunidad = jsonExcel[x]['cae.preciocomunidad'];
+                infoServicio.contratado = (jsonExcel[x]['cae.contratado'] === undefined ? 0 : jsonExcel[x]['cae.contratado'] );
+                infoServicio.precio = (jsonExcel[x]['cae.pvp'] === undefined ? 0 : jsonExcel[x]['cae.pvp']);
+                infoServicio.preciocomunidad = (jsonExcel[x]['cae.preciocomunidad'] === undefined ? 0 : jsonExcel[x]['cae.preciocomunidad']);
 
                 Comunidad.comunidadservicioscontratados.push(infoServicio);
 
                 var infoServicio = new Object();
                 infoServicio.idservicio = 2;
-                infoServicio.contratado = jsonExcel[x]['Rgpd.contratado'];
-                infoServicio.precio = jsonExcel[x]['Rgpd.pvp'];
-                infoServicio.preciocomunidad = jsonExcel[x]['Rgpd.preciocomunidad'];
+                infoServicio.contratado = (jsonExcel[x]['Rgpd.contratado'] === undefined ? 0 :jsonExcel[x]['Rgpd.contratado'] );
+                infoServicio.precio = ( jsonExcel[x]['Rgpd.pvp'] === undefined ? 0 : jsonExcel[x]['Rgpd.pvp'] );
+                infoServicio.preciocomunidad = ( jsonExcel[x]['Rgpd.preciocomunidad'] === undefined ? 0 : jsonExcel[x]['Rgpd.preciocomunidad'] );
                 Comunidad.comunidadservicioscontratados.push(infoServicio);
 
                 var infoServicio = new Object();
                 infoServicio.idservicio = 3;
-                infoServicio.contratado = jsonExcel[x]['prl.contratado'];
-                infoServicio.precio = jsonExcel[x]['prl.pvp'];
-                infoServicio.preciocomunidad = jsonExcel[x]['prl.preciocomunidad'];
+                infoServicio.contratado = (jsonExcel[x]['prl.contratado'] === undefined ? 0 : jsonExcel[x]['prl.contratado']);
+                infoServicio.precio = (jsonExcel[x]['prl.pvp'] === undefined ? 0 : jsonExcel[x]['prl.pvp']);
+                infoServicio.preciocomunidad = (jsonExcel[x]['prl.preciocomunidad'] === undefined ? 0 : jsonExcel[x]['prl.preciocomunidad']);
                 Comunidad.comunidadservicioscontratados.push(infoServicio);
 
                 var infoServicio = new Object();
                 infoServicio.idservicio = 4;
-                infoServicio.contratado = jsonExcel[x]['instalaciones.contratado'];
-                infoServicio.precio = jsonExcel[x]['instalaciones.pvp'];
-                infoServicio.preciocomunidad = jsonExcel[x]['instalaciones.preciocomunidad'];
+                infoServicio.contratado = (jsonExcel[x]['instalaciones.contratado'] === undefined ? 0 : jsonExcel[x]['instalaciones.contratado']);
+                infoServicio.precio = (jsonExcel[x]['instalaciones.pvp'] === undefined ? 0 : jsonExcel[x]['instalaciones.pvp']);
+                infoServicio.preciocomunidad = (jsonExcel[x]['instalaciones.preciocomunidad'] === undefined ? 0 : jsonExcel[x]['instalaciones.preciocomunidad']);
                 Comunidad.comunidadservicioscontratados.push(infoServicio);
 
                 var infoServicio = new Object();
                 infoServicio.idservicio = 5;
-                infoServicio.contratado = jsonExcel[x]['certificadosdigitales.contratado'];
-                infoServicio.precio = jsonExcel[x]['certificadosdigitales.pvp'];
-                infoServicio.preciocomunidad = jsonExcel[x]['certificadosdigitales.preciocomunidad']; 
+                infoServicio.contratado = ( jsonExcel[x]['certificadosdigitales.contratado'] === undefined ? 0 : jsonExcel[x]['certificadosdigitales.contratado'] );
+                infoServicio.precio = ( jsonExcel[x]['certificadosdigitales.pvp'] === undefined ? 0 : jsonExcel[x]['certificadosdigitales.pvp'] );
+                infoServicio.preciocomunidad = ( jsonExcel[x]['certificadosdigitales.preciocomunidad'] === undefined ? 0 : jsonExcel[x]['certificadosdigitales.preciocomunidad'] ); 
                 Comunidad.comunidadservicioscontratados.push(infoServicio);
+
+                console.log(Comunidad);
 
                 //  Generamos la comunidad en base de datos
                 core.Modelo.Insert('comunidad', Comunidad, false);

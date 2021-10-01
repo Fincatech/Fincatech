@@ -259,3 +259,7 @@ CREATE TABLE `fincatech`.`empresatipo` (
 INSERT INTO `fincatech`.`empresatipo` (`nombre`) VALUES ('Empresa');
 INSERT INTO `fincatech`.`empresatipo` (`nombre`) VALUES ('Autónomo');
 
+#########
+
+ALTER TABLE `fincatech`.`comunidad` 
+ADD COLUMN `ibancomunidad` VARCHAR(30) NULL AFTER `cif`;
