@@ -6,6 +6,7 @@
 *
 **/
 namespace HappySoftware\Controller\Traits;
+use HappySoftware\Database\DatabaseCore;
 
 trait FilesTrait{
 
@@ -58,10 +59,9 @@ trait FilesTrait{
 
                 //  Insertamos el registro en base de datos
                     $sqlFile = "insert into ficheroscomunes(nombre, nombrestorage, ubicacion, estado, created, usercreate) values (";
-                    $sqlFile .= "'$nombre', '$fichero', '" . $ruta . "', null, now(), " . $this->getLoggedUserId() . ")"; 
-                    // die($sqlFile);
-                    $this->repositorio->queryRaw( $sqlFile );
-                    return ($this->repositorio->getLastID("ficheroscomunes") - 1);
+                    $sqlFile .= "'$nombre', '$fichero', '" . $ruta . "', null, now(), " . $this->getLoggedUserId() . ")";                     
+                    $this->getRepositorio()->queryRaw( $sqlFile );
+                    return ($this->getRepositorio()->getLastID("ficheroscomunes") - 1);
 
             }catch(Exception $ex){
                 print_r($ex);

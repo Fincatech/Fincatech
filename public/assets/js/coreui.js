@@ -2,8 +2,15 @@
 
 let CoreUI = {
 
+    tituloModulo: null,
+
     init: function(){
 
+    },
+
+    setTitulo: function(value)
+    {
+        CoreUI.tituloModulo = value;
     },
 
     Utils: {
@@ -39,13 +46,19 @@ let CoreUI = {
             return valor;
         },
 
-        setTituloPantalla: function(entidad, campo)
+        setTituloPantalla: function(entidad, campo, nombre = null)
         {
             //  Lo primero de todo es comprobar si existe la entidad en el modelo
-            if(core.Modelo.entity[entidad] !== undefined)
-            {
-                $('.titulo-modulo').text(core.Modelo.entity[entidad][0][campo]);
-            }
+                if(nombre !== null)
+                {
+                    $('.titulo-modulo').text(nombre);
+                    return;
+                }
+
+                if(core.Modelo.entity[entidad] !== undefined && core.Modelo.entity[entidad] !== null)
+                {
+                    $('.titulo-modulo').text(core.Modelo.entity[entidad][0][campo]);
+                }
         }
 
     },
@@ -78,7 +91,7 @@ let CoreUI = {
                     "processing": "Procesando...",
                     "search": "Buscar:",
                     "searching": true,
-                    "searchPlaceholder": "Término de búsqueda",
+                    "searchPlaceholder": "",
                     "zeroRecords": "No se encontraron resultados",
                     "emptyTable": "Ningún dato disponible en esta tabla",
                     "aria": {
@@ -211,9 +224,37 @@ let CoreUI = {
             return  (valor == '' ? 'N/D': valor) ;
         },
 
-        /** Añade la definición de una columna */
-        addColumn: function(nombre, titulo, renderHTML, clase, widthColumn )
+        /** Agrega una columna con click para ampliar información */
+        addColumnRow: function(id, data)
         {
+            var columna = {};
+
+            if(typeof CoreUI.tableData.columns[id] === 'undefined')
+            {
+                CoreUI.tableData.columns[id] = [];
+            }
+
+            columna = {
+                    "className": 'details-control',
+                     "orderable": false,
+                     "data": data,
+                     "defaultContent": '',
+                     "render": function () {
+                         return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
+                     },
+                     width:"15px"
+            };
+
+            CoreUI.tableData.columns[id].push(columna);
+        },
+
+        /** Añade la definición de una columna */
+        addColumn: function(id, nombre, titulo, renderHTML, clase, widthColumn )
+        {
+            if(typeof CoreUI.tableData.columns[id] === 'undefined')
+            {
+                CoreUI.tableData.columns[id] = [];
+            }
 
             var columna = {};
 
@@ -236,12 +277,111 @@ let CoreUI = {
                 columna = {"data": nombre, "width": widthColumn, "render":null, "title":titulo};
             }
 
-            this.columns.push(columna);
+            CoreUI.tableData.columns[id].push(columna);
+
+        },
+
+        /** Muestra la fila de información ampliada para CAE Empresa */
+        formatEmpresa: function (d)
+        {
+            //  Debemos comprobar el rol para subir fichero
+                var canUploadFile = false;
+                var needFileUpload = false;
+                var fileLink = '';
+
+                if(core.Security.getRole() == 'CONTRATISTA')
+                {
+                    canUploadFile = true;
+
+                }
+
+            //  Comprobamos el estado del fichero)
+
+            //  Si es un 
+            var salida = `
+                <div class="table-responsive">
+                    <table border="0" class="table table-bordered table-light">
+                        <thead class="">
+                            <tr>
+                                <th style="background: #dee2e6 !important;">Requerimiento</th>
+                                <th class="text-center" style="background: #dee2e6 !important;width:150px;">Fecha última actuación</th>
+                                <th class="text-center" style="background: #dee2e6 !important;">Estado</th>
+                                <th style="background: #dee2e6 !important;">&nbsp;</th>`;
+            salida += `        
+                            </tr>
+                        </thead>`;
+
+            for(x = 0; x < d.documentacioncae.length; x++)
+            {
+
+                //  Nombre del requerimiento
+                    salida += `
+                        <tr>
+                            <td>
+                            ${d.documentacioncae[x].requerimiento}
+                            </td>
+                            <td class="text-center" >`;
+
+                //  Fecha última actuación
+                    if(d.documentacioncae[x].fechaultimaactuacion != '' && d.documentacioncae[x].fechaultimaactuacion != null)
+                    {
+                        salida += moment( d.documentacioncae[x].fechaultimaactuacion ).locale('es').format('L');
+                    }else{
+                        salida += 'No se ha realizado ninguna actuación'; 
+                    }
+                    salida += '</td>';
+
+                //  Estado del requerimiento
+                    salida += '<td class="text-center" >' + (!d.documentacioncae[x].idficherorequerimiento ? '<span class="badge rounded-pill bg-danger pl-3 pr-3 pt-2 pb-2">No adjuntado</span>' : '<span class="badge rounded-pill bg-success pl-3 pr-3 pt-2 pb-2">Disponible para descargar</span>') + '</td>';
+
+                //  Enlace al fichero de descarga si está ya adjuntado o bien para subir si tiene permiso
+                    ficheroAdjuntado = (!d.documentacioncae[x].idficherorequerimiento ? false : true);
+                    if(ficheroAdjuntado)   //  DESCARGAR FICHERO YA SUBIDO
+                    {
+                        salida += ` <td class="text-center">
+                                        <a href="javascript:void(0)" data-toggle="tooltip" data-placement="bottom" title="Ver documento" id="home" data-original-title="Ver documento">
+                                            <i class="bi bi-cloud-arrow-down text-success" style="font-size: 30px;"></i>
+                                        </a>
+                                    </td>`;
+                    }
+
+                //  Construimos el enlace de salida para que pueda descargar el fichero adjuntado
+                    if(!ficheroAdjuntado && canUploadFile)
+                    {  //  SUBIR FICHERO SOLO PARA CONTRATISTA (EMPRESA)
+                        dataset = ` data-idcomunidad="${d.documentacioncae[x].idcomunidad}" data-idempresa="${d.id}" data-idempleado="" data-idrequerimiento="${d.documentacioncae[x].idrequerimiento}" data-idrelacionrequerimiento="${d.documentacioncae[x].idrelacion}" data-entidad="empresa" `;
+                        salida += `<td class="text-center" ><a href="javascript:void(0)" class="btnAdjuntarFicheroDocumento" data-toggle="tooltip" ${dataset} data-placement="bottom" title="" id="home" data-original-title="Adjuntar documento"><i class="bi bi-cloud-arrow-up text-success" style="font-size: 30px;"></i></a></td>`;
+                    }
+
+                    if(!ficheroAdjuntado && !canUploadFile)
+                    {
+                        salida += '<td>&nbsp;</td>';
+                    }
+
+                    salida += `</tr>`;
+            }
+            salida += '</table></div>';
+            return salida;
+        },
+
+        format: function ( d, id ) 
+        {
+            var salida;
+
+            switch(id)
+            {
+                case 'listadoEmpresa':
+                case 'listadoEmpresa':
+                case 'listadoEmpresaComunidad':
+                    salida = CoreUI.tableData.formatEmpresa(d);
+                    break;
+            }
+
+            return salida;
 
         },
 
         /** Renderiza la tabla */
-        render: function(id, entity, endpoint, allColumns, _paging = true, _search = true)
+        render: function(id, entity, endpoint, allColumns, usePagination = true, _search = true)
         {
             // console.log(this.columns.length);
             CoreUI.tableData.init();
@@ -250,27 +390,66 @@ let CoreUI = {
                 //  Nos traemos la definición de la entidad para poder generar las columnas de la tabla
             }
 
+            var detailRows = [];
+
             //  Cargamos el listad
             window['table' + id] = $(`#${id}`).DataTable({
-                "serverSide": true,
+                "serverSide": false,
                 "autoWidth": true,
                 "select": true,
                 "retrieve": true,
-                "paging": _paging,
+                "paging": usePagination,
                 "searching": _search,
                 ajax: {
                     "url": config.baseURLEndpoint + endpoint,
                     "dataSrc": "data." + entity 
                 },
-                "columns": this.columns,  
+                "columns": CoreUI.tableData.columns[id],  
                 "columnDefs": [{
-                    "targets": this.columns.length -1,
+                    "targets": CoreUI.tableData.columns[id].length -1,
                     "className": "p-0 text-center"
                 }],
                 "drawCallback": function(settings){
                     feather.replace();
                 }
             });
+
+            // On each draw, loop over the `detailRows` array and show any child rows
+            window['table' + id].on( 'draw', function () {
+                $.each( detailRows, function ( i, id ) {
+                    $('#'+id+' td.details-control').trigger( 'click' );
+                } );
+            } );
+
+         // Add event listener for opening and closing details
+            $('#' + id).on( 'click', 'tr td.details-control', function (e) {
+                //  Obtenemos el id de la tabla que está disparando el evento
+                    idTabla = ($(this).parent().parent().parent().attr('id'));
+
+                    var tr = $(this).closest('tr');
+                    var row = window['table' + idTabla].row( tr );
+                    var idx = $.inArray( tr.attr('id'), detailRows );
+        
+                if ( row.child.isShown() ) {
+                    tr.removeClass( 'details' );
+                    row.child.hide();
+        
+                    // Remove from the 'open' array
+                    detailRows.splice( idx, 1 );
+                }
+                else {
+                    tr.addClass( 'details' );
+                    row.child( CoreUI.tableData.format(row.data(), idTabla )).show();
+        
+                    // Add to the 'open' array
+                    if ( idx === -1 ) {
+                        detailRows.push( tr.attr('id') );
+                    }
+                }
+
+                documentalCore.Events();
+
+            } );
 
             //  Suscripción al evento del click salvo que la tabla no sea clicable
             if( !$(`#${id}`).hasClass('no-clicable') )
@@ -354,7 +533,6 @@ let CoreUI = {
         },
 
     }
-
 
 }
 

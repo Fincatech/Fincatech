@@ -27,21 +27,21 @@
             <!-- Notas informativas, Documentación Básica e Informes de valoración y seguimiento solo si es administrador de fincas -->
             <?php if($App->isAdminFincas()): ?>
                 <li class="nav-item">
-                    <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Documentación básica" href="<?php echo APPFOLDER . "documentacionbasica/basica"; ?>" id="home">
+                    <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Documentación básica" href="<?php echo APPFOLDER . "rgpd/documentacionbasica"; ?>" id="documentacionbasica_nav">
                         <div class="position-relative">
                             <i class="bi bi-folder2-open"></i>
                         </div>
                     </a>                    
                 </li>                            
                 <li class="nav-item">
-                    <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Informes valoración y seguimiento" href="<?php echo APPFOLDER . "informevaloracionseguimiento/list"; ?>" id="home">
+                    <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Informes de evaluación y seguimiento" href="<?php echo APPFOLDER . "rgpd/informevaloracionseguimiento"; ?>" id="informevaloracionseguimiento_nav">
                         <div class="position-relative">
                             <i class="bi bi-journal-bookmark"></i>
                         </div>
                     </a>                    
                 </li>  
                 <li class="nav-item">
-                    <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Notas informativas" title="Notas informativas" href="<?php echo APPFOLDER . "notasinformativas/list"; ?>" id="home">
+                    <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Notas informativas" title="Notas informativas" href="<?php echo APPFOLDER . "rgpd/notasinformativas"; ?>" id="notasinformativas_nav">
                         <div class="position-relative">
                             <i class="bi bi-journals"></i>
                         </div>
@@ -53,7 +53,7 @@
             <!-- Mensajes: Consultas al DPD -->
             <!-- Solo para DPD y ADMINFINCAS -->
             <?php if($App->getUserRol() == 'ROLE_DPD' || $App->getUserRol() == 'ROLE_ADMINFINCAS'): ?>
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown d-none">
                 <a class="nav-icon dropdown-toggle" data-toggle="tooltip" data-placement="bottom" title="Consultas al DPD" href="#" id="messagesDropdown" data-toggle="dropdown">
                     <div class="position-relative">
                         <i class="align-middle" data-feather="message-square"></i>
@@ -130,7 +130,7 @@
                     </a>
                 <?php //endif; ?>
                 <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-toggle="dropdown">
-                    <!-- <img src="<?php //echo ASSETS_IMG; ?>avatars/avatar.jpg" class="avatar img-fluid rounded mr-1" alt="Oscar Rodríguez" />--><i class="bi bi-person-circle" style="font-size:20px;"></i> <span class="text-dark">Óscar Rodríguez</span>
+                    <!-- <img src="<?php //echo ASSETS_IMG; ?>avatars/avatar.jpg" class="avatar img-fluid rounded mr-1" alt="Oscar Rodríguez" />--><i class="bi bi-person-circle" style="font-size:20px;"></i> <span class="text-dark usuarioFincatech">Óscar Rodríguez</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right">
                     <?php if(!$App->isSudo()): ?>

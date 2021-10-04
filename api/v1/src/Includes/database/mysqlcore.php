@@ -658,7 +658,7 @@ class DatabaseCore {
 			$total = $row['TOTAL'];
 			
 		}
-		//echo 'query: ' . $sql;
+		// echo 'query: ' . $sql;
 		//echo $sql . ' Total: ' . $total;
 		if($total  == 0)
 		{

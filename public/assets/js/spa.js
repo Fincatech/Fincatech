@@ -14,6 +14,10 @@ let spaCore = {
            await spaCore.listadoDashboard();
         }
 
+        //  Título del módulo
+            if($('.titulo-modulo').length && core.model == 'Spa')
+                CoreUI.setTitulo('nombre');        
+
     },
 
     // Gestión de eventos
@@ -73,37 +77,37 @@ let spaCore = {
             //  Cargamos el listado de comunidades
             CoreUI.tableData.init();
             //  Código
-            CoreUI.tableData.addColumn("cif","CIF");
+            CoreUI.tableData.addColumn('listadoSpa', "cif","CIF");
 
             //  Nombre
-            CoreUI.tableData.addColumn("nombre", "NOMBRE");
+            CoreUI.tableData.addColumn('listadoSpa', "nombre", "NOMBRE");
 
             //  Persona de contacto
-            CoreUI.tableData.addColumn("personacontacto", "PERSONA DE CONTACTO");
+            CoreUI.tableData.addColumn('listadoSpa', "personacontacto", "PERSONA DE CONTACTO");
 
             //  Localidad
-            CoreUI.tableData.addColumn("localidad", "Localidad");
+            CoreUI.tableData.addColumn('listadoSpa', "localidad", "Localidad");
 
             //  Localidad
-            CoreUI.tableData.addColumn("provincia[0].Nombre", "Provincia");
+            CoreUI.tableData.addColumn('listadoSpa', "provincia[0].Nombre", "Provincia");
 
             //  Email
                 var html = '<a href="mailto:data:email$" class="pl-1 pr-1">data:email$</a>';
-                CoreUI.tableData.addColumn(null, "EMAIL", html);
+                CoreUI.tableData.addColumn('listadoSpa', null, "EMAIL", html);
 
             //  Teléfono
-            CoreUI.tableData.addColumn("telefono", "TELEFONO");
+            CoreUI.tableData.addColumn('listadoSpa', "telefono", "TELEFONO");
 
             //  Fecha de alta
                 var html = 'data:created$';
-                CoreUI.tableData.addColumn(null, "Fecha alta", html);
+                CoreUI.tableData.addColumn('listadoSpa', null, "Fecha alta", html);
 
             //  Columna de acciones
                 var html = '<ul class="nav justify-content-center">';
                     html += '<li class="nav-item"><a href="javascript:void(0);" class="btnVerSpa d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="eye" class="text-info img-fluid"></i></a></li>';
                     html += `<li class="nav-item"><a href="${baseURL}spa/data:id$" class="btnEditarSpa d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid"></i></a></li>`;
                     html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarSpa d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid"></i></li></ul>';
-                CoreUI.tableData.addColumn(null, "", html);
+                CoreUI.tableData.addColumn('listadoSpa', null, "", html);
 
             CoreUI.tableData.render("listadoSpa", "Spa", "spa/list");
         }

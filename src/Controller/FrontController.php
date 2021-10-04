@@ -15,7 +15,13 @@ class MainController{
     private $pageTitle;
     private $controllerName;
     private $controllerAction;
+    private $controllerRoute;
     private $_id;
+
+    //  Esta variable se utiliza para comprobar si el segundo parámetro del controller
+    //  es una acción propiamente dicha, si no, indica una subruta
+    //  FIXME: Esto debería de ir en el middleware
+    private $aceptedActions = Array('create', 'add', 'list'); 
 
     public function __construct()
     {
@@ -34,6 +40,16 @@ class MainController{
     {
         return ( $this->getUserRol() == 'ROLE_ADMINFINCAS' );
     }
+
+    public function getFullControllerRoute()
+    {
+        return $this->controllerRoute;
+    } 
+
+    private function setFullControllerRoute($value)
+    {
+        $this->controllerRoute = $value;
+    } 
 
     public function getUserRol()
     {
@@ -75,7 +91,7 @@ class MainController{
         //  El primer parámetro es el nombre del controlador
         $this->controllerName = $controllerInfo[0];
 
-        //  El segundo es la acción y/o el ID solicitado
+        //  El segundo es la acción, ID solicitado o vista fuera de la arquitectura por defecto
         if(count($controllerInfo) > 1)
         {
             //  Comprobamos si es un entero o una acción
@@ -88,57 +104,57 @@ class MainController{
                 $this->controllerAction = $controllerInfo[1];
             }
         }else{
-            //  Cargamos el listado correspondiente siempre que no sea el dashboard
             $this->controllerAction = "list";
         }
 
+        // die($this->controllerAction);
+
         //  Comprobamos si está en el dashboard y además es un administrador de fincas
         if($this->getController() == 'dashboard')
-        {
             $this->controllerAction = '';
-        }
 
-        // $this->controllerName = $value;
         return $this;
-
     }
 
     public function Run()
     {
-        if(empty($_GET['route']))
-        {
-            $this->setController( 'login' );
-        }else{
-            $this->setController( $_GET['route'] );
-        }
+        //  Guardamos toda la url de la petición
+            $this->setFullControllerRoute($_GET['route']);
 
-        //  Comprobamos la seguridad
-        if(!$this->isLogged() && $this->getController() != 'login')
-        {
-            MainController::redirectToLogin();
-        }
-
-        $resultValidation = $this->checkSecurity();
-
-        if($resultValidation['status'] === true && !empty($resultValidation['data']))
-        {
-            $userData = $resultValidation['data']->userData;
-            $this->userRol = $userData->role;
-            $this->getController();
-            $this->InitView();
-        }else{
-
-            if($this->getController() === 'login')
+            if(empty($_GET['route']))
             {
-                $this->userRol = 'ROLE_LOGIN';
-                $this->InitView();
-            
+                $this->setController( 'login' );
             }else{
-                MainController::redirectToLogin();
-                exit;
+                $this->setController( $_GET['route'] );
             }
 
-        }
+        //  Comprobamos la seguridad
+            if(!$this->isLogged() && $this->getController() != 'login')
+            {
+                MainController::redirectToLogin();
+            }
+
+            $resultValidation = $this->checkSecurity();
+
+            if($resultValidation['status'] === true && !empty($resultValidation['data']))
+            {
+                $userData = $resultValidation['data']->userData;
+                $this->userRol = $userData->role;
+                $this->getController();
+                $this->InitView();
+            }else{
+
+                if($this->getController() === 'login')
+                {
+                    $this->userRol = 'ROLE_LOGIN';
+                    $this->InitView();
+                
+                }else{
+                    MainController::redirectToLogin();
+                    exit;
+                }
+
+            }
 
         //  Obtenemos el nombre del controlador que se va a utilizar
 

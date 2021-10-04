@@ -12,7 +12,7 @@ let dpdCore = {
     {
 
         this.events();
-        if($('#listadoDpd').length)
+        if($('#listadoDpd').length && core.model == 'Dpd')
         {
             dpdCore.renderTabla();
         }
@@ -262,13 +262,13 @@ let dpdCore = {
             CoreUI.tableData.init();
 
             //  Comunidad
-            CoreUI.tableData.addColumn("comunidad[0].nombre","COMUNIDAD");
+            CoreUI.tableData.addColumn('listadoDpd', "comunidad[0].nombre","COMUNIDAD");
 
             //  Consulta
-            CoreUI.tableData.addColumn("consulta", "Consulta");
+            CoreUI.tableData.addColumn('listadoDpd', "consulta", "Consulta");
 
             //  Respuesta
-            CoreUI.tableData.addColumn("respuesta", "Respuesta");
+            CoreUI.tableData.addColumn('listadoDpd', "respuesta", "Respuesta");
 
             //  Fichero asociado
                 var html = '<a href="' + config.baseURL + 'public/storage/data:ficheroscomunes.nombrestorage$" target="_blank"><i class="bi bi-cloud-arrow-down" style="font-size:24px;"></i></a>'
@@ -280,23 +280,24 @@ let dpdCore = {
 
             //  Fecha de creación
                 var html = 'data:created$';
-                CoreUI.tableData.addColumn(null, "Fecha", html, 'text-center', '80px');
+                CoreUI.tableData.addColumn('listadoDpd', null, "Fecha", html, 'text-center', '80px');
 
             //  Estado
                 var html = 'data:solucionado$';
-                CoreUI.tableData.addColumn(null, "Estado", html, 'text-center');
+                CoreUI.tableData.addColumn('listadoDpd', null, "Estado", html, 'text-center');
 
                 if($('body').attr('hs-role') == 'DPD')
                 {
                     //  Columna de acciones
                         var html = '<ul class="nav justify-content-center accionesTabla">';
                             html += '<li class="nav-item"><a href="javascript:void(0);" class="btnResponderConsulta d-inline-block" data-id="data:id$"><i data-feather="send" class="text-info img-fluid"  style="height:42px; width: 42px;"></i></a></li>';
-                            CoreUI.tableData.addColumn(null, "", html, 'text-center');
+                            CoreUI.tableData.addColumn('listadoDpd', null, "", html, 'text-center');
                 }
 
             $('#listadoDpd').addClass('no-clicable');
             CoreUI.tableData.render("listadoDpd", "Dpd", "dpd/list");
         }
+        return true;
     }
 
 

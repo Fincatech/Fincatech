@@ -17,6 +17,9 @@ let administradorCore = {
         }else if( core.model.toLowerCase() == "administrador" && core.actionModel != "list"){
             core.model = "Usuario";
             comunidadesCore.renderTablaComunidadesAdministrador(core.modelId);
+            //  Título del módulo
+                if($('.titulo-modulo').length && core.model == 'Administrador')
+                    CoreUI.setTitulo('nombre');            
         }
 
     },
@@ -72,37 +75,37 @@ let administradorCore = {
         if($('#listadoAdministrador').length)
         {
             //  Cargamos el listado de administradores
-            CoreUI.tableData.init();
+                CoreUI.tableData.init();
 
             //  Nombre
-            CoreUI.tableData.addColumn("nombre", "NOMBRE");
+                CoreUI.tableData.addColumn('listadoAdministrador', "nombre", "NOMBRE");
 
-            CoreUI.tableData.addColumn("cif", "CIF");
+                CoreUI.tableData.addColumn('listadoAdministrador', "cif", "CIF");
 
             //  Email
                 var html = '<a href="mailto:data:emailcontacto$" class="pl-1 pr-1">data:emailcontacto$</a>';
-                CoreUI.tableData.addColumn(null, "EMAIL", html);
+                CoreUI.tableData.addColumn('listadoAdministrador', null, "EMAIL", html);
 
             //  Teléfono
-                CoreUI.tableData.addColumn("telefono", "TELEFONO");
+                CoreUI.tableData.addColumn('listadoAdministrador', "telefono", "TELEFONO");
 
             //  Comunidades
                 var html = '';
-                CoreUI.tableData.addColumn(null, "Comunidades", html);
+                CoreUI.tableData.addColumn('listadoAdministrador', null, "Comunidades", html);
 
             // Estado
                 var html = 'data:estado$';
-                CoreUI.tableData.addColumn(null, "Estado", html);
+                CoreUI.tableData.addColumn('listadoAdministrador', null, "Estado", html);
             //  Fecha de alta
                 var html = 'data:created$';
-                CoreUI.tableData.addColumn(null, "Fecha de alta", html);
+                CoreUI.tableData.addColumn('listadoAdministrador', null, "Fecha de alta", html);
 
             //  Columna de acciones
                 var html = '<ul class="nav justify-content-center">';
                     html += '<li class="nav-item"><a href="javascript:void(0);" class="btnVerAdministrador d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="eye" class="text-info img-fluid"></i></a></li>';
                     html += `<li class="nav-item"><a href="${baseURL}administrador/data:id$" class="btnEditarAdministrador d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid"></i></a></li>`;
                     html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarAdministrador d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid"></i></li></ul>';
-                CoreUI.tableData.addColumn(null, "", html);
+                CoreUI.tableData.addColumn('listadoAdministrador', null, "", html);
 
             CoreUI.tableData.render("listadoAdministrador", "Usuario", "administrador/list");
         }

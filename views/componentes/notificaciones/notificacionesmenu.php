@@ -1,4 +1,4 @@
-<li class="nav-item dropdown">
+<li class="nav-item dropdown d-none">
     <a class="nav-icon dropdown-toggle" data-toggle="tooltip" data-placement="bottom" title="Notificaciones"  href="#" id="alertsDropdown" data-toggle="dropdown">
         <div class="position-relative">
             <i class="align-middle" data-feather="bell"></i>

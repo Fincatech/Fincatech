@@ -16,6 +16,10 @@ let usuarioCore = {
             await usuarioCore.listadoDashboard();
         }
 
+        //  Título del módulo
+            if($('.titulo-modulo').length && core.model == 'Usuario')
+                CoreUI.setTitulo('nombre');    
+
     },
 
     // Gestión de eventos
@@ -33,6 +37,8 @@ let usuarioCore = {
         });
 
     },
+
+
 
     /** Elimina una comunidad previa confirmación */
     eliminar: function(id, nombre)
@@ -77,35 +83,35 @@ let usuarioCore = {
             CoreUI.tableData.init();
 
             //  Nombre
-            CoreUI.tableData.addColumn("nombre", "NOMBRE");
+            CoreUI.tableData.addColumn('listadoUsuario', "nombre", "NOMBRE");
 
             //  Rol
                 var html = 'data:rol.nombre$';
-                CoreUI.tableData.addColumn(null, "ROL", html);
+                CoreUI.tableData.addColumn('listadoUsuario', null, "ROL", html);
 
-            CoreUI.tableData.addColumn("cif", "CIF");
+            CoreUI.tableData.addColumn('listadoUsuario', "cif", "CIF");
 
             //  Email
                 var html = '<a href="mailto:data:emailcontacto$" class="pl-1 pr-1">data:emailcontacto$</a>';
-                CoreUI.tableData.addColumn(null, "EMAIL", html);
+                CoreUI.tableData.addColumn('listadoUsuario', null, "EMAIL", html);
 
             //  Teléfono
-            CoreUI.tableData.addColumn("telefono", "TELEFONO");
+            CoreUI.tableData.addColumn('listadoUsuario', "telefono", "TELEFONO");
 
 
             // Estado
                 var html = 'data:estado$';
-                CoreUI.tableData.addColumn(null, "Estado", html);
+                CoreUI.tableData.addColumn('listadoUsuario', null, "Estado", html);
             //  Fecha de alta
                 var html = 'data:created$';
-                CoreUI.tableData.addColumn(null, "Fecha de alta", html);
+                CoreUI.tableData.addColumn('listadoUsuario', null, "Fecha de alta", html);
 
             //  Columna de acciones
                 var html = '<ul class="nav justify-content-center">';
                     html += '<li class="nav-item"><a href="javascript:void(0);" class="btnVerUsuario d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="eye" class="text-info img-fluid"></i></a></li>';
                     html += `<li class="nav-item"><a href="${baseURL}usuario/data:id$" class="btnEditarUsuario d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid"></i></a></li>`;
                     html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarUsuario d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid"></i></li></ul>';
-                CoreUI.tableData.addColumn(null, "", html);
+                CoreUI.tableData.addColumn('listadoUsuario', null, "", html);
 
             CoreUI.tableData.render("listadoUsuario", "Usuario", "usuario/list");
         }

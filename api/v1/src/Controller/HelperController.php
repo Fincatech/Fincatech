@@ -3,14 +3,41 @@
 namespace HappySoftware\Controller;
 
 use Firebase\JWT\JWT;
+use HappySoftware\Controller\Traits;
+use DI\ContainerBuilder;
 
-class HelperController{
+class HelperController
+{
+
+    use \HappySoftware\Controller\Traits\SecurityTrait;
+
+    public static function getLoggedUserInfo()
+    {
+        $userData = null;
+        if(isset( $_COOKIE['FINCATECHTOKEN'] ) )
+        {
+            $tokenJWT = $_COOKIE['FINCATECHTOKEN'];
+            $userData = get_object_vars(JWT::decode($tokenJWT, JWT_SECRET_KEY, array('HS512')))['userData'];
+        }else{
+            $userData = [];
+            $userData['id'] = null;
+            $userData['login'] = null;
+            $userData['nombre'] = null;
+            $userData['email'] = null;
+            $userData['role'] = null;
+        }
+
+        return $userData; //['user'];//['userdata'];
+
+    } 
 
     public static function successResponse($data, $codeResponse = 200)
     {
-
+        // self::getLoggedUserInfo();
+        // HelperController::getLoggedUserInfo();
         $responseData['data'] = $data;
         $responseData['status'] = [];
+        $responseData['user'] = self::getLoggedUserInfo();
         $responseData['status']['response'] = 'ok';
         $responseData['status']['code'] = $codeResponse;
 

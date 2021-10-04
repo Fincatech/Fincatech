@@ -11,6 +11,8 @@ define("security", [
             "js"=>[
                 "administrador",
                 "comunidades",
+                "dpd",
+                "documental",
                 "empresa",
                 "empleado",
                 'informevaloracionseguimiento',
@@ -19,12 +21,19 @@ define("security", [
                 "spa",
                 "sudo",
                 "usuario",
-            ]            
+            ] ,
+            "permissions" => [
+                "create" => "all",
+                "delete" => "all",
+                "update" => "all"
+            ],
+         
         ],
         "ROLE_ADMIN"=>[
             "folder"=>"admin",
             "titulo" => "Admin",
-            "menulateral"=> false
+            "menulateral"=> false,
+            "create" => "all"
         ],
         "ROLE_DPD"=>[
             "folder"=>"dpd",
@@ -37,12 +46,22 @@ define("security", [
                 'informevaloracionseguimiento',                
                 "notasinformativas",
                 "requerimiento",
-            ] 
+            ],
+            "permissions" => [
+                "create" => "all",
+                "delete" => "all",
+                "update" => "all"
+            ],            
         ],
         "ROLE_REVDOC"=>[
             "folder"=>"revdoc",
             "titulo" => "Revisión documental",
-            "menulateral"=> false
+            "menulateral"=> false,
+            "permissions" => [
+                "create" => "all",
+                "delete" => "all",
+                "update" => "all"
+            ],            
         ],
         "ROLE_ADMINFINCAS"=>[
             "folder"=>"adminfincas",
@@ -59,7 +78,12 @@ define("security", [
                 "documental",
                 "requerimiento",
                 "servicios",
-            ]
+            ],
+            "permissions" => [
+                "create" => ['comunidad', 'dpd'],
+                "delete" => ["comunidad"],
+                "update" => "all"
+            ],            
         ],
         "ROLE_CONTRATISTA"=>[
             "folder"=>"contratista"

@@ -78,6 +78,21 @@ return function (App $app) {
 
     });    
 
+    $app->get('/userinfo', function(Request $request, Response $response, array $params )
+    {
+        // Instanciamos el controller principal
+        //$frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+
+        //$frontController = new $frontControllerName();
+        //$frontController->Init('Login');
+
+        $response->getBody()->write( HelperController::successResponse( null ) );
+
+        return $response;  
+
+    
+    });
+
     //  EVALUAR QUE LOS LISTADOS SE HAGAN POR POST Y/O POR GET TAMBIÉN
     //  CUANDO ES POST ES PORQUE TIENE PAGINACIÓN Y DEMÁS FILTROS
     $app->post('/{controller}/create', function(Request $request, Response $response, array $params ): Response
@@ -180,6 +195,99 @@ return function (App $app) {
 
     });
 
+    /** Recupera la documentación para una comunidad */
+
+
+    /** Recupera la documentación básica dada de alta en el sistema */
+    $app->get('/rgpd/documentacionbasica', function (Request $request, Response $response, array $params)
+    {
+        //$frontController = new Fincatech\Controller\FrontController();
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontController = new $frontControllerName();
+        
+        $frontController->Init('Requerimiento');
+
+        $response->getBody()->write( $frontController->context->ListRequerimientoByIdTipo(1)  );
+        return $response;  
+
+    });
+
+    /** Recupera las notas informativas asociadas a un administrador */
+    $app->get('/rgpd/notasinformativas', function (Request $request, Response $response, array $params)
+    {
+        //$frontController = new Fincatech\Controller\FrontController();
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontController = new $frontControllerName();
+        
+        $frontController->Init('Notasinformativas');
+
+        $response->getBody()->write( $frontController->context->List($params)  );
+        return $response;  
+
+    });
+
+    /** Recupera los informes de valoración y seguimiento asignados a un administrador */
+    $app->get('/rgpd/informevaloracionseguimiento', function (Request $request, Response $response, array $params)
+    {
+        //$frontController = new Fincatech\Controller\FrontController();
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontController = new $frontControllerName();
+        
+        $frontController->Init('InformeValoracionSeguimiento');
+
+        $response->getBody()->write( $frontController->context->List($params)  );
+        return $response;  
+
+    });
+
+    ///////////////////////////////////////////////////
+    ////                   CAE, PRL                 ///
+    ///////////////////////////////////////////////////
+
+    $app->post('/requerimiento/{destino}/create', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // $data = $request->getParsedBody();
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Documental');
+
+        $destinoDocumento = $params['destino'];
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        $response->getBody()->write( $frontController->context->uploadRequerimiento($destinoDocumento, $data) );
+        return $response;
+
+    });   
+
+    /** Asigna un documento a un requerimiento según el destino: Empresa, Comunidad, Empleado */
+    $app->post('/requerimiento/{destino}/{idrequerimiento}', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // $data = $request->getParsedBody();
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Documental');
+
+        $destinoDocumento = $params['destino'];
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        $response->getBody()->write( $frontController->context->uploadRequerimiento($destinoDocumento, $data) );
+        return $response;
+
+    }); 
+
+
     /** Punto de entrada para get. Se utiliza para listar todo
      *
     */
@@ -199,6 +307,43 @@ return function (App $app) {
 
     });
 
+    //  Empresas asociadas a una comunidad
+    $app->get('/comunidad/{id}/empresas', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Comunidad');
+
+        $id = $params['id'];
+
+        $response->getBody()->write( $frontController->context->getEmpresasByComunidadId($id) );
+
+        return $response;  
+
+    });    
+
+    //  Empleados de una comunidad
+    $app->get('/comunidad/{id}/empleados', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Comunidad');
+
+        $id = $params['id'];
+
+        $response->getBody()->write( $frontController->context->ListServiciosContratadosByComunidadId($id) );
+
+        return $response;  
+
+    });    
+
+    //  Servicios contratados por una comunidad
     $app->get('/comunidad/{id}/servicioscontratados', function (Request $request, Response $response, array $params)
     {
 
@@ -215,6 +360,44 @@ return function (App $app) {
         return $response;  
 
     });
+
+    $app->post('/comunidad/{idcomunidad}/empresa/{idempresa}/asignar', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // $data = $request->getParsedBody();
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Comunidad');
+
+        $idComunidad = $params['idcomunidad'];
+        $idEmpresa = $params['idempresa'];
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        $response->getBody()->write( $frontController->context->asignarEmpresa($idComunidad, $idEmpresa) );
+        return $response;
+
+    });  
+
+    // NOTE: ¿? Documentación requerida para una comunidad
+    // $app->get('/comunidad/{idcomunidad}/documentacion', function (Request $request, Response $response, array $params)
+    // {
+    //     //$frontController = new Fincatech\Controller\FrontController();
+    //     $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+    //     $frontController = new $frontControllerName();
+        
+    //     $frontController->Init('Requerimiento');
+
+    //     $id = $params['idcomunidad'];
+
+    //     $response->getBody()->write( $frontController->context->GetDocumentacionComunidad($id)  );
+    //     return $response;  
+
+    // });
 
     $app->get('/administrador/{id}/comunidades', function (Request $request, Response $response, array $params)
     {
@@ -263,19 +446,6 @@ return function (App $app) {
 
         $response->getBody()->write( $frontController->context->ListEmpleadosByEmpresaId($idEmpresa) );
 
-        return $response;  
-
-    });
-
-    $app->get('/documentacion/basica/list', function (Request $request, Response $response, array $params)
-    {
-        //$frontController = new Fincatech\Controller\FrontController();
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
-        $frontController = new $frontControllerName();
-        
-        $frontController->Init('Requerimiento');
-
-        $response->getBody()->write( $frontController->context->ListRequerimientoByIdTipo(6)  );
         return $response;  
 
     });

@@ -7,7 +7,7 @@ use HappySoftware\Controller\HelperController;
 use HappySoftware\Controller\Traits\ConfigTrait;
 use HappySoftware\Controller\Traits\FilesTrait;
 use HappySoftware\Controller\Traits\SecurityTrait;
-use HappySoftware\Model\Model;
+use \HappySoftware\Model\Model;
 
 class FrontController{
 
@@ -18,7 +18,7 @@ class FrontController{
      * @var Controller
      */
     public $context;
-    protected $model;
+    protected $model; // protected
     public $helperModel;
 
     /**
@@ -29,6 +29,7 @@ class FrontController{
 
     public function __construct()
     {
+        $this->InstantiateHelperModel();
         require_once ABSPATH .'src/Includes/database/mysqlcore.php';
     }
 
@@ -39,7 +40,6 @@ class FrontController{
     {
         //  Instancia del trait de configuración
         //  TODO: Auto incluir todos los traits en función del controlador que se llama
-        $this->InstantiateHelperModel();
         $this->InstantiateController($controllerName, $params);
         $this->InstantiateEntityObject();
 
@@ -97,11 +97,15 @@ class FrontController{
 
     public function InstantiateHelperModel()
     {
-
         //  Instanciamos el helpermodel
-        include_once(ABSPATH.'src/Model/Model.php');
+        require_once(ABSPATH.'src/Model/Model.php');
         $this->model = new Model();
+        $this->helperModel = new Model();
+    } 
 
+    protected function GetHelperModel()
+    {
+        return $this->helperModel;
     }
 
     public function GetController($controllerName)

@@ -73,7 +73,121 @@ let Constantes = {
           </div>
       </div>
     </div>
-    `
+    `,
+
+   CargaDocumento: `
+   <div class="row">
+        <div class="col-12 text-center text-uppercase align-self-center">
+          <p class="m-0" style="display: block; font-size: 18px;"> Carga de documento</p>
+        </div>
+    </div>
+    <div class="row mb-2 wrapperInformacion">
+      <div class="col-12">
+          <p class="mt-3 text-justify" style="font-size: 14px;">1. Seleccione el fichero que desea adjuntar al requerimiento</p>
+          <p class="mt-3 text-justify" style="font-size: 14px;">2. Presione el botón <strong>Adjuntar documento</strong></p>
+      </div>
+    </div>
+    <div class="form-group row mb-2 justify-content-center wrapperSelectorFichero">
+      <div class="col-12">  
+          <div class="wrapperFichero row border rounded-lg ml-0 mr-0 mb-0 shadow-inset border-1 pt-3 pb-2">
+              <div class="col-2 align-self-center h-100 text-center">
+                  <i class="bi bi-cloud-arrow-up text-info" style="font-size: 30px;"></i>
+              </div>
+              <div class="col-10 pl-0 align-self-center">
+                  <input accept=".pdf, .doc, .docx" class="form-control form-control-sm ficheroAdjuntar border-0" hs-fichero-entity="Documental" id="ficheroadjuntar" name="ficheroadjuntar" type="file">
+              </div>       
+          </div>
+          <span class="pb-3 d-block text-center pt-2" style="font-size: 13px;">Sólo se permiten ficheros con extensión pdf, doc o docx</span>    
+          
+          <!-- Mensaje de error --> 
+          <div class="wrapperMensajeErrorCarga row text-light p-3" style="display: none; font-size: 14px;">
+              <div class="col-12 bg-danger p-3 rounded shadow-neumorphic">
+                <p class="mensaje"></p>
+              </div>
+          </div>          
+
+          <!-- Botón de iniciar proceso -->
+          <div class="row mt-3">
+            <div class="col-12">
+              <a href="javascript:void(0);" class="btn d-block btn-success bntUploadDocumento pt-3 pb-3">Adjuntar documento</a>
+            </div>
+          </div>
+      </div>
+    </div>
+    `,
+
+    AsignacionEmpresa: `
+    <div class="row">
+        <div class="col-12 text-center text-uppercase align-self-center">
+          <p class="m-0" style="display: block; font-size: 18px;"> Carga automática de comunidades</p>
+        </div>
+    </div>
+    <div class="row mb-2 wrapperInformacion">
+      <div class="col-12">
+          <p class="mt-3 text-justify" style="font-size: 14px;">Para asignar una empresa, puede buscar por nombre, e-mail o CIF/NIF en el listado de empresas que tiene en pantalla.</p>
+          <p class="mt-3 text-justify" style="font-size: 14px;">Si no encuentra la empresa que desea asociar, puede crear una nueva clicando sobre el botón CREAR NUEVA EMPRESA. Una vez creada la empresa, ésta será asignada automáticamente a la comunidad actual.</p>
+      </div>
+    </div>
+
+    <!-- Listado simple de empresas del sistema-->
+
+    <div class="row mb-4 wrapperSelectorEmpresa">
+
+      <div class="col-12 text-left">
+
+          <div class="card-body shadow-inset rounded-lg border mb-1 border-white space-between">
+
+          <!-- Empresas -->
+
+              <div class="row flex-grow-1">
+                  <div class="col-12">
+
+                      <div class="card">
+
+                          <div class="card-header pl-0 pt-0"><!--headerListado-->
+
+                              <div class="row">
+
+                                  <div class="col-12 col-md-9">
+                                      <h5 class="card-title mb-0 text-uppercase font-weight-normal pl-3 pt-1"><i class="bi bi-people pr-2"></i> Empresas disponibles</h5>
+                                  </div>
+                      
+                              </div>
+
+                          </div>
+
+                          <div class="card-body">
+
+                              <table class="table table-hover my-0 hs-tabla w-100" name="listadoSimpleEmpresas" id="listadoSimpleEmpresas" data-model="Empresa">
+                                  <thead></thead>
+                                  <tbody></tbody>
+                              </table>
+
+                          </div>
+
+                      </div>
+
+                  </div>
+              </div>
+
+          </div>
+
+      </div>  
+
+    </div>
+
+    <div class="form-group row mb-2 justify-content-center wrapperCrearNuevaEmpresa">
+      <div class="col-12">           
+          <!-- Botón de crear empresa y asignar a comunidad -->
+          <div class="row mt-3">
+            <div class="col-12 text-center">
+              <a href="javascript:void(0);" class="btn btn-success bntCrearNuevaEmpresaCAE pt-1 pb-1">CREAR NUEVA EMPRESA</a>
+            </div>
+          </div>
+      </div>
+    </div>
+    `,
+
 }
 
 
@@ -111,6 +225,9 @@ let core =
     }
 
     core.Events();
+
+    //  Recuperamos la info del usuario
+        core.Security.getUserInfo();
 
   },
 
@@ -221,7 +338,7 @@ let core =
           const file = e.target.files[0];
           if(file !== undefined)
           {
-            console.log(file);
+// console.log(file);
             // encode the file using the FileReader API
             const reader = new FileReader();
             reader.onloadend = () => {
@@ -330,7 +447,15 @@ let core =
             {
               $('#password').val('');
             }
-            
+            //  Pintamos el titulo según el campo que hemos establecido en el componente correspondiente
+
+            //  Si no está definido, entonces dejamos por defecto el que viene
+                if(CoreUI.tituloModulo !== null)
+                {
+                  // console.log(core.Modelo.entity[core.model]);
+                  // console.log( core.Modelo.entity[core.model][CoreUI.tituloModulo] );
+                  CoreUI.Utils.setTituloPantalla(null, null, core.Modelo.entity[core.model][0][CoreUI.tituloModulo]);
+                }
           });
 
         }
@@ -628,11 +753,11 @@ console.log('accion: ' + actionSave);
      */
     Insert: async function(entidadSave, postData, updateModel = true)
     {
-    console.log('Llega al insert');
-    console.log(`${entidadSave}/create`);
+console.log('Llega al insert');
+console.log(`${entidadSave}/create`);
       await apiFincatech.post(`${entidadSave}/create`, postData).then(async (response) =>
       {
-  console.log('tiene respuesta');
+console.log('tiene respuesta');
           var responseData = JSON.parse(response);
 
           // console.log('Resultado inserción1: ' + responseData.data);
@@ -776,6 +901,21 @@ console.log('accion: ' + actionSave);
         
       },
 
+      /** Información del usuario autenticado */
+      getUserInfo: async function()
+      {
+          await apiFincatech.get('userinfo' ).then( response => 
+          {
+              respuesta = JSON.parse(response);
+              if(respuesta.user.nombre != null && respuesta.user.nombre != '')
+              {
+                  $('.usuarioFincatech').text(respuesta.user.nombre);
+              }else{
+                  $('.usuarioFincatech').text('Fincatech');
+              }
+          });
+      },
+
       /** Logout del sistema */
       logout: async function()
       {
@@ -812,7 +952,14 @@ console.log('accion: ' + actionSave);
             });
         //  En caso contrario mostramos el mensaje de error devuelto por el api
 
+      },
+
+      getRole: function()
+      {
+        return $('body').attr('hs-role');
       }
+
+
 
   },
 

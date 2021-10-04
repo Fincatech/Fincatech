@@ -37,7 +37,7 @@
                         </div>
                         <div class="col-12 col-md-2">
                             <label for="email"><i class="bi bi-key pr-2"></i>Repetir contraseña</label>              
-                            <input type="password" class="form-control data text-left" id="passwordConfirme" name="passwordConfirme" maxlength="20" required>                            
+                            <input type="password" class="form-control text-left" id="passwordConfirme" name="passwordConfirme" maxlength="20" required>                            
                         </div>  
                         <div class="col-12 col-md-2">
                             <label for="email"><i class="bi bi-key pr-2"></i>ROL / Tipo</label>              

@@ -99,6 +99,14 @@ trait SecurityTrait{
 
     }
 
+    /** Devuelve si el usuario autenticado tiene permiso para crear */
+    public function userCanCreate()
+    {
+        //  Recuperamos desde las settings si el rol tiene permiso
+        //  para crear entidad, de ser así, renderizamos el botón de crear
+
+    }
+
     /*
         ROLE_SUDO
         ROLE_ADMIN

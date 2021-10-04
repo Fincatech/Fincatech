@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row flex-grow-1">
 
     <div class="col-md-3 col-xl-2 pb-4">
 
@@ -34,10 +34,10 @@
 
     <div class="col-md-9 col-xl-10">
 
-        <div class="tab-content">
+        <div class="tab-content h-100">
 
             <!-- Datos de la comunidad -->
-            <div class="tab-pane fade show active" id="datos" role="tabpanel">
+            <div class="tab-pane fade show active h-100" id="datos" role="tabpanel">
 
                 <div class="row">
 
@@ -64,7 +64,7 @@
             </div>
 
             <!-- Datos de documentos asociados -->
-            <div class="tab-pane fade" id="documentos" role="tabpanel">
+            <div class="tab-pane fade h-100" id="documentos" role="tabpanel">
 
                 <div class="row">
 

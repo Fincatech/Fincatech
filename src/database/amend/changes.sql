@@ -263,3 +263,77 @@ INSERT INTO `fincatech`.`empresatipo` (`nombre`) VALUES ('Autónomo');
 
 ALTER TABLE `fincatech`.`comunidad` 
 ADD COLUMN `ibancomunidad` VARCHAR(30) NULL AFTER `cif`;
+
+CREATE OR REPLACE VIEW `view_comunidadesempresa` AS
+    SELECT 
+        `ce`.`activa` AS `activa`,
+        `ce`.`created` AS `fechaasociacion`,
+        `ce`.`id` AS `idrelation`,
+        `c`.`id` AS `idcomunidad`,
+        `e`.`id` AS `idempresa`,
+        `c`.`codigo` AS `codigo`,
+        `c`.`nombre` AS `nombre`,
+        `c`.`idspa` AS `idspa`,
+        `c`.`usuarioId` AS `usuarioId`
+    FROM
+        ((`comunidadempresa` `ce`
+        LEFT JOIN `empresa` `e` ON ((`e`.`id` = `ce`.`idempresa`)))
+        LEFT JOIN `comunidad` `c` ON ((`c`.`id` = `ce`.`idcomunidad`)))
+    ORDER BY `c`.`nombre`
+
+create function idempresarequerimiento() returns INTEGER DETERMINISTIC NO SQL return @idempresarequerimiento;
+
+CREATE OR REPLACE VIEW `view_documentoscaeempresa` AS
+    SELECT 
+        `er`.`id` AS `idrelacion`,
+        `r`.`nombre` AS `requerimiento`,
+        `r`.`caduca` AS `caduca`,
+        `r`.`sujetorevision` AS `sujetorevision`,
+        `r`.`requieredescarga` AS `requieredescarga`,
+        `r`.`activado` AS `activado`,
+        `r`.`id` AS `idrequerimiento`,
+        `r`.`idrequerimientotipo` AS `idrequerimientotipo`,
+        `er`.`idempresa` AS `idempresa`,
+        `er`.`idcomunidad` AS `idcomunidad`,
+        `er`.`idestado` AS `idestado`,
+        `er`.`created` AS `created`,
+        `er`.`updated` AS `fechaultimaactuacion`,
+        `r`.`nombre` AS `nombre`,
+        `fr`.`id` AS `idficherorequerimiento`,
+        `fr`.`nombre` AS `nombreficherorequerimiento`,
+        `fr`.`nombrestorage` AS `storageficherorequerimiento`,
+        `fr`.`ubicacion` AS `ubicacionficherorequerimiento`,
+        `fr`.`created` AS `fechasubida`,
+        `f`.`id` AS `idfichero`,
+        `f`.`nombre` AS `nombrefichero`,
+        `f`.`nombrestorage` AS `storagefichero`,
+        `f`.`ubicacion` AS `ubicacionfichero`
+    FROM
+        (((`requerimiento` `r`
+        LEFT JOIN `empresarequerimiento` `er` ON (((`er`.`idrequerimiento` = `r`.`id`)
+            AND (`er`.`idempresa` = IDEMPRESAREQUERIMIENTO()))))
+        LEFT JOIN `ficheroscomunes` `f` ON ((`f`.`id` = `r`.`idfichero`)))
+        LEFT JOIN `ficheroscomunes` `fr` ON ((`fr`.`id` = `er`.`idfichero`)))
+    WHERE
+        (`r`.`idrequerimientotipo` = 4)
+    ORDER BY `r`.`nombre`
+
+ALTER TABLE `fincatech`.`comunidadrequerimiento` 
+DROP FOREIGN KEY `FK_COMREQ_ESTADO`;
+ALTER TABLE `fincatech`.`comunidadrequerimiento` 
+ADD COLUMN `estado` VARCHAR(2) NULL AFTER `fechacaducidad`,
+CHANGE COLUMN `idrequerimiento` `idtiporequerimiento` INT(11) NOT NULL ,
+CHANGE COLUMN `idestado` `idestado` INT(11) NULL ;
+ALTER TABLE `fincatech`.`comunidadrequerimiento` 
+ADD CONSTRAINT `FK_COMREQ_ESTADO`
+  FOREIGN KEY (`idestado`)
+  REFERENCES `fincatech`.`documentoestado` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `fincatech`.`comunidadrequerimiento` 
+CHANGE COLUMN `idtiporequerimiento` `idrequerimiento` INT(11) NOT NULL ;
+
+ALTER TABLE `fincatech`.`empleadorequerimiento` 
+ADD COLUMN `idrequerimiento` INT(11) NULL AFTER `idempleado`;
+

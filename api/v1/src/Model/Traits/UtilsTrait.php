@@ -38,8 +38,10 @@ trait UtilsTrait{
                 }
                 $x++;
             }
+            $datos[$entity] = array_values($datos[$entity]);
         }
-        $datosTmp = $datos[$entity];
+
+        // $datosTmp = array_values($datos[$entity]);
         // $datos[$entity] = [];
         // $datos[$entity] = [$datosTmp];
         return $datos;

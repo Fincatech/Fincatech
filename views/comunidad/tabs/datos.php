@@ -1,5 +1,5 @@
 
-<form class="form-data form-floating">
+<form class="form-data form-floating form-comunidad">
 
 <!-- Código - CIF - Nombre -->
 <div class="form-group row mb-2">

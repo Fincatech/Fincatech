@@ -21,9 +21,7 @@ trait ViewTrait{
     {
         global $appSettings;
         global $App;
-        //         echo $this->getUserRol();
-        //         print_r(security[$this->getUserRol()]);
-        // die(security[$this->getUserRol()]['menulateral']);
+
         return ( security[$this->getUserRol()]['menulateral'] == true );
     }
 
@@ -75,20 +73,26 @@ trait ViewTrait{
                         $iconoAccion = "plus-square";
                         $includeFile .= $this->getController() . '/form';
                         break;
-                    default:
+                    case 'list':
                         $iconoAccion = "list";
                         $App->renderTable("listado" . ucfirst($this->getController()), ucfirst($this->getController()), []); 
                         $includeFile .= $this->getListadoRoute();
-                        //$includeFile .= "componentes/listado/listado";
+                        break;
+                    default:
+                    
+                        //  Es una vista aparte
+                        if( $this->checkIfViewExists($includeFile, $this->getController() . '/' . $this->getAction()))
+                        {
+                            $includeFile .=  $this->getController() . '/' . $this->getAction();
+                        }else{
+                            //  Lanzamos una excepción de vista
+                            die('0');
+                            throw new \Exception('Vista no encontrada');
+                            exit();
+                        }
                         break;
                 }
                 
-                // if($this->getAction() == 'get')
-                // {
-                //     //  Form
-                //     // $includeFile .= $this->getController() . '/form';
-                // }else{
-                //     //  Listado
                 //     //DEBUG: 
                     
                 //     // TODO: Hay que meter esta configuración para el controller
@@ -102,11 +106,11 @@ trait ViewTrait{
                 break;
         }
         
-        // echo('Controller: ' . $this->getController() . 
-        //     " - Action: " . $this->controllerAction . 
-        //     " - ID: " . $this->_id .
-        //     " - Include: " . $includeFile . '.php');
-
+//         echo('Controller: ' . $this->getController() . 
+//             " - Action: " . $this->controllerAction . 
+//             " - ID: " . $this->_id .
+//             " - Include: " . $includeFile . '.php');
+// die('1');
         require_once( $includeFile . '.php');
     }
 
@@ -130,6 +134,7 @@ trait ViewTrait{
             $viewRoute = ABSPATH.'views/'.$viewName;
             if(!file_exists($viewRoute))
             {
+                die('no existe');
                 throw new \Exception('Vista no encontrada');
             }else{
                 include($viewRoute);
@@ -149,15 +154,16 @@ trait ViewTrait{
         //  Comprobamos si del modelo que se va a recuperar (es decir, el nombre del controller) hay un fichero de listado
         //  Si no devolvemos el por defecto
         $ruta = 'componentes/listado/listado';
-
         if(file_exists(ABSPATH . 'views/' . $this->getController() . '/listado.php'))
-        {
             $ruta = $this->getController() . '/listado';
-        }
 
         return $ruta;
     }
 
+    private function checkIfViewExists($route, $view)
+    {
+        return file_exists( $route . $view . '.php' );
+    } 
 
     /** Renderiza la vista en función del controller */
     public function renderAppView()
@@ -173,12 +179,15 @@ trait ViewTrait{
         include_once(ABSPATH.'views/comunes/header.php');
 
         //  Renderiza el menú lateral
-        if( $this->renderMenuLateral())
+        if( $this->renderMenuLateral() && $this->isLogged() )
         {
             //  Menú lateral
             require_once(ABSPATH.'views/' . security[$rol]['folder'] . '/menulateral.php');
         }
 
+        //  FIXME:  Meter la apertura del container en un fichero independiente
+        //          Llamamos al método getContainerView()
+        //          Cerramos el container
         //  Contenedor de la aplicación
         include_once(ABSPATH.'views/comunes/container.php');     
 

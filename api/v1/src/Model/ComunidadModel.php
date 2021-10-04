@@ -2,11 +2,13 @@
 
 namespace Fincatech\Model;
 
+use Fincatech\Controller\EmpresaController;
+
 use Fincatech\Entity\Comunidad;
 
 use Fincatech\Model\Requerimiento;
-
 use Fincatech\Model\ServiciosModel;
+
 use HappySoftware\Controller\Traits\SecurityTrait;
 
 class ComunidadModel extends \HappySoftware\Model\Model{
@@ -32,6 +34,7 @@ class ComunidadModel extends \HappySoftware\Model\Model{
         
         //  Instanciamos el controller de tipos de servicio
         $this->InitController('Servicios');
+
     }
 
     /** Obtiene el listado de servicios contratados por una comunidad */
@@ -101,14 +104,22 @@ class ComunidadModel extends \HappySoftware\Model\Model{
             $useLoggedUserId = true;
 
         $data = parent::List($params, $useLoggedUserId);
+
         if(count($data['Comunidad']) > 0)
         {
             for($x=0; $x < count($data['Comunidad']); $x++)
             {
                 $data['Comunidad'][$x]['comunidadservicioscontratados'] = $this->GetListadoServiciosContratados($data['Comunidad'][$x]['id']);
+
+                //  TODO: Recuperamos los documentos asociados a una comunidad
+
+                //  TODO: Comprobamos si la comunidad tiene alguna empresa de tipo Autónomo asignada
             }
+
+
         }
       
+
         //  Recuperamos los servicios contratados por la comunidad
             return $data;
     }
@@ -154,6 +165,52 @@ class ComunidadModel extends \HappySoftware\Model\Model{
     private function ExisteServicioComunidad($idComunidad, $idServicio)
     {
        return $this->getRepositorio()->ExisteRegistro('comunidadservicioscontratados', "idcomunidad = $idComunidad and idservicio = $idServicio");
+    }
+
+    private function ComunidadTieneEmpleadoPropio($empresas)
+    {
+        //  Los trabajadores autónomos
+
+    }
+
+    private function GetDocumentacionComunidad($id, $tieneTrabajadores = false)
+    {
+
+    }
+
+    public function GetEmpresasByComunidadId($id)
+    {
+        //  Instanciamos el controller de empresa
+        $this->InitController('Empresa');
+
+            $sql = "select * from view_empresascomunidad where idcomunidad = $id";
+            $data = $this->query($sql);
+
+            for($x = 0; $x < count($data); $x++)
+            {
+                //  Recuperamos los documentos asociados a CAE de empresa y su estado
+                    $sql = "SELECT * FROM view_documentoscaeempresa where @IDEMPRESAREQUERIMIENTO:=" . $data[$x]['id']; 
+                    // echo($sql . ' ' );
+                    $data[$x]['documentacioncae'] = $this->query($sql);
+            }
+
+            // $data = $this->EmpresaController->List(null)['Empresa'];
+        // // $datos, $entity, $key, $value    
+        // //  Filtramos los resultados por id de comunidad            
+            // $data = $this->filterResults($data, 'Empresa', 'idcomunidad', $id);
+            return $data;
+    }
+
+    public function asignarEmpresa($idComunidad, $idEmpresa)
+    {
+        $sql = "insert into comunidadempresa(idcomunidad, idempresa, activa, created, usercreate) values (";
+        $sql .= $idComunidad . ", ";
+        $sql .= $idEmpresa . ", 1,  now(), ";
+        $sql .= $this->getLoggedUserId() . " ";
+        $sql .= " ) ";
+
+        $this->getRepositorio()->queryRaw($sql);  
+        return 'ok';
     }
 
 }

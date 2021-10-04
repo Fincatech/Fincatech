@@ -122,4 +122,20 @@ class ComunidadController extends FrontController{
         return HelperController::successResponse( $data );
     }
 
+    /** Devuelve las empresas asociadas a una comunidad */
+    public function getEmpresasByComunidadId($id)
+    {
+        $data = [];
+        $data['empresascomunidad'] = $this->ComunidadModel->GetEmpresasByComunidadId($id);
+        $data['total'] = count($data);
+        return HelperController::successResponse( $data );
+    
+    }
+
+    /** Asigna una empresa a una comunidad */
+    public function asignarEmpresa($idcomunidad, $idempresa)
+    {
+        return HelperController::successResponse( $this->ComunidadModel->asignarEmpresa($idcomunidad, $idempresa) );
+    }
+
 }

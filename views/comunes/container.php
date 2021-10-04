@@ -1,10 +1,9 @@
 <div class="main">
 
     <?php 
-    // die($App->getController());
 if($App->getController() != 'login'): 
 
-        // Incluímos la barra superior 
+        //  Incluímos la barra superior 
             include_once('menusuperior.php'); 
         ?>
 

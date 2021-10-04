@@ -23,7 +23,7 @@
 
                     <div class="col-12">
 
-                        <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoDocumentacionBasica" id="listadoDocumentacionBasica" data-model="requerimiento">
+                        <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoDocumentacionBasica" id="listadoDocumentacionBasica" data-model="Requerimiento">
                             <thead class="thead"></thead>
                             <tbody class="tbody"></tbody>
                         </table>

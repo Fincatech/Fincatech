@@ -43,27 +43,27 @@ let informeValoracionSeguimientoCore = {
         {
 
             //  Cargamos el listado de comunidades
-            CoreUI.tableData.init();
-
+                CoreUI.tableData.init();
+                
             //  Fecha de creación
                 var html = 'data:created$';
-                CoreUI.tableData.addColumn(null, "Fecha", html, 'text-center', '80px');
+                CoreUI.tableData.addColumn('listadoInformevaloracionseguimiento', null, "Fecha", html, 'text-center', '80px');
 
             //  Nombre
-                CoreUI.tableData.addColumn("titulo","TITULO", null, 'text-justify');
+                CoreUI.tableData.addColumn('listadoInformevaloracionseguimiento', "titulo","TITULO", null, 'text-justify');
 
             //  Tipo
-                CoreUI.tableData.addColumn("usuario[0].nombre", "Administrador de fincas", null,'text-left');
+                CoreUI.tableData.addColumn('listadoInformevaloracionseguimiento', "usuario[0].nombre", "Administrador de fincas", null,'text-left');
 
             //  Fichero asociado
                 var html = '<a href="' + config.baseURL + 'public/storage/data:ficheroscomunes.nombrestorage$" target="_blank"><i class="bi bi-cloud-arrow-down" style="font-size:24px;"></i></a>'
-                CoreUI.tableData.addColumn(null, "Fichero", html, 'text-center', '120px');
+                CoreUI.tableData.addColumn('listadoInformevaloracionseguimiento', null, "Fichero", html, 'text-center', '120px');
 
             //  Columna de acciones
                 var html = '<ul class="nav justify-content-center accionesTabla">';
                     html += `<li class="nav-item"><a href="${baseURL}informevaloracionseguimiento/data:id$" class="d-inline-block" data-id="data:id$" data-titulo="data:titulo$"><i data-feather="edit" class="text-success img-fluid"></i></a></li>`;
                     html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarInformeValoracionSeguimiento d-inline-block" data-id="data:id$" data-titulo="data:titulo$"><i data-feather="trash-2" class="text-danger img-fluid"></i></li></ul>';
-                CoreUI.tableData.addColumn(null, "", html);
+                CoreUI.tableData.addColumn('listadoInformevaloracionseguimiento', null, "", html);
 
                 // $('#listadoInformevaloracionseguimiento').addClass('no-clicable');
                 CoreUI.tableData.render("listadoInformevaloracionseguimiento", "InformeValoracionSeguimiento", "informevaloracionseguimiento/list");

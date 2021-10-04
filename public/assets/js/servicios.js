@@ -164,7 +164,7 @@ let serviciosCore = {
             case 'ADMINFINCAS':
                 //  Recuperamos los datos del modelo y pintamos los valores,
                 //  a tomar por culo
-                    console.log('Adminfincas servicios contratados');
+                    console.log('TODO: Adminfincas servicios contratados');
                 break;
         }
 

@@ -13,16 +13,17 @@ let empleadoCore = {
         {
             empleadoCore.renderTabla();
         }else{
+            
+
             // core.Files.init();
             // core.Files.Fichero.entidadId = core.modelId;        
         }
 
         empleadoCore.renderTablaEmpresasEmpleado(core.modelId);
 
-        if($('.titulo-modulo').length)
-        {
-            CoreUI.Utils.setTituloPantalla('Empleado','nombre');
-        }
+        //  Título del módulo
+        if($('.titulo-modulo').length && core.model == 'Empleado')
+            CoreUI.setTitulo('nombre');
     },
 
     events: async function()
@@ -74,7 +75,6 @@ let empleadoCore = {
     {
         if($('#listadoEmpleado').length)
         {
-
             //  Cargamos el listado de comunidades
             CoreUI.tableData.init();
 
@@ -83,32 +83,32 @@ let empleadoCore = {
             //     CoreUI.tableData.addColumn(null, "Fecha", html, 'text-center');
 
             //  Nombre y apellidos
-            CoreUI.tableData.addColumn("nombre","Nombre", null, 'text-left');
+            CoreUI.tableData.addColumn('listadoEmpleado', "nombre","Nombre", null, 'text-left');
 
             //  CIF
-            CoreUI.tableData.addColumn("numerodocumento", "DNI/NIE", null, 'text-left');
+            CoreUI.tableData.addColumn('listadoEmpleado', "numerodocumento", "DNI/NIE", null, 'text-left');
 
             //  Dirección
-            CoreUI.tableData.addColumn("direccion", "Dirección", null, 'text-left');
+            CoreUI.tableData.addColumn('listadoEmpleado', "direccion", "Dirección", null, 'text-left');
 
             //  Email
-            CoreUI.tableData.addColumn("email", "EMAIL", null, 'text-left');
+            CoreUI.tableData.addColumn('listadoEmpleado', "email", "EMAIL", null, 'text-left');
 
             //  Teléfono
-            CoreUI.tableData.addColumn("telefono", "TELEFONO", null, 'text-left');
+            CoreUI.tableData.addColumn('listadoEmpleado', "telefono", "TELEFONO", null, 'text-left');
 
             //  Localidad
-            CoreUI.tableData.addColumn("localidad", "Localidad", null, 'text-left');
+            CoreUI.tableData.addColumn('listadoEmpleado', "localidad", "Localidad", null, 'text-left');
 
             // Estado
                 var html = 'data:estado$';
-                CoreUI.tableData.addColumn(null, "Estado", html);
+                CoreUI.tableData.addColumn('listadoEmpleado', null, "Estado", html);
 
             //  Columna de acciones
                 var html = '<ul class="nav justify-content-center accionesTabla">';
                     html += `<li class="nav-item"><a href="${baseURL}empleado/data:id$" class="btnEditarEmpleado d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid"></i></a></li>`;
                     html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarEmpleado d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid"></i></li></ul>';
-                CoreUI.tableData.addColumn(null, "", html);
+                CoreUI.tableData.addColumn('listadoEmpleado', null, "", html);
 
                 // $('#listadoEmpleado').addClass('no-clicable');
                 CoreUI.tableData.render("listadoEmpleado", "Empleado", "empleado/list");
@@ -119,29 +119,55 @@ let empleadoCore = {
     {
         if($('#listadoEmpresasEmpleado').length)
         {
+            CoreUI.tableData.init();
+
+            //  Empresa
+                CoreUI.tableData.addColumn('listadoEmpresasEmpleado', "razonsocial", "Empresa", null, 'text-left');
+
+            //  Puesto
+                CoreUI.tableData.addColumn('listadoEmpresasEmpleado',"puesto", "Puesto", null, 'text-left');
+
+            //  Fecha de alta
+                CoreUI.tableData.addColumn('listadoEmpresasEmpleado',"fechaalta", "Fecha alta", null, 'text-center', '80px');
+
+            //  Fecha de baja
+                CoreUI.tableData.addColumn('listadoEmpresasEmpleado',"fechabaja", "Fecha baja", null, 'text-center', '80px');
+
+            // Estado
+                var html = 'data:estado$';
+                CoreUI.tableData.addColumn('listadoEmpresasEmpleado',null, "Estado", html, 'text-center', '90px');
+
+                CoreUI.tableData.render("listadoEmpresasEmpleado", "Empresasempleado", `empleado/${idempleado}/empresas`, false, false, false);
+        }
+    },
+
+    renderTablaEmpleadosComunidad: async function(idcomunidad)
+    {
+        if($('#listadoEmpleadosComunidad').length)
+        {
 
             CoreUI.tableData.init();
 
             //  Empresa
-                CoreUI.tableData.addColumn("razonsocial", "Empresa", null, 'text-left');
+                CoreUI.tableData.addColumn('listadoEmpleadosComunidad', "razonsocial", "Empresa", null, 'text-left');
 
             //  Puesto
-                CoreUI.tableData.addColumn("puesto", "Puesto", null, 'text-left');
+                CoreUI.tableData.addColumn('listadoEmpleadosComunidad', "puesto", "Puesto", null, 'text-left');
 
             //  Fecha de alta
-                CoreUI.tableData.addColumn("fechaalta", "Fecha alta", null, 'text-center', '80px');
+                CoreUI.tableData.addColumn('listadoEmpleadosComunidad', "fechaalta", "Fecha alta", null, 'text-center', '80px');
 
             //  Fecha de baja
-                CoreUI.tableData.addColumn("fechabaja", "Fecha baja", null, 'text-center', '80px');
+                CoreUI.tableData.addColumn('listadoEmpleadosComunidad', "fechabaja", "Fecha baja", null, 'text-center', '80px');
 
             // Estado
                 var html = 'data:estado$';
-                CoreUI.tableData.addColumn(null, "Estado", html, 'text-center', '90px');
+                CoreUI.tableData.addColumn('listadoEmpleadosComunidad', null, "Estado", html, 'text-center', '90px');
 
-            CoreUI.tableData.render("listadoEmpresasEmpleado", "Empresasempleado", `empleado/${idempleado}/empresas`, false, false, false);
-        }
-    },
-
+            CoreUI.tableData.render("listadoEmpleadosComunidad", "Empresasempleado", `empleado/1/empresas`, false, false, false);
+        }    
+    
+    }
 
 }
 

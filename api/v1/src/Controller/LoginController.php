@@ -13,6 +13,11 @@ class LoginController extends FrontController{
         $this->InstantiateHelperModel();
     }
 
+    public function getLoggedUserInfo()
+    {
+        return HelperController::getLoggedUserInfo();
+    }
+
     /** Logout y destoy de la sesión del usuario */
     public function logout()
     {
@@ -77,7 +82,7 @@ class LoginController extends FrontController{
                     }
 
                 //  Creamos el token JWT
-                    $JWTToken = $this->createToken($data['id'], $data['email'], $data['email'], $data['rol'], $issuedAt->getTimeStamp(), $expire );
+                    $JWTToken = $this->createToken($data['id'], $data['email'], $data['email'], $data['nombre'], $data['rol'], $issuedAt->getTimeStamp(), $expire );
             }
         }
 
@@ -91,7 +96,7 @@ class LoginController extends FrontController{
         
     }
 
-    private function createToken($id, $login, $email, $role, $issuedAt, $expire)
+    private function createToken($id, $login, $email, $nombre, $role, $issuedAt, $expire)
     {
 
         //  Referencia: https://www.sitepoint.com/php-authorization-jwt-json-web-tokens/
@@ -108,6 +113,7 @@ class LoginController extends FrontController{
                 'userData' => [ // información del usuario
                     'id' => $id,
                     'login' => $login,
+                    'nombre' => $nombre,
                     'email' => $email,
                     'role' => $role
                 ]
