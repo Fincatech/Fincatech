@@ -29,15 +29,86 @@ let empleadoCore = {
     events: async function()
     {   
 
-        // $('body').on(core.helper.clickEventType, '.btnSaveData', (evt)=>{
-        //     evt.stopImmediatePropagation();
-        //     // empleadoCore.eliminar( $(evt.currentTarget).attr('data-id'), $(evt.currentTarget).attr('data-nombre') );
-        // });
-
         $('body').on(core.helper.clickEventType, '.btnEliminarEmpleado', (evt)=>{
             evt.stopImmediatePropagation();
             empleadoCore.eliminar( $(evt.currentTarget).attr('data-id'), $(evt.currentTarget).attr('data-nombre') );
         });
+
+        $('body').on(core.helper.clickEventType, '.btnNuevoEmpleadoComunidad', function(evt)
+        {
+            //  Llamamos al modal de nuevo empleado
+                empleadoCore.mostrarModalNuevoEmpleado();
+        });
+
+        //  Bindeamos el botón de guardar nuevo empleado ¿?
+
+    },
+
+    mostrarModalNuevoEmpleado: async function()
+    {
+            apiFincatech.getView("empleado", "form").then((resultHTML)=>{
+
+                // result = CoreUI.Utils.parse(resultHTML, core.modelId);
+                //  resultHTML;
+                Swal.fire({
+                    text: "",
+                    html: resultHTML,
+                    grow:'row',
+                    showCancelButton: true,
+                    showConfirmButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: '<i class="bi bi-save mr-2"></i> Guardar',
+                    cancelButtonText: '<i class="bi bi-x-circle mr-2"></i> Cancelar',
+                    reverseButtons: true,
+                    buttonsStyling: false,
+                    customClass: {
+                        confirmButton: 'btn btnSaveData btn-success shadow d-block pb-2 pt-2',
+                        cancelButton: 'btn btn-danger btnCancelSave shadow d-block pb-2 pt-2 mr-3'
+                    },                    
+                    didOpen: function(e)
+                    {
+                        $('.formEmpleadoComunidad #idcomunidad').val(core.modelId);
+                        $('.formEmpleadoComunidad .nombreComunidad').text(core.Modelo.entity.Comunidad[0].nombre);
+
+                        //  Cargamos los combos 
+                            core.Forms.getSelectData( 'Tipopuestoempleado', 'Tipopuestoempleado.nombre', 'Tipopuestoempleado.id', '', '', 'puestoEmpleadoComunidad', true ).then(()=>{
+                                $('body .formEmpleadoComunidad #puestoEmpleadoComunidad').select2({
+                                    dropdownParent: $('.swal2-container'),
+                                    theme: 'bootstrap4', 
+                                });
+                            });  
+
+                            core.Forms.getSelectData( 'Provincia', 'Provincia.Nombre', 'Provincia.Id', '', '', 'provinciaEmpleadoComunidad', true ).then(()=>{
+                                $('body .formEmpleadoComunidad #provinciaEmpleadoComunidad').select2({
+                                    dropdownParent: $('.swal2-container'),
+                                    theme: 'bootstrap4', 
+                                });
+                            }); 
+
+
+                    }                    
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                        core.Forms.mapDataToSave('formEmpleadoComunidad');
+                        core.Modelo.Insert('Empleado', core.Forms.data, false).then( ()=>{
+                            //  Recargamos el listado de empleados de la comunidad
+                                window['listadoEmpleadosComunidad'].ajax.reload();
+                        });
+                        //  Llamamos al endpoint de eliminar
+                        // apiFincatech.delete("empleado", id).then((result) =>{
+                        //     Swal.fire(
+                        //         'Empleado eliminado correctamente',
+                        //         '',
+                        //         'success'
+                        //       );
+                        //       $('#listadoEmpleado').DataTable().ajax.reload();
+                        // });
+                    }
+                }); 
+            });    
+           
+
     },
 
     /** Elimina una comunidad previa confirmación */

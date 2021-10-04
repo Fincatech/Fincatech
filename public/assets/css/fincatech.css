@@ -364,4 +364,20 @@ body div.dataTables_wrapper div.dataTables_filter input {
   font-weight: 300;
   text-indent: 5px;
 }
+
+.shown .abrir {
+  display: none;
+}
+
+.shown .cerrar {
+  display: initial !important;
+}
+
+.dataTable .cerrar {
+  display: none;
+}
+
+.swal2-html-container {
+  font-size: .875rem !important;
+}
 /*# sourceMappingURL=fincatech.css.map */

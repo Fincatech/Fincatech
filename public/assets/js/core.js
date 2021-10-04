@@ -404,35 +404,7 @@ let core =
         core.Modelo.schema = result;
 
         //  Recuperamos los valores de los posible combos que haya en la pantalla
-        if($("body .form-data .select-data").length)
-        {
-
-          $("body .form-data .select-data").each(function()
-          {
-              var insertarOpcionSeleccionar = false;
-
-              var entidadCombo = $(this).attr("hs-list-entity");
-              var keyField = $(this).attr("hs-list-field");
-              var keyValue = $(this).attr("hs-list-value");
-              var elDOM = $(this).prop("id");
-
-              var keyOriginField = $(this).attr("hs-field");
-              var keyOriginValue = $(this).attr("hs-value");
-
-              if($(this).attr('hs-seleccionar') !== undefined)
-              {
-                insertarOpcionSeleccionar = $(this).attr('hs-seleccionar');              
-              }
-
-              core.Forms.getSelectData( entidadCombo, keyField, keyValue, keyOriginField, keyOriginValue, elDOM, insertarOpcionSeleccionar );
-
-          });
-
-          $('.selectpicker').select2({
-            theme: 'bootstrap4',          
-          });
-
-        }
+        core.Forms.initializeSelectData();
 
         // Si hay un id informado recuperamos la entidad desde el endpoint
         if(core.modelId != "")
@@ -472,6 +444,42 @@ let core =
       });
     },
 
+    /** Inicializa los combos del formulario */
+    initializeSelectData: function()
+    {
+        if($("body .form-data .select-data").length)
+        {
+
+          $("body .form-data .select-data").each(function()
+          {
+              var insertarOpcionSeleccionar = false;
+
+              var entidadCombo = $(this).attr("hs-list-entity");
+              var keyField = $(this).attr("hs-list-field");
+              var keyValue = $(this).attr("hs-list-value");
+              var elDOM = $(this).prop("id");
+
+              var keyOriginField = $(this).attr("hs-field");
+              var keyOriginValue = $(this).attr("hs-value");
+
+              if($(this).attr('hs-seleccionar') !== undefined)
+              {
+                insertarOpcionSeleccionar = $(this).attr('hs-seleccionar');              
+              }
+
+              core.Forms.getSelectData( entidadCombo, keyField, keyValue, null, null, elDOM, insertarOpcionSeleccionar );
+              $('.selectpicker').select2({
+                theme: 'bootstrap4',          
+              });
+          });
+
+          $('.selectpicker').select2({
+            theme: 'bootstrap4',          
+          });
+
+        }
+    },
+
     /** Mapeamos la información devuelta por el endpoint con los datos del formulario */
     mapData: async function(formularioMapeo = null)
     {
@@ -491,7 +499,7 @@ let core =
           var entidad = $(this).attr('hs-entity') ;
           var campo = $(this).attr('hs-field') ;
           var valor = '';
-          // console.log('Entidad: ' + entidad + ' Campo: ' + campo);
+          //  console.log('Entidad: ' + entidad + ' Campo: ' + campo);
           //  Validamos que el campo venga informado desde el endpoint
           if(core.Modelo.entity[ entidad ][0][campo] !== undefined)
           {
@@ -571,13 +579,15 @@ let core =
     },
 
     /** Mapea la información de la pantalla a la propiedad data para guardar */
-    mapDataToSave: function()
+    mapDataToSave: function(formularioProceso = null)
     {
 
         core.Forms.data = {};
+        if(formularioProceso == null)
+          formularioProceso = 'form-data';
 
         //  Recorremos todos los campos del formulario
-        $("body .form-data .data").each(function(){
+        $(`body .${formularioProceso} .data`).each(function(){
         
           var fieldName = $(this).attr("hs-field");
           var entity = $(this).attr("hs-entity");
@@ -760,11 +770,11 @@ console.log('accion: ' + actionSave);
      */
     Insert: async function(entidadSave, postData, updateModel = true)
     {
-console.log('Llega al insert');
-console.log(`${entidadSave}/create`);
+// console.log('Llega al insert');
+// console.log(`${entidadSave}/create`);
       await apiFincatech.post(`${entidadSave}/create`, postData).then(async (response) =>
       {
-console.log('tiene respuesta');
+// console.log('tiene respuesta');
           var responseData = JSON.parse(response);
 
           // console.log('Resultado inserción1: ' + responseData.data);
@@ -783,8 +793,8 @@ console.log('tiene respuesta');
                   core.actionModel = "get";
                   core.modelId = idInsercion;
 
-                  CoreUI.Modal.Success("El registro se ha creado correctamente");              
               }
+              CoreUI.Modal.Success("El registro se ha creado correctamente");              
           }else{
 
             //  TODO: Ver cuál es el error en el json

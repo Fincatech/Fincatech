@@ -378,6 +378,7 @@ return function (App $app) {
 
     });
 
+    /** Asigna una empresa a una comunidad */
     $app->post('/comunidad/{idcomunidad}/empresa/{idempresa}/asignar', function(Request $request, Response $response, array $params ): Response
     {
 

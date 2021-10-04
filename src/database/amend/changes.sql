@@ -340,7 +340,12 @@ ALTER TABLE `empleadorequerimiento`
 ADD COLUMN `idrequerimiento` INT(11) NULL AFTER `idempleado`;
 
 ######## 04/10/2021
-CREATE  OR REPLACE VIEW `view_documentoscomunidad` AS
+USE `fincatech`;
+CREATE 
+     OR REPLACE ALGORITHM = UNDEFINED 
+    DEFINER = `root`@`localhost` 
+    SQL SECURITY DEFINER
+VIEW `view_documentoscomunidad` AS
     SELECT 
         `cr`.`id` AS `idrelacion`,
         `r`.`nombre` AS `requerimiento`,
@@ -348,9 +353,10 @@ CREATE  OR REPLACE VIEW `view_documentoscomunidad` AS
         `r`.`sujetorevision` AS `sujetorevision`,
         `r`.`requieredescarga` AS `requieredescarga`,
         `r`.`activado` AS `activado`,
+        `r`.`tipo` AS `tiporequerimiento`,
         `r`.`id` AS `idrequerimiento`,
         `r`.`idrequerimientotipo` AS `idrequerimientotipo`,
-        `cr`.`idcomunidad` AS `idcomunidad`,
+        IDEMPRESAREQUERIMIENTO() AS `idcomunidad`,
         `cr`.`idestado` AS `idestado`,
         `cr`.`created` AS `created`,
         `cr`.`updated` AS `fechaultimaactuacion`,
@@ -373,3 +379,4 @@ CREATE  OR REPLACE VIEW `view_documentoscomunidad` AS
     WHERE
         (`r`.`idrequerimientotipo` = 6)
     ORDER BY `r`.`nombre`;
+

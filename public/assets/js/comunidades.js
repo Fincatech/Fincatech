@@ -35,7 +35,7 @@ let comunidadesCore = {
                         empleadoCore.renderTablaEmpleadosComunidad(core.modelId);
                 
                     //  Cargamos la documentación de la comunidad
-                        documentalCore.renderTablaDocumentacionComunidad(core.modelId);
+                        documentalCore.Comunidad.renderTablaDocumentacionComunidad(core.modelId);
 
 
                 }
@@ -82,6 +82,24 @@ let comunidadesCore = {
         $('body').on(core.helper.clickEventType, '.btnAsociarEmpresaCAE', async function(e)
         {
             comunidadesCore.mostrarModalAsociarEmpresa();
+        });
+
+        $('body').on(core.helper.clickEventType, '.btnNuevoEmpleadoComunidad', async function(e)
+        {
+            //  Comprobamos si tiene spa asignado y si está editando o añadiendo
+            if(core.actionModel == 'get')
+            {
+                //  Comprobamos si tiene spa asignado
+                    if(core.Modelo.entity.Comunidad[0].idspa == '-1')
+                    {
+                        //  Avisamos de que debe asignar el spa
+                            CoreUI.Modal.Error('Para dar de alta un empleado debe asignar primero un SPA a la comunidad', 'Comunidad sin SPA asignado', function()
+                            {
+                                Swal.close();
+                            });
+                    }
+            }
+
         });
 
     //  Cambio nombre de comunidad
@@ -158,8 +176,9 @@ let comunidadesCore = {
                         CoreUI.Modal.Success("La empresa se ha asignado correctamente. Los empleados aparecerán en el listado una vez que el contratista los asigne.");
 
                         //  Recargamos la tabla de empresas para reflejar el cambio
-                            comunidadesCore.renderTablaEmpresasComunidad();
-
+                            // comunidadesCore.renderTablaEmpresasComunidad();
+                            window['tablelistadoEmpresaComunidad'].ajax.reload();
+                            
                     }else{
                         //  TODO: Ver cuál es el error en el json
                         Modal.Error("No se ha podido registrar el documento por el siguiente motivo:<br><br>" + responseData.status.response);
@@ -242,29 +261,71 @@ let comunidadesCore = {
         if($('#listadoComunidad').length)
         {
             //  Cargamos el listado de comunidades
-            CoreUI.tableData.init();
+                CoreUI.tableData.init();
+
+            //  Columna con información adicional de estado de documentación
+                CoreUI.tableData.addColumnRow('listadoComunidad', 'documentacioncomunidad');
+
             //  Código
-            CoreUI.tableData.addColumn('listadoComunidad', "codigo","COD");
+                CoreUI.tableData.addColumn('listadoComunidad', "codigo","COD");
             //  Nombre
-            CoreUI.tableData.addColumn('listadoComunidad', "nombre", "NOMBRE");
+                CoreUI.tableData.addColumn('listadoComunidad', "nombre", "NOMBRE");
 
             //  Administrador
-            CoreUI.tableData.addColumn('listadoComunidad', "usuario[0].nombre", "Administrador");            
-                // var html = `<a href="${baseURL}administrador/data:usuarioId$" class="pl-1 pr-1">data:usuario.nombre$</a>`;
-                // CoreUI.tableData.addColumn(null, "ADMINISTRADOR", html);
+                CoreUI.tableData.addColumn('listadoComunidad', "usuario[0].nombre", "Administrador");            
 
             //  Email
                 var html = '<a href="mailto:data:emailcontacto$" class="pl-1 pr-1">data:emailcontacto$</a>';
                 CoreUI.tableData.addColumn('listadoComunidad', null, "EMAIL", html);
 
             //  Teléfono
-            CoreUI.tableData.addColumn('listadoComunidad', "telefono", "TELEFONO");
+                CoreUI.tableData.addColumn('listadoComunidad', "telefono", "TELEFONO");
 
             //  Documentos pendientes de subir
-            CoreUI.tableData.addColumn('listadoComunidad', "nombre", "doc pend. de subir");
+                CoreUI.tableData.addColumn('listadoComunidad',function(row, type, val, meta)
+                {
+                    //  Contamos el número de documentos pendientes de adjuntar
+                    var claseAviso = 'text-success';
 
-            //  Pendientes de verificar
-            CoreUI.tableData.addColumn('listadoComunidad', "nombre", "doc pend. de verificar");
+                    var iDocumentos = 0;
+                        for(x = 0; x < row.documentacioncomunidad.length; x++)
+                        {
+                            if(row.documentacioncomunidad[x].idficherorequerimiento == null)
+                            {
+                                iDocumentos++;
+                                claseAviso = 'text-danger';
+                            }
+
+                        }
+                        return `<p class="text-center m-0"><span class=" ${claseAviso}" style="font-size: 15px;"> ${iDocumentos}</span></p>`;
+                }, "doc pend. de subir", null, 'text-center');
+
+            //  Documentos verificados
+                CoreUI.tableData.addColumn('listadoComunidad', function(row, type, val, meta)
+                {
+                    //  Contamos el número de documentos pendientes de adjuntar
+                    var iDocumentos = 0;
+                    var iDocumentosTotal = 0;
+
+                        for(x = 0; x < row.documentacioncomunidad.length; x++)
+                        {
+                            iDocumentosTotal++;
+                            if(row.documentacioncomunidad[x].idficherorequerimiento != null)
+                            {
+                                iDocumentos++;
+                            }
+                        }
+                        
+                        if(iDocumentosTotal == iDocumentos)
+                        {
+                            return `<p class="text-center m-0"><i class="bi bi-check2-square text-success" style="font-size:24px;"></i></p>`;
+                        }else{
+                            return `<p class="text-center m-0"><span class="" style="font-size:15px;">${iDocumentos}</span></p>`;
+                        }
+
+                        
+
+                }, "doc verificados", null, 'text-center');
 
             //  Fecha de alta
                 var html = 'data:created$';
@@ -281,6 +342,7 @@ let comunidadesCore = {
                     html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid"></i></li></ul>';
                 CoreUI.tableData.addColumn('listadoComunidad', null, "", html);
 
+            $('#listadoComunidad').addClass('no-clicable');
             CoreUI.tableData.render("listadoComunidad", "Comunidad", "comunidad/list");
         }
 

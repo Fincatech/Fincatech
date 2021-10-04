@@ -5,6 +5,7 @@
 <script type="text/javascript" src="<?php echo ASSETS; ?>vendor/node_modules/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript" src="<?php echo ASSETS; ?>vendor/node_modules/izimodal/js/iziModal.min.js"></script>
 <script src="<?php echo ASSETS; ?>vendor/node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
+<!-- <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
 <link rel="stylesheet" href="<?php echo ASSETS; ?>vendor/node_modules/sweetalert2/dist/sweetalert2.min.css">
 
 <!-- Dropzone -->

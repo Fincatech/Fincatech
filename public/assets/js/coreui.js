@@ -240,7 +240,7 @@ let CoreUI = {
                      "data": data,
                      "defaultContent": '',
                      "render": function () {
-                         return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
+                         return '<i class="fa fa-plus-square text-success abrir" aria-hidden="true"></i><i class="fa fa-minus-square text-danger cerrar" aria-hidden="true"></i>';
                      },
                      width:"15px"
             };
@@ -281,6 +281,66 @@ let CoreUI = {
 
         },
 
+        formatComunidad: function(d)
+        {
+            //  Debemos comprobar el rol para subir fichero
+                var canUploadFile = false;
+                var needFileUpload = false;
+                var fileLink = '';
+
+                if(core.Security.getRole() == 'ADMINFINCAS')
+                    canUploadFile = true;
+
+            var salida = `
+                <div class="table-responsive">
+                    <table border="0" class="table table-bordered table-light">
+                        <thead class="">
+                            <tr>
+                                <th style="background: #dee2e6 !important;">Requerimiento</th>
+                                <th class="text-center" style="background: #dee2e6 !important;width:150px;">Estado</th>
+                                <th class="text-center" style="background: #dee2e6 !important;">Documento</th>
+                            </tr>
+                        </thead>`;
+
+                for(x = 0; x < d.documentacioncomunidad.length; x++)
+                {
+
+                    //  Nombre del requerimiento
+                        salida += `<tr>
+                                    <td>${d.documentacioncomunidad[x].requerimiento}</td>`;
+
+                    //  Estado del requerimiento
+                        salida += '<td class="text-center" >' + (!d.documentacioncomunidad[x].idficherorequerimiento ? '<span class="badge rounded-pill bg-danger pl-3 pr-3 pt-2 pb-2">No adjuntado</span>' : '<span class="badge rounded-pill bg-success pl-3 pr-3 pt-2 pb-2">Disponible para descargar</span>') + '</td>';
+
+                    //  Enlace al fichero de descarga si está ya adjuntado o bien para subir si tiene permiso
+                        ficheroAdjuntado = (!d.documentacioncomunidad[x].idficherorequerimiento ? false : true);
+                        if(ficheroAdjuntado)   //  DESCARGAR FICHERO YA SUBIDO
+                        {
+                            salida += ` <td class="text-center">
+                                            <a href="${baseURL}public/storage/${d.documentacioncomunidad[x].storageficherorequerimiento}" target="_blank" data-bs-toggle="tooltip" data-placement="bottom" title="Ver documento">
+                                                <i class="bi bi-cloud-arrow-down text-success" style="font-size: 30px;"></i>
+                                            </a>                                            
+                                        </td>`;
+                        }
+
+                    //  Construimos el enlace de salida para que pueda descargar el fichero adjuntado
+                    //  SUBIR FICHERO SOLO PARA ADMINISTRADOR
+                        if(!ficheroAdjuntado && canUploadFile)
+                        {  
+                                dataset = ` data-idcomunidad="${d.documentacioncomunidad[x].idcomunidad}" data-idempresa="" data-idempleado="" data-idrequerimiento="${d.documentacioncomunidad[x].idrequerimiento}" data-idrelacionrequerimiento="${d.documentacioncomunidad[x].idrelacion}" data-entidad="comunidad" `;
+                                salida += `<td class="text-center" ><a href="javascript:void(0)" class="btnAdjuntarFicheroDocumento" data-toggle="tooltip" ${dataset} data-placement="bottom" title="" id="home" data-original-title="Adjuntar documento"><i class="bi bi-cloud-arrow-up text-danger" style="font-size: 30px;"></i></a></td>`;
+                        }
+
+                        if(!ficheroAdjuntado && !canUploadFile)
+                            salida += '<td>&nbsp;</td>';
+
+                        salida += `</tr>`;
+                }
+
+                salida += '</table></div>';
+                return salida;
+        },
+
         /** Muestra la fila de información ampliada para CAE Empresa */
         formatEmpresa: function (d)
         {
@@ -317,9 +377,7 @@ let CoreUI = {
                 //  Nombre del requerimiento
                     salida += `
                         <tr>
-                            <td>
-                            ${d.documentacioncae[x].requerimiento}
-                            </td>
+                            <td>${d.documentacioncae[x].requerimiento}</td>
                             <td class="text-center" >`;
 
                 //  Fecha última actuación
@@ -374,10 +432,75 @@ let CoreUI = {
                 case 'listadoEmpresaComunidad':
                     salida = CoreUI.tableData.formatEmpresa(d);
                     break;
+                case 'listadoComunidad':
+                    salida = CoreUI.tableData.formatComunidad(d);
+                    break;
             }
 
             return salida;
 
+        },
+
+        tableEventsClick: function(id, detailRows)
+        {
+               // On each draw, loop over the `detailRows` array and show any child rows
+            window['table' + id].on( 'draw', function () {
+                $.each( detailRows, function ( i, id ) {
+                    $('body #'+id+' td.details-control').off();
+                    $('body #'+id+' td.details-control').trigger( 'click' );
+                } );
+            } );
+
+         // Add event listener for opening and closing details
+            $('body #' + id +' tr td.details-control').off();
+            $('body #' + id).on( core.helper.clickEventType, 'tr td.details-control', function (e) {
+                //  Obtenemos el id de la tabla que está disparando el evento
+                    idTabla = ($(this).parent().parent().parent().attr('id'));
+
+                    var tr = $(this).closest('tr');
+                    var row = window['table' + idTabla].row( tr );
+                    var idx = $.inArray( tr.attr('id'), detailRows );
+        
+                if ( row.child.isShown() ) {
+                    tr.removeClass( 'shown' );
+                    row.child.hide();
+        
+                    // Remove from the 'open' array
+                    // detailRows.splice( idx, 1 );
+                    tr.removeClass('shown');
+                }
+                else {
+                    tr.addClass( 'shown' );
+                    row.child( CoreUI.tableData.format(row.data(), idTabla )).show();
+        
+                    // Add to the 'open' array
+                    // if ( idx === -1 ) {
+                    //     detailRows.push( tr.attr('id') );
+                    // }
+                }
+
+                documentalCore.Events();
+
+            } );
+
+            //  Suscripción al evento del click salvo que la tabla no sea clicable
+            if( !$(`body #${id}`).hasClass('no-clicable') )
+            {
+                $(`body #${id} tr > td`).off();
+                $(`body #${id}`).on('click', 'tr > td', function (e) 
+                {
+                    if($(this).html().indexOf('accionesTabla') > 0)
+                    {
+                        console.log('Ha clicado en acciones');
+                    }else{
+                        var data = window['table' + id].row( this ).data();
+                        //  Redirigimos a la pantalla correspondiente que está basada en el endpoint
+                        //  quitando "list" ya que es el endpoint que se utiliza para el listado ajax
+                        window.location.href = baseURL + endpoint.toLowerCase().replace('list', data.id);
+                    }
+
+                });
+            }     
         },
 
         /** Renderiza la tabla */
@@ -394,7 +517,7 @@ let CoreUI = {
 
             var opciones = {
                 "serverSide": false,
-                "autoWidth": true,
+                "autoWidth": false,
                 "select": true,
                 "retrieve": true,
                 "paging": usePagination,
@@ -414,89 +537,11 @@ let CoreUI = {
             };
 
             if(customRender != null)
-            {
                 opciones['render'] = customRender;
-            }
-
-            //  Cargamos el listad
-            // window['table' + id] = $(`#${id}`).DataTable({
-            //     "serverSide": false,
-            //     "autoWidth": true,
-            //     "select": true,
-            //     "retrieve": true,
-            //     "paging": usePagination,
-            //     "searching": _search,
-            //     ajax: {
-            //         "url": config.baseURLEndpoint + endpoint,
-            //         "dataSrc": "data." + entity 
-            //     },
-            //     "columns": CoreUI.tableData.columns[id],  
-            //     "columnDefs": [{
-            //         "targets": CoreUI.tableData.columns[id].length -1,
-            //         "className": "p-0 text-center"
-            //     }],
-            //     "drawCallback": function(settings){
-            //         feather.replace();
-            //     }
-            // });
 
             window['table' + id] = $(`#${id}`).DataTable(opciones);
 
-            // On each draw, loop over the `detailRows` array and show any child rows
-            window['table' + id].on( 'draw', function () {
-                $.each( detailRows, function ( i, id ) {
-                    $('#'+id+' td.details-control').trigger( 'click' );
-                } );
-            } );
-
-         // Add event listener for opening and closing details
-            $('#' + id).on( 'click', 'tr td.details-control', function (e) {
-                //  Obtenemos el id de la tabla que está disparando el evento
-                    idTabla = ($(this).parent().parent().parent().attr('id'));
-
-                    var tr = $(this).closest('tr');
-                    var row = window['table' + idTabla].row( tr );
-                    var idx = $.inArray( tr.attr('id'), detailRows );
-        
-                if ( row.child.isShown() ) {
-                    tr.removeClass( 'details' );
-                    row.child.hide();
-        
-                    // Remove from the 'open' array
-                    detailRows.splice( idx, 1 );
-                }
-                else {
-                    tr.addClass( 'details' );
-                    row.child( CoreUI.tableData.format(row.data(), idTabla )).show();
-        
-                    // Add to the 'open' array
-                    if ( idx === -1 ) {
-                        detailRows.push( tr.attr('id') );
-                    }
-                }
-
-                documentalCore.Events();
-
-            } );
-
-            //  Suscripción al evento del click salvo que la tabla no sea clicable
-            if( !$(`#${id}`).hasClass('no-clicable') )
-            {
-                $(`#${id}`).on('click', 'tr > td', function (e) 
-                {
-                    console.log($(this));
-                    if($(this).html().indexOf('accionesTabla') > 0)
-                    {
-                        console.log('Ha clicado en acciones');
-                    }else{
-                        var data = window['table' + id].row( this ).data();
-                        //  Redirigimos a la pantalla correspondiente que está basada en el endpoint
-                        //  quitando "list" ya que es el endpoint que se utiliza para el listado ajax
-                        window.location.href = baseURL + endpoint.toLowerCase().replace('list', data.id);
-                    }
-
-                });
-            }
+            CoreUI.tableData.tableEventsClick(id, detailRows);
 
         }        
 

@@ -68,7 +68,7 @@ class DocumentalModel extends \HappySoftware\Model\Model{
 
         //  Cierre de consulta
             $sql .= " ) ";
-
+// die($sql);
             $this->getRepositorio()->queryRaw( $sql );
 
         //  Devolvemos un estado ok

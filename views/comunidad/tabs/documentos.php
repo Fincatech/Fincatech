@@ -8,7 +8,7 @@
 
                             <div class="card-header pl-1 mb-2">
 
-                                <h5 class="card-title mb-0"><i class="bi bi-truck mr-2"></i> <span class="titulo">Requerimientos comunidad</span></h5>
+                                <h5 class="card-title mb-0"><i class="bi bi-folder-check mr-2"></i> <span class="titulo">Requerimientos comunidad</span></h5>
 
                             </div>
                     
@@ -19,18 +19,6 @@
                                     <div class="col-12">
 
                                         <div class="card">
-
-                                            <div class="card-header pl-0 pt-0"><!--headerListado-->
-
-                                                <div class="row">
-
-                                                    <div class="col-12">
-                                                        <h5 class="card-title mb-0 text-uppercase font-weight-normal pl-3 pt-1"><i class="bi bi-folder-check pr-2"></i> Documentación</h5>
-                                                    </div>
-                                        
-                                                </div>
-
-                                            </div>
 
                                             <div class="card-body">
 

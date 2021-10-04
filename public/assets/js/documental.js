@@ -38,19 +38,13 @@ let documentalCore = {
         $('body .bntUploadDocumento').off();
         $('body').on(core.helper.clickEventType, '.bntUploadDocumento', function(e)
         {
-            e.preventDefault();
+            e.stopImmediatePropagation();
             documentalCore.uploadRequerimiento();
         });
 
+        $('body .btnAdjuntarFicheroDocumento').off();
         $('body').on(core.helper.clickEventType, '.btnAdjuntarFicheroDocumento', async function()
         {
-
-            console.log('idcomunidad: ' +  $(this).attr('data-idcomunidad'));
-            console.log('idempresa = ' + $(this).attr('data-idempresa'));
-            console.log('.idempleado = ' + $(this).attr('data-idempleado'));
-            console.log('.idrequerimiento = ' + $(this).attr('data-idrequerimiento'));
-            console.log('.idrelacionrequerimiento = ' + $(this).attr('data-idrelacionrequerimiento'));
-            console.log('.entidad = ' + $(this).attr('data-entidad'));
 
             documentalCore.idcomunidad = $(this).attr('data-idcomunidad');
             documentalCore.idempresa = $(this).attr('data-idempresa');
@@ -59,13 +53,6 @@ let documentalCore = {
             documentalCore.idrelacionrequerimiento = $(this).attr('data-idrelacionrequerimiento');
             documentalCore.entidad = $(this).attr('data-entidad');
 
-            console.log('documentalCore.idcomunidad ' + documentalCore.idcomunidad);
-            console.log('documentalCore.idempresa : ' + documentalCore.idempresa) ;
-            console.log('documentalCore.idempleado  ' + documentalCore.idempleado);
-            console.log('documentalCore.idrequerimiento  ' + documentalCore.idrequerimiento);
-            console.log('documentalCore.idrelacionrequerimiento  ' + documentalCore.idrelacionrequerimiento);
-            console.log('documentalCore.entidad ' + documentalCore.entidad);
-
             const { value: file } = await Swal.fire({
             title: '',
             html: Constantes.CargaDocumento,
@@ -73,7 +60,7 @@ let documentalCore = {
             showConfirmButton: false,
             // grow: 'row',
             showCloseButton: true,
-            didOpen: function(e)
+            didOpen: function()
             {
 
                 //  Inicializamos el componente de ficheros
@@ -117,6 +104,26 @@ let documentalCore = {
                 CoreUI.Modal.Success("El documento se ha registrado correctamente");
                 //  Recargamos la tabla de empresas para reflejar el cambio
                     empresaCore.renderTabla();
+
+                //  Recargamos el listado de comunidades
+                
+                
+                //  Actualizamos la tabla del listado de comunidades
+                if($('body #listadoComunidad').length)
+                {
+                    window['tablelistadoComunidad'].ajax.reload();               
+                }
+
+                if($('body #listadoDocumentacionComunidad').length)
+                {
+                    window['listadoDocumentacionComunidad'].ajax.reload();
+                    // CoreUI.tableData.tableEventsClick('listadoDocumentacionComunidad');
+                }
+
+                if($('body #listadoEmpresa').length)
+                    window['listadoEmpresa'].ajax.reload();
+          
+
             }else{
                 //  TODO: Ver cuál es el error en el json
                 Modal.Error("No se ha podido registrar el documento por el siguiente motivo:<br><br>" + responseData.status.response);
@@ -128,8 +135,65 @@ let documentalCore = {
 
     },
 
-    COMUNIDAD: {
+    Comunidad: {
     
+        /**  */
+        renderTablaDocumentacionComunidad: async function(id)
+        {
+            if($('#listadoDocumentacionComunidad').length)
+            {
+
+                //  Cargamos el listado de comunidades
+                CoreUI.tableData.init();
+
+                //  Requerimiento
+                    CoreUI.tableData.addColumn('listadoDocumentacionComunidad', "requerimiento","Documento", null, 'text-justify', '70%');
+
+                //  Estado del requerimiento
+                    CoreUI.tableData.addColumn('listadoDocumentacionComunidad', 
+                        function(row, type, val, meta)
+                        {
+                            if(row.idficherorequerimiento == null)
+                            {
+                                return '<span class="badge rounded-pill bg-danger pl-3 pr-3 pt-2 pb-2 d-block">No adjuntado</span>';
+                            }else{
+                                return '<span class="badge rounded-pill bg-success pl-3 pr-3 pt-2 pb-2 d-block">Subido</span>';
+                            }
+                        },
+                    "Estado", null, 'text-center', '10%');
+
+                //  Fichero asociado
+                    CoreUI.tableData.addColumn('listadoDocumentacionComunidad', 
+                        function(row, type, val, meta)
+                        {
+                            var ficheroAdjuntado = false;
+                            var htmlSalida = '';
+                            var estado = '';
+
+                            //  Enlace de descarga
+                            if(row.idficherorequerimiento != null)
+                            {
+                                ficheroAdjuntado = true;
+                                //  Tiene fichero ya subido
+                                htmlSalida += `<a href="${config.baseURL}public/storage/${row.storagefichero}" target="_blank"><i class="bi bi-cloud-arrow-down" style="font-size:24px;"></i></a>`;
+                            }
+
+                            //  Validamos que solo el admin de fincas o el sudo pueda subir el fichero
+                            if((core.Security.getRole() == 'SUDO' || core.Security.getRole() == 'ADMINFINCAS') && row.idficherorequerimiento == null)
+                            {
+                                htmlSalida += `<a href="javascript:void(0)" class="btnAdjuntarFicheroDocumento" data-toggle="tooltip" data-idcomunidad="${row.idcomunidad}" data-idempresa="" data-idempleado="" data-idrequerimiento="${row.idrequerimiento}" data-idrelacionrequerimiento="${row.idrelacion}" data-entidad="comunidad"><i class="bi bi-cloud-arrow-up text-success" style="font-size: 24px;"></i></a>`;
+                            }
+
+                            return htmlSalida; // row.requerimiento;
+
+                        }, 
+                    "Documento", null, 'text-center', '20%');
+
+                    $('#listadoDocumentacionComunidad').addClass('no-clicable');
+                    CoreUI.tableData.render("listadoDocumentacionComunidad", "documentacioncomunidad", `comunidad/${id}/documentacioncomunidad`);
+            }    
+        },
+
     },
 
     CAE:{
@@ -197,43 +261,6 @@ let documentalCore = {
                 // $('#listadoNotasinformativas').addClass('no-clicable');
                 CoreUI.tableData.render("listadoNotasinformativas", "Notasinformativas", "notasinformativas/list");
         }
-    },
-
-    /**  */
-    renderTablaDocumentacionComunidad: async function(id)
-    {
-        if($('#listadoDocumentacionComunidad').length)
-        {
-
-            //  Cargamos el listado de comunidades
-            CoreUI.tableData.init();
-
-            //  
-                //var html = 'data:created$';
-                //CoreUI.tableData.addColumn('listadoDocumentacionComunidad', null, "Fecha", html, 'text-center');
-
-            //  Requerimiento
-                CoreUI.tableData.addColumn('listadoDocumentacionComunidad', "requerimiento","Documento", null, 'text-justify', '80%');
-
-            //  Fichero asociado
-                CoreUI.tableData.addColumn('listadoDocumentacionComunidad', 
-                    function(row, type, val, meta)
-                    {
-                        if(row.storagefichero != '')
-                        {
-
-                        }else{
-                            
-                        }
-                        return row.requerimiento;
-                    }, "Documento", null, 'text-center');
-
-                var html = '<a href="' + config.baseURL + 'public/storage/data:storagefichero$" target="_blank"><i class="bi bi-cloud-arrow-down" style="font-size:24px;"></i></a>'
-                CoreUI.tableData.addColumn('listadoDocumentacionComunidad', null, "Fichero", html, 'text-center');
-
-                $('#listadoDocumentacionComunidad').addClass('no-clicable');
-                CoreUI.tableData.render("listadoDocumentacionComunidad", "documentacioncomunidad", `comunidad/${id}/documentacioncomunidad`);
-        }    
     },
 
 }

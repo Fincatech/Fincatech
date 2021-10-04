@@ -170,16 +170,37 @@ class ComunidadModel extends \HappySoftware\Model\Model{
        return $this->getRepositorio()->ExisteRegistro('comunidadservicioscontratados', "idcomunidad = $idComunidad and idservicio = $idServicio");
     }
 
-    private function ComunidadTieneEmpleadoPropio($empresas)
+    /**  Comprueba si una comunidad tiene empleados o alguna empresa asociada */
+    private function ComunidadTieneEmpleado($id)
     {
-        //  Los trabajadores autónomos
+
+        $empleados = $this->getRepositorio()->selectCount('empleadocomunidad', 'idcomunidad', '=', $id);
+        $empresas = $this->getRepositorio()->selectCount('comunidadempresa', 'idcomunidad', '=', $id);
+
+        if($empleados > 0 || $empresas > 0)
+        {
+            return true;
+        }else{
+            return false;
+        }
 
     }
 
     public function GetDocumentacionComunidad($id, $tieneTrabajadores = false)
     {
-        $sql = "SELECT * FROM fincatech.view_documentoscomunidad where @IDEMPRESAREQUERIMIENTO:=" . $id; 
-        return $this->query($sql);
+
+        $sql = "SELECT * FROM view_documentoscomunidad where @idempresarequerimiento:=" . $id; 
+        $datos['comtipo'] = $this->query($sql);
+
+        if(!$this->ComunidadTieneEmpleado($id))
+        {
+            $datos = $this->filterResults($datos, 'comtipo', 'tiporequerimiento', 'COM')['comtipo'];
+        }else{
+            $datos = $datos['comtipo'];
+        }
+
+        return $datos;
+
     }
 
     public function GetEmpresasByComunidadId($id)
