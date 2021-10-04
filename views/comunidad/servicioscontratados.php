@@ -16,4 +16,17 @@ if($App->isSudo()):?>
     </table>
 </div>
 
+<?php else: ?>
+    <div class="table-responsive form-servicioscontratados-info">
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="bg-light font-weight-normal text-uppercase">Servicio</th>
+                <th class="text-center bg-light font-weight-normal text-uppercase">Contratado</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
 <?php   endif; ?>

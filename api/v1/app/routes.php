@@ -287,7 +287,6 @@ return function (App $app) {
 
     }); 
 
-
     /** Punto de entrada para get. Se utiliza para listar todo
      *
     */
@@ -356,6 +355,24 @@ return function (App $app) {
         $id = $params['id'];
 
         $response->getBody()->write( $frontController->context->ListServiciosContratadosByComunidadId($id) );
+
+        return $response;  
+
+    });
+
+    //  Servicios contratados por una comunidad
+    $app->get('/comunidad/{id}/documentacioncomunidad', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Comunidad');
+
+        $id = $params['id'];
+
+        $response->getBody()->write( $frontController->context->getDocumentacionByComunidadId($id) );
 
         return $response;  
 

@@ -45,9 +45,9 @@ class ServiciosController extends FrontController{
         return $this->ServiciosModel->Get($id);
     }
 
-    public function List($params = null)
+    public function List($params = null, $useLoggedUserId = false)
     {
-       return $this->ServiciosModel->List($params);
+       return $this->ServiciosModel->List($params, $useLoggedUserId);
     }
 
 }

@@ -473,13 +473,20 @@ let core =
     },
 
     /** Mapeamos la información devuelta por el endpoint con los datos del formulario */
-    mapData: async function()
+    mapData: async function(formularioMapeo = null)
     {
+      var formularioDestino = 'body .form-data';
+      if(formularioMapeo !== null)
+        formularioDestino = `body .${formularioMapeo}`;
+
       //  Comprobamos que esté declarado el formulario
-      if($("body .form-data").length)
+      // if($("body .form-data").length)
+      if( $(formularioDestino).length )
       {
         //  .form-data -> Dentro de este container se encuentran todos los datos
-        $("body .data").each( function(){
+        // $("body .data").each( function(){
+        $(`${formularioDestino} .data`).each( function(){
+
 
           var entidad = $(this).attr('hs-entity') ;
           var campo = $(this).attr('hs-field') ;

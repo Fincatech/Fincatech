@@ -40,15 +40,16 @@ class ComunidadModel extends \HappySoftware\Model\Model{
     /** Obtiene el listado de servicios contratados por una comunidad */
     private function GetListadoServiciosContratados($id)
     {
-
         $data = $this->GetServiciosContratados($id);
-
+        
         //  Validamos que haya servicioscontratados para si no crear el mismo modelo
-            if(count($data) == 0)
-            {
+        if(count($data) == 0)
+        {
                 //  Recuperamos los precios base del producto
                 $data = $this->ServiciosController->List(null)['Tiposservicios'];
-            }  
+            // print_r($data);
+            // die();
+        }  
             
         return $data;
     }
@@ -62,12 +63,12 @@ class ComunidadModel extends \HappySoftware\Model\Model{
         //  Recuperamos los servicios contratados por la comunidad
             $data['Comunidad'][0]['servicioscontratados'] = $this->GetListadoServiciosContratados($id);
 
-        // Por cada uno de los servicios comprobamos si la comunidad lo tiene activo
-        return $data;
+        //  Por cada uno de los servicios comprobamos si la comunidad lo tiene activo
+            return $data;
     }
 
     //  Recuperamos el listado de las comunidades
-    public function GetServiciosContratados($idcomunidad)
+    private function GetServiciosContratados($idcomunidad)
     {
         $sql = "select * from view_comunidadservicioscontratados where idcomunidad = $idcomunidad order by nombre asc";
         $dataServiciosContratados = $this->query($sql);
@@ -87,11 +88,12 @@ class ComunidadModel extends \HappySoftware\Model\Model{
     {
         $data = parent::Get($id);
 
-        if(@count($data['Comunidad']) > 0)
-            $data['Comunidad'][0]['comunidadservicioscontratados'] = $this->GetListadoServiciosContratados($data['Comunidad'][0]['id']);
+        // if(count($data['Comunidad']) > 0)
+        $data['Comunidad'][0]['comunidadservicioscontratados'] = $this->GetListadoServiciosContratados($data['Comunidad'][0]['id']);
 
         //  Cargamos los documentos de la comunidad
-
+        //  Recuperamos los documentos asociados a una comunidad
+        $data['Comunidad'][0]['documentacioncomunidad'] = $this->GetDocumentacionComunidad($data['Comunidad'][0]['id']);
         return $data;
 
     }
@@ -111,8 +113,9 @@ class ComunidadModel extends \HappySoftware\Model\Model{
             {
                 $data['Comunidad'][$x]['comunidadservicioscontratados'] = $this->GetListadoServiciosContratados($data['Comunidad'][$x]['id']);
 
-                //  TODO: Recuperamos los documentos asociados a una comunidad
-
+                //  Recuperamos los documentos asociados a una comunidad
+                //$sql = "SELECT * FROM fincatech.view_documentoscomunidad where @IDEMPRESAREQUERIMIENTO:=" . $data['Comunidad'][$x]['id']; 
+                $data['Comunidad'][$x]['documentacioncomunidad'] = $this->GetDocumentacionComunidad($data['Comunidad'][$x]['id']);
                 //  TODO: Comprobamos si la comunidad tiene alguna empresa de tipo Autónomo asignada
             }
 
@@ -173,9 +176,10 @@ class ComunidadModel extends \HappySoftware\Model\Model{
 
     }
 
-    private function GetDocumentacionComunidad($id, $tieneTrabajadores = false)
+    public function GetDocumentacionComunidad($id, $tieneTrabajadores = false)
     {
-
+        $sql = "SELECT * FROM fincatech.view_documentoscomunidad where @IDEMPRESAREQUERIMIENTO:=" . $id; 
+        return $this->query($sql);
     }
 
     public function GetEmpresasByComunidadId($id)
@@ -186,13 +190,16 @@ class ComunidadModel extends \HappySoftware\Model\Model{
             $sql = "select * from view_empresascomunidad where idcomunidad = $id";
             $data = $this->query($sql);
 
-            for($x = 0; $x < count($data); $x++)
+            if($data)
             {
-                //  Recuperamos los documentos asociados a CAE de empresa y su estado
-                    $sql = "SELECT * FROM view_documentoscaeempresa where @IDEMPRESAREQUERIMIENTO:=" . $data[$x]['id']; 
-                    // echo($sql . ' ' );
-                    $data[$x]['documentacioncae'] = $this->query($sql);
+                for($x = 0; $x < count($data); $x++)
+                {
+                    //  Recuperamos los documentos asociados a CAE de empresa y su estado
+                        $sql = "SELECT * FROM view_documentoscaeempresa where @IDEMPRESAREQUERIMIENTO:=" . $data[$x]['id']; 
+                        $data[$x]['documentacioncae'] = $this->query($sql);
+                }
             }
+
 
             // $data = $this->EmpresaController->List(null)['Empresa'];
         // // $datos, $entity, $key, $value    
@@ -201,6 +208,7 @@ class ComunidadModel extends \HappySoftware\Model\Model{
             return $data;
     }
 
+    /** Asigna una empresa a una comunidad */
     public function asignarEmpresa($idComunidad, $idEmpresa)
     {
         $sql = "insert into comunidadempresa(idcomunidad, idempresa, activa, created, usercreate) values (";

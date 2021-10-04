@@ -1,4 +1,4 @@
-            <div class="tab-pane fade h-100" id="empresa" role="tabpanel">
+            <div class="tab-pane fade h-100" id="documentos" role="tabpanel">
 
                 <div class="row h-100">
 
@@ -25,7 +25,7 @@
                                                 <div class="row">
 
                                                     <div class="col-12">
-                                                        <h5 class="card-title mb-0 text-uppercase font-weight-normal pl-3 pt-1"><i class="bi bi-shop pr-2"></i> Documentación</h5>
+                                                        <h5 class="card-title mb-0 text-uppercase font-weight-normal pl-3 pt-1"><i class="bi bi-folder-check pr-2"></i> Documentación</h5>
                                                     </div>
                                         
                                                 </div>
@@ -34,7 +34,7 @@
 
                                             <div class="card-body">
 
-                                                <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoDocumentacionComunidad" id="listadoDocumentacionComunidad" data-model="comunidad">
+                                                <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoDocumentacionComunidad" id="listadoDocumentacionComunidad" data-model="Comunidad">
                                                     <thead class="thead"></thead>
                                                     <tbody class="tbody"></tbody>
                                                 </table>

@@ -2,13 +2,13 @@
 
 <div class="sidebar-content js-simplebar">
 
-    <a class="sidebar-brand" href="index.html">
+    <a class="sidebar-brand" href="<?php echo HOME_URL; ?>dashboard">
         <span class="align-middle">Fincatech</span>
     </a>
 
     <ul class="sidebar-nav navComunidades"></ul>
 
-    <div class="sidebar-cta">
+    <!-- <div class="sidebar-cta">
 
         <div class="sidebar-cta-content">
 
@@ -32,7 +32,7 @@
 
         </div>
 
-    </div>
+    </div> -->
 
 </div>
 

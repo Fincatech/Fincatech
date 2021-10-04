@@ -381,7 +381,7 @@ let CoreUI = {
         },
 
         /** Renderiza la tabla */
-        render: function(id, entity, endpoint, allColumns, usePagination = true, _search = true)
+        render: function(id, entity, endpoint, allColumns, usePagination = true, _search = true, customRender = null)
         {
             // console.log(this.columns.length);
             CoreUI.tableData.init();
@@ -392,8 +392,7 @@ let CoreUI = {
 
             var detailRows = [];
 
-            //  Cargamos el listad
-            window['table' + id] = $(`#${id}`).DataTable({
+            var opciones = {
                 "serverSide": false,
                 "autoWidth": true,
                 "select": true,
@@ -412,7 +411,36 @@ let CoreUI = {
                 "drawCallback": function(settings){
                     feather.replace();
                 }
-            });
+            };
+
+            if(customRender != null)
+            {
+                opciones['render'] = customRender;
+            }
+
+            //  Cargamos el listad
+            // window['table' + id] = $(`#${id}`).DataTable({
+            //     "serverSide": false,
+            //     "autoWidth": true,
+            //     "select": true,
+            //     "retrieve": true,
+            //     "paging": usePagination,
+            //     "searching": _search,
+            //     ajax: {
+            //         "url": config.baseURLEndpoint + endpoint,
+            //         "dataSrc": "data." + entity 
+            //     },
+            //     "columns": CoreUI.tableData.columns[id],  
+            //     "columnDefs": [{
+            //         "targets": CoreUI.tableData.columns[id].length -1,
+            //         "className": "p-0 text-center"
+            //     }],
+            //     "drawCallback": function(settings){
+            //         feather.replace();
+            //     }
+            // });
+
+            window['table' + id] = $(`#${id}`).DataTable(opciones);
 
             // On each draw, loop over the `detailRows` array and show any child rows
             window['table' + id].on( 'draw', function () {

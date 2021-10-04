@@ -3,6 +3,10 @@ let comunidadesCore = {
     comunidades: Object(),
     comunidad: Object(),
 
+    iTotalDocumentos: 0,
+    iTotalDocumentosPendientes: 0,
+    iTotalDocumentosSubidos: 0, 
+
     init: async function()
     {
         //  Bindeamos los eventos de los diferentes botones de comunidades
@@ -32,6 +36,8 @@ let comunidadesCore = {
                 
                     //  Cargamos la documentación de la comunidad
                         documentalCore.renderTablaDocumentacionComunidad(core.modelId);
+
+
                 }
 
                 CoreUI.setTitulo('nombre');
@@ -320,11 +326,77 @@ let comunidadesCore = {
 
     },
 
+    renderTablaDocumentacion: async function(id)
+    {
+        if($('#listadoDocumentacionComunidad').length)
+        {
+            //  Cargamos el listado de comunidades
+            CoreUI.tableData.init();
+            //  Código
+            CoreUI.tableData.addColumn('listadoDocumentacionComunidad', "requerimiento",'Documento');
+            // //  Nombre
+            // CoreUI.tableData.addColumn('listadoDocumentacionComunidad', "nombre", "NOMBRE");
+
+            // //  Email
+            //     var html = '<a href="mailto:data:emailcontacto$" class="pl-1 pr-1">data:emailcontacto$</a>';
+            //     CoreUI.tableData.addColumn('listadoDocumentacionComunidad', null, "EMAIL", html);
+
+            // //  Teléfono
+            // CoreUI.tableData.addColumn('listadoDocumentacionComunidad', "telefono", "TELEFONO");
+
+            // //  Documentos pendientes de subir
+            // CoreUI.tableData.addColumn('listadoDocumentacionComunidad', "nombre", "doc pend. de subir");
+
+            // //  Pendientes de verificar
+            // CoreUI.tableData.addColumn('listadoDocumentacionComunidad', "nombre", "doc pend. de verificar");
+
+            // //  Fecha de alta
+            //     var html = 'data:created$';
+            //     CoreUI.tableData.addColumn('listadoDocumentacionComunidad', null, "Fecha alta", html);
+
+            // Estado
+                // var html = 'data:estado$';
+                // CoreUI.tableData.addColumn('listadoDocumentacionComunidad', null, "Estado", html);
+
+            CoreUI.tableData.render("listadoDocumentacionComunidad", "Comunidad[0].documentacioncomunidad", `comunidad/${id}`);
+        }
+    },
+
     /** Recupera el listado de comunidades en el dashboard */
     listadoDashboard: async function()
     {
         await comunidadesCore.getAll().then(async (data)=>{
                $('.statscomunidades .total').html(comunidadesCore.comunidades.total);
+                var _iTotalDocumentos = 0;
+                var _iTotalDocumentosPendientes = 0;
+                var _iTotalDocumentosSubidos = 0;
+
+            //  Calculamos cuantos documentos tiene verificados de todas las comunidades
+                if(comunidadesCore.comunidades.total > 0)
+                {
+                    //  Por cada comunidad hay que calcular cuantos documentos hay
+                    for(i = 0; i < comunidadesCore.comunidades.length; i++)
+                    {
+                        
+                        for( y = 0; y < comunidadesCore.comunidades[i]['documentacioncomunidad'].length; y++)
+                        {
+                            _iTotalDocumentos++;
+                            if( comunidadesCore.comunidades[i]['documentacioncomunidad'][y].idrelacion == '' ||
+                                comunidadesCore.comunidades[i]['documentacioncomunidad'][y].idrelacion == null)
+                                {
+                                    _iTotalDocumentosPendientes++;
+                                }else{
+                                    _iTotalDocumentosSubidos++;
+                                }
+                        }
+
+                    }
+
+                }
+            //  Calculamos cuantos documentos tiene pendientes de verificar
+                $('.totalDocumentosVerificados').text(_iTotalDocumentosSubidos);
+                $('.totalDocumentosPendientes').text(_iTotalDocumentosPendientes);
+                $('.totalDocumentos').text(_iTotalDocumentos);
                this.renderTabla();
         });
   

@@ -138,4 +138,19 @@ class ComunidadController extends FrontController{
         return HelperController::successResponse( $this->ComunidadModel->asignarEmpresa($idcomunidad, $idempresa) );
     }
 
+    /** Recupera la documentación para una comunidad por su id */
+    public function getDocumentacionByComunidadId($id)
+    {
+        $data = [];
+        $data['documentacioncomunidad'] = $this->ComunidadModel->GetDocumentacionComunidad($id);
+
+        // TODO: Comprobamos si la empresa tiene empleados o empresas asociadas para mostrar
+        // el doc adicional
+
+        $data['total'] = count($data);
+
+
+        return HelperController::successResponse( $data );
+    }
+
 }

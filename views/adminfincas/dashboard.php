@@ -21,8 +21,20 @@
                                 <div class="card card-dashboard">
                                     <div class="card-body">
                                         <img src="<?php echo ASSETS_IMG; ?>check-square.png" class="img-responsive icono-marcaagua" />
+                                        <h5 class="card-title mb-4">Documentos</h5>
+                                        <h1 class="mt-1 mb-3 text-success totalDocumentos">0</h1>
+                                        <div class="mb-1">
+                                            <!--<span class="text-muted"><i data-feather="eye"></i> <a href="javascript:void(0);" class="btnVerDocumentosPendientes text-dark">ver documentos pendientes</a></span>-->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>                            
+                            <div class="col">
+                                <div class="card card-dashboard">
+                                    <div class="card-body">
+                                        <img src="<?php echo ASSETS_IMG; ?>check-square.png" class="img-responsive icono-marcaagua" />
                                         <h5 class="card-title mb-4">Documentos Verificados</h5>
-                                        <h1 class="mt-1 mb-3 text-success">132</h1>
+                                        <h1 class="mt-1 mb-3 text-success totalDocumentosVerificados">0</h1>
                                         <div class="mb-1">
                                             <!--<span class="text-muted"><i data-feather="eye"></i> <a href="javascript:void(0);" class="btnVerDocumentosPendientes text-dark">ver documentos pendientes</a></span>-->
                                         </div>
@@ -34,17 +46,17 @@
                                     <div class="card-body">
                                         <img src="<?php echo ASSETS_IMG; ?>alert-triangle.png" class="img-responsive icono-marcaagua" />
                                         <h5 class="card-title mb-4">Documentos pendientes de subir</h5>
-                                        <h1 class="mt-1 mb-3 text-danger text-center">12</h1>
+                                        <h1 class="mt-1 mb-3 text-danger text-center totalDocumentosPendientes">0</h1>
                                                 <div class="mb-1 text-center">
                                                     <span class="text-muted"><i data-feather="eye"></i> <a href="javascript:void(0);" class="btnVerDocumentosPendientes text-dark">ver documentos</a></span>
                                                 </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col">
+                            <!-- <div class="col">
                                 <div class="card card-dashboard">
                                     <div class="card-body">
-                                        <img src="<?php echo ASSETS_IMG; ?>alert-triangle.png" class="img-responsive icono-marcaagua" />
+                                        <img src="<?php //echo ASSETS_IMG; ?>alert-triangle.png" class="img-responsive icono-marcaagua" />
                                         <h5 class="card-title mb-4">Documentos pendientes de verificar</h5>
                                             <h1 class="mt-1 mb-3 text-danger text-center">12</h1>
                                             <div class="mb-1 text-center">
@@ -52,7 +64,7 @@
                                             </div>
                                     </div>
                                 </div>
-                            </div>									
+                            </div>									 -->
                             <!-- <div class="col-sm-2">
                                 <div class="card card-dashboard">
                                     <div class="card-body">

@@ -209,21 +209,30 @@ let documentalCore = {
             CoreUI.tableData.init();
 
             //  
-                var html = 'data:created$';
-                CoreUI.tableData.addColumn('listadoDocumentacionComunidad', null, "Fecha", html, 'text-center');
+                //var html = 'data:created$';
+                //CoreUI.tableData.addColumn('listadoDocumentacionComunidad', null, "Fecha", html, 'text-center');
 
-            //  Titulo
-                CoreUI.tableData.addColumn('listadoDocumentacionComunidad', "titulo","TITULO", null, 'text-justify');
-
-            //  Descripcion
-                CoreUI.tableData.addColumn('listadoDocumentacionComunidad', "descripcion", "NOTA", null, 'text-justify');
+            //  Requerimiento
+                CoreUI.tableData.addColumn('listadoDocumentacionComunidad', "requerimiento","Documento", null, 'text-justify', '80%');
 
             //  Fichero asociado
-                var html = '<a href="' + config.baseURL + 'public/storage/data:ficheroscomunes.nombrestorage$" target="_blank"><i class="bi bi-cloud-arrow-down" style="font-size:24px;"></i></a>'
+                CoreUI.tableData.addColumn('listadoDocumentacionComunidad', 
+                    function(row, type, val, meta)
+                    {
+                        if(row.storagefichero != '')
+                        {
+
+                        }else{
+                            
+                        }
+                        return row.requerimiento;
+                    }, "Documento", null, 'text-center');
+
+                var html = '<a href="' + config.baseURL + 'public/storage/data:storagefichero$" target="_blank"><i class="bi bi-cloud-arrow-down" style="font-size:24px;"></i></a>'
                 CoreUI.tableData.addColumn('listadoDocumentacionComunidad', null, "Fichero", html, 'text-center');
 
-                // $('#listadoNotasinformativas').addClass('no-clicable');
-                CoreUI.tableData.render("listadoDocumentacionComunidad", "Notasinformativas", "notasinformativas/list");
+                $('#listadoDocumentacionComunidad').addClass('no-clicable');
+                CoreUI.tableData.render("listadoDocumentacionComunidad", "documentacioncomunidad", `comunidad/${id}/documentacioncomunidad`);
         }    
     },
 

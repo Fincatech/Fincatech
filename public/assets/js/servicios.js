@@ -67,11 +67,12 @@ let serviciosCore = {
     },
 
     /** Añade una fila con la información del servicio a la tabla de servicios */
-    addServiceToTable: function (servicioData, idServicioComunidad)
+    addServiceToTable: function (servicioData, idServicioComunidad, fullInfo = false)
     {
         var checked = (servicioData.contratado == 1 ? ' checked="checked" ' : '');
-
-        var html = `
+        if(fullInfo)
+        {
+            var html = `
             <tr class="dataServicioContratado" data-idservicio="${servicioData.id}" data-idserviciocomunidad="${idServicioComunidad}">
                 <td class="mb-0 pb-0">
                     <div class="form-check">
@@ -92,9 +93,24 @@ let serviciosCore = {
             </tr>
         `;
         $('body .form-servicioscontratados table tbody').append(html);
+        }else{
+
+            var iconoEstadoServicio = (servicioData.contratado == 0 || typeof servicioData.contratado === 'undefined' ? '<i class="bi bi-x-circle text-danger" style="font-size:21px;"></i>' : '<i class="bi bi-check-circle text-success" style="font-size:21px;"></i>');
+            var html = `
+            <tr>
+                <td class="mb-0 pb-0">
+                        <label class="form-check-label">${servicioData.nombre}</label>
+                </td>
+                <td class="mb-0 pb-0 text-center">${iconoEstadoServicio}</td>
+            </tr>
+        `;     
+            $('body .form-servicioscontratados-info table tbody').append(html);      
+        }
+
+        
     },
 
-    /**
+    /** FIXME: Hay que modificar la lógica de este método y hacerla más legible, eficiente y utilizando good practises
      * Carga los datos del listado de comunidades en la tabla listadoComunidades
      */
     renderServicios: async function()
@@ -152,7 +168,7 @@ let serviciosCore = {
                             {
                                 idServicioComunidad = responseData[nombreEntidad][x].idserviciocomunidad;
                             }
-                            serviciosCore.addServiceToTable(responseData[nombreEntidad][x], idServicioComunidad);
+                            serviciosCore.addServiceToTable(responseData[nombreEntidad][x], idServicioComunidad, true);
                         }
 
                     }); 
@@ -161,10 +177,31 @@ let serviciosCore = {
                 break;
 
             //  Si es admin de fincas recuperamos el listado de servicios contratados por una comunidad
-            case 'ADMINFINCAS':
-                //  Recuperamos los datos del modelo y pintamos los valores,
-                //  a tomar por culo
-                    console.log('TODO: Adminfincas servicios contratados');
+            default:
+                //  Recuperamos los datos del modelo y pintamos los valores
+                if(typeof core.modelId === 'undefined' || core.modelId === '')
+                    return;
+
+                endpointServicios = `comunidad/${core.modelId}/servicioscontratados`;
+                console.log(endpointServicios);
+                nombreEntidad = 'comunidadservicioscontratados';
+
+                await apiFincatech.get(endpointServicios).then(async (data)=>
+                {
+                    result = JSON.parse(data);
+                    responseStatus = result.status;
+                    responseData = result.data.Comunidad[0];
+
+                    $('body .form-servicioscontratados-info table tbody').html('');
+                    //  Recorremos todos los servicios devueltos por el sistema
+                    
+                    for(x = 0; x < responseData[nombreEntidad].length; x++ )
+                    {
+                        var idServicioComunidad = '';
+                        serviciosCore.addServiceToTable(responseData[nombreEntidad][x], null, false);
+                    }
+
+                });                 
                 break;
         }
 
@@ -203,5 +240,5 @@ let serviciosCore = {
 }
 
 $(()=>{
-    serviciosCore.init();
+   serviciosCore.init();
 });

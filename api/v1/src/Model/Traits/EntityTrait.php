@@ -135,7 +135,7 @@ trait EntityTrait{
                                from 
                                    " . $relacion->table . " rel, " . $this->mainEntity . " pri
                                where 
-                                   pri." . $relacion->sourceColumn . " = rel." . $relacion->targetColumn;
+                                   pri." . $relacion->sourceColumn . "= rel." . $relacion->targetColumn;
 
                                //  Tenemos que acotar la búsqueda al campo de la relación principal                                
                                $relationQuery .= " and pri." . $relacion->sourceColumn . " = ";
@@ -148,10 +148,10 @@ trait EntityTrait{
                                from 
                                " . $relacion->table . " relacionada, " . $this->mainEntity . " principal
                                where 
-                                   principal." . $relacion->targetColumn . " = relacionada." . $relacion->sourceColumn;                            
+                                   principal." . $relacion->targetColumn . "= relacionada." . $relacion->sourceColumn;                            
 
                                //  Tenemos que acotar la búsqueda al campo de la relación principal
-                               $relationQuery .= " and principal." . $relacion->targetColumn . " = ";   
+                               $relationQuery .= " and principal." . $relacion->targetColumn . "= ";   
                                break;
                            case RELACION_INVERSA:
                                //  INVERSA
@@ -163,7 +163,7 @@ trait EntityTrait{
                                     from 
                                         " . $relacion->table . " rel
                                     where 
-                                        rel." . $relacion->targetColumn . " = " . $this->entityData[$this->mainEntity][$x][$relacion->sourceColumn];
+                                        rel." . $relacion->targetColumn . "= " . $this->entityData[$this->mainEntity][$x][$relacion->sourceColumn];
                                }
 
                                break;
@@ -177,7 +177,7 @@ trait EntityTrait{
                                     from 
                                         " . $relacion->table . " rel
                                     where 
-                                        rel." . $relacion->targetColumn . " = " . $this->entityData[$this->mainEntity][$x][$relacion->sourceColumn];
+                                        rel." . $relacion->targetColumn . "= " . $this->entityData[$this->mainEntity][$x][$relacion->sourceColumn];
                                 }
                                 break;
                        }

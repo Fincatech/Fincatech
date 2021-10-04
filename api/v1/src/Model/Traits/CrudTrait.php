@@ -284,7 +284,6 @@ trait CrudTrait{
                 $this->queryToExecute .= " limit " . $params['start'] . "," . $params['length'];
 
         // die($this->queryToExecute);
-
         $this->execute(true,false);
 
         $this->entityData['total'] = $this->getTotalRows("select * from " . $this->mainEntity . " ");

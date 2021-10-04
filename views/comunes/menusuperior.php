@@ -13,6 +13,8 @@
         </div>
     </form>
 
+    <span class="titulo titulo-modulo d-sm-inline-block" style="min-width: fit-content;"></span>
+
     <?php endif; ?>
 
     <div class="navbar-collapse collapse">

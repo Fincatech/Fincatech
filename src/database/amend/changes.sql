@@ -1,14 +1,14 @@
-ALTER TABLE `fincatech`.`spa` 
+ALTER TABLE `spa` 
 CHANGE COLUMN `codigopostal` `codpostal` VARCHAR(5) NULL DEFAULT NULL ;
 
-ALTER TABLE `fincatech`.`usuario` 
+ALTER TABLE `usuario` 
 ADD COLUMN `password` VARCHAR(40) NULL AFTER `rolid`;
 
 ####### 23/09/2021
 
 
 
-CREATE TABLE `fincatech`.`comunidadempresa` (
+CREATE TABLE `comunidadempresa` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `idcomunidad` INT(11) NULL,
   `idempresa` INT(11) NULL,
@@ -39,21 +39,21 @@ VIEW `view_empresascomunidad` AS
         LEFT JOIN `comunidad` `c` ON ((`ce`.`idcomunidad` = `c`.`id`)))
         LEFT JOIN `empresa` `e` ON ((`e`.`id` = `ce`.`idempresa`)))
 
-ALTER TABLE `fincatech`.`informevaloracionseguimiento` 
+ALTER TABLE `informevaloracionseguimiento` 
 ADD COLUMN `usercreate` INT(11) NULL AFTER `estado`;
 
-ALTER TABLE `fincatech`.`tipopuestoempleado` 
+ALTER TABLE `tipopuestoempleado` 
 ADD COLUMN `usercreate` INT(11) NULL AFTER `nombre`;
 
-ALTER TABLE `fincatech`.`tiposinstalacion` 
+ALTER TABLE `tiposinstalacion` 
 ADD COLUMN `usercreate` INT(11) NULL AFTER `nombre`;
 
-ALTER TABLE `fincatech`.`usuario` 
+ALTER TABLE `usuario` 
 ADD COLUMN `movil` VARCHAR(20) NULL AFTER `telefono`;
 
 # TODO: 24092021
 
-CREATE TABLE `fincatech`.`dpd` (
+CREATE TABLE `dpd` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `idcomunidad` int(11) DEFAULT NULL,
   `consulta` text COLLATE utf8mb4_spanish2_ci,
@@ -64,16 +64,16 @@ CREATE TABLE `fincatech`.`dpd` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
 
-ALTER TABLE `fincatech`.`dpd` 
+ALTER TABLE `dpd` 
 ADD COLUMN `fecharesolucion` DATETIME NULL AFTER `create`;
 
-ALTER TABLE `fincatech`.`dpd` 
+ALTER TABLE `dpd` 
 ADD COLUMN `idfichero` INT(11) NULL AFTER `fecharesolucion`;
 
-ALTER TABLE `fincatech`.`ficheroscomunes` 
+ALTER TABLE `ficheroscomunes` 
 ADD COLUMN `nombrestorage` VARCHAR(255) NULL AFTER `nombre`;
 
-CREATE TABLE `fincatech`.`ficheroshistorico` (
+CREATE TABLE `ficheroshistorico` (
   `id` INT NOT NULL,
   `entidadorigen` VARCHAR(70) NULL,
   `idoriginal` INT(11) NULL,
@@ -86,60 +86,60 @@ CREATE TABLE `fincatech`.`ficheroshistorico` (
   `usercreate` INT(11) NULL,
   PRIMARY KEY (`id`));
 
-ALTER TABLE `fincatech`.`requerimientos` 
-RENAME TO  `fincatech`.`requerimiento` ;
+ALTER TABLE `requerimientos` 
+RENAME TO  `requerimiento` ;
 
-CREATE TABLE `fincatech`.`requerimientotipo` (
+CREATE TABLE `requerimientotipo` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(100) NULL,
   `created` DATETIME NULL,
   `usercreate` INT(11) NULL,
   PRIMARY KEY (`id`));
 
-ALTER TABLE `fincatech`.`informevaloracionseguimiento` 
+ALTER TABLE `informevaloracionseguimiento` 
 ADD COLUMN `idusuario` INT(11) NULL AFTER `idfichero`,
 CHANGE COLUMN `estado` `estado` VARCHAR(1) NULL DEFAULT NULL AFTER `idusuario`;
 
-INSERT INTO `fincatech`.`requerimientotipo` (`nombre`, `created`, `usercreate`) VALUES ('Documentación básica', '2021-01-01', '1');
-INSERT INTO `fincatech`.`requerimientotipo` (`nombre`, `created`, `usercreate`) VALUES ('Cámaras de seguridad', '2021-01-01', '1');
-INSERT INTO `fincatech`.`requerimientotipo` (`nombre`, `created`, `usercreate`) VALUES ('Contratos de cesión a terceros', '2021-01-01', '1');
-INSERT INTO `fincatech`.`requerimientotipo` (`nombre`, `created`, `usercreate`) VALUES ('PRL - Empresa', '2021-01-01', '1');
-INSERT INTO `fincatech`.`requerimientotipo` (`nombre`, `created`, `usercreate`) VALUES ('PRL - Empleado', '2021-01-01', '1');
-INSERT INTO `fincatech`.`requerimientotipo` (`nombre`, `created`, `usercreate`) VALUES ('Comunidad', '2021-01-01', '1');
+INSERT INTO `requerimientotipo` (`nombre`, `created`, `usercreate`) VALUES ('Documentación básica', '2021-01-01', '1');
+INSERT INTO `requerimientotipo` (`nombre`, `created`, `usercreate`) VALUES ('Cámaras de seguridad', '2021-01-01', '1');
+INSERT INTO `requerimientotipo` (`nombre`, `created`, `usercreate`) VALUES ('Contratos de cesión a terceros', '2021-01-01', '1');
+INSERT INTO `requerimientotipo` (`nombre`, `created`, `usercreate`) VALUES ('PRL - Empresa', '2021-01-01', '1');
+INSERT INTO `requerimientotipo` (`nombre`, `created`, `usercreate`) VALUES ('PRL - Empleado', '2021-01-01', '1');
+INSERT INTO `requerimientotipo` (`nombre`, `created`, `usercreate`) VALUES ('Comunidad', '2021-01-01', '1');
 
-ALTER TABLE `fincatech`.`requerimiento` 
+ALTER TABLE `requerimiento` 
 ADD COLUMN `idrequerimientotipo` INT(11) NULL AFTER `tiempocaducidad`;
 
-UPDATE `fincatech`.`requerimiento` SET `idrequerimientotipo` = '1', `idcomunidad` = NULL WHERE (`id` = '1');
-UPDATE `fincatech`.`requerimiento` SET `idrequerimientotipo` = '1' WHERE (`id` = '2');
-UPDATE `fincatech`.`requerimiento` SET `idrequerimientotipo` = '1' WHERE (`id` = '3');
-UPDATE `fincatech`.`requerimiento` SET `idrequerimientotipo` = '1' WHERE (`id` = '4');
-UPDATE `fincatech`.`requerimiento` SET `idrequerimientotipo` = '1' WHERE (`id` = '5');
-UPDATE `fincatech`.`requerimiento` SET `tipo` = 'COMEM' WHERE (`id` = '5');
+UPDATE `requerimiento` SET `idrequerimientotipo` = '1', `idcomunidad` = NULL WHERE (`id` = '1');
+UPDATE `requerimiento` SET `idrequerimientotipo` = '1' WHERE (`id` = '2');
+UPDATE `requerimiento` SET `idrequerimientotipo` = '1' WHERE (`id` = '3');
+UPDATE `requerimiento` SET `idrequerimientotipo` = '1' WHERE (`id` = '4');
+UPDATE `requerimiento` SET `idrequerimientotipo` = '1' WHERE (`id` = '5');
+UPDATE `requerimiento` SET `tipo` = 'COMEM' WHERE (`id` = '5');
 
-ALTER TABLE `fincatech`.`requerimiento` 
+ALTER TABLE `requerimiento` 
 DROP COLUMN `tiempocaducidad`,
 ADD COLUMN `sujetorevision` TINYINT(1) NULL AFTER `caduca`,
 ADD COLUMN `requieredescarga` TINYINT(1) NULL AFTER `sujetorevision`;
 
-ALTER TABLE `fincatech`.`requerimiento` 
+ALTER TABLE `requerimiento` 
 CHANGE COLUMN `caduca` `caduca` TINYINT(1) NULL DEFAULT '0' ;
 
-ALTER TABLE `fincatech`.`comunidadempresa` 
+ALTER TABLE `comunidadempresa` 
 ADD COLUMN `usercreate` INT(11) NULL AFTER `created`;
 
 ##########################################################################################
 ## 27/09/2021
 
-ALTER TABLE `fincatech`.`empleado` 
+ALTER TABLE `empleado` 
 ADD COLUMN `localidad` VARCHAR(100) NULL AFTER `idlocalidad`,
 ADD COLUMN `provinciaid` INT(11) NULL AFTER `localidad`;
 
-ALTER TABLE `fincatech`.`empleado` 
+ALTER TABLE `empleado` 
 CHANGE COLUMN `codigopostal` `codpostal` VARCHAR(5) NULL DEFAULT NULL ;
 
 
-ALTER TABLE `fincatech`.`empleado` 
+ALTER TABLE `empleado` 
 ADD COLUMN `telefono` VARCHAR(20) NULL AFTER `email`;
 
 CREATE 
@@ -164,23 +164,23 @@ VIEW `view_empleadosempresa` AS
         LEFT JOIN `empresa` `emp` ON ((`emp`.`id` = `e`.`idempresa`)))
         LEFT JOIN `tipopuestoempleado` `tpe` ON ((`tpe`.`id` = `epl`.`idtipopuestoempleado`)));
 
-ALTER TABLE `fincatech`.`empleado` 
+ALTER TABLE `empleado` 
 CHANGE COLUMN `tipodocumento` `tipodocumento` VARCHAR(1) NULL DEFAULT 'N' ;        
 
-ALTER TABLE `fincatech`.`empleadoempresa` 
+ALTER TABLE `empleadoempresa` 
 CHANGE COLUMN `fechaalta` `fechaalta` DATETIME NULL DEFAULT NULL ,
 CHANGE COLUMN `fechabaja` `fechabaja` DATETIME NULL DEFAULT NULL ;
 
 ############ 28092021
 
-ALTER TABLE `fincatech`.`empresa` 
+ALTER TABLE `empresa` 
 ADD COLUMN `estado` VARCHAR(1) NULL AFTER `codpostal`,
 CHANGE COLUMN `codigopostal` `codpostal` VARCHAR(5) NULL DEFAULT NULL ;
 
-ALTER TABLE `fincatech`.`usuario` 
+ALTER TABLE `usuario` 
 ADD COLUMN `idspa` INT(11) NULL AFTER `estado`;
 
-CREATE TABLE `fincatech`.`tiposservicios` (
+CREATE TABLE `tiposservicios` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(40) NULL,
   `precio` FLOAT NULL,
@@ -190,15 +190,15 @@ CREATE TABLE `fincatech`.`tiposservicios` (
   `usercreate` INT(11) NULL,
   PRIMARY KEY (`id`));
 
-INSERT INTO `fincatech`.`tiposservicios` (`nombre`) VALUES ('CAE');
-INSERT INTO `fincatech`.`tiposservicios` (`nombre`) VALUES ('RGPD');
-INSERT INTO `fincatech`.`tiposservicios` (`nombre`) VALUES ('PRL');
-INSERT INTO `fincatech`.`tiposservicios` (`nombre`) VALUES ('Instalaciones');
-INSERT INTO `fincatech`.`tiposservicios` (`nombre`) VALUES ('Certificados Digitales');
+INSERT INTO `tiposservicios` (`nombre`) VALUES ('CAE');
+INSERT INTO `tiposservicios` (`nombre`) VALUES ('RGPD');
+INSERT INTO `tiposservicios` (`nombre`) VALUES ('PRL');
+INSERT INTO `tiposservicios` (`nombre`) VALUES ('Instalaciones');
+INSERT INTO `tiposservicios` (`nombre`) VALUES ('Certificados Digitales');
 
 update fincatech.tiposservicios set precio = 0, preciocomunidad = 0, retorno = 0;
 
-CREATE TABLE `fincatech`.`comunidadservicioscontratados` (
+CREATE TABLE `comunidadservicioscontratados` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `idcomunidad` INT(11) NULL,
   `idservicio` INT(11) NULL,
@@ -210,10 +210,10 @@ CREATE TABLE `fincatech`.`comunidadservicioscontratados` (
   PRIMARY KEY (`id`));
 
 #####################
-ALTER TABLE `fincatech`.`comunidad` 
+ALTER TABLE `comunidad` 
 ADD COLUMN `idspa` INT(11) NULL AFTER `cif`;
 
-ALTER TABLE `fincatech`.`usuario` 
+ALTER TABLE `usuario` 
 DROP COLUMN `idspa`;
 
 #########
@@ -237,31 +237,31 @@ CREATE OR REPLACE VIEW `view_comunidadservicioscontratados` AS
         (`tiposservicios` `s`
         LEFT JOIN `comunidadservicioscontratados` `cs` ON ((`cs`.`idservicio` = `s`.`id`)))
 
-INSERT INTO `fincatech`.`comunidadservicioscontratados` (`idcomunidad`, `idservicio`, `precio`, `preciocomunidad`, `retorno`, `usercreate`, `created`) VALUES ('22', '1', '0', '0', '0', '1', '2021-01-01');
-INSERT INTO `fincatech`.`comunidadservicioscontratados` (`idcomunidad`, `idservicio`, `precio`, `preciocomunidad`, `retorno`, `usercreate`, `created`) VALUES ('22', '2', '0', '0', '0', '1', '2021-01-01');
-INSERT INTO `fincatech`.`comunidadservicioscontratados` (`idcomunidad`, `idservicio`, `precio`, `preciocomunidad`, `retorno`, `usercreate`, `created`) VALUES ('22', '3', '0', '0', '0', '1', '2021-01-01');
-INSERT INTO `fincatech`.`comunidadservicioscontratados` (`idcomunidad`, `idservicio`, `precio`, `preciocomunidad`, `retorno`, `usercreate`, `created`) VALUES ('22', '4', '0', '0', '0', '1', '2021-01-01');
-INSERT INTO `fincatech`.`comunidadservicioscontratados` (`idcomunidad`, `idservicio`, `precio`, `preciocomunidad`, `retorno`, `usercreate`, `created`) VALUES ('22', '5', '0', '0', '0', '1', '2021-01-01');
+INSERT INTO `comunidadservicioscontratados` (`idcomunidad`, `idservicio`, `precio`, `preciocomunidad`, `retorno`, `usercreate`, `created`) VALUES ('22', '1', '0', '0', '0', '1', '2021-01-01');
+INSERT INTO `comunidadservicioscontratados` (`idcomunidad`, `idservicio`, `precio`, `preciocomunidad`, `retorno`, `usercreate`, `created`) VALUES ('22', '2', '0', '0', '0', '1', '2021-01-01');
+INSERT INTO `comunidadservicioscontratados` (`idcomunidad`, `idservicio`, `precio`, `preciocomunidad`, `retorno`, `usercreate`, `created`) VALUES ('22', '3', '0', '0', '0', '1', '2021-01-01');
+INSERT INTO `comunidadservicioscontratados` (`idcomunidad`, `idservicio`, `precio`, `preciocomunidad`, `retorno`, `usercreate`, `created`) VALUES ('22', '4', '0', '0', '0', '1', '2021-01-01');
+INSERT INTO `comunidadservicioscontratados` (`idcomunidad`, `idservicio`, `precio`, `preciocomunidad`, `retorno`, `usercreate`, `created`) VALUES ('22', '5', '0', '0', '0', '1', '2021-01-01');
 
-ALTER TABLE `fincatech`.`comunidadservicioscontratados` 
+ALTER TABLE `comunidadservicioscontratados` 
 ADD COLUMN `contratado` TINYINT(1) NULL DEFAULT 0 AFTER `preciocomunidad`;
    
 ####
 
-ALTER TABLE `fincatech`.`empresa` 
+ALTER TABLE `empresa` 
 ADD COLUMN `idtipoempresa` INT(11) NULL AFTER `codpostal`;
 
-CREATE TABLE `fincatech`.`empresatipo` (
+CREATE TABLE `empresatipo` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(20) NULL,
   PRIMARY KEY (`id`));
 
-INSERT INTO `fincatech`.`empresatipo` (`nombre`) VALUES ('Empresa');
-INSERT INTO `fincatech`.`empresatipo` (`nombre`) VALUES ('Autónomo');
+INSERT INTO `empresatipo` (`nombre`) VALUES ('Empresa');
+INSERT INTO `empresatipo` (`nombre`) VALUES ('Autónomo');
 
 #########
 
-ALTER TABLE `fincatech`.`comunidad` 
+ALTER TABLE `comunidad` 
 ADD COLUMN `ibancomunidad` VARCHAR(30) NULL AFTER `cif`;
 
 CREATE OR REPLACE VIEW `view_comunidadesempresa` AS
@@ -318,22 +318,58 @@ CREATE OR REPLACE VIEW `view_documentoscaeempresa` AS
         (`r`.`idrequerimientotipo` = 4)
     ORDER BY `r`.`nombre`
 
-ALTER TABLE `fincatech`.`comunidadrequerimiento` 
+ALTER TABLE `comunidadrequerimiento` 
 DROP FOREIGN KEY `FK_COMREQ_ESTADO`;
-ALTER TABLE `fincatech`.`comunidadrequerimiento` 
+
+ALTER TABLE `comunidadrequerimiento` 
 ADD COLUMN `estado` VARCHAR(2) NULL AFTER `fechacaducidad`,
 CHANGE COLUMN `idrequerimiento` `idtiporequerimiento` INT(11) NOT NULL ,
 CHANGE COLUMN `idestado` `idestado` INT(11) NULL ;
-ALTER TABLE `fincatech`.`comunidadrequerimiento` 
+
+ALTER TABLE `comunidadrequerimiento` 
 ADD CONSTRAINT `FK_COMREQ_ESTADO`
   FOREIGN KEY (`idestado`)
-  REFERENCES `fincatech`.`documentoestado` (`id`)
+  REFERENCES `documentoestado` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
-ALTER TABLE `fincatech`.`comunidadrequerimiento` 
+ALTER TABLE `comunidadrequerimiento` 
 CHANGE COLUMN `idtiporequerimiento` `idrequerimiento` INT(11) NOT NULL ;
 
-ALTER TABLE `fincatech`.`empleadorequerimiento` 
+ALTER TABLE `empleadorequerimiento` 
 ADD COLUMN `idrequerimiento` INT(11) NULL AFTER `idempleado`;
 
+######## 04/10/2021
+CREATE  OR REPLACE VIEW `view_documentoscomunidad` AS
+    SELECT 
+        `cr`.`id` AS `idrelacion`,
+        `r`.`nombre` AS `requerimiento`,
+        `r`.`caduca` AS `caduca`,
+        `r`.`sujetorevision` AS `sujetorevision`,
+        `r`.`requieredescarga` AS `requieredescarga`,
+        `r`.`activado` AS `activado`,
+        `r`.`id` AS `idrequerimiento`,
+        `r`.`idrequerimientotipo` AS `idrequerimientotipo`,
+        `cr`.`idcomunidad` AS `idcomunidad`,
+        `cr`.`idestado` AS `idestado`,
+        `cr`.`created` AS `created`,
+        `cr`.`updated` AS `fechaultimaactuacion`,
+        `r`.`nombre` AS `nombre`,
+        `fr`.`id` AS `idficherorequerimiento`,
+        `fr`.`nombre` AS `nombreficherorequerimiento`,
+        `fr`.`nombrestorage` AS `storageficherorequerimiento`,
+        `fr`.`ubicacion` AS `ubicacionficherorequerimiento`,
+        `fr`.`created` AS `fechasubida`,
+        `f`.`id` AS `idfichero`,
+        `f`.`nombre` AS `nombrefichero`,
+        `f`.`nombrestorage` AS `storagefichero`,
+        `f`.`ubicacion` AS `ubicacionfichero`
+    FROM
+        (((`requerimiento` `r`
+        LEFT JOIN `comunidadrequerimiento` `cr` ON (((`cr`.`idrequerimiento` = `r`.`id`)
+            AND (`cr`.`idcomunidad` = IDEMPRESAREQUERIMIENTO()))))
+        LEFT JOIN `ficheroscomunes` `f` ON ((`f`.`id` = `r`.`idfichero`)))
+        LEFT JOIN `ficheroscomunes` `fr` ON ((`fr`.`id` = `cr`.`idfichero`)))
+    WHERE
+        (`r`.`idrequerimientotipo` = 6)
+    ORDER BY `r`.`nombre`;
