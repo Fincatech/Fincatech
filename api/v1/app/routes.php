@@ -332,11 +332,11 @@ return function (App $app) {
         $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
-        $frontController->Init('Comunidad');
+        $frontController->Init('Empleado');
 
         $id = $params['id'];
 
-        $response->getBody()->write( $frontController->context->ListServiciosContratadosByComunidadId($id) );
+        $response->getBody()->write( $frontController->context->ListEmpleadosByComunidadId($id) );
 
         return $response;  
 

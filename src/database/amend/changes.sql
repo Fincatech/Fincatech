@@ -380,3 +380,135 @@ VIEW `view_documentoscomunidad` AS
         (`r`.`idrequerimientotipo` = 6)
     ORDER BY `r`.`nombre`;
 
+######## 05102021 14:09
+
+CREATE OR REPLACE
+VIEW `view_empleadosempresa` AS
+    SELECT 
+        `e`.`id` AS `id`,
+        `e`.`idempleado` AS `idempleado`,
+        `e`.`idempresa` AS `idempresa`,
+        `e`.`idcomunidad` AS `idcomunidad`,
+        `epl`.`nombre` AS `nombre`,
+        `epl`.`numerodocumento` AS `numerodocumento`,
+        `epl`.`localidad` AS `localidad`,
+        `epl`.`email` AS `email`,
+        `epl`.`telefono` AS `telefono`,
+        `epl`.`estado` AS `estado`,
+        `tpe`.`nombre` AS `puesto`,
+        `emp`.`razonsocial` AS `razonsocial`,
+        DATE_FORMAT(`e`.`fechaalta`, '%d-%m-%Y') AS `fechaalta`,
+        DATE_FORMAT(`e`.`fechabaja`, '%d-%m-%Y') AS `fechabaja`,
+        `epl`.`created` AS `created`,
+        'Externo' AS `tipoempleado`
+    FROM
+        (((`empleadoempresa` `e`
+        LEFT JOIN `empleado` `epl` ON ((`epl`.`id` = `e`.`idempleado`)))
+        LEFT JOIN `empresa` `emp` ON ((`emp`.`id` = `e`.`idempresa`)))
+        LEFT JOIN `tipopuestoempleado` `tpe` ON ((`tpe`.`id` = `epl`.`idtipopuestoempleado`)));
+
+ALTER TABLE `fincatech`.`empleadoempresa` 
+DROP FOREIGN KEY `FK_EMPLEMPR_EMPRESA`,
+DROP FOREIGN KEY `FK_EMPLEMPR_EMPLEADO`,
+DROP FOREIGN KEY `FK_EMPLEMPR_COMUNIDAD`;
+ALTER TABLE `fincatech`.`empleadoempresa` 
+DROP INDEX `FK_EMPLEMPR_EMPLEADO_idx` ,
+DROP INDEX `FK_EMPLEMPR_COMUNIDAD_idx` ,
+DROP INDEX `FK_EMPLEMPR_EMPRESA_idx` ;
+;
+
+ALTER TABLE `fincatech`.`empleadoempresa` 
+CHANGE COLUMN `fechaalta` `fechaalta` DATE NULL DEFAULT NULL ,
+CHANGE COLUMN `fechabaja` `fechabaja` DATE NULL DEFAULT NULL ;
+
+ALTER TABLE `fincatech`.`empleadocomunidad` 
+CHANGE COLUMN `fechaalta` `fechaalta` DATE NULL DEFAULT NULL ,
+CHANGE COLUMN `fechabaja` `fechabaja` DATE NULL DEFAULT NULL ;
+
+ALTER TABLE `fincatech`.`empresa` 
+CHANGE COLUMN `razonsocial` `razonsocial` VARCHAR(100) NOT NULL ;
+
+ALTER TABLE `fincatech`.`comunidad` 
+CHANGE COLUMN `localidad` `localidad` VARCHAR(100) NULL DEFAULT NULL ;
+
+ALTER TABLE `fincatech`.`comunidad` 
+CHANGE COLUMN `localidadid` `idlocalidad` INT(11) NULL DEFAULT NULL ;
+
+ALTER TABLE `fincatech`.`comunidad` 
+CHANGE COLUMN `cif` `cif` VARCHAR(20) NULL DEFAULT NULL ;
+
+ALTER TABLE `fincatech`.`empresa` 
+CHANGE COLUMN `razonsocial` `razonsocial` VARCHAR(100) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_spanish_ci' NOT NULL ;
+
+ALTER TABLE `fincatech`.`comunidad` 
+CHANGE COLUMN `nombre` `nombre` VARCHAR(100) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_spanish_ci' NOT NULL ;
+
+USE `fincatech`;
+CREATE OR REPLACE VIEW `view_empleadoscomunidad` AS
+    SELECT 
+        `e`.`id` AS `id`,
+        `e`.`idempleado` AS `idempleado`,
+        null as idempresa,
+        `e`.`idcomunidad` AS `idcomunidad`,
+        `epl`.`nombre` AS `nombre`,
+        `epl`.`numerodocumento` AS `numerodocumento`,
+        `epl`.`localidad` AS `localidad`,
+        `epl`.`email` AS `email`,
+        `epl`.`telefono` AS `telefono`,
+        `epl`.`estado` AS `estado`,
+        `tpe`.`nombre` AS `puesto`,
+        `com`.`nombre` AS `razonsocial`,
+        DATE_FORMAT(`e`.`fechaalta`, '%d-%m-%Y') AS `fechaalta`,
+        DATE_FORMAT(`e`.`fechabaja`, '%d-%m-%Y') AS `fechabaja`,
+        `epl`.`created` AS `created`,
+        'Comunidad' AS `tipoempleado`
+    FROM
+        (((`empleadocomunidad` `e`
+        LEFT JOIN `empleado` `epl` ON ((`epl`.`id` = `e`.`idempleado`)))
+        LEFT JOIN `comunidad` `com` ON ((`com`.`id` = `e`.`idcomunidad`)))
+        LEFT JOIN `tipopuestoempleado` `tpe` ON ((`tpe`.`id` = `epl`.`idtipopuestoempleado`)));
+
+ALTER TABLE `fincatech`.`empleadorequerimiento` 
+ADD COLUMN `fechacaducidad` DATE NULL AFTER `fechadescarga`,
+ADD COLUMN `idestado` INT(11) NULL AFTER `idfichero`,
+ADD COLUMN `observaciones` VARCHAR(255) NULL AFTER `idestado`;
+
+CREATE OR REPLACE 
+VIEW `view_documentosempleado` AS
+    SELECT 
+        `eplr`.`id` AS `idrelacion`,
+        `r`.`nombre` AS `requerimiento`,
+        `r`.`caduca` AS `caduca`,
+        `r`.`sujetorevision` AS `sujetorevision`,
+        `r`.`requieredescarga` AS `requieredescarga`,
+        `r`.`activado` AS `activado`,
+        `r`.`tipo` AS `tiporequerimiento`,
+        `r`.`id` AS `idrequerimiento`,
+        `r`.`idrequerimientotipo` AS `idrequerimientotipo`,
+        IDEMPRESAREQUERIMIENTO() AS `idempleado`,
+        `eplr`.`idestado` AS `idestado`,
+        `eplr`.`created` AS `created`,
+        `eplr`.`updated` AS `fechaultimaactuacion`,
+        `eplr`.`observaciones` AS `observaciones`,
+        `eplr`.`fechadescarga` AS `fechadescarga`,
+        `eplr`.`fechacaducidad` AS `fechacaducidad`,
+        eplr.estado,
+        `r`.`nombre` AS `nombre`,
+        `fr`.`id` AS `idficherorequerimiento`,
+        `fr`.`nombre` AS `nombreficherorequerimiento`,
+        `fr`.`nombrestorage` AS `storageficherorequerimiento`,
+        `fr`.`ubicacion` AS `ubicacionficherorequerimiento`,
+        `fr`.`created` AS `fechasubida`,
+        `f`.`id` AS `idfichero`,
+        `f`.`nombre` AS `nombrefichero`,
+        `f`.`nombrestorage` AS `storagefichero`,
+        `f`.`ubicacion` AS `ubicacionfichero`
+    FROM
+        (((`requerimiento` `r`
+        LEFT JOIN `empleadorequerimiento` `eplr` ON (((`eplr`.`idrequerimiento` = `r`.`id`)
+            AND (`eplr`.`idempleado` = IDEMPRESAREQUERIMIENTO()))))
+        LEFT JOIN `ficheroscomunes` `f` ON ((`f`.`id` = `r`.`idfichero`)))
+        LEFT JOIN `ficheroscomunes` `fr` ON ((`fr`.`id` = `eplr`.`idfichero`)))
+    WHERE
+        (`r`.`idrequerimientotipo` = 5)
+    ORDER BY `r`.`nombre`;

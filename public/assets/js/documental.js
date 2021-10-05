@@ -116,12 +116,12 @@ let documentalCore = {
 
                 if($('body #listadoDocumentacionComunidad').length)
                 {
-                    window['listadoDocumentacionComunidad'].ajax.reload();
+                    window['tablelistadoDocumentacionComunidad'].ajax.reload();
                     // CoreUI.tableData.tableEventsClick('listadoDocumentacionComunidad');
                 }
 
                 if($('body #listadoEmpresa').length)
-                    window['listadoEmpresa'].ajax.reload();
+                    window['tablelistadoEmpresa'].ajax.reload();
           
 
             }else{

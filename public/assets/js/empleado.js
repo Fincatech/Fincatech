@@ -13,8 +13,6 @@ let empleadoCore = {
         {
             empleadoCore.renderTabla();
         }else{
-            
-
             // core.Files.init();
             // core.Files.Fichero.entidadId = core.modelId;        
         }
@@ -36,11 +34,26 @@ let empleadoCore = {
 
         $('body').on(core.helper.clickEventType, '.btnNuevoEmpleadoComunidad', function(evt)
         {
-            //  Llamamos al modal de nuevo empleado
-                empleadoCore.mostrarModalNuevoEmpleado();
-        });
+            //  Comprobamos si tiene spa asignado y si está editando o añadiendo
+            if(core.actionModel == 'get')
+            {
+                //  Comprobamos si tiene spa asignado
+                    if(core.Modelo.entity.Comunidad[0].idspa == '-1' || core.Modelo.entity.Comunidad[0].idspa == null)
+                    {
+                        //  Avisamos de que debe asignar el spa
+                            CoreUI.Modal.Error('Para dar de alta un empleado debe asignar primero un SPA a la comunidad', 'Comunidad sin SPA asignado', function()
+                            {
+                                Swal.close();
+                            });
+                    }else{
+                        //  Llamamos al modal de nuevo empleado
+                            empleadoCore.mostrarModalNuevoEmpleado();                        
+                    }
 
-        //  Bindeamos el botón de guardar nuevo empleado ¿?
+            }else{
+                CoreUI.Modal.Info('Para dar de alta un empleado en esta comunidad, primero debe guardarla', 'Alta de nuevo empleado');
+            }
+        });
 
     },
 
@@ -53,7 +66,8 @@ let empleadoCore = {
                 Swal.fire({
                     text: "",
                     html: resultHTML,
-                    grow:'row',
+                    grow:'false',
+                    width: '120rem',
                     showCancelButton: true,
                     showConfirmButton: true,
                     confirmButtonColor: '#3085d6',
@@ -63,8 +77,10 @@ let empleadoCore = {
                     reverseButtons: true,
                     buttonsStyling: false,
                     customClass: {
-                        confirmButton: 'btn btnSaveData btn-success shadow d-block pb-2 pt-2',
-                        cancelButton: 'btn btn-danger btnCancelSave shadow d-block pb-2 pt-2 mr-3'
+                        actions: 'text-center p-3 shadow-inset rounded-pill border-light border-2 bg-white',
+                        confirmButton: 'btn btnSaveData btn-success shadow d-block pb-2 pt-2 confirmButtonModal',
+                        cancelButton: ' btn btn-danger btnCancelSave shadow d-block pb-2 pt-2 mr-3 cancelButtonModal',
+                        popup: 'bg-transparent'
                     },                    
                     didOpen: function(e)
                     {
@@ -86,24 +102,29 @@ let empleadoCore = {
                                 });
                             }); 
 
+                            $('.swal2-container .btnSaveData').removeClass('btnSaveData');
 
-                    }                    
+
+                    },
+                    preConfirm: function(e)
+                    {
+                        if(core.Forms.Validate('formEmpleadoComunidad'))
+                        {
+                            return true;
+                        }else{
+                            //  Mostramos el mensaje de error correspondiente
+                            Swal.showValidationMessage('Debe completar todos los campos marcados como obligatorios');
+                            return false;
+                        }               
+                    }                 
                   }).then((result) => {
-                    if (result.isConfirmed) {
-                        core.Forms.mapDataToSave('formEmpleadoComunidad');
-                        core.Modelo.Insert('Empleado', core.Forms.data, false).then( ()=>{
-                            //  Recargamos el listado de empleados de la comunidad
-                                window['listadoEmpleadosComunidad'].ajax.reload();
-                        });
-                        //  Llamamos al endpoint de eliminar
-                        // apiFincatech.delete("empleado", id).then((result) =>{
-                        //     Swal.fire(
-                        //         'Empleado eliminado correctamente',
-                        //         '',
-                        //         'success'
-                        //       );
-                        //       $('#listadoEmpleado').DataTable().ajax.reload();
-                        // });
+                    if (result.isConfirmed) 
+                    {
+                            core.Forms.mapDataToSave('formEmpleadoComunidad');
+                            core.Modelo.Insert('empleado', core.Forms.data, false).then( ()=>{
+                                //  Recargamos el listado de empleados de la comunidad
+                                    window['listadoEmpleadosComunidad'].ajax.reload();
+                            });
                     }
                 }); 
             });    
@@ -149,9 +170,7 @@ let empleadoCore = {
             //  Cargamos el listado de comunidades
             CoreUI.tableData.init();
 
-            // //  Fecha de creación
-            //     var html = 'data:created$';
-            //     CoreUI.tableData.addColumn(null, "Fecha", html, 'text-center');
+            CoreUI.tableData.addColumnRow('listadoEmpleado', 'documentacionprl');
 
             //  Nombre y apellidos
             CoreUI.tableData.addColumn('listadoEmpleado', "nombre","Nombre", null, 'text-left');
@@ -214,16 +233,42 @@ let empleadoCore = {
 
     renderTablaEmpleadosComunidad: async function(idcomunidad)
     {
-        if($('#listadoEmpleadosComunidad').length)
+        if($('#listadoEmpleadosComunidad').length &&
+            typeof idcomunidad !== 'undefined' &&
+            idcomunidad != '' && idcomunidad != null)
         {
 
-            CoreUI.tableData.init();
+                CoreUI.tableData.init();
+
+                CoreUI.tableData.addColumnRow('listadoEmpleadosComunidad', 'documentacionprl');
+
+            //  Tipo
+                CoreUI.tableData.addColumn('listadoEmpleadosComunidad', function(row, type, val, meta){
+
+                    var icono = '<i class="bi bi-shop pr-2"></i>';
+                    var clase = '';
+                    if(row.tipoempleado == 'Comunidad')
+                    {
+                        icono = '<i class="bi bi-building pr-2"></i>';
+                        clase = 'text-info';
+
+                    }
+
+                    return `<span class="text-uppercase ${clase}">${icono} <span style="font-size: 12px;">${row.tipoempleado}</span></span>`;
+
+                } , "Contratación", null, 'text-center', '100px');
 
             //  Empresa
-                CoreUI.tableData.addColumn('listadoEmpleadosComunidad', "razonsocial", "Empresa", null, 'text-left');
+                CoreUI.tableData.addColumn('listadoEmpleadosComunidad', "razonsocial", "Empresa / Comunidad", null, 'text-left');
+
+            //  Nombre
+                CoreUI.tableData.addColumn('listadoEmpleadosComunidad', "nombre", "Nombre y apellidos", null, 'text-left');
 
             //  Puesto
                 CoreUI.tableData.addColumn('listadoEmpleadosComunidad', "puesto", "Puesto", null, 'text-left');
+
+            //  Email
+                CoreUI.tableData.addColumn('listadoEmpleadosComunidad', "email", "Correo electrónico", null, 'text-left');
 
             //  Fecha de alta
                 CoreUI.tableData.addColumn('listadoEmpleadosComunidad', "fechaalta", "Fecha alta", null, 'text-center', '80px');
@@ -231,11 +276,56 @@ let empleadoCore = {
             //  Fecha de baja
                 CoreUI.tableData.addColumn('listadoEmpleadosComunidad', "fechabaja", "Fecha baja", null, 'text-center', '80px');
 
-            // Estado
-                var html = 'data:estado$';
-                CoreUI.tableData.addColumn('listadoEmpleadosComunidad', null, "Estado", html, 'text-center', '90px');
+            //  Documentación completada
+                CoreUI.tableData.addColumn('listadoEmpleadosComunidad', function(row, type, val, meta){
 
-            CoreUI.tableData.render("listadoEmpleadosComunidad", "Empresasempleado", `empleado/1/empresas`, false, false, false);
+                    //  Contamos el número de documentos frente al número de documentos adjuntados
+                    var iDoc = 0;
+                    var iDocAdjuntos = 0;
+
+                    for(i = 0; i < row.documentacionprl.length; i++)
+                    {
+                        iDoc++;
+                        if(row.documentacionprl[i].idficherorequerimiento != null)
+                            iDocAdjuntos++;
+                    }
+
+                    var icono = '<i class="bi bi-x-circle text-danger" style="font-size:24px;"></i>';
+
+                    if(iDocAdjuntos == iDoc)
+                        icono = '<i class="bi bi-check2-square text-success" style="font-size:24px;"></i>';
+
+
+                    return `<p class="m-0 text-center">${icono}</p>`;
+
+                } , "DOC. ADJUNTADA", null, 'text-center');
+            //  Estado
+                var html = 'data:estado$';
+                CoreUI.tableData.addColumn('listadoEmpleadosComunidad', null, "Estado", html, 'text-center', '80px');
+
+            //  Acciones
+                CoreUI.tableData.addColumn('listadoEmpleadosComunidad', function(row, type, val, meta)
+                {
+                    var salida =  '';
+
+                    if(row.tipoempleado == 'Comunidad')
+                    {
+                        salida = `<ul class="nav justify-content-center accionesTabla">
+                                        <li class="nav-item">
+                                            <a href="${baseURL}empleado/${row.idempleado}" class="btnEditarEmpleado d-inline-block" data-id="${row.idempleado}" data-nombre="${row.nombre}"><i data-feather="edit" class="text-success img-fluid mr-2"></i></a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="javascript:void(0);" class="btnEliminarEmpleado d-inline-block" data-id="${row.idempleado}" data-nombre="${row.nombre}"><i data-feather="trash-2" class="text-danger img-fluid"></i></a>
+                                        </li>
+                                </ul>`;
+                    }
+
+                    return salida;
+
+                } , "&nbsp;", null, 'text-center', '70px');
+
+                $('#listadoEmpleadosComunidad').addClass('no-clicable');
+                CoreUI.tableData.render("listadoEmpleadosComunidad", "Empleado", `comunidad/${idcomunidad}/empleados`, false, false, false);
         }    
     
     }

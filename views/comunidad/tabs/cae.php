@@ -46,7 +46,7 @@
 
                                             <div class="card-body">
 
-                                                <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoEmpresaComunidad" id="listadoEmpresaComunidad" data-model="empresa">
+                                                <table class="table table-hover my-0 hs-tabla w-100 no-clicable" data-order='[[ 1, "asc" ]]' name="listadoEmpresaComunidad" id="listadoEmpresaComunidad" data-model="empresa">
                                                     <thead class="thead"></thead>
                                                     <tbody class="tbody"></tbody>
                                                 </table>
@@ -78,7 +78,7 @@
 
                                             <div class="card-body pt-0">
 
-                                                <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoEmpleadosComunidad" id="listadoEmpleadosComunidad" data-model="Empleado">
+                                                <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoEmpleadosComunidad" id="listadoEmpleadosComunidad" data-order='[[ 2, "asc" ]]'  data-model="Empleado">
                                                     <thead class="thead"></thead>
                                                     <tbody class="tbody"></tbody>
                                                 </table>

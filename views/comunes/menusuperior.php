@@ -1,6 +1,9 @@
 <nav class="navbar navbar-expand navbar-light navbar-bg">
+
+    <img src="<?php echo HOME_URL ;?>public/assets/img/logo-fincatech.png" style="max-width: 130px;">    
+
     <?php if($App->isAdminFincas()): ?>
-    <img src="public/assets/img/logo-fincatech.png" style="max-width: 130px;">
+    
     <!-- <a class="sidebar-toggle d-flex">
         <i class="hamburger align-self-center"></i>
     </a>

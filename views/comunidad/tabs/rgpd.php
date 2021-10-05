@@ -1,6 +1,6 @@
 <div class="tab-pane fade h-100" id="rgpd" role="tabpanel">
 
-    <div class="row">
+    <div class="row h-100">
 
         <div class="col-12 d-flex">
 

@@ -12,7 +12,7 @@ trait CrudTrait{
         if($this->isInsertAction())
         {
             $this->constructInsertSQL();
-
+// die($this->getSQL());
             //  Ejecutamos sobre la propiedad SQL
             $this->repositorio->queryRaw( $this->getSQL() );
             $data['id'] = $this->repositorio->getLastID($this->getEntidad()) - 1;

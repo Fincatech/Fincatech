@@ -67,6 +67,8 @@ let CoreUI = {
 
         _this: null,
         columns: [],
+        selectedRowIndex: null,
+        selectedRowTableId: null,
 
         /** Inicializador del componente de tabla enlazada a datos */
         init: function()
@@ -341,6 +343,126 @@ let CoreUI = {
                 return salida;
         },
 
+        formatEmpleado: function(d)
+        {
+            //  Debemos comprobar el rol para subir fichero
+                var canUploadFile = false;
+                var needFileUpload = false;
+                var fileLink = '';
+
+            //  Tipo empleado 
+                var value = $(`body #${CoreUI.tableData.selectedRowTableId} tr#${CoreUI.tableData.selectedRowIndex} td:nth-child(2)`).html().indexOf('Comunidad');
+                var empleadoComunidad = false;
+                    
+                if(value>=0)
+                    empleadoComunidad = true;
+
+            //  SÓLO EL PERFIL DE CONTRATISTA PUEDE SUBIR FICHEROS
+                if(core.Security.getRole() == 'CONTRATISTA' && !empleadoComunidad)
+                    canUploadFile = true;
+
+            var salida = `
+                <div class="table-responsive">
+                    <table border="0" class="table table-bordered table-light">
+                        <thead class="">
+                            <tr>
+                                <th style="background: #dee2e6 !important;">Requerimiento</th>
+                                <th class="text-center" style="background: #dee2e6 !important;width:150px;">Estado</th>
+                                <th class="text-center" style="background: #dee2e6 !important;">Documento</th>
+                                <th class="text-center" style="background: #dee2e6 !important;">Fecha de caducidad</th>
+                                <th class="text-center" style="background: #dee2e6 !important;">Observaciones</th>
+                            </tr>
+                        </thead>`;
+
+                for(x = 0; x < d.documentacionprl.length; x++)
+                {
+
+                    //  Nombre del requerimiento
+                        salida += `<tr>
+                                    <td>${d.documentacionprl[x].requerimiento}</td>`;
+
+                    //  Estado del requerimiento
+                    //  Puede tener los siguientes estados:
+                    //      P: Pendiente de validación
+                    //      N: No adjuntado
+                    //      R: Rechazado
+                    //      V: Validado (Está OK)
+                    //      C: Caducado
+                    var estadoRequerimiento = '';
+                    var classRequerimiento;
+                    switch(d.documentacionprl[x].estado)
+                    {
+                        case '':
+                        case 'N':
+                            estadoRequerimiento = 'No adjuntado';
+                            classRequerimiento = 'danger';
+                            break;
+                        case 'R':
+                            estadoRequerimiento = 'Rechazado';
+                            classRequerimiento = 'danger';
+                            break;
+                        case 'V':
+                            estadoRequerimiento = 'Validado';
+                            classRequerimiento = 'success';
+                            break;
+                        case 'C':
+                            estadoRequerimiento = 'Caducado';
+                            classRequerimiento = 'warning';
+                            break;
+                        case 'P':
+                            estadoRequerimiento = 'Pendiente de validación';
+                            classRequerimiento = 'info';
+                            break;
+                        default:
+                            estadoRequerimiento = 'No adjuntado';
+                            classRequerimiento = 'danger';
+                            break;
+
+                    }
+                        salida += `<td class="text-center" ><span class="badge rounded-pill bg-${classRequerimiento} pl-3 pr-3 pt-2 pb-2">${estadoRequerimiento}</span></td>`;
+
+                    //  Enlace al fichero de descarga si está ya adjuntado o bien para subir si tiene permiso
+                        ficheroAdjuntado = (!d.documentacionprl[x].idficherorequerimiento ? false : true);
+                        if(ficheroAdjuntado)   //  DESCARGAR FICHERO YA SUBIDO
+                        {
+                            salida += ` <td class="text-center">
+                                            <a href="${baseURL}public/storage/${d.documentacionprl[x].storageficherorequerimiento}" target="_blank" data-bs-toggle="tooltip" data-placement="bottom" title="Ver documento">
+                                                <i class="bi bi-cloud-arrow-down text-success" style="font-size: 30px;"></i>
+                                            </a>                                            
+                                        </td>`;
+                        }
+
+                    //  Si es un empleado de la comunidad y además pertenece al rol admin de fincas entonces le damos permiso para subir el fichero
+                        if( empleadoComunidad && core.Security.getRole() == 'ADMINFINCAS')
+                            canUploadFile = true;
+
+                    //  Construimos el enlace de salida para que pueda descargar el fichero adjuntado
+                    //  SUBIR FICHERO SOLO PARA ADMINISTRADOR
+                        if(canUploadFile)
+                        {  
+                                dataset = ` data-idcomunidad="" data-idempresa="" data-idempleado="${d.documentacionprl[x].idempleado}" data-idrequerimiento="${d.documentacionprl[x].idrequerimiento}" data-idrelacionrequerimiento="${d.documentacionprl[x].idrelacion}" data-entidad="empleado" `;
+                                salida += `<td class="text-center" ><a href="javascript:void(0)" class="btnAdjuntarFicheroDocumento" data-toggle="tooltip" ${dataset} data-placement="bottom" title="" id="home" data-original-title="Adjuntar documento"><i class="bi bi-cloud-arrow-up text-danger" style="font-size: 30px;"></i></a></td>`;
+                        }
+
+                        if(!ficheroAdjuntado && !canUploadFile)
+                            salida += '<td>&nbsp;</td>';
+
+                        //  Fecha de caducidad
+                            var fechaCaducidad = (d.documentacionprl[x].fechacaducidad == null || d.documentacionprl[x].fechacaducidad == '' ? '-' :  moment(d.documentacionprl[x].fechacaducidad).locale('es').format('L'));
+                            salida += `<td class="text-center">${fechaCaducidad}</td>`;
+
+                        //  Observaciones
+                            var observaciones = (d.documentacionprl[x].observaciones == null ? '' : d.documentacionprl[x].observaciones);
+
+                            salida += `<td class="text-justify">${observaciones}</td>`;
+
+                        salida += `</tr>`;
+                }
+
+                salida += '</table></div>';
+                return salida;
+        },
+
         /** Muestra la fila de información ampliada para CAE Empresa */
         formatEmpresa: function (d)
         {
@@ -435,6 +557,9 @@ let CoreUI = {
                 case 'listadoComunidad':
                     salida = CoreUI.tableData.formatComunidad(d);
                     break;
+                case 'listadoEmpleadosComunidad':
+                    salida = CoreUI.tableData.formatEmpleado(d);
+                    break;
             }
 
             return salida;
@@ -454,8 +579,13 @@ let CoreUI = {
          // Add event listener for opening and closing details
             $('body #' + id +' tr td.details-control').off();
             $('body #' + id).on( core.helper.clickEventType, 'tr td.details-control', function (e) {
+
+                //  Obtenemos el id de la fila que ha disparado el evento
+                    CoreUI.tableData.selectedRowIndex = $(this).parent().attr('id');
+
                 //  Obtenemos el id de la tabla que está disparando el evento
                     idTabla = ($(this).parent().parent().parent().attr('id'));
+                    CoreUI.tableData.selectedRowTableId = idTabla;
 
                     var tr = $(this).closest('tr');
                     var row = window['table' + idTabla].row( tr );
@@ -472,11 +602,6 @@ let CoreUI = {
                 else {
                     tr.addClass( 'shown' );
                     row.child( CoreUI.tableData.format(row.data(), idTabla )).show();
-        
-                    // Add to the 'open' array
-                    // if ( idx === -1 ) {
-                    //     detailRows.push( tr.attr('id') );
-                    // }
                 }
 
                 documentalCore.Events();
@@ -484,23 +609,23 @@ let CoreUI = {
             } );
 
             //  Suscripción al evento del click salvo que la tabla no sea clicable
-            if( !$(`body #${id}`).hasClass('no-clicable') )
-            {
-                $(`body #${id} tr > td`).off();
-                $(`body #${id}`).on('click', 'tr > td', function (e) 
+                if( !$(`body #${id}`).hasClass('no-clicable') )
                 {
-                    if($(this).html().indexOf('accionesTabla') > 0)
+                    $(`body #${id} tr > td`).off();
+                    $(`body #${id}`).on('click', 'tr > td', function (e) 
                     {
-                        console.log('Ha clicado en acciones');
-                    }else{
-                        var data = window['table' + id].row( this ).data();
-                        //  Redirigimos a la pantalla correspondiente que está basada en el endpoint
-                        //  quitando "list" ya que es el endpoint que se utiliza para el listado ajax
-                        window.location.href = baseURL + endpoint.toLowerCase().replace('list', data.id);
-                    }
+                        if($(this).html().indexOf('accionesTabla') > 0)
+                        {
+                            console.log('Ha clicado en acciones');
+                        }else{
+                            var data = window['table' + id].row( this ).data();
+                            //  Redirigimos a la pantalla correspondiente que está basada en el endpoint
+                            //  quitando "list" ya que es el endpoint que se utiliza para el listado ajax
+                            window.location.href = baseURL + endpoint.toLowerCase().replace('list', data.id);
+                        }
 
-                });
-            }     
+                    });
+                }     
         },
 
         /** Renderiza la tabla */
@@ -529,11 +654,14 @@ let CoreUI = {
                 "columns": CoreUI.tableData.columns[id],  
                 "columnDefs": [{
                     "targets": CoreUI.tableData.columns[id].length -1,
-                    "className": "p-0 text-center"
+                    "className": "text-center"
                 }],
                 "drawCallback": function(settings){
                     feather.replace();
-                }
+                },
+                "fnCreatedRow": function( nRow, aData, iDataIndex ) {
+                    $(nRow).attr('id', iDataIndex);
+                }                
             };
 
             if(customRender != null)
@@ -587,6 +715,21 @@ let CoreUI = {
                     callback();
                 }
             });    
+        },
+
+        Info: function(texto, titulo, callback)
+        {
+            Swal.fire({
+                text: `${texto}`,
+                title: '',
+                icon: 'info',
+                showCancelButton: false
+            }).then( (result) =>{
+                if(result.isConfirmed && typeof callback !== 'undefined')
+                {
+                    callback();
+                }
+            }); 
         },
 
         /** Muestra un modal de error */

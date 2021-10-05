@@ -615,6 +615,7 @@ let core =
               if( core.Forms.data[entityRelated] === undefined )
                 core.Forms.data[entityRelated] = {};
 
+              //  Obtenemos el valor del campo según el tipo que sea (text, select,...)
               core.Forms.data[entityRelated][fieldName] = core.Forms.getValueByTipoCampo( $(this) );
 
             }
@@ -719,20 +720,22 @@ console.log('accion: ' + actionSave);
     },
 
     /** Valida el formulario y devuelve la respuesta correspondiente */
-    Validate: function()
+    Validate: function(nombreFormulario = null)
     {
       var result = true;
 
-      if( $('body .form-required').length == 0)
+      if(nombreFormulario == null)
+        nombreFormulario = 'form-data'
+
+
+      if( $(`body .${nombreFormulario} .form-required`).length == 0)
         return true;
 
       //  Recorre todos los elementos del dom que sean susceptibles de ser validados
-      $('body .form-required').each(function()
+      $(`body .${nombreFormulario} .form-required`).each(function()
       {
         if($(this).val() == '')
-        {
           result = false;
-        }
       });
 
       return result;
@@ -798,7 +801,7 @@ console.log('accion: ' + actionSave);
           }else{
 
             //  TODO: Ver cuál es el error en el json
-            Modal.Error("No se ha podido guardar por el siguiente motivo:<br><br>" + responseData.status.response);
+                Modal.Error("No se ha podido guardar por el siguiente motivo:<br><br>" + responseData.status.response);
 
           }
 

@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row ml-1 mr-1">
 
     <div class="col-12 d-flex">
 
@@ -6,14 +6,14 @@
 
             <div class="card-header pl-1 mb-2">
 
-                <h5 class="card-title mb-0"><i data-feather=""></i> <span class="titulo titulo-modulo">Nuevo empleado</span></h5>
+                <h5 class="card-title mb-0 text-left"><i class="bi bi-person-plus"></i> <span class="titulo titulo-modulo">Nuevo empleado de la comunidad</span></h5>
 
             </div>
     
             <div class="card-body shadow-inset rounded-lg border mb-1 border-white">
 
                 <form class="form-data form-floating text-left formEmpleadoComunidad" autocomplete="off">
-                    <input type="hidden" id="idcomunidad" name="idcomunidad" class="data" hs-field="idcomunidad" hs-entity="empleadocomunidad" value="data[valueidcomunidad]">
+                    <input type="hidden" id="idcomunidad" name="idcomunidad" class="data" hs-field="idcomunidad" hs-entity-related="Empleado" hs-entity="Empleado" value="data[valueidcomunidad]">
                     <!-- Estado del empleado -->
                     <!-- <div class="form-group row mb-2 justify-content-start">
                         <div class="col-12 col-md-2 text-left">
@@ -29,9 +29,9 @@
                             <p class="nombreComunidad pt-2 pb-2 shadow-inset pl-2"></p>
                         </div>
                         <div class="col-12 col-md-4">
-                            <label for="direccion"><i class="bi bi-wrench pr-2"></i>Puesto de trabajo</label>                        
-                            <select id="puestoEmpleadoComunidad" name="puestoEmpleadoComunidad" class="select-data data custom-select form-control selectpicker" data-live-search="true" 
-                            hs-entity="Empleado" hs-entity-related="Empleado" hs-field="estado" 
+                            <label for="direccion"><i class="bi bi-wrench pr-2"></i>Puesto de trabajo*</label>                        
+                            <select id="puestoEmpleadoComunidad" name="puestoEmpleadoComunidad" class="select-data data custom-select form-control selectpicker form-required" data-live-search="true" 
+                            hs-entity="Empleado" hs-entity-related="Empleado" hs-field="idtipopuestoempleado" 
                             hs-list-entity="Estado" hs-list-field="nombre" hs-list-value="sId"></select>
                         </div>                        
                     </div> 
@@ -40,10 +40,10 @@
                     <div class="form-group row mb-2">
                         <div class="col-12 col-md-2 text-left">
                             <label for="cif" class="pl-0"><i class="bi bi-credit-card-2-front pr-2"></i>DNI/NIE*</label>
-                            <input type="text" class="form-control data text-center form-required" id="numerodocumento" name="numerodocumento" maxlength="20" placeholder="Documento de identidad"  hs-entity="Empleado" hs-field="numerodocumento" required>
+                            <input type="text" class="form-control data text-center form-required" id="numerodocumento" name="numerodocumento" maxlength="20" placeholder="Documento de identidad"  hs-entity="Empleado" hs-entity-related="Empleado"  hs-field="numerodocumento" required>
                         </div>
                         <div class="col-12 col-md-10 text-left">
-                            <label for="nombre"><i class="bi bi-person pr-2"></i>Nombre y apellidos</label>              
+                            <label for="nombre"><i class="bi bi-person pr-2"></i>Nombre y apellidos*</label>              
                             <input type="text" hs-entity-related="Empleado" class="form-control data text-left form-required" id="nombre" name="nombre" hs-entity="Empleado" hs-field="nombre" maxlength="100" required>
                         </div>                        
                     </div>
@@ -81,8 +81,8 @@
                         </div>
 
                         <div class="col-12 col-md-10">
-                            <label for="email"><i class="bi bi-envelope pr-2"></i>Email</label>                          
-                            <input type="text" hs-entity-related="Empleado" maxlength="255" class="form-control data text-left" id="email" name="email" placeholder="Email" hs-entity="Empleado" hs-field="email">
+                            <label for="email"><i class="bi bi-envelope pr-2"></i>Email*</label>                          
+                            <input type="text" hs-entity-related="Empleado" maxlength="255" class="form-control data text-left form-required" id="email" name="email" placeholder="Email" hs-entity="Empleado" hs-field="email">
                         </div>                     
 
                     </div>                    

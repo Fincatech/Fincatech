@@ -335,3 +335,11 @@ body div.dataTables_wrapper div.dataTables_filter input {
 .shown .cerrar {display: initial !important;}
 .dataTable .cerrar{ display: none; }
 .swal2-html-container{font-size: .875rem !important;}
+
+.confirmButtonModal{
+    border-radius: 0rem 50rem 50rem 0rem !important;
+}
+
+.cancelButtonModal{
+    border-radius: 50rem 0rem 0rem 50rem !important;
+}

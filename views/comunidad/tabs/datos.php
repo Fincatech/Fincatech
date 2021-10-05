@@ -93,7 +93,7 @@
 <div class="form-group row mb-2">
     <div class="col-12">
         <label for="ibancomunidad"><i class="bi bi-bank pr-2"></i>IBAN</label>              
-        <input type="text" class="form-control data text-center" id="ibancomunidad" name="ibancomunidad" placeholder="Código Cuenta IBAN"  hs-entity="Comunidad" hs-field="ibancomunidad" maxlength="30">
+        <input type="text" class="form-control data text-center text-uppercase" id="ibancomunidad" name="ibancomunidad" placeholder="Código Cuenta IBAN"  hs-entity="Comunidad" hs-field="ibancomunidad" maxlength="30">
     </div>                       
 
 </div> 

@@ -30,18 +30,39 @@ class EmpleadoController extends FrontController{
                 $informacionEmpresaAsociada = true;
                 unset($datos['empleadoempresa']);
             }
-            
+        
+        //  Extremos el id de la comunidad si viene informado para
+        //  crear la posterior relación entre comunidad e id de empleado
+            $idComunidad = null;
+            if(@isset($datos['Empleado']['idcomunidad']))
+            {
+                $datos = $datos['Empleado'];
+                $idComunidad = $datos['idcomunidad'];
+                $datos['estado'] = 'A';
+                unset( $datos['idcomunidad'] );
+            }
+
         //  Llamamos al método de crear
             $idEmpleado = $this->EmpleadoModel->Create($entidadPrincipal, $datos);
 
         //  Guardamos la relación entre el empleado y la empresa
             if($informacionEmpresaAsociada)
             {
-            // die(1);
                 $empleadoEmpresa['idempleado'] = $idEmpleado['id'];
                 $empleadoEmpresa['estado'] = $datos['estado'];
                 $empleadoEmpresa['fechaalta'] = 'now()';
                 $this->EmpleadoModel->Create('empleadoempresa', $empleadoEmpresa);
+            }
+
+        //  Si es un alta de empleado de comunidad, guardamos la relación entre ambos
+            if( !is_null($idComunidad) )
+            {
+                $empleadoComunidad = [];
+                $empleadoComunidad['idempleado'] = $idEmpleado['id'];
+                $empleadoComunidad['idcomunidad'] = $idComunidad;
+                $empleadoComunidad['estado'] = $datos['estado'];
+                $empleadoComunidad['fechaalta'] = 'now()';
+                $this->EmpleadoModel->Create('empleadocomunidad', $empleadoComunidad);
             }
 
             return $idEmpleado; //
@@ -72,9 +93,18 @@ class EmpleadoController extends FrontController{
         return $this->EmpleadoModel->List($params) ;
     }
 
+    public function ListEmpleadosByComunidadId($idcomunidad)
+    {
+        
+        $data = $this->EmpleadoModel->GetEmpleadosByComunidadId($idcomunidad);
+        return HelperController::successResponse( $data );
+    }
+
+
     /** Devuelve el listado de empleados por el id de la empresa */
     public function ListEmpleadosByEmpresaId($idEmpresa)
     {
+        // FIXME: Incluir documentación PRL y sacarlo de aquí para meterlo en el modelo
         $data = [];
         $data['Empleados'] = $this->EmpleadoModel->GetEmpleadosByEmpresaId($idEmpresa);
         return HelperController::successResponse( $data );
