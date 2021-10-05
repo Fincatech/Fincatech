@@ -1,6 +1,7 @@
 <nav class="navbar navbar-expand navbar-light navbar-bg">
     <?php if($App->isAdminFincas()): ?>
-    <a class="sidebar-toggle d-flex">
+    <img src="public/assets/img/logo-fincatech.png" style="max-width: 130px;">
+    <!-- <a class="sidebar-toggle d-flex">
         <i class="hamburger align-self-center"></i>
     </a>
     
@@ -11,11 +12,11 @@
                 <i class="align-middle" data-feather="search"></i>
             </button>
         </div>
-    </form>
-
-    <span class="titulo titulo-modulo d-sm-inline-block" style="min-width: fit-content;"></span>
+    </form> -->
 
     <?php endif; ?>
+
+    <span class="titulo titulo-modulo d-sm-inline-block" style="min-width: fit-content;"></span>
 
     <div class="navbar-collapse collapse">
         <ul class="navbar-nav navbar-align">
@@ -125,8 +126,6 @@
             <?php endif; ?>
             <!-- Perfil y acciones principales -->
             <li class="nav-item dropdown">
-
-                
                     <a class="nav-icon dropdown-toggle d-inline-block d-sm-none" href="#" data-toggle="dropdown">
                         <i class="align-middle" data-feather="settings"></i>
                     </a>
@@ -140,7 +139,7 @@
                     <?php endif; ?>
                     <!-- Sólo para usuarios de tipo administrador de fincas -->
                     <?php if($App->isAdminFincas() ) : ?>
-                    <a class="dropdown-item disabled" href="#"><i class="align-middle mr-1" data-feather="eye"></i> SPA Asignado</a>
+                    <!-- <a class="dropdown-item disabled" href="#"><i class="align-middle mr-1" data-feather="eye"></i> SPA Asignado</a> -->
                     <?php endif; ?>
                     <!-- <a class="dropdown-item disabled" href="#"><i class="align-middle mr-1" data-feather="users"></i> RGPD Empleados</a> -->
                     <div class="dropdown-divider"></div>

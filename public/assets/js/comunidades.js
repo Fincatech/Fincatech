@@ -18,7 +18,7 @@ let comunidadesCore = {
 
             //  Recuperamos el listado de comunidades
                 await comunidadesCore.listadoDashboard();
-                await comunidadesCore.renderMenuLateral();
+                // await comunidadesCore.renderMenuLateral();
 
         }else{
 
@@ -76,6 +76,12 @@ let comunidadesCore = {
             //  Creamos la asociación
                 comunidadesCore.asignarEmpresa( $(this).attr('data-id') );
 
+        });
+
+    //  Desasignar empresa a comunidad
+        $('body').on(core.helper.clickEventType, '.btnEliminarEmpresaComunidad', function(e)
+        {
+            comunidadesCore.eliminarEmpresaComunidad( $(this).attr('data-id'), $(this).attr('data-nombre') );
         });
 
     //  Mostrar modal de asignar empresa a comunidad
@@ -136,6 +142,11 @@ let comunidadesCore = {
         core.Modelo.Delete("comunidad", id, nombre, "listadoComunidades");
     },
 
+
+    /**
+     * Asigna una empresa a una comunidad
+     * @param {*} id 
+     */
     asignarEmpresa: async function(id)
     {
             var existe = false;
@@ -173,7 +184,7 @@ let comunidadesCore = {
 
                     if(responseData.status['response'] == "ok")
                     {
-                        CoreUI.Modal.Success("La empresa se ha asignado correctamente. Los empleados aparecerán en el listado una vez que el contratista los asigne.");
+                        CoreUI.Modal.Success("La empresa se ha asignado correctamente. Los empleados aparecerán en el listado una vez que la empresa los asigne.");
 
                         //  Recargamos la tabla de empresas para reflejar el cambio
                             // comunidadesCore.renderTablaEmpresasComunidad();
@@ -192,6 +203,15 @@ let comunidadesCore = {
         //
     },
 
+    /**
+     * Elimina la relación entre una empresa y una comunidad
+     * @param {*} id 
+     * @param {*} nombre 
+     */
+    eliminarEmpresaComunidad: async function(id, nombre)
+    {
+        core.Modelo.Delete(`comunidad/${id}/empresa/${id}`, id, nombre, "listadoEmpresaComunidad", '¿Desea eliminar la relación de la empresa con la comunidad?');
+    },
 
     mostrarModalAsociarEmpresa: async function()
     {

@@ -14,8 +14,8 @@
                                         <h5 class="card-title mb-0"><i class="bi bi-truck mr-2"></i> <span class="titulo">CAE</span></h5>
                                     </div>
                                     <div class="col-12 col-md-9 text-right">
-                                        <a href="javascript:void(0)" class="btn btn-outline-secondary text-uppercase rounded-pill shadow pl-2 pr-4 btnAsociarEmpresaCAE"><i class="bi bi-shop pr-2 pl-2"></i> ASOCIAR EMPRESA / AUTÓNOMO</a>
-                                        <a href="javascript:void(0)" class="btn btn-outline-secondary text-uppercase rounded-pill shadow pl-2 pr-4 btnNuevoEmpleadoComunidad"><i class="bi bi-person pl-2 pr-2"></i> ALTA EMPLEADO COMUNIDAD</a>
+                                        <a href="javascript:void(0)" class="btn btn-outline-secondary text-uppercase rounded-pill shadow pl-2 pr-4 btnAsociarEmpresaCAE mr-2"><i class="bi bi-shop pr-2 pl-2"></i> ASOCIAR EMPRESA / AUTÓNOMO</a>
+                                        <a href="javascript:void(0)" class="btn btn-outline-info text-uppercase rounded-pill shadow pl-2 pr-4 btnNuevoEmpleadoComunidad"><i class="bi bi-person pl-2 pr-2"></i> ALTA EMPLEADO COMUNIDAD</a>
                                     </div>
 
                                 </div>
@@ -76,7 +76,7 @@
 
                                             </div>
 
-                                            <div class="card-body">
+                                            <div class="card-body pt-0">
 
                                                 <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoEmpleadosComunidad" id="listadoEmpleadosComunidad" data-model="Empleado">
                                                     <thead class="thead"></thead>

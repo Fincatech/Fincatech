@@ -119,7 +119,7 @@ let Constantes = {
     AsignacionEmpresa: `
     <div class="row">
         <div class="col-12 text-center text-uppercase align-self-center">
-          <p class="m-0" style="display: block; font-size: 18px;"> Carga automática de comunidades</p>
+          <p class="m-0" style="display: block; font-size: 18px;"> Asociar empresa externa a comunidad</p>
         </div>
     </div>
     <div class="row mb-2 wrapperInformacion">

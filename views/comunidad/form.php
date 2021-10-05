@@ -47,7 +47,14 @@
 
                             <div class="card-header pl-1 mb-2">
 
-                                <h5 class="card-title mb-0"><i data-feather="<?php echo $iconoAccion; ?>"></i> <span class="titulo titulo-modulo">Comunidad</span></h5>
+                                <div class="row">
+                                    <div class="col-12 col-md-9">
+                                        <h5 class="card-title mb-0"><i data-feather="<?php echo $iconoAccion; ?>"></i> <span class="titulo titulo-modulo">Comunidad</span></h5>
+                                    </div>
+                                    <div class="col-12 col-md-3 text-right">
+                                        <a href="<?php echo APPFOLDER . $App->getController() . "/add" ?>" class="btn btn-outline-success text-uppercase rounded-pill shadow pl-2 pr-4"><i class="bi bi-plus-circle pr-3"></i> NUEVA <?php echo strtoupper($App->getController() ); ?></a>
+                                    </div>
+                                </div>
 
                             </div>
                     

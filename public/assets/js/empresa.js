@@ -198,6 +198,9 @@ let empresaCore = {
 
     renderTablaEmpresasComunidad: async function(idcomunidad)
     {
+        if(idcomunidad == '' || typeof idcomunidad === 'undefined' || idcomunidad == null )
+            return;
+
         if($('#listadoEmpresaComunidad').length)
         {
 
@@ -206,7 +209,7 @@ let empresaCore = {
             //  Añadimos la columna de desplegar
             // CoreUI.tableData.addColumnRow('listadoEmpresaComunidad', 'empresatipo');
             CoreUI.tableData.addColumnRow('listadoEmpresaComunidad', 'documentacioncae');
-            
+
             //  Razón social
             CoreUI.tableData.addColumn('listadoEmpresaComunidad', "razonsocial","Nombre", null, 'text-left');
 

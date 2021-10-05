@@ -140,6 +140,9 @@ let documentalCore = {
         /**  */
         renderTablaDocumentacionComunidad: async function(id)
         {
+            if(id == '' || typeof id === 'undefined' || id == null )
+                return;
+
             if($('#listadoDocumentacionComunidad').length)
             {
 
