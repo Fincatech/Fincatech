@@ -63,8 +63,8 @@ trait UtilsTrait{
         {
             while($row = mysqli_fetch_assoc($results))
             {
-
                 $arrayResults[] = $row;
+                // print_r($row);
             }
         }
 

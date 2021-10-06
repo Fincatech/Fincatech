@@ -512,3 +512,8 @@ VIEW `view_documentosempleado` AS
     WHERE
         (`r`.`idrequerimientotipo` = 5)
     ORDER BY `r`.`nombre`;
+
+########### 5/10/2021 20:07
+
+ALTER TABLE `fincatech`.`empleadorequerimiento` 
+ADD COLUMN `idcomunidad` INT(11) NULL AFTER `idempresa`;

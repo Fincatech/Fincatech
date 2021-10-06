@@ -26,6 +26,27 @@ class EmpleadoModel extends \HappySoftware\Model\Model{
 
     }
 
+    public function Update($entidadPrincipal, $datos, $usuarioId)
+    {
+
+        //  Hay que comprobar si está asociado a una empresa
+        //  Este valor viene infomado de: idempresa
+            if(@isset($datos['empleadoempresa']['idempresa']))
+            {
+                $idEmpresaTemporal = $datos['empleadoempresa']['idempresa'];
+                //  Quitamos el valor del array
+                    unset($datos['idempresa']);
+                    unset($datos['empleadoempresa']);
+            }
+
+        //  Guardamos la entidad principal
+            parent::Update($entidadPrincipal, $datos, $usuarioId);
+
+        //  Guardamos la relación entre el empleado y la empresa
+            $this->SaveRelationBetweenEmpleadoAndEmpresa( $usuarioId, $idEmpresaTemporal, $datos['estado']);
+
+    }
+
     public function Get($id)
     {
         $data = parent::Get($id);
@@ -35,21 +56,57 @@ class EmpleadoModel extends \HappySoftware\Model\Model{
         return $data;
     }
 
+
+    private function SaveRelationBetweenEmpleadoAndEmpresa($idempleado, $idempresa, $estado)
+    {
+
+        //  Comprobamos si existe ya el empleado en la tabla de relación
+            if( $this->getRepositorio()->ExisteRegistro('empleadoempresa', 'idempleado = ' . $idempleado) )
+            {
+                //  Si existe, únicamente actualizamos el ID de la empresa
+                    $this->UpdateRelationBetweenEmpleadoAndEmpresa($idempleado, $idempresa, $estado);
+            }else{
+                //  Si no existe, generamos la relación
+                $empleadoEmpresa['idempresa'] = ($idempresa == '-1' ? 'null' : $idempresa);
+                $empleadoEmpresa['idempleado'] = $idempleado;
+                $empleadoEmpresa['estado'] = $estado;
+                $empleadoEmpresa['fechaalta'] = 'now()';
+                parent::Create('empleadoempresa', $empleadoEmpresa, $estado);            
+            }
+
+
+
+    }
+
+    /** Actualiza la relación entre el empleado y la empresa */
+    private function UpdateRelationBetweenEmpleadoAndEmpresa($idempleado, $idempresa, $estado)
+    {
+        //  Si se ha dado de baja lo reflejamos
+            $fechaBaja = ($estado == 'B' ? ' fechabaja = now() , ' : '');
+        
+            $sql = "update empleadoempresa set $fechaBaja idempresa = " . $idempresa . " where idempleado = " . $idempleado;
+
+            $this->getRepositorio()->queryRaw($sql);
+
+    }
+
     public function GetEmpleadosByComunidadId($idcomunidad)
     {
+        $data = [];
         
         $sql = 'select * from view_empleadosempresa where idcomunidad = ' . $idcomunidad;
         $sql .= ' UNION ALL ';
         $sql .= 'select * from view_empleadoscomunidad where idcomunidad = ' . $idcomunidad;
-        
 
-        $data = [];
         $data['Empleado'] = $this->query( $sql );
+
         for($x = 0; $x < count($data['Empleado']); $x++)
         {
             //  Recuperamos los documentos asociados a PRL de empleado
-                $data['Empleado'][$x]['documentacionprl'] = $this->GetDocumentacionEmpleado($data['Empleado'][$x]['id']);
+                //$data['Empleados'][$x]['documentacionprl'] = $this->GetDocumentacionEmpleado($data['Empleado'][$x]['idempleado']);
+                $data['Empleado'][$x]['documentacionprl'] = $this->GetDocumentacionEmpleado($data['Empleado'][$x]['idempleado']);
         } 
+
         return $data;
     }
 
@@ -80,6 +137,7 @@ class EmpleadoModel extends \HappySoftware\Model\Model{
     /** Recupera todos los registros */
     public function List($params = null, $useLoggedUserId = true)
     {
+
         $data = [];
         $data = parent::List($params);
 
@@ -99,7 +157,8 @@ class EmpleadoModel extends \HappySoftware\Model\Model{
 
     public function GetDocumentacionEmpleado($id)
     {
-        $sql = "SELECT * FROM fincatech.view_documentosempleado where @IDEMPRESAREQUERIMIENTO:=" . $id; 
+        $sql = "SELECT * FROM view_documentosempleado where @p1:=" . $id; 
+
         return $this->query($sql);
     }
 

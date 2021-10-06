@@ -123,6 +123,8 @@ let documentalCore = {
                 if($('body #listadoEmpresa').length)
                     window['tablelistadoEmpresa'].ajax.reload();
           
+                if($('body #listadoEmpleadosComunidad').length)
+                    window['tablelistadoEmpleadosComunidad'].ajax.reload();
 
             }else{
                 //  TODO: Ver cuál es el error en el json

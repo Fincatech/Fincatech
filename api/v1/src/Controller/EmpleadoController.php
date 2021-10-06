@@ -85,7 +85,10 @@ class EmpleadoController extends FrontController{
 
     public function Get($id)
     {
-        return $this->EmpleadoModel->Get($id);
+        $data = [];
+        $data = $this->EmpleadoModel->Get($id);
+        $data['Empleado'][0]['idempresa'] = $data['Empleado'][0]['empleadoempresa'][0]['idempresa'];
+        return $data;
     }
 
     public function List($params = null)
@@ -97,6 +100,7 @@ class EmpleadoController extends FrontController{
     {
         
         $data = $this->EmpleadoModel->GetEmpleadosByComunidadId($idcomunidad);
+    //    die();
         return HelperController::successResponse( $data );
     }
 

@@ -40,7 +40,7 @@
                     <div class="form-group row mb-2">
                         <div class="col-12 col-md-2 text-left">
                             <label for="cif" class="pl-0"><i class="bi bi-credit-card-2-front pr-2"></i>DNI/NIE*</label>
-                            <input type="text" class="form-control data text-center form-required" id="numerodocumento" name="numerodocumento" maxlength="20" placeholder="Documento de identidad"  hs-entity="Empleado" hs-entity-related="Empleado"  hs-field="numerodocumento" required>
+                            <input type="text" class="form-control data text-center form-required" id="numerodocumento" name="numerodocumento" maxlength="20" placeholder="Documento de identidad" hs-entity="Empleado" hs-entity-related="Empleado"  hs-field="numerodocumento" required>
                         </div>
                         <div class="col-12 col-md-10 text-left">
                             <label for="nombre"><i class="bi bi-person pr-2"></i>Nombre y apellidos*</label>              

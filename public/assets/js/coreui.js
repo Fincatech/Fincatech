@@ -345,6 +345,7 @@ let CoreUI = {
 
         formatEmpleado: function(d)
         {
+
             //  Debemos comprobar el rol para subir fichero
                 var canUploadFile = false;
                 var needFileUpload = false;
@@ -428,21 +429,23 @@ let CoreUI = {
                             salida += ` <td class="text-center">
                                             <a href="${baseURL}public/storage/${d.documentacionprl[x].storageficherorequerimiento}" target="_blank" data-bs-toggle="tooltip" data-placement="bottom" title="Ver documento">
                                                 <i class="bi bi-cloud-arrow-down text-success" style="font-size: 30px;"></i>
-                                            </a>                                            
-                                        </td>`;
+                                            </a>`;
+
+                            //  Si es un empleado de la comunidad y además pertenece al rol admin de fincas entonces le damos permiso para subir el fichero
+                                if( empleadoComunidad && core.Security.getRole() == 'ADMINFINCAS')
+                                    canUploadFile = true;
+
+                            //  SUBIR FICHERO SOLO PARA ADMINISTRADOR
+                                if(canUploadFile)
+                                {  
+                                        dataset = ` data-idcomunidad="" data-idempresa="" data-idempleado="${d.idempleado}" data-idrequerimiento="${d.documentacionprl[x].idrequerimiento}" data-idrelacionrequerimiento="${d.documentacionprl[x].idrelacion}" data-entidad="empleado" `;
+                                        salida += `<a href="javascript:void(0)" class="btnAdjuntarFicheroDocumento" data-toggle="tooltip" ${dataset} data-placement="bottom" title="" id="home" data-original-title="Adjuntar documento"><i class="bi bi-cloud-arrow-up text-danger" style="font-size: 30px;"></i></a>`;
+                                }
+
+                            salida += `</td>`;
                         }
 
-                    //  Si es un empleado de la comunidad y además pertenece al rol admin de fincas entonces le damos permiso para subir el fichero
-                        if( empleadoComunidad && core.Security.getRole() == 'ADMINFINCAS')
-                            canUploadFile = true;
 
-                    //  Construimos el enlace de salida para que pueda descargar el fichero adjuntado
-                    //  SUBIR FICHERO SOLO PARA ADMINISTRADOR
-                        if(canUploadFile)
-                        {  
-                                dataset = ` data-idcomunidad="" data-idempresa="" data-idempleado="${d.documentacionprl[x].idempleado}" data-idrequerimiento="${d.documentacionprl[x].idrequerimiento}" data-idrelacionrequerimiento="${d.documentacionprl[x].idrelacion}" data-entidad="empleado" `;
-                                salida += `<td class="text-center" ><a href="javascript:void(0)" class="btnAdjuntarFicheroDocumento" data-toggle="tooltip" ${dataset} data-placement="bottom" title="" id="home" data-original-title="Adjuntar documento"><i class="bi bi-cloud-arrow-up text-danger" style="font-size: 30px;"></i></a></td>`;
-                        }
 
                         if(!ficheroAdjuntado && !canUploadFile)
                             salida += '<td>&nbsp;</td>';

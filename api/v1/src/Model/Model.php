@@ -175,7 +175,6 @@ class Model extends FrontController{
             // error_log("Query: " . $this->queryToExecute,0);
 // die($this->queryToExecute);
             $this->entityData[$this->mainEntity] = [];
-        //   die('2');  
             $this->entityData[$this->mainEntity] = $this->mapMysqliResultsToObject($resultData);
             //  Obtiene las relaciones de la entidad principal si las hay
             if($relations)

@@ -12,15 +12,15 @@ trait CrudTrait{
         if($this->isInsertAction())
         {
             $this->constructInsertSQL();
-// die($this->getSQL());
             //  Ejecutamos sobre la propiedad SQL
-            $this->repositorio->queryRaw( $this->getSQL() );
-            $data['id'] = $this->repositorio->getLastID($this->getEntidad()) - 1;
-            return $data;
+            // die($this->getSQL());
+                $this->repositorio->queryRaw( $this->getSQL() );
+                $data['id'] = $this->repositorio->getLastID($this->getEntidad()) - 1;
+                return $data;
         }else{
             //  Ejecutamos sobre la propiedad SQL
-            $this->repositorio->queryRaw( $this->constructUpdateSQL() );
-            return [];
+                $this->repositorio->queryRaw( $this->constructUpdateSQL() );
+                return [];
         }
 
     }
@@ -50,15 +50,14 @@ trait CrudTrait{
         //  para evitar problemas a la hora de guardar los datos
         //  Comprobamos si hay fichero adjuntado a la petición
             $ficheroId = $this->getFileInfoFromPostData($data);
-
             if( $ficheroId != null)
             {
                 $data['idfichero'] = $ficheroId;
              
             }
             unset($data['fichero']);
-
         //  Recuperamos todos los valores del post que hemos recibido
+
             $this->processJSONPostData($data);
 
         //  Auditoría
@@ -74,16 +73,14 @@ trait CrudTrait{
     {
 
         //  Recuperamos todos los valores del post que hemos recibido
-        // echo 'processJSONPostData----' . PHP_EOL;
-        foreach($data as $key => $value)
-        {
-                // echo 'Key: ' . $key . " - Value: " . $value . PHP_EOL . '<br>';
-                //  Validamos que exista la propiedad en la tabla
-                $value = $this->fixFieldValue($key, $value);
-                $this->addField($key, $value);
-        }  
+            foreach($data as $key => $value)
+            {
+                    // echo 'Key: ' . $key . " - Value: " . $value . PHP_EOL . '<br>';
+                    //  Validamos que exista la propiedad en la tabla
+                    $value = $this->fixFieldValue($key, $value);
+                    $this->addField($key, $value);
+            }  
           
-        // echo 'FIN processJSONPostData----' . PHP_EOL;
     }
     
     ////////////////////////////////////
@@ -157,7 +154,7 @@ trait CrudTrait{
             $this->processJSONPostData($data);
 
         //  Guardamos
-        return $this->Save();
+            return $this->Save();
     }
 
     /**

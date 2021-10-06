@@ -14,7 +14,8 @@ let empleadoCore = {
             empleadoCore.renderTabla();
         }else{
             // core.Files.init();
-            // core.Files.Fichero.entidadId = core.modelId;        
+            // core.Files.Fichero.entidadId = core.modelId; 
+                   
         }
 
         empleadoCore.renderTablaEmpresasEmpleado(core.modelId);
@@ -123,7 +124,7 @@ let empleadoCore = {
                             core.Forms.mapDataToSave('formEmpleadoComunidad');
                             core.Modelo.Insert('empleado', core.Forms.data, false).then( ()=>{
                                 //  Recargamos el listado de empleados de la comunidad
-                                    window['listadoEmpleadosComunidad'].ajax.reload();
+                                    window['tablelistadoEmpleadosComunidad'].ajax.reload();
                             });
                     }
                 }); 

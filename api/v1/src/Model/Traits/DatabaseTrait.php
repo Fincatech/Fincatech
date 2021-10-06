@@ -36,8 +36,8 @@ trait DatabaseTrait{
 
         // if($this->getEntidad() == 'empleadoempresa')
         // {
-        //     print_r($this->fields);
-        //     die('3s');
+            // print_r($this->fields);
+            // die('3s');
         // }
 
        //  si ya viene informado el campo usercreate cogemos el valor y 

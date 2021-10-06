@@ -10,8 +10,17 @@
 
                     <div class="row mb-3">
 
-                        <div class="col-6">
+                        <div class="col-12 col-md-4">
                             <h5 class="card-title mb-0"><i class="bi bi-shield-lock mr-2"></i> <span class="titulo">RGPD</span></h5>
+                        </div>
+
+                        <div class="col-12 col-md-8">
+                            <ul class="nav">
+                                <li class="nav-item"><a href="prueba" class="btnMenuRGPD">Prueba</a></li>
+                                <li class="nav-item"><a href="prueba" class="btnMenuRGPD">Prueba2</a></li>
+                                <li class="nav-item"><a href="prueba" class="btnMenuRGPD">Prueba3</a></li>
+                            </ul>
+
                         </div>
 
                     </div>

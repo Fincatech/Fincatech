@@ -38,7 +38,7 @@ class EmpresaModel extends \HappySoftware\Model\Model{
                     $data['Empresa'][$x]['comunidades'] = $this->query($sql);
 
                 //  Recuperamos los documentos asociados a CAE de empresa y su estado
-                    $sql = "SELECT * FROM fincatech.view_documentoscaeempresa where @IDEMPRESAREQUERIMIENTO:=" . $data['Empresa'][$x]['id']; 
+                    $sql = "SELECT * FROM fincatech.view_documentoscaeempresa where @p1:=" . $data['Empresa'][$x]['id']; 
                     // echo($sql . ' ' );
                     $data['Empresa'][$x]['documentacioncae'] = $this->query($sql);
             }

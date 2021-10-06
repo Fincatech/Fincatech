@@ -90,24 +90,6 @@ let comunidadesCore = {
             comunidadesCore.mostrarModalAsociarEmpresa();
         });
 
-        // $('body').on(core.helper.clickEventType, '.btnNuevoEmpleadoComunidad', async function(e)
-        // {
-        //     //  Comprobamos si tiene spa asignado y si está editando o añadiendo
-        //     if(core.actionModel == 'get')
-        //     {
-        //         //  Comprobamos si tiene spa asignado
-        //             if(core.Modelo.entity.Comunidad[0].idspa == '-1')
-        //             {
-        //                 //  Avisamos de que debe asignar el spa
-        //                     CoreUI.Modal.Error('Para dar de alta un empleado debe asignar primero un SPA a la comunidad', 'Comunidad sin SPA asignado', function()
-        //                     {
-        //                         Swal.close();
-        //                     });
-        //             }
-        //     }
-
-        // });
-
     //  Cambio nombre de comunidad
         $('body .form-comunidad #nombre').on('keyup', function(e)
         {

@@ -189,7 +189,7 @@ class ComunidadModel extends \HappySoftware\Model\Model{
     public function GetDocumentacionComunidad($id, $tieneTrabajadores = false)
     {
 
-        $sql = "SELECT * FROM view_documentoscomunidad where @idempresarequerimiento:=" . $id; 
+        $sql = "SELECT * FROM view_documentoscomunidad where @p1:=" . $id; 
         $datos['comtipo'] = $this->query($sql);
 
         if(!$this->ComunidadTieneEmpleado($id))
@@ -216,7 +216,7 @@ class ComunidadModel extends \HappySoftware\Model\Model{
                 for($x = 0; $x < count($data); $x++)
                 {
                     //  Recuperamos los documentos asociados a CAE de empresa y su estado
-                        $sql = "SELECT * FROM view_documentoscaeempresa where @IDEMPRESAREQUERIMIENTO:=" . $data[$x]['id']; 
+                        $sql = "SELECT * FROM view_documentoscaeempresa where @p1:=" . $data[$x]['id']; 
                         $data[$x]['documentacioncae'] = $this->query($sql);
                 }
             }

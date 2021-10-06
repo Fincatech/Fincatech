@@ -149,7 +149,7 @@ let Constantes = {
                               <div class="row">
 
                                   <div class="col-12 col-md-9">
-                                      <h5 class="card-title mb-0 text-uppercase font-weight-normal pl-3 pt-1"><i class="bi bi-people pr-2"></i> Empresas disponibles</h5>
+                                      <h5 class="card-title mb-0 text-uppercase font-weight-normal pl-3 pt-1"><i class="bi bi-shop pr-2"></i> Empresas disponibles</h5>
                                   </div>
                       
                               </div>
@@ -269,7 +269,7 @@ let core =
               });
             });
 
-            //  Bindemos el evento del botón procesar importación
+            //  Bindeamos el evento del botón procesar importación
             $('body').on(core.helper.clickEventType, '.bntProcesarImportacion', function()
             {
               comunidadesCore.Import.importarComunidades();
@@ -279,17 +279,6 @@ let core =
 
         });
 
-      //   if (file) {
-      //     const reader = new FileReader()
-      //     reader.onload = (e) => {
-      //       Swal.fire({
-      //         title: 'Your uploaded picture',
-      //         imageUrl: e.target.result,
-      //         imageAlt: 'The uploaded picture'
-      //       })
-      //     }
-      //     reader.readAsDataURL(file)
-      //   }
       });
 
   },
@@ -501,7 +490,8 @@ let core =
           var valor = '';
           //  console.log('Entidad: ' + entidad + ' Campo: ' + campo);
           //  Validamos que el campo venga informado desde el endpoint
-          if(core.Modelo.entity[ entidad ][0][campo] !== undefined)
+          
+          if(typeof core.Modelo.entity[ entidad ][0][campo] !== 'undefined')
           {
             valor = core.Modelo.entity[ entidad ][0][campo];
           }
@@ -515,9 +505,10 @@ let core =
                 //  Leemos el id
                 var id = $(this).attr("id");
                 //  Validamos que exista el valor en el modelo antes de mapear
-                if(id !== undefined && id !== -1)
+                if(typeof id !== 'undefined' && id !== -1)
                 {
-                  $(`#${id} option[value=${valor}]`).attr('selected','selected');
+                  if(valor !== '')
+                    $(`#${id} option[value=${valor}]`).attr('selected','selected');
                 }else{
                 
                 }
@@ -578,11 +569,36 @@ let core =
             return e.val();  
     },
 
-    /** Mapea la información de la pantalla a la propiedad data para guardar */
+    /** Mapea el formulario para montar el json de envío al endpoint */
+    mapFormDataToSave: function(formularioProceso)
+    {
+        core.Forms.data = {};
+
+        if(formularioProceso == null)
+          formularioProceso = 'form-data';    
+
+        //  Obtenemos el nombre del modelo
+            var modelo = $(`body .${formularioProceso}`).attr('hs-model');
+
+        //  Recorremos todos los input del form para procesarlo
+            $(`body .${formularioProceso} .data`).each(function()
+            {
+            
+              var fieldName = $(this).attr("hs-field");
+              var entity = $(this).attr("hs-entity");
+
+              core.Forms.data[fieldName] = core.Forms.getValueByTipoCampo( $(this) );
+
+            });
+
+    },
+
+    /** Deprecated: Mapea la información de la pantalla a la propiedad data para guardar */
     mapDataToSave: function(formularioProceso = null)
     {
 
         core.Forms.data = {};
+
         if(formularioProceso == null)
           formularioProceso = 'form-data';
 
@@ -613,7 +629,7 @@ let core =
             {
               //  Si la entidad no existe, debemos inicializar
               if( core.Forms.data[entityRelated] === undefined )
-                core.Forms.data[entityRelated] = {};
+                  core.Forms.data[entityRelated] = {};
 
               //  Obtenemos el valor del campo según el tipo que sea (text, select,...)
               core.Forms.data[entityRelated][fieldName] = core.Forms.getValueByTipoCampo( $(this) );
@@ -773,11 +789,9 @@ console.log('accion: ' + actionSave);
      */
     Insert: async function(entidadSave, postData, updateModel = true)
     {
-// console.log('Llega al insert');
-// console.log(`${entidadSave}/create`);
       await apiFincatech.post(`${entidadSave}/create`, postData).then(async (response) =>
       {
-// console.log('tiene respuesta');
+
           var responseData = JSON.parse(response);
 
           // console.log('Resultado inserción1: ' + responseData.data);

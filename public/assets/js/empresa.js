@@ -31,11 +31,87 @@ let empresaCore = {
             evt.stopImmediatePropagation();
             empresaCore.eliminar( $(evt.currentTarget).attr('data-id'), $(evt.currentTarget).attr('data-nombre') );
         });
+
+        $('body').on(core.helper.clickEventType, '.bntCrearNuevaEmpresaCAE', function(evt)
+        {
+            empresaCore.mostrarModalNuevaEmpresaCAE();
+        });
+
     },
 
-    mostrarModalEmpresasCAE: async function()
+    /**
+     * Muestra el modal de crear nueva empresa desde el CAE
+     */
+    mostrarModalNuevaEmpresaCAE: async function()
     {
-    
+
+        apiFincatech.getView("empresa", "form").then((resultHTML)=>{
+
+                Swal.fire({
+                    text: "",
+                    html: resultHTML,
+                    grow:'false',
+                    width: '120rem',
+                    showCancelButton: true,
+                    showConfirmButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: '<i class="bi bi-save mr-2"></i> Guardar',
+                    cancelButtonText: '<i class="bi bi-x-circle mr-2"></i> Cancelar',
+                    reverseButtons: true,
+                    buttonsStyling: false,
+                    customClass: {
+                        actions: 'text-center p-3 shadow-inset rounded-pill border-light border-2 bg-white',
+                        confirmButton: 'btn btnSaveData btn-success shadow d-block pb-2 pt-2 confirmButtonModal',
+                        cancelButton: ' btn btn-danger btnCancelSave shadow d-block pb-2 pt-2 mr-3 cancelButtonModal',
+                        popup: 'bg-transparent'
+                    },                    
+                    didOpen: function(e)
+                    {
+
+                        //  Cargamos los combos 
+                            core.Forms.getSelectData( 'Empresatipo', 'Empresatipo.nombre', 'Empresatipo.id', '', '', 'tipoEmpresaComunidad', true ).then(()=>{
+                                $('body .formEmpresaComunidad #tipoEmpresaComunidad').select2({
+                                    dropdownParent: $('.swal2-container'),
+                                    theme: 'bootstrap4', 
+                                });
+                            });  
+
+                            core.Forms.getSelectData( 'Provincia', 'Provincia.Nombre', 'Provincia.Id', '', '', 'provinciaEmpresaComunidad', true ).then(()=>{
+                                $('body .formEmpresaComunidad #provinciaEmpresaComunidad').select2({
+                                    dropdownParent: $('.swal2-container'),
+                                    theme: 'bootstrap4', 
+                                });
+                            }); 
+
+                            $('.swal2-container .btnSaveData').removeClass('btnSaveData');
+
+
+                    },
+                    preConfirm: function(e)
+                    {
+                        if(core.Forms.Validate('formEmpresaComunidad'))
+                        {
+                            return true;
+                        }else{
+                            //  Mostramos el mensaje de error correspondiente
+                            Swal.showValidationMessage('Debe completar todos los campos marcados como obligatorios');
+                            return false;
+                        }               
+                    }                 
+                  }).then((result) => {
+                    if (result.isConfirmed) 
+                    {
+                            core.Forms.mapFormDataToSave('formEmpresaComunidad');
+                            core.Modelo.Insert('empresa', core.Forms.data, false).then( ()=>{
+                                //  Recargamos el listado de empresas de la comunidad
+                                    window['tablelistadoEmpresaComunidad'].ajax.reload();
+                            }).catch(function(e){
+                                return false;
+                            });
+                    }
+                }); 
+            }); 
     },
 
     /** Elimina una comunidad previa confirmación */
@@ -229,7 +305,7 @@ let empresaCore = {
             CoreUI.tableData.addColumn('listadoEmpresaComunidad', "localidad", "Localidad", null, 'text-left');
 
             //  Persona de contacto
-            CoreUI.tableData.addColumn('listadoEmpresaComunidad', "empresatipo[0].nombre", "Tipo", null, 'text-left');
+            CoreUI.tableData.addColumn('listadoEmpresaComunidad', "tipoempresa", "Tipo", null, 'text-left');
 
 
             //  Columna de acciones
