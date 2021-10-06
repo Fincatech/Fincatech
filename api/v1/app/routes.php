@@ -195,9 +195,6 @@ return function (App $app) {
 
     });
 
-    /** Recupera la documentación para una comunidad */
-
-
     /** Recupera la documentación básica dada de alta en el sistema */
     $app->get('/rgpd/documentacionbasica', function (Request $request, Response $response, array $params)
     {
@@ -239,6 +236,26 @@ return function (App $app) {
         return $response;  
 
     });
+
+    /** Asigna un documento a un requerimiento según el destino: Empresa, Comunidad, Empleado */
+    $app->post('/rgpd/{destino}/{idcomunidad}/create', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Documental');
+
+        $destinoDocumento = $params['destino'];
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        $response->getBody()->write( $frontController->context->uploadRequerimientoRGPD($destinoDocumento, $data) );
+        return $response;
+
+    }); 
 
     ///////////////////////////////////////////////////
     ////                   CAE, PRL                 ///
@@ -286,6 +303,23 @@ return function (App $app) {
         return $response;
 
     }); 
+
+    /** Recupera los tipos de documentos disponibles para descargar según el tipo de RGPD */
+    $app->get('/rgpd/requerimiento/{idtipo}/list', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Requerimiento');
+        $idTipo = $params['idtipo'];
+        
+        $response->getBody()->write( $frontController->context->ListRequerimientoByIdTipo($idTipo) );
+
+        return $response;  
+
+    });
 
     /** Punto de entrada para get. Se utiliza para listar todo
      *

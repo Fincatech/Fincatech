@@ -290,7 +290,7 @@ let CoreUI = {
                 var needFileUpload = false;
                 var fileLink = '';
 
-                if(core.Security.getRole() == 'ADMINFINCAS')
+                if(core.Security.getRole() == 'ADMINFINCAS' || core.Security.getRole() == 'SUDO')
                     canUploadFile = true;
 
             var salida = `
@@ -327,7 +327,7 @@ let CoreUI = {
 
                     //  Construimos el enlace de salida para que pueda descargar el fichero adjuntado
                     //  SUBIR FICHERO SOLO PARA ADMINISTRADOR
-                        if(!ficheroAdjuntado && canUploadFile)
+                        if(canUploadFile)
                         {  
                                 dataset = ` data-idcomunidad="${d.documentacioncomunidad[x].idcomunidad}" data-idempresa="" data-idempleado="" data-idrequerimiento="${d.documentacioncomunidad[x].idrequerimiento}" data-idrelacionrequerimiento="${d.documentacioncomunidad[x].idrelacion}" data-entidad="comunidad" `;
                                 salida += `<td class="text-center" ><a href="javascript:void(0)" class="btnAdjuntarFicheroDocumento" data-toggle="tooltip" ${dataset} data-placement="bottom" title="" id="home" data-original-title="Adjuntar documento"><i class="bi bi-cloud-arrow-up text-danger" style="font-size: 30px;"></i></a></td>`;
@@ -345,7 +345,8 @@ let CoreUI = {
 
         formatEmpleado: function(d)
         {
-
+console.log('Format empleados');
+console.log(d);
             //  Debemos comprobar el rol para subir fichero
                 var canUploadFile = false;
                 var needFileUpload = false;
@@ -354,12 +355,13 @@ let CoreUI = {
             //  Tipo empleado 
                 var value = $(`body #${CoreUI.tableData.selectedRowTableId} tr#${CoreUI.tableData.selectedRowIndex} td:nth-child(2)`).html().indexOf('Comunidad');
                 var empleadoComunidad = false;
-                    
+          
                 if(value>=0)
                     empleadoComunidad = true;
 
-            //  SÓLO EL PERFIL DE CONTRATISTA PUEDE SUBIR FICHEROS
-                if(core.Security.getRole() == 'CONTRATISTA' && !empleadoComunidad)
+            //  SÓLO EL PERFIL DE CONTRATISTA PUEDE SUBIR FICHEROS o bien el administrador de la comunidad
+            //  siempre que el empleado sea directo de la comunidad
+                if( (core.Security.getRole() == 'CONTRATISTA' && !empleadoComunidad) )
                     canUploadFile = true;
 
             var salida = `
@@ -391,6 +393,10 @@ let CoreUI = {
                     //      C: Caducado
                     var estadoRequerimiento = '';
                     var classRequerimiento;
+
+                    if( empleadoComunidad && core.Security.getRole() == 'ADMINFINCAS')
+                        canUploadFile = true;
+
                     switch(d.documentacionprl[x].estado)
                     {
                         case '':
@@ -424,26 +430,23 @@ let CoreUI = {
 
                     //  Enlace al fichero de descarga si está ya adjuntado o bien para subir si tiene permiso
                         ficheroAdjuntado = (!d.documentacionprl[x].idficherorequerimiento ? false : true);
+                        salida += ` <td class="text-center">`;
                         if(ficheroAdjuntado)   //  DESCARGAR FICHERO YA SUBIDO
                         {
-                            salida += ` <td class="text-center">
+                            salida += ` 
                                             <a href="${baseURL}public/storage/${d.documentacionprl[x].storageficherorequerimiento}" target="_blank" data-bs-toggle="tooltip" data-placement="bottom" title="Ver documento">
                                                 <i class="bi bi-cloud-arrow-down text-success" style="font-size: 30px;"></i>
                                             </a>`;
-
-                            //  Si es un empleado de la comunidad y además pertenece al rol admin de fincas entonces le damos permiso para subir el fichero
-                                if( empleadoComunidad && core.Security.getRole() == 'ADMINFINCAS')
-                                    canUploadFile = true;
-
-                            //  SUBIR FICHERO SOLO PARA ADMINISTRADOR
-                                if(canUploadFile)
-                                {  
-                                        dataset = ` data-idcomunidad="" data-idempresa="" data-idempleado="${d.idempleado}" data-idrequerimiento="${d.documentacionprl[x].idrequerimiento}" data-idrelacionrequerimiento="${d.documentacionprl[x].idrelacion}" data-entidad="empleado" `;
-                                        salida += `<a href="javascript:void(0)" class="btnAdjuntarFicheroDocumento" data-toggle="tooltip" ${dataset} data-placement="bottom" title="" id="home" data-original-title="Adjuntar documento"><i class="bi bi-cloud-arrow-up text-danger" style="font-size: 30px;"></i></a>`;
-                                }
-
-                            salida += `</td>`;
                         }
+
+                        //  Si es un empleado de la comunidad y además pertenece al rol admin de fincas entonces le damos permiso para subir el fichero
+                            if(canUploadFile)
+                            {  
+                                dataset = ` data-idcomunidad="" data-idempresa="" data-idempleado="${d.idempleado}" data-idrequerimiento="${d.documentacionprl[x].idrequerimiento}" data-idrelacionrequerimiento="${d.documentacionprl[x].idrelacion}" data-entidad="empleado" `;
+                                salida += `<a href="javascript:void(0)" class="btnAdjuntarFicheroDocumento" data-toggle="tooltip" ${dataset} data-placement="bottom" title="" id="home" data-original-title="Adjuntar documento"><i class="bi bi-cloud-arrow-up text-danger" style="font-size: 30px;"></i></a>`;
+                            }
+
+                        salida += `</td>`;
 
 
 
@@ -556,11 +559,14 @@ let CoreUI = {
                 case 'listadoEmpresa':
                 case 'listadoEmpresaComunidad':
                     salida = CoreUI.tableData.formatEmpresa(d);
+                    console.log('click empresas');
                     break;
                 case 'listadoComunidad':
+                    console.log('click comundiad');
                     salida = CoreUI.tableData.formatComunidad(d);
                     break;
                 case 'listadoEmpleadosComunidad':
+                    console.log('click empleados');
                     salida = CoreUI.tableData.formatEmpleado(d);
                     break;
             }

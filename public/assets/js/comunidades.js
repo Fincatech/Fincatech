@@ -108,6 +108,10 @@ let comunidadesCore = {
 
     guardarComunidad: function()
     {   
+
+        if(core.Forms.Validate('form-comunidad'))
+        {
+
         //  Mapeamos los datos iniciales de la comunidad
             core.Forms.mapDataToSave();
 
@@ -116,6 +120,10 @@ let comunidadesCore = {
 
         //  Guardamos los datos ya mapeados correctamente
             core.Forms.Save( true );
+        }else{
+            CoreUI.Modal.Error('Rellene los campos obligatorios para poder guardar la comunidad', 'Formulario incompleto');
+        }
+
     },
 
     /** Elimina una comunidad previa confirmación */

@@ -76,6 +76,52 @@ class DocumentalModel extends \HappySoftware\Model\Model{
 
     }
 
+    public function createRequerimientoRGPD($destino, $idFichero, $datos)
+    {
+        $tablaDestino = '';
+
+        switch ($destino)
+        {
+            case 'camarasseguridad':
+                $tablaDestino = 'camarasseguridad';
+                break;
+            case 'contratoscesion':
+                $tablaDestino = 'contratoscesion';
+                break;
+            default:
+                return 'ok';
+                break;
+        }
+
+        //  Generamos el registro en la base de datos
+            $sql = "insert into " . $tablaDestino . "(titulo, descripcion, idfichero, idcomunidad, created) ";
+            $sql .=" values (";
+
+        //  Título
+            $sql .= "'" . $this->getRepositorio()::PrepareDBString( $datos['titulo'] ) . "', ";
+
+        //  Descripción
+            $sql .= "'" . $this->getRepositorio()::PrepareDBString( $datos['observaciones'] ) . "', ";
+
+        //  ID Fichero
+            $sql .= $idFichero . ", ";
+
+        //  ID Comunidad
+            $sql .= $datos['idcomunidad'] . ", ";
+
+        //  Created
+            $sql .= "now() ";
+
+        //  Cierre de consulta
+            $sql .= " ) ";
+// die($sql);
+            $this->getRepositorio()->queryRaw( $sql );
+
+        //  Devolvemos un estado ok
+            return 'ok';
+
+    }
+
     public function cambiarEstadoRequerimiento($idrequerimiento, $destino, $nuevoEtado)
     {
     

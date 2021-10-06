@@ -28,10 +28,15 @@ class ComunidadController extends FrontController{
         //  Si es el usuario sudo el que ha dado de alta la comunidad
         //  forzamos que se guarde en estado 'A' (Activada) para que lo apruebe el admin del sistema
         if($this->getLoggedUserRole() == 'ROLE_SUDO')
+        {
             $datos['estado'] = 'A';
+        }else{
+            $datos['estado'] = 'P';
+        }
 
         //  Creamos la comunidad y obtenemos el id del registro para procesar los posibles servicios contratados
         //  así como los precios 
+        $datosServiciosContratados = null;
         if(isset($datos['comunidadservicioscontratados']))
         {
                 $datosServiciosContratados = $datos['comunidadservicioscontratados'];
@@ -44,14 +49,18 @@ class ComunidadController extends FrontController{
         $idComunidad = $this->ComunidadModel->Create($entidadPrincipal, $datos);
 
         //  Insertamos los servicios contratados por la comunidad
-        for($x = 0; $x < count($datosServiciosContratados); $x++)
+        if(!is_null($datosServiciosContratados))
         {
-            $idServicio = $datosServiciosContratados[$x]['idservicio'];
-            $precio = $datosServiciosContratados[$x]['precio'];
-            $precioComunidad = $datosServiciosContratados[$x]['preciocomunidad'];
-            $contratado = $datosServiciosContratados[$x]['contratado'];
-            $this->ComunidadModel->InsertServicioContratado($idComunidad['id'], $idServicio, $precio, $precioComunidad, $contratado);
+            for($x = 0; $x < count($datosServiciosContratados); $x++)
+            {
+                $idServicio = $datosServiciosContratados[$x]['idservicio'];
+                $precio = $datosServiciosContratados[$x]['precio'];
+                $precioComunidad = $datosServiciosContratados[$x]['preciocomunidad'];
+                $contratado = $datosServiciosContratados[$x]['contratado'];
+                $this->ComunidadModel->InsertServicioContratado($idComunidad['id'], $idServicio, $precio, $precioComunidad, $contratado);
+            }
         }
+
 
         return $idComunidad;
 

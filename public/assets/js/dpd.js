@@ -262,7 +262,7 @@ let dpdCore = {
             CoreUI.tableData.init();
 
             //  Comunidad
-            CoreUI.tableData.addColumn('listadoDpd', "comunidad[0].nombre","COMUNIDAD");
+            // CoreUI.tableData.addColumn('listadoDpd', "comunidad[0].nombre","COMUNIDAD");
 
             //  Consulta
             CoreUI.tableData.addColumn('listadoDpd', "consulta", "Consulta");

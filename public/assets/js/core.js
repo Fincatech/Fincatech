@@ -188,6 +188,59 @@ let Constantes = {
     </div>
     `,
 
+    CargaDocumentoRGPD: `
+    <div class="row">
+         <div class="col-12 text-center text-uppercase align-self-center">
+           <p class="m-0" style="display: block; font-size: 18px;"> Carga de documento</p>
+         </div>
+     </div>
+     <div class="row mb-2 wrapperInformacion">
+       <div class="col-12">
+           <p class="mt-3 text-justify" style="font-size: 14px;">1. Seleccione el fichero que desea adjuntar</p>
+           <p class="mt-3 text-justify" style="font-size: 14px;">2. Presione el botón <strong>Adjuntar documento</strong></p>
+       </div>
+     </div>
+     <div class="form-group row mb-2 justify-content-center wrapperSelectorFichero">
+       <div class="col-12">  
+           <div class="wrapperFichero row border rounded-lg ml-0 mr-0 mb-0 shadow-inset border-1 pt-3 pb-2">
+               <div class="col-2 align-self-center h-100 text-center">
+                   <i class="bi bi-cloud-arrow-up text-info" style="font-size: 30px;"></i>
+               </div>
+               <div class="col-10 pl-0 align-self-center">
+                   <input accept=".pdf, .doc, .docx" class="form-control form-control-sm ficheroAdjuntar border-0" hs-fichero-entity="Documental" id="ficheroadjuntar" name="ficheroadjuntar" type="file">
+               </div>       
+           </div>
+           <span class="pb-3 d-block text-center pt-2" style="font-size: 13px;">Sólo se permiten ficheros con extensión pdf, doc o docx</span>    
+           
+          <div class="row form-group text-left">
+            <div class="col-12">
+              <label>Título</label>
+              <input type="text" class="form-control w-100 tituloDocumentoRGPD mt-2" id="tituloDocumentoRGPD" maxlength="40" name="tituloDocumentoRGPD">
+            </div>
+          </div>
+          <div class="row form-group text-left mt-2">
+            <div class="col-12">
+              <label>Descripción</label>
+              <textarea class="form-control w-100 observacionesDocumentoRGPD shadow-inset border-0 mt-2" id="observacionesDocumentoRGPD" rows="3" name="observacionesDocumentoRGPD"></textarea>
+            </div>
+          </div>          
+           <!-- Mensaje de error --> 
+           <div class="wrapperMensajeErrorCarga row text-light p-3" style="display: none; font-size: 14px;">
+               <div class="col-12 bg-danger p-3 rounded shadow-neumorphic">
+                 <p class="mensaje"></p>
+               </div>
+           </div>          
+ 
+           <!-- Botón de adjuntar documento -->
+           <div class="row mt-3">
+             <div class="col-12">
+               <a href="javascript:void(0);" class="btn d-block btn-success bntUploadDocumentoRGPD pt-3 pb-3">Adjuntar documento</a>
+             </div>
+           </div>
+       </div>
+     </div>
+     `,
+
 }
 
 

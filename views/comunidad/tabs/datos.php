@@ -13,7 +13,7 @@
     <!-- CIF -->
     <div class="col-12 col-md-2 text-left">
         <label for="cif" class="pl-0"><i class="bi bi-credit-card-2-front pr-2"></i>CIF*</label>
-            <input type="text" class="form-control data text-center form-required" id="cif" name="cif" placeholder="CIF/NIF"  hs-entity="Comunidad" hs-field="cif" required>
+            <input type="text" class="form-control data text-center form-required" id="cif" name="cif" placeholder="CIF/NIF" hs-entity="Comunidad" hs-field="cif" required>
     </div>  
 
     <!-- Administrador asignado -->
@@ -47,8 +47,8 @@
 <!-- Spa -->
 <div class="form-group row mb-2">
     <div class="col-12">
-        <label for="nombre"><i class="bi bi-shield-check pr-2"></i>SPA Asignado</label>
-        <select id="idspa" name="idspa" class="select-data data custom-select form-control selectpicker" data-live-search="true" hs-entity="Comunidad" hs-field="idspa" hs-list-entity="Spa" hs-list-field="nombre" hs-list-value="id"></select>
+        <label for="nombre"><i class="bi bi-shield-check pr-2"></i>SPA Asignado*</label>
+        <select id="idspa" name="idspa" class="select-data data custom-select form-control selectpicker form-required" data-live-search="true" hs-entity="Comunidad" hs-field="idspa" hs-list-entity="Spa" hs-list-field="nombre" hs-list-value="id"></select>
     </div>
 </div> 
 
@@ -67,7 +67,7 @@
                 <input type="text" class="form-control data text-center" id="codpostal" name="codpostal" placeholder="Código postal"  hs-entity="Comunidad" hs-field="codpostal">
     </div>
     <div class="col-12 col-md-7">
-        <label for="localidad"><i class="bi bi-geo-alt pr-2"></i>Localidad</label>
+        <label for="localidad"><i class="bi bi-geo-alt pr-2"></i>Localidad*</label>
             <input type="text" class="form-control data form-required" id="localidad" name="localidad" placeholder="Localidad"  hs-entity="Comunidad" hs-field="localidad" required>
     </div>
     <div class="col-12 col-md-3">
@@ -83,7 +83,7 @@
             <input type="text" class="form-control data text-center" id="telefono" name="telefono" placeholder="Teléfono"  hs-entity="Comunidad" hs-field="telefono">
     </div>
     <div class="col-12 col-md-10">
-        <label for="email"><i class="bi bi-envelope pr-2"></i>E-Mail</label>              
+        <label for="email"><i class="bi bi-envelope pr-2"></i>E-Mail*</label>              
         <input type="text" class="form-control data text-left form-required" id="email" name="email" placeholder="E-mail"  hs-entity="Comunidad" hs-field="emailcontacto" required>
     </div>                       
 

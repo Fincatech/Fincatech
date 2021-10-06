@@ -25,6 +25,45 @@ class EmpresaModel extends \HappySoftware\Model\Model{
 
     }
 
+    public function Create($entidad, $datos)
+    {
+                //  Generamos en primer lugar el objeto usuario de tipo contratista
+        //  FIXME: Esto hay que meterlo en el objeto del modelo de usuario y luego guardar
+        $datosNuevoUsuario = [];
+        $datosNuevoUsuario['nombre'] = $datos['razonsocial'];
+        $datosNuevoUsuario['cif'] = $datos['cif'];
+        $datosNuevoUsuario['direccion'] = $datos['direccion'];
+        $datosNuevoUsuario['localidad'] = $datos['localidad'];
+        $datosNuevoUsuario['codpostal'] = $datos['codpostal'];
+        $datosNuevoUsuario['telefono'] = $datos['telefono'];
+        $datosNuevoUsuario['emailcontacto'] = $datos['email'];
+        $datosNuevoUsuario['email'] = $datos['email'];
+        $datosNuevoUsuario['rolid'] = 6;
+        $datosNuevoUsuario['password'] = md5('finca123456');
+        $datosNuevoUsuario['estado'] = 'P';
+        $datosNuevoUsuario['salt'] = '';
+
+    //  Recuperamos el ID del usuario para poder asignarlo a la hora de crear la empresa
+        $idNuevoUsuario = parent::Create('Usuario', $datosNuevoUsuario);
+        $datos['idusuario'] = $idNuevoUsuario['id'];
+
+        //TODO: $this->createRelationBetweenEmpresaAndComunidad($idComunidad, $idEmpresa);
+
+        return parent::Create($entidad, $datos);
+    }
+
+    // TODO: Recuperar ID cuando hace la llamada desde el front
+    private function createRelationBetweenEmpresaAndComunidad($idComunidad, $idEmpresa)
+    {
+        $sql = "insert into comunidadempresa(idcomunidad, idempresa, activa, created, usercreate) values (";
+        $sql .= $idComunidad . ", ";
+        $sql .= $idEmpresa . ", 1,  now(), ";
+        $sql .= $this->getLoggedUserId() . " ";
+        $sql .= " ) ";
+
+        $this->getRepositorio()->queryRaw($sql);  
+    }
+
     public function List($params =  null, $useUserLogged = false)
     {
         $data = [];

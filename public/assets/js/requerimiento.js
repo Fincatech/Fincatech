@@ -18,6 +18,19 @@ let requerimientoCore = {
  
         }
 
+        if( $('#listadoDocumentacionContratosCesion').length)
+            requerimientoCore.renderTablaDocumentacionContratosCesion();
+
+        if( $('#listadoContratosCesion'))
+            requerimientoCore.renderTablaContratosCesion();
+
+        if( $('#listadoDocumentacionCamarasSeguridad'))
+            requerimientoCore.renderTablaDocumentacionCamarasSeguridad();
+
+        if( $('#listadoCamarasSeguridad'))
+            requerimientoCore.renderTablaCamarasSeguridad();
+    
+
     },
 
     events: async function()
@@ -59,8 +72,57 @@ let requerimientoCore = {
                 // $('#listadoRequerimiento').addClass('no-clicable');
                 CoreUI.tableData.render("listadoRequerimiento", "Requerimiento", "requerimiento/list");
         }
-    }
+    },
 
+    renderTablaDocumentacionContratosCesion: async function()
+    {
+        if($('#listadoDocumentacionContratosCesion').length)
+        {
+
+            //  Cargamos el listado de documentos de contratos de cesión
+                CoreUI.tableData.init();
+
+            //  Nombre
+                CoreUI.tableData.addColumn('listadoDocumentacionContratosCesion', "nombre","NOMBRE", null, 'text-justify');
+
+            //  Fichero asociado
+                var html = '<a href="' + config.baseURL + 'public/storage/data:ficheroscomunes.nombrestorage$" target="_blank"><i class="bi bi-cloud-arrow-down" style="font-size:24px;"></i></a>'
+                CoreUI.tableData.addColumn('listadoDocumentacionContratosCesion', null, "Fichero", html, 'text-center', '120px');
+
+                $('#listadoDocumentacionContratosCesion').addClass('no-clicable');
+                CoreUI.tableData.render("listadoDocumentacionContratosCesion", "Requerimiento", "rgpd/requerimiento/3/list", false, false, false);
+        }
+    },
+
+    renderTablaDocumentacionCamarasSeguridad: async function()
+    {
+        if($('#listadoDocumentacionCamarasSeguridad').length)
+        {
+
+            //  Cargamos el listado de documentos de contratos de cesión
+                CoreUI.tableData.init();
+
+            //  Nombre
+                CoreUI.tableData.addColumn('listadoDocumentacionCamarasSeguridad', "nombre","NOMBRE", null, 'text-justify');
+
+            //  Fichero asociado
+                var html = '<a href="' + config.baseURL + 'public/storage/data:ficheroscomunes.nombrestorage$" target="_blank"><i class="bi bi-cloud-arrow-down" style="font-size:24px;"></i></a>'
+                CoreUI.tableData.addColumn('listadoDocumentacionCamarasSeguridad', null, "Fichero", html, 'text-center', '120px');
+
+                $('#listadoDocumentacionCamarasSeguridad').addClass('no-clicable');
+                CoreUI.tableData.render("listadoDocumentacionCamarasSeguridad", "Requerimiento", "rgpd/requerimiento/2/list", false, false, false);
+        }
+    },
+
+    renderTablaContratosCesion: async function()
+    {
+
+    },
+
+    renderTablaCamarasSeguridad: async function()
+    {
+
+    },
 
 }
 

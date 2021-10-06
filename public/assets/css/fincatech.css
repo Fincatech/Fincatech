@@ -388,4 +388,37 @@ body div.dataTables_wrapper div.dataTables_filter input {
 .cancelButtonModal {
   border-radius: 50rem 0rem 0rem 50rem !important;
 }
+
+div#listadoDocumentacionContratosCesion_wrapper .row:first-child,
+div#listadoDocumentacionCamarasSeguridad_wrapper .row:first-child {
+  display: none;
+}
+
+div#listadoDocumentacionContratosCesion_info,
+div#listadoDocumentacionCamarasSeguridad_info {
+  display: none !important;
+}
+
+table#listadoDocumentacionContratosCesion thead,
+table#listadoDocumentacionCamarasSeguridad thead {
+  display: none;
+}
+
+table#listadoDocumentacionContratosCesion,
+table#listadoDocumentacionCamarasSeguridad {
+  margin-top: 0 !important;
+  border-radius: 0;
+  padding: 0;
+}
+
+#listadoDocumentacionCamarasSeguridad.table > :not(caption) > * > *,
+#listadoDocumentacionContratosCesion.table > :not(caption) > * > * {
+  padding: 0px 0 0px 10px !important;
+}
+
+a.nav-link.active {
+  background-color: #17a2b8b8 !important;
+  color: white !important;
+  border-color: #17a2b8 !important;
+}
 /*# sourceMappingURL=fincatech.css.map */

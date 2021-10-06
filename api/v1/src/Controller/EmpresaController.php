@@ -17,13 +17,31 @@ class EmpresaController extends FrontController{
 
     public function Create($entidadPrincipal, $datos)
     {
-        //  Llamamos al método de crear
+
+      //    Llamamos al método de crear
             $result = $this->EmpresaModel->Create('Empresa', $datos);
-            
-        //  Tenemos que generar un nuevo usuario
 
-        //  Para ello debemos instanciar el controller de usuario para pasarle los datos
+        // //  Generamos en primer lugar el objeto usuario de tipo contratista
+        // //  FIXME: Esto hay que meterlo en el objeto del modelo de usuario y luego guardar
+        //     $datosNuevoUsuario = [];
+        //     $datosNuevoUsuario['nombre'] = $datos['razonsocial'];
+        //     $datosNuevoUsuario['cif'] = $datos['cif'];
+        //     $datosNuevoUsuario['direccion'] = $datos['direccion'];
+        //     $datosNuevoUsuario['localidad'] = $datos['localidad'];
+        //     $datosNuevoUsuario['codpostal'] = $datos['codpostal'];
+        //     $datosNuevoUsuario['telefono'] = $datos['telefono'];
+        //     $datosNuevoUsuario['emailcontacto'] = $datos['email'];
+        //     $datosNuevoUsuario['email'] = $datos['email'];
+        //     $datosNuevoUsuario['rolid'] = 6;
+        //     $datosNuevoUsuario['password'] = md5('finca123456');
+        //     $datosNuevoUsuario['estado'] = $datos[''];
+        //     $datosNuevoUsuario['salt'] = '';
 
+        // //  Recuperamos el ID del usuario para poder asignarlo a la hora de crear la empresa
+        //     $idNuevoUsuario = $this->empresaModel->Create('Usuario', $datosNuevoUsuario);
+        //     $datos['idusuario'] = $idNuevoUsuario['id'];
+
+  
 
         return $result;
     }

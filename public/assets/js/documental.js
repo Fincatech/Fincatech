@@ -65,13 +65,39 @@ let documentalCore = {
 
                 //  Inicializamos el componente de ficheros
                     core.Files.init();
-
-                //  Bindemos el evento del botón procesar importación
-
-
             }});
 
         });
+
+        //  Adjuntar documento RGPD
+        $('body .btnAdjuntarDocumentoRGPD').off();
+        $('body').on(core.helper.clickEventType, '.btnAdjuntarDocumentoRGPD', async function()
+        {
+
+            documentalCore.idcomunidad = core.modelId;
+            documentalCore.entidad = $(this).attr('data-tipo');
+
+            const { value: file } = await Swal.fire({
+            title: '',
+            html: Constantes.CargaDocumentoRGPD,
+            showCancelButton: false,
+            showConfirmButton: false,
+            showCloseButton: true,
+            didOpen: function()
+            {
+                //  Inicializamos el componente de ficheros
+                    core.Files.init();
+            }});
+
+        });        
+
+        $('body .bntUploadDocumentoRGPD').off();
+        $('body').on(core.helper.clickEventType, '.bntUploadDocumentoRGPD', function(e)
+        {
+            e.stopImmediatePropagation();
+            documentalCore.uploadRequerimientoRGPD();
+        });
+
     },
 
     /**
@@ -136,6 +162,54 @@ let documentalCore = {
 
 
     },
+
+    /**
+     * 
+     * @param {*} idrequerimiento 
+     * @param {*} idtipo Admin C: Comunidad | E: Empresa | EM: Empleado 
+     */
+     uploadRequerimientoRGPD: async function()
+     {
+        //  TODO: Hay que obtener el título y la descripción
+
+         //  Envía el documento al endpoint para registrarlo
+         var data = Object();
+             data = {
+                 idcomunidad: documentalCore.idcomunidad,
+                 entidad: documentalCore.entidad,
+                 fichero: core.Files.fichero,
+                 titulo: $('body .tituloDocumentoRGPD').val(),
+                 observaciones: $('body .observacionesDocumentoRGPD').val(),
+             };
+ // console.log(data);
+ // console.log('endpoint requerimiento ' + `requerimiento/${documentalCore.entidad}/${documentalCore.idrequerimiento}`);
+         await apiFincatech.post(`rgpd/${documentalCore.entidad}/${documentalCore.idcomunidad}/create`, data).then(async (response) =>
+         {
+ 
+             var responseData = JSON.parse(response);
+ 
+             if(responseData.status['response'] == "ok")
+             {
+                 CoreUI.Modal.Success("El documento se ha registrado correctamente");
+
+                 // Recargamos la tabla de cámaras de seguridad adjuntos
+                    if($('body #listadoCamarasSeguridad').length)
+                        window['tablelistadoCamarasSeguridad'].ajax.reload();               
+
+                 // Recargamos la tabla de contratos de cesión adjuntos
+                    if($('body #listadoContratosCesion').length)
+                        window['tablelistadoContratosCesion'].ajax.reload();
+
+             }else{
+                 //  TODO: Ver cuál es el error en el json
+                 Modal.Error("No se ha podido registrar el documento por el siguiente motivo:<br><br>" + responseData.status.response);
+ 
+             }
+ 
+         });
+ 
+ 
+     },
 
     Comunidad: {
     

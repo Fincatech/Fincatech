@@ -44,7 +44,6 @@ class DocumentalController extends FrontController{
                 $datos[ $relaciones[ $datos['entidad'] ]['campo'] ]))
             {
                 return HelperController::successResponse($this->DocumentalModel->updateRequerimiento());
-                die('existe el requerimiento');
             }else{
                 // Destino, idFichero, datos
                 return HelperController::successResponse($this->DocumentalModel->createRequerimiento(
@@ -52,6 +51,20 @@ class DocumentalController extends FrontController{
                     $datos));
             }
 
+    }
+
+    /** Sube un requerimiento de RGPD a la tabla que corresponda */
+    public function uploadRequerimientoRGPD($destino, $datos)
+    {
+
+        //  Subimos el fichero a la plataforma
+            $idFichero = $this->uploadFile($datos['fichero']['nombre'], $datos['fichero']['base64']);
+
+        //  TODO: Validar que no exista el requeririmiento en bbdd
+        //  para eso analizamos el cuerpo de la petición para ver si viene informado el ID del requerimiento previamente subido
+
+        //  Destino, idFichero, datos
+            return HelperController::successResponse($this->DocumentalModel->createRequerimientoRGPD( $destino, $idFichero, $datos) );
     }
 
     public function getRepositorio()
