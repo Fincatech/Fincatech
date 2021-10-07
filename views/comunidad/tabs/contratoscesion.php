@@ -23,17 +23,17 @@
     </div>
 
     <!-- Tabla documentos a adjuntar -->
-    <div class="row mt-1">
+    <!-- <div class="row mt-1">
         <div class="col-12">
             <div class="alert alert-secondary m-0 justify-content-center rounded" role="alert">
                 <p class="m-0 p-3 text-uppercase">Documentos modelo disponibles para descargar</p>
             </div>            
         </div>
-    </div>
+    </div> -->
 
     <div class="row mt-1">
         <div class="col-12">
-            <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoDocumentacionContratosCesion" id="listadoDocumentacionContratosCesion" data-model="Requerimiento">
+            <table class="table my-0 hs-tabla w-100 no-clicable border-0" name="listadoDocumentacionContratosCesion" id="listadoDocumentacionContratosCesion" data-model="Requerimiento">
                 <thead class="thead"></thead>
                 <tbody class="tbody"></tbody>
             </table>
@@ -43,20 +43,14 @@
     <!-- Tabla contratos adjuntados -->
     <div class="row mt-1">
         <div class="col-12">
-            <div class="alert alert-primary m-0 rounded w-100" role="alert">
                 <div class="row w-100">
-                    <div class="col-12 col-md-6">
-                        <p class="m-0 p-3 text-uppercase"><i class="bi bi-pen pr-2"></i>Contratos adjuntados</p>
-                    </div>
-                 
-                    <div class="col-12 col-md-6 text-right align-self-center">
-                        <a href="javascript:void(0);" class="btnAdjuntarDocumentoRGPD btn btn-outline-primary text-uppercase rounded-pill shadow pl-2 pr-4" data-tipo="contratoscesion"><i class="bi bi-plus-circle pr-3"></i> Añadir nuevo</a>
+                    <div class="col-12 text-center align-self-center">
+                        <a href="javascript:void(0);" class="btnAdjuntarDocumentoRGPD btn btn-outline-primary text-uppercase rounded-pill shadow pl-2 pr-4" data-tipo="contratoscesion"><i class="bi bi-plus-circle pr-3"></i> Añadir nuevo contrato de cesión de datos a terceros</a>
                     </div>
                 </div>
-            </div>            
         </div>
     </div>
-    <div class="row mt-3 flex-grow-1">
+    <div class="row flex-grow-1">
         <div class="col-12">    
             <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoContratosCesion" id="listadoContratosCesion" data-model="Comunidad">
                 <thead class="thead"></thead>

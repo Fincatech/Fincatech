@@ -1,5 +1,5 @@
-<div class="tab-pane fade h-100" id="dpd" role="tabpanel">
-
+<div class="tab-pane fade flex-grow-1 space-between col-12" id="rgpdconsultasdpd" role="tabpanel">
+    
     <div class="row">
 
         <div class="col-12 d-flex">

@@ -78,6 +78,11 @@ class DocumentalController extends FrontController{
         $this->DocumentalModel->uploadRequerimiento($datos);
     }
 
+    /** Devuelve un listado de requerimientos según el tipo y la comunidad */
+    public function ListRequerimientoRGPD($destino, $idComunidad)
+    {
+        return HelperController::successResponse( $this->DocumentalModel->ListRequerimientoRGPD($destino, $idComunidad) );
+    }
 
     // public function Create($entidadPrincipal, $datos)
     // {

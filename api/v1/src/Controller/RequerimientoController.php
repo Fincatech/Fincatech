@@ -54,8 +54,6 @@ class RequerimientoController extends FrontController{
 
     public function ListRequerimientoByIdTipo($idTipo)
     {
-
-        // return helperController::successResponse( $this->RequerimientoModel->List(null, false) );
         return helperController::successResponse( $this->RequerimientoModel->ListRequerimientoByIdTipo($idTipo) );
     }
 

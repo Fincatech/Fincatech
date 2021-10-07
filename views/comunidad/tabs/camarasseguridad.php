@@ -1,17 +1,17 @@
 <div class="tab-pane fade flex-grow-1 space-between col-12" id="rgpdcamarasseguridad" role="tabpanel">
 
     <!-- Tabla documentos a adjuntar -->
-    <div class="row mt-1">
+    <!-- <div class="row mt-1">
         <div class="col-12">
             <div class="alert alert-secondary m-0 justify-content-center rounded" role="alert">
                 <p class="m-0 p-3 text-uppercase">Documentos modelo disponibles para descargar</p>
             </div>            
         </div>
-    </div>
+    </div> -->
 
     <div class="row mt-1">
         <div class="col-12">
-            <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoDocumentacionCamarasSeguridad" id="listadoDocumentacionCamarasSeguridad" data-model="Requerimiento">
+            <table class="table table-hover my-0 hs-tabla w-100 no-clicable border-0" name="listadoDocumentacionCamarasSeguridad" id="listadoDocumentacionCamarasSeguridad" data-model="Requerimiento">
                 <thead class="thead"></thead>
                 <tbody class="tbody"></tbody>
             </table>

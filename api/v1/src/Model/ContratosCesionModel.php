@@ -26,9 +26,9 @@ class ContratosCesionModel extends \HappySoftware\Model\Model{
     }
 
     // /** Recupera todos los registros */
-    // public function List($params = null)
-    // {
-    //     return parent::List($params);
-    // }
+    public function List($params = null, $useLoggedUser = false)
+    {
+        return parent::List($params, $useLoggedUser);
+    }
 
 }

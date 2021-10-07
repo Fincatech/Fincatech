@@ -4,9 +4,12 @@ namespace Fincatech\Controller;
 
 // Sustituir Model por el nombre del modelo real. Ej: UsuarioModel
 use HappySoftware\Controller\HelperController;
+use HappySoftware\Controller\Traits\SecurityTrait;
 use Firebase\JWT\JWT;
 
 class LoginController extends FrontController{
+
+    use SecurityTrait;
 
     public function __construct($params = null)
     {
@@ -25,6 +28,31 @@ class LoginController extends FrontController{
         setcookie('FINCATECHTOKEN', '', time() - 3600, "/");
         $data['logout'] = 'ok';
         return HelperController::successResponse($data);
+    }
+
+    /** Método que cambia el password para el usuario en sesión */
+    public function changePassword($params)
+    {
+
+            $newPass = $this->model->getRepositorio()::PrepareDBString( $params['password'] );
+
+        //  Si el usuario está autenticado procedemos a actualizar el password en bbdd
+        //  sobre el id del usuario en sesión
+            $data = [];
+
+            if($this->isLogged())
+            {
+                $idUsuario = $this->getLoggedUserId();
+                
+                $sql = "update usuario set password='" . $newPass . "' where id = $idUsuario ";
+                $this->model->getRepositorio()->queryRaw($sql);
+                $data['changepassword'] = 'ok';
+            }else{
+                $data['changepassword'] = 'ko';
+            }
+            
+            return HelperController::successResponse($data);
+
     }
 
     public function checkLogin($params)

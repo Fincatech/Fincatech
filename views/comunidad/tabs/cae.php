@@ -15,7 +15,7 @@
                                     </div>
                                     <div class="col-12 col-md-9 text-right">
                                         <a href="javascript:void(0)" class="btn btn-outline-secondary text-uppercase rounded-pill shadow pl-2 pr-4 btnAsociarEmpresaCAE mr-2"><i class="bi bi-shop pr-2 pl-2"></i> ASOCIAR EMPRESA / AUTÓNOMO</a>
-                                        <a href="javascript:void(0)" class="btn btn-outline-info text-uppercase rounded-pill shadow pl-2 pr-4 btnNuevoEmpleadoComunidad"><i class="bi bi-person pl-2 pr-2"></i> ALTA EMPLEADO COMUNIDAD</a>
+                                        <a href="javascript:void(0)" class="btn btn-outline-info text-uppercase rounded-pill shadow pl-2 pr-4 btnNuevoEmpleadoComunidad d-none"><i class="bi bi-person pl-2 pr-2"></i> ALTA EMPLEADO COMUNIDAD</a>
                                     </div>
 
                                 </div>

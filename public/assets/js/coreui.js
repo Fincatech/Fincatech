@@ -251,7 +251,7 @@ let CoreUI = {
         },
 
         /** Añade la definición de una columna */
-        addColumn: function(id, nombre, titulo, renderHTML, clase, widthColumn )
+        addColumn: function(id, nombre, titulo, renderHTML, clase, widthColumn, _render = null )
         {
             if(typeof CoreUI.tableData.columns[id] === 'undefined')
             {
@@ -276,7 +276,7 @@ let CoreUI = {
                     }
                 };
             }else{
-                columna = {"data": nombre, "width": widthColumn, "render":null, "title":titulo};
+                columna = {"data": nombre, "width": widthColumn, "render": _render, "title":titulo};
             }
 
             CoreUI.tableData.columns[id].push(columna);

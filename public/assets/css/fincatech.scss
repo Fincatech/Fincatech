@@ -351,6 +351,7 @@ div#listadoDocumentacionCamarasSeguridad_wrapper .row:first-child
 }
 
 div#listadoDocumentacionContratosCesion_info,
+#listadoContratosCesion_info,
 div#listadoDocumentacionCamarasSeguridad_info {
     display: none !important;
 }
@@ -375,4 +376,8 @@ a.nav-link.active {
     background-color: #17a2b8b8 !important;
     color: white !important;
     border-color: #17a2b8 !important;
+}
+
+.dataTables_info {
+    display: none;
 }

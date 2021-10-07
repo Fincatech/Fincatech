@@ -137,8 +137,11 @@
                     <!-- <img src="<?php //echo ASSETS_IMG; ?>avatars/avatar.jpg" class="avatar img-fluid rounded mr-1" alt="Oscar Rodríguez" />--><i class="bi bi-person-circle" style="font-size:20px;"></i> <span class="text-dark usuarioFincatech">Óscar Rodríguez</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right">
+                    <!-- Cambiar contraseña -->
+                    
+                    <a class="dropdown-item btnChangePassword" href="javascript:void(0);"><i class="align-middle mr-1" data-feather="unlock"></i> Cambiar contraseña</a>
                     <?php if(!$App->isSudo()): ?>
-                        <a class="dropdown-item disabled" href="pages-profile.html"><i class="align-middle mr-1" data-feather="user"></i> Perfil</a>
+                        <a class="dropdown-item disabled d-none" href="javascript:void(0);"><i class="align-middle mr-1" data-feather="user"></i> Perfil</a>
                     <?php endif; ?>
                     <!-- Sólo para usuarios de tipo administrador de fincas -->
                     <?php if($App->isAdminFincas() ) : ?>

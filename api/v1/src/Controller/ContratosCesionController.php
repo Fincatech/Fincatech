@@ -40,9 +40,9 @@ class ContratosCesionController extends FrontController{
         return $this->ContratosCesionModel->Get($id);
     }
 
-    public function List($params = null)
+    public function List($params = null, $useLoggedUser = false)
     {
-       return $this->ContratosCesionModel->List($params);
+       return $this->ContratosCesionModel->List($params, $useLoggedUser);
     }
 
 }

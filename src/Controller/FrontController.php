@@ -173,7 +173,7 @@ class MainController{
     public static function redirectToLogin()
     {
         header('Location: ' . HOME_URL . 'login');
-        die();
+        exit;
     }
 
 

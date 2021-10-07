@@ -62,6 +62,29 @@ return function (App $app) {
 
     });  
 
+    //  Cambio de password para el usuario actual
+    $app->post('/changepassword', function(Request $request, Response $response, array $params ): Response
+    {
+
+        //$data = $request->getParsedBody();
+            $body= file_get_contents("php://input"); 
+            $data = json_decode($body, true);
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        //  Instanciamos el controller del login
+            $frontController->Init( 'login', $data );
+
+
+
+        $response->getBody()->write( $frontController->context->changePassword( $data ) );
+        
+        return $response;
+
+    });  
+
     //  Renderizado de vistas
     $app->post('/getview', function(Request $request, Response $response, array $params ): Response
     {
@@ -257,6 +280,40 @@ return function (App $app) {
 
     }); 
 
+    /** Recupera los documentos relativos al rgpd para una comunidad */
+    $app->get('/rgpd/documentacion/{destino}/{idcomunidad}/list', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Documental');
+
+        $destinoDocumento = $params['destino'];
+        $idComunidad = $params['idcomunidad'];
+
+        $response->getBody()->write( $frontController->context->ListRequerimientoRGPD($destinoDocumento, $idComunidad) );
+        return $response;
+
+    }); 
+
+    /** Recupera los tipos de documentos disponibles para descargar según el tipo de RGPD */
+    $app->get('/rgpd/requerimiento/{idtipo}/list', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Requerimiento');
+        $idTipo = $params['idtipo'];
+        
+        $response->getBody()->write( $frontController->context->ListRequerimientoByIdTipo($idTipo) );
+
+        return $response;  
+
+    });
     ///////////////////////////////////////////////////
     ////                   CAE, PRL                 ///
     ///////////////////////////////////////////////////
@@ -303,23 +360,6 @@ return function (App $app) {
         return $response;
 
     }); 
-
-    /** Recupera los tipos de documentos disponibles para descargar según el tipo de RGPD */
-    $app->get('/rgpd/requerimiento/{idtipo}/list', function (Request $request, Response $response, array $params)
-    {
-
-        // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
-
-        $frontController = new $frontControllerName();
-        $frontController->Init('Requerimiento');
-        $idTipo = $params['idtipo'];
-        
-        $response->getBody()->write( $frontController->context->ListRequerimientoByIdTipo($idTipo) );
-
-        return $response;  
-
-    });
 
     /** Punto de entrada para get. Se utiliza para listar todo
      *

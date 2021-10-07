@@ -114,7 +114,7 @@ class DocumentalModel extends \HappySoftware\Model\Model{
 
         //  Cierre de consulta
             $sql .= " ) ";
-// die($sql);
+
             $this->getRepositorio()->queryRaw( $sql );
 
         //  Devolvemos un estado ok
@@ -137,6 +137,31 @@ class DocumentalModel extends \HappySoftware\Model\Model{
     {
         $tablasRelaciones = $this->getRelacionesTabla();
         return $this->getRepositorio()->ExisteRegistro($tablaDestino, " idrequerimiento=$idrequerimiento and $idkey = $id");
+    }
+
+    /** Recupera el listado de requerimientos según su tipología e id de comunidad */
+    public function ListRequerimientoRGPD($destino, $idcomunidad)
+    {
+
+        //  FIXME: Buscar forma más eficiente y menos peligrosa que esta
+            $destino = ($destino == 'camarasseguridad' ? 'CamarasSeguridad' : 'ContratosCesion');
+
+       //   Instanciamos el controller correspondiente
+            $this->InitController( $destino );
+            $modelo = $destino.'Controller';
+
+        //  Recuperamos el listado general
+        //  FIXME: Utilizar el filtro de resultados por idcomunidad
+            $datos = $this->$modelo->List(null, false);
+       
+       //   Filtramos los datos por idcomunidad
+            $datos = $this->filterResults($datos, $destino, 'idcomunidad', $idcomunidad);
+
+        //  NOTE: ???Para aliviar la respuesta quitamos los datos de la comunidad ya que no los vamos a necesitar
+        //    unset($datos[$destino]['comunidad']);
+
+            return $datos;
+
     }
 
 }

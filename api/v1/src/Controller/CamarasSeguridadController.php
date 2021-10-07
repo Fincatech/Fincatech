@@ -11,6 +11,7 @@ class CamarasSeguridadController extends FrontController{
 
     public function __construct($params = null)
     {
+        parent::__construct();
         $this->InitModel('CamarasSeguridad', $params);
     }
 

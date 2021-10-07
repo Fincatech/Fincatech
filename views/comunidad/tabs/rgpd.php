@@ -31,9 +31,25 @@
                             <div class="row">
                                 <div class="col-12 pl-0 pr-0">
                                     <ul class="nav nav-tabs" id="tablaRGPD" role="tablist">
+                                        <!-- Documentación básica -->
                                         <li class="nav-item" role="presentation">
-                                            <a class="nav-link active" data-toggle="tab" href="#rgpdcontratoscesion" role="tab" aria-selected="true"><i class="bi bi-pen pr-2"></i>Contratos de cesión a terceros</a>
+                                            <a class="nav-link" data-toggle="tab" href="#rgpddocumentacionbasica" role="tab" aria-selected="false"><i class="bi bi-folder2-open pr-2"></i>Documentación básica</a>
+                                        </li> 
+                                        <!-- Notas informativas -->                                       
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link" data-toggle="tab" href="#rgpdnotasinformativas" role="tab" aria-selected="true"><i class="bi bi-journals pr-2"></i>Notas informativas</a>
                                         </li>
+                                        <!-- Informes de evaluación y seguimiento -->                                       
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link" data-toggle="tab" href="#rgpdinformesevaluacion" role="tab" aria-selected="true"><i class="bi bi-journal-bookmark pr-2"></i>Informes de evaluación y seguimiento</a>
+                                        </li>    
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link" data-toggle="tab" href="#rgpdconsultasdpd" role="tab" aria-selected="true"><i class="bi bi-chat-right-text pr-2"></i>Consultas al dpd</a>
+                                        </li>                                           
+                                        <!-- Consultas al DPD -->                                       
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link" data-toggle="tab" href="#rgpdcontratoscesion" role="tab" aria-selected="true"><i class="bi bi-pen pr-2"></i>Contratos de cesión de datos a terceros</a>
+                                        </li>                                                                              
                                         <li class="nav-item" role="presentation">
                                             <a class="nav-link" data-toggle="tab" href="#rgpdcamarasseguridad" role="tab" aria-selected="false"><i class="bi bi-camera-video pr-2"></i>Cámaras de seguridad</a>
                                         </li>
@@ -45,6 +61,7 @@
                                     <div class="tab-content d-flex row w-100">
                                         <?php include_once('contratoscesion.php'); ?>
                                         <?php include_once('camarasseguridad.php'); ?>
+                                        <?php include_once('dpd.php'); ?>
                                     </div>                                
                                 </div>
                             </div>

@@ -98,6 +98,15 @@ let documentalCore = {
             documentalCore.uploadRequerimientoRGPD();
         });
 
+        $('body').on(core.helper.clickEventType, '.btnEliminarDocumentoRGPD', function(e)
+        {
+            //  Eliminamos el registro correspondiente según el tipo al que corresponda
+                var id = $(this).attr('data-id');
+                var nombre = $(this).attr('data-nombre');
+                var tipo = $(this).attr('data-tipo');
+                documentalCore.RGPD.eliminarDocumento(id, nombre, tipo);
+        });
+
     },
 
     /**
@@ -170,12 +179,13 @@ let documentalCore = {
      */
      uploadRequerimientoRGPD: async function()
      {
-        //  TODO: Hay que obtener el título y la descripción
+        //  TODO: Hay que ver si es un update o no, esto viene determinado por el idrequerimiento
 
          //  Envía el documento al endpoint para registrarlo
          var data = Object();
              data = {
                  idcomunidad: documentalCore.idcomunidad,
+                 idrequerimiento: documentalCore.idrequerimiento,
                  entidad: documentalCore.entidad,
                  fichero: core.Files.fichero,
                  titulo: $('body .tituloDocumentoRGPD').val(),
@@ -290,6 +300,17 @@ let documentalCore = {
         {
         
         }
+
+    },
+
+    RGPD: {
+
+    /** Elimina una comunidad previa confirmación */
+        eliminarDocumento: function(id, nombre, tipo)
+        {
+            var destinoTablaHTML = (tipo == 'camarasseguridad' ? 'listadoCamarasSeguridad' : 'listadoContratosCesion');
+            core.Modelo.Delete(tipo, id, nombre, destinoTablaHTML);
+        },
 
     },
 

@@ -314,7 +314,7 @@ let empresaCore = {
                 CoreUI.tableData.addColumn('listadoEmpresaComunidad', null, "", html);
 
                 $('#listadoEmpresaComunidad').addClass('no-clicable');
-                CoreUI.tableData.render("listadoEmpresaComunidad", "empresascomunidad", `comunidad/${idcomunidad}/empresas`);
+                CoreUI.tableData.render("listadoEmpresaComunidad", "empresascomunidad", `comunidad/${idcomunidad}/empresas`, null, false, false);
         }  
     },
 

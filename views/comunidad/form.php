@@ -17,9 +17,9 @@
                         <a class="list-group-item list-group-item-action" data-toggle="list" href="#documentos" role="tab" aria-selected="false"><i class="bi bi-folder-check mr-2"></i> Documentos</a>
                         <a class="list-group-item list-group-item-action" data-toggle="list" href="#empresa" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> CAE</a>
                         <a class="list-group-item list-group-item-action" data-toggle="list" href="#rgpd" role="tab" aria-selected="false"><i class="bi bi-shield-lock mr-2"></i> RGPD</a>
-                        <?php if($App->getLoggedUserRole() == 'ROLE_ADMINFINCAS'): ?>
-                            <a class="list-group-item list-group-item-action" data-toggle="list" href="#dpd" role="tab" aria-selected="false"><i class="bi bi-chat-right-text mr-2"></i> DPD</a>
-                        <?php endif; ?>
+                        <?php //if($App->getLoggedUserRole() == 'ROLE_ADMINFINCAS'): ?>
+                            <!-- <a class="list-group-item list-group-item-action" data-toggle="list" href="#dpd" role="tab" aria-selected="false"><i class="bi bi-chat-right-text mr-2"></i> DPD</a> -->
+                        <?php //endif; ?>
                         <!-- <a class="list-group-item list-group-item-action disabled" data-toggle="list" href="#maquinaria" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> Maquinaria / Químicos</a> -->
                         <!-- <a class="list-group-item list-group-item-action disabled" data-toggle="list" href="#controlhorario" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> Control horario</a> -->
                     </div>
@@ -77,7 +77,7 @@
             <?php include('tabs/cae.php'); ?>            
 
             <!-- DPD -->
-            <?php include('tabs/dpd.php'); ?>
+            <?php //include('tabs/dpd.php'); ?>
 
             <!-- RGPD -->
             <?php include('tabs/rgpd.php'); ?>
