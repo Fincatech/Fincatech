@@ -1,4 +1,4 @@
-<div class="tab-pane fade show active flex-grow-1 space-between col-12" id="rgpdcontratoscesion" role="tabpanel">
+<div class="tab-pane fade flex-grow-1 space-between col-12" id="rgpdcontratoscesion" role="tabpanel">
 
     <!-- Mensaje informativo -->
     <div class="row mt-3">

@@ -16,6 +16,7 @@ define("security", [
                 "empresa",
                 "empleado",
                 'informevaloracionseguimiento',
+                'notasinformativas',
                 "requerimiento",
                 "servicios",
                 "spa",

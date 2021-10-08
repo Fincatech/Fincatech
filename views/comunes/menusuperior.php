@@ -19,20 +19,20 @@
 
     <?php endif; ?>
 
-    <span class="titulo titulo-modulo d-sm-inline-block" style="min-width: fit-content;"></span>
+    
 
     <div class="navbar-collapse collapse">
         <ul class="navbar-nav navbar-align">
             <li class="nav-item">
                 <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Dashboard" href="<?php echo APPFOLDER . "dashboard"; ?>" id="home">
-                    <div class="position-relative">
-                        <i class="bi bi-house-door"></i>
+                    <div class="position-relative text-center text-info">
+                        <i class="bi bi-house-door mr-2"></i><span style="font-size: 12px;display: block;">Ir al inicio</span>
                     </div>
                 </a>
             </li>
             <!-- Notas informativas, Documentación Básica e Informes de valoración y seguimiento solo si es administrador de fincas -->
             <?php if($App->isAdminFincas()): ?>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Documentación básica" href="<?php echo APPFOLDER . "rgpd/documentacionbasica"; ?>" id="documentacionbasica_nav">
                         <div class="position-relative">
                             <i class="bi bi-folder2-open"></i>
@@ -52,7 +52,7 @@
                             <i class="bi bi-journals"></i>
                         </div>
                     </a>                    
-                </li>
+                </li> -->
             <?php endif; ?>
             <!-- Notificaciones -->
             <?php $App->renderView('componentes/notificaciones/notificacionesmenu.php'); ?>

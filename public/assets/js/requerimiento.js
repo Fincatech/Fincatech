@@ -108,12 +108,12 @@ let requerimientoCore = {
             //  Cargamos el listado de documentos de contratos de cesión
                 CoreUI.tableData.init();
 
-            //  Nombre
-                CoreUI.tableData.addColumn('listadoDocumentacionCamarasSeguridad', "nombre","NOMBRE", null, 'text-justify');
+            // //  Nombre
+            //     CoreUI.tableData.addColumn('listadoDocumentacionCamarasSeguridad', "nombre","NOMBRE", null, 'text-justify');
 
             //  Fichero asociado
-                var html = '<a href="' + config.baseURL + 'public/storage/data:ficheroscomunes.nombrestorage$" target="_blank"><i class="bi bi-cloud-arrow-down" style="font-size:24px;"></i></a>'
-                CoreUI.tableData.addColumn('listadoDocumentacionCamarasSeguridad', null, "Fichero", html, 'text-center', '120px');
+                var html = '<a href="' + config.baseURL + 'public/storage/data:ficheroscomunes.nombrestorage$" target="_blank"><i class="bi bi-cloud-arrow-down mr-2" style="font-size:24px;"></i>data:nombre$</a>'
+                CoreUI.tableData.addColumn('listadoDocumentacionCamarasSeguridad', null, "Fichero", html, 'text-left', '120px');
 
                 $('#listadoDocumentacionCamarasSeguridad').addClass('no-clicable');
                 CoreUI.tableData.render("listadoDocumentacionCamarasSeguridad", "Requerimiento", "rgpd/requerimiento/2/list", false, false, false);
@@ -214,7 +214,7 @@ let requerimientoCore = {
                 CoreUI.tableData.addColumn('listadoCamarasSeguridad', null, "", html);
 
                 $('#listadoCamarasSeguridad').addClass('no-clicable');
-                CoreUI.tableData.render("listadoCamarasSeguridad", "CamarasSeguridad", `rgpd/documentacion/camarasseguridad/${idComunidad}/list`);
+                CoreUI.tableData.render("listadoCamarasSeguridad", "CamarasSeguridad", `rgpd/documentacion/camarasseguridad/${idComunidad}/list`, false, false, false );
         }
     },
 

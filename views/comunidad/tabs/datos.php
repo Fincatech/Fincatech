@@ -99,6 +99,7 @@
 </div> 
 
 <!-- Servicios contratados -->
+<?php if($App->isSudo()): ?>
 <div class="form-group row mb-2">
 
     <div class="col-12">
@@ -120,7 +121,7 @@
     </div>
 
 </div>
-
+<?php endif; ?>
 <?php $App->renderActionButtons(); ?>
 
 </form>

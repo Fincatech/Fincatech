@@ -16,7 +16,7 @@ let documentalCore = {
         //  Notas informativas
         if($('#listadoNotasinformativas').length)
         {
-            notasInformativasCore.renderTabla();
+          //  notasInformativasCore.renderTabla();
         }else{
             core.Files.init();
             core.Files.Fichero.entidadId = core.modelId;        

@@ -37,6 +37,21 @@ let empresaCore = {
             empresaCore.mostrarModalNuevaEmpresaCAE();
         });
 
+        $('body').on(core.helper.clickEventType, '#listadoEmpresaComunidad tr', function(e)
+        {
+            e.stopImmediatePropagation();
+            $('.wrapperEmpresasComunidad').hide();
+            
+            //  Cargamos el listado de empleados para la comunidad y empresa seleccionada
+                $('.wrapperEmpleadosEmpresaComunidad').css('opacity','1');
+        })
+
+        $('body').on(core.helper.clickEventType, '.btnCerrarEmpleadosComunidad', function(e)
+        {
+            $('.wrapperEmpleadosEmpresaComunidad').css('opacity','0');
+            $('.wrapperEmpresasComunidad').show();
+        });
+
     },
 
     /**
@@ -284,7 +299,7 @@ let empresaCore = {
 
             //  Añadimos la columna de desplegar
             // CoreUI.tableData.addColumnRow('listadoEmpresaComunidad', 'empresatipo');
-            CoreUI.tableData.addColumnRow('listadoEmpresaComunidad', 'documentacioncae');
+            // CoreUI.tableData.addColumnRow('listadoEmpresaComunidad', 'documentacioncae');
 
             //  Razón social
             CoreUI.tableData.addColumn('listadoEmpresaComunidad', "razonsocial","Nombre", null, 'text-left');

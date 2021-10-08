@@ -13,13 +13,10 @@
                     </div>
 
                     <div class="list-group list-group-flush" role="tablist">
-                        <a class="list-group-item list-group-item-action active" data-toggle="list" href="#datos" role="tab" aria-selected="true"><i class="bi bi-archive mr-2"></i> Datos</a>
-                        <a class="list-group-item list-group-item-action" data-toggle="list" href="#documentos" role="tab" aria-selected="false"><i class="bi bi-folder-check mr-2"></i> Documentos</a>
+                        <a class="list-group-item list-group-item-action active d-none" data-toggle="list" href="#datos" role="tab" aria-selected="true"><i class="bi bi-archive mr-2"></i> Datos</a>
+                        <!-- <a class="list-group-item list-group-item-action" data-toggle="list" href="#documentos" role="tab" aria-selected="false"><i class="bi bi-folder-check mr-2"></i> Documentos</a> -->
                         <a class="list-group-item list-group-item-action" data-toggle="list" href="#empresa" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> CAE</a>
                         <a class="list-group-item list-group-item-action" data-toggle="list" href="#rgpd" role="tab" aria-selected="false"><i class="bi bi-shield-lock mr-2"></i> RGPD</a>
-                        <?php //if($App->getLoggedUserRole() == 'ROLE_ADMINFINCAS'): ?>
-                            <!-- <a class="list-group-item list-group-item-action" data-toggle="list" href="#dpd" role="tab" aria-selected="false"><i class="bi bi-chat-right-text mr-2"></i> DPD</a> -->
-                        <?php //endif; ?>
                         <!-- <a class="list-group-item list-group-item-action disabled" data-toggle="list" href="#maquinaria" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> Maquinaria / Químicos</a> -->
                         <!-- <a class="list-group-item list-group-item-action disabled" data-toggle="list" href="#controlhorario" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> Control horario</a> -->
                     </div>
@@ -49,10 +46,10 @@
 
                                 <div class="row">
                                     <div class="col-12 col-md-9">
-                                        <h5 class="card-title mb-0"><i data-feather="<?php echo $iconoAccion; ?>"></i> <span class="titulo titulo-modulo">Comunidad</span></h5>
+                                        <h5 class="card-title mb-0"><i class="bi bi-building" style="color: #17a2b8;"></i> <span class="titulo titulo-modulo pl-1"></span></h5>
                                     </div>
                                     <div class="col-12 col-md-3 text-right">
-                                        <a href="<?php echo APPFOLDER . $App->getController() . "/add" ?>" class="btn btn-outline-success text-uppercase rounded-pill shadow pl-2 pr-4"><i class="bi bi-plus-circle pr-3"></i> NUEVA <?php echo strtoupper($App->getController() ); ?></a>
+                                        <!-- <a href="<?php // echo APPFOLDER . $App->getController() . "/add" ?>" class="btn btn-outline-success text-uppercase rounded-pill shadow pl-2 pr-4"><i class="bi bi-plus-circle pr-3"></i> NUEVA <?php echo strtoupper($App->getController() ); ?></a> -->
                                     </div>
                                 </div>
 

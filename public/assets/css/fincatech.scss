@@ -381,3 +381,20 @@ a.nav-link.active {
 .dataTables_info {
     display: none;
 }
+
+#listadoEmpresaComunidad_wrapper.dataTables_wrapper .row:first-child {
+    display: none;
+}
+
+.wrapperEmpresasComunidad{
+    transition: all 300ms ease-in-out;
+}
+
+.wrapperEmpleadosEmpresaComunidad{
+    opacity:0; 
+    transition: all 300ms ease-in;
+}
+#listadoEmpleadosComunidad_wrapper .row:first-child {
+    display: none;
+    margin-bottom: 0 !important;
+}

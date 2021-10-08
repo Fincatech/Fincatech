@@ -13,6 +13,7 @@ trait ViewTrait{
     public function renderActionButtons()
     {
         global $appSettings, $App;
+
         include(ABSPATH.'views/comunes/acciones_form.php');
     }
 
@@ -50,7 +51,8 @@ trait ViewTrait{
         //  Incluimos las opciones de menú a las que tiene acceso según su rol de usuario
         if( $this->isLogged() )
         {
-            include(ABSPATH . 'views/' . security[$this->getUserRol()]['folder'] . '/menuacciones.php');
+            if(file_exists(ABSPATH . 'views/' . security[$this->getUserRol()]['folder'] . '/menuacciones.php'))
+                include(ABSPATH . 'views/' . security[$this->getUserRol()]['folder'] . '/menuacciones.php');
         }
 
         //  Comprobamos qué vista es la que hay que renderizar

@@ -4,17 +4,17 @@
 
         <div class="col-12 d-flex">
 
-            <div class="card flex-fill shadow-neumorphic pl-3 pb-3 pt-2 pr-3">
+            <div class="card flex-fill pt-2">
 
-                <div class="card-header pl-1 mb-2">
+                <div class="card-header pl-1">
 
-                    <div class="row mb-3">
+                    <div class="row">
 
-                        <div class="col-6">
+                        <!-- <div class="col-6">
                             <h5 class="card-title mb-0"><i class="bi bi-chat-right-text mr-2"></i> <span class="titulo">Consultas DPD</span></h5>
-                        </div>
-                        <div class="col-6 text-right">
-                            <a href="javascript:void(0);" class="btn btn-outline-secondary text-uppercase rounded-pill shadow pl-2 pr-4 btnCrearConsultaDPD"><i class="bi bi-plus-circle pr-3"></i> CREAR CONSULTA</a>
+                        </div> -->
+                        <div class="col-12 text-center">
+                            <a href="javascript:void(0);" class="btn btn-outline-primary text-uppercase rounded-pill shadow pl-2 pr-4 btnCrearConsultaDPD"><i class="bi bi-plus-circle pr-3"></i> ENVIAR CONSULTA AL DPD</a>
                         </div>
 
                     </div>
@@ -39,7 +39,6 @@
                 </div>
 
             </div>
-
 
         </div>
 

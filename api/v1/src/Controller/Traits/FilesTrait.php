@@ -63,7 +63,7 @@ trait FilesTrait{
                     $this->getRepositorio()->queryRaw( $sqlFile );
                     return ($this->getRepositorio()->getLastID("ficheroscomunes") - 1);
 
-            }catch(Exception $ex){
+            }catch(\Exception $ex){
                 print_r($ex);
                 die();
             }
