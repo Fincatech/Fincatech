@@ -12,7 +12,7 @@ trait ConfigTrait{
 
     private static $settings;
 
-    public static function getNamespaceName()
+    public static function getHSNamespaceName()
     {
         global $appSettings;
         return $appSettings['project']['namespace'];

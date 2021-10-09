@@ -25,8 +25,14 @@ trait SecurityTrait{
 
     public function getLoggedUserRole()
     {
-        $usuarioRol = get_object_vars( $this->getJWTUserData()['data']->userData )['role'];
-        return $usuarioRol;
+        if($this->isLogged())
+        {
+            $usuarioRol = get_object_vars( $this->getJWTUserData()['data']->userData )['role'];
+            return $usuarioRol;
+        }else{
+            throw new \Exception('No tiene acceso');
+            die();
+        }
     }
 
     public function getLoggedUserId()

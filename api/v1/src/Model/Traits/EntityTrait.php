@@ -13,7 +13,7 @@ trait EntityTrait{
     protected function InitEntity($entity)
     {
 
-        $entityNameSpace = ConfigTrait::getNamespaceName() . 'Entity\\' . $entity;
+        $entityNameSpace = ConfigTrait::getHSNamespaceName() . 'Entity\\' . $entity;
 
         include_once(ABSPATH . 'src/Entity/'. $entity . '.php');
         

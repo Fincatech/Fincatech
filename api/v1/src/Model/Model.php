@@ -4,6 +4,7 @@ namespace HappySoftware\Model;
 
 use Fincatech\Controller\FrontController;
 use HappySoftware\Controller\HelperController;
+use HappySoftware\Controller\Traits;
 use HappySoftware\Controller\Traits\ConfigTrait;
 use HappySoftware\Controller\Traits\FilesTrait;
 use HappySoftware\Controller\Traits\SecurityTrait;
@@ -24,7 +25,8 @@ use HappySoftware\Entity\DatabaseHelper\Relations;
 
 class Model extends FrontController{
     
-    use ConfigTrait, CrudTrait, DatabaseTrait, EntityTrait, SchemaTrait, TableTrait, UtilsTrait;
+    use ConfigTrait;
+    use CrudTrait, DatabaseTrait, EntityTrait, SchemaTrait, TableTrait, UtilsTrait;
     use SecurityTrait, FilesTrait;
 
     /** Namespace del proyecto enlazado */
@@ -75,7 +77,7 @@ class Model extends FrontController{
     private $pageResultsLimit;
 
     public $usuarios;
-
+ 
     public function Test()
     {
         echo 'TestModel',PHP_EOL;

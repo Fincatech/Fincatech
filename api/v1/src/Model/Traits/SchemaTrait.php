@@ -59,7 +59,7 @@ trait SchemaTrait{
         if(is_null($schemaInfo) && $this->repositorio->getCreateMissingTables() == true)
         {
             //  Creamos la tabla en base a la entidad, para ello creamos la instancia
-            $entityName = ConfigTrait::getNamespaceName() . 'Entity\\' . $tableName;
+            $entityName = ConfigTrait::getHSNamespaceName() . 'Entity\\' . $tableName;
             $entityCreate = new $entityName();
 
             //  Recuperamos la información de la nueva tabla creada

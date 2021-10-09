@@ -73,7 +73,8 @@ class LoginController extends FrontController{
                     AND r.id = u.rolid
                     and u.estado = 'A'
         ";
-
+        echo '1';
+// die($sql);
         $resultado = false;
         $result = $this->model->query($sql);
         
@@ -118,7 +119,8 @@ class LoginController extends FrontController{
         $data['token'] = $JWTToken;
 
         //  Metemos en una cookie el token
-            setcookie('FINCATECHTOKEN', $JWTToken, $expire, "/"); // 86400 = 1 day
+        // die('oscar');
+            setcookie('FINCATECHTOKEN', $JWTToken, $expire, "/", "happysoftware.es", true); // 86400 = 1 day
 
         return HelperController::successResponse($data);
         

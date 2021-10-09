@@ -85,7 +85,7 @@ class FrontController{
         include_once(ABSPATH.'src/Model/'.$modelName.'.php');
 
         //$this->model->setMainModel( $modelName );
-        $instanceName = ConfigTrait::getNamespaceName() . 'Model\\' . $modelName;
+        $instanceName = ConfigTrait::getHSNamespaceName() . 'Model\\' . $modelName;
         
         $this->$modelName = new $instanceName($params);        
     }

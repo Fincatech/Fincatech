@@ -9,11 +9,11 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\App;
 use Slim\Interfaces\RouteCollectorProxyInterface as Group;
 
-use HappySoftware\Controller\Traits\ConfigTrait;
 
 use Fincatech\Controller;
 use Fincatech\Controller\FrontController;
 use HappySoftware\Controller\HelperController;
+use HappySoftware\Controller\Traits\ConfigTrait;
 
 return function (App $app) {
 
@@ -29,7 +29,7 @@ return function (App $app) {
     {
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         $frontController->Init('login');
@@ -47,7 +47,7 @@ return function (App $app) {
         $data = $request->getParsedBody();
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         //  Instanciamos el controller del login
@@ -71,7 +71,7 @@ return function (App $app) {
             $data = json_decode($body, true);
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         //  Instanciamos el controller del login
@@ -92,7 +92,7 @@ return function (App $app) {
         $data = $request->getParsedBody();
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         
@@ -104,7 +104,7 @@ return function (App $app) {
     $app->get('/userinfo', function(Request $request, Response $response, array $params )
     {
         // Instanciamos el controller principal
-        //$frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        //$frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         //$frontController = new $frontControllerName();
         //$frontController->Init('Login');
@@ -127,7 +127,7 @@ return function (App $app) {
         $data = json_decode($body, true);
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         $frontController->Init($params['controller']);
@@ -145,7 +145,7 @@ return function (App $app) {
         $data = $request->getParsedBody();
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         $frontController->Init($params['controller']);
@@ -169,7 +169,7 @@ return function (App $app) {
     {
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
         
         $frontController = new $frontControllerName();
         $frontController->Init($params['controller']);
@@ -187,7 +187,7 @@ return function (App $app) {
     {
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         $frontController->Init($params['controller']);
@@ -205,7 +205,7 @@ return function (App $app) {
         // $data = $request->getParsedBody();
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         $frontController->Init($params['controller']);
@@ -222,7 +222,7 @@ return function (App $app) {
     $app->get('/rgpd/documentacionbasica', function (Request $request, Response $response, array $params)
     {
         //$frontController = new Fincatech\Controller\FrontController();
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
         $frontController = new $frontControllerName();
         
         $frontController->Init('Requerimiento');
@@ -236,7 +236,7 @@ return function (App $app) {
     $app->get('/rgpd/notasinformativas', function (Request $request, Response $response, array $params)
     {
         //$frontController = new Fincatech\Controller\FrontController();
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
         $frontController = new $frontControllerName();
         
         $frontController->Init('Notasinformativas');
@@ -250,7 +250,7 @@ return function (App $app) {
     $app->get('/rgpd/informevaloracionseguimiento', function (Request $request, Response $response, array $params)
     {
         //$frontController = new Fincatech\Controller\FrontController();
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
         $frontController = new $frontControllerName();
         
         $frontController->Init('InformeValoracionSeguimiento');
@@ -265,7 +265,7 @@ return function (App $app) {
     {
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         $frontController->Init('Documental');
@@ -285,7 +285,7 @@ return function (App $app) {
     {
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         $frontController->Init('Documental');
@@ -303,7 +303,7 @@ return function (App $app) {
     {
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         $frontController->Init('Requerimiento');
@@ -324,7 +324,7 @@ return function (App $app) {
         // $data = $request->getParsedBody();
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         $frontController->Init('Documental');
@@ -346,7 +346,7 @@ return function (App $app) {
         // $data = $request->getParsedBody();
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         $frontController->Init('Documental');
@@ -368,7 +368,7 @@ return function (App $app) {
     {
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         $frontController->Init($params['controller']);
@@ -385,7 +385,7 @@ return function (App $app) {
     {
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         $frontController->Init('Comunidad');
@@ -403,7 +403,7 @@ return function (App $app) {
     {
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         $frontController->Init('Empleado');
@@ -421,7 +421,7 @@ return function (App $app) {
     {
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         $frontController->Init('Comunidad');
@@ -439,7 +439,7 @@ return function (App $app) {
     {
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         $frontController->Init('Comunidad');
@@ -459,7 +459,7 @@ return function (App $app) {
         // $data = $request->getParsedBody();
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         $frontController->Init('Comunidad');
@@ -479,7 +479,7 @@ return function (App $app) {
     // $app->get('/comunidad/{idcomunidad}/documentacion', function (Request $request, Response $response, array $params)
     // {
     //     //$frontController = new Fincatech\Controller\FrontController();
-    //     $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+    //     $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
     //     $frontController = new $frontControllerName();
         
     //     $frontController->Init('Requerimiento');
@@ -495,7 +495,7 @@ return function (App $app) {
     {
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         $frontController->Init('Comunidad');
@@ -512,7 +512,7 @@ return function (App $app) {
     {
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         $frontController->Init('Empleado');
@@ -529,7 +529,7 @@ return function (App $app) {
     {
 
         // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
         $frontController->Init('Empleado');
@@ -546,7 +546,7 @@ return function (App $app) {
     $app->get('/{controller}/{id:[0-9]+}', function (Request $request, Response $response, array $params)
     {
         //$frontController = new Fincatech\Controller\FrontController();
-        $frontControllerName = ConfigTrait::getNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
         $frontController = new $frontControllerName();
         
         $frontController->Init($params['controller']);
@@ -556,7 +556,7 @@ return function (App $app) {
 
     });
 
-    $app->get('/', function (Request $request, Response $response) {
+    $app->get('/test', function (Request $request, Response $response) {
         $response->getBody()->write('Hello world!');
         return $response;
     });
