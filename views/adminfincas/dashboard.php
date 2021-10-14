@@ -1,5 +1,5 @@
             <!-- Info inicial -->
-            <div class="row">
+            <div class="row d-none">
                 <!-- <div class="col-xl-6 col-xxl-5 d-flex"> -->
                 <div class="col-12 d-flex">
                     <div class="w-100">

@@ -181,11 +181,11 @@ trait ViewTrait{
         include_once(ABSPATH.'views/comunes/header.php');
 
         // //  Renderiza el menú lateral
-        // if( $this->renderMenuLateral() && $this->isLogged() )
-        // {
-        //     //  Menú lateral
-        //     require_once(ABSPATH.'views/' . security[$rol]['folder'] . '/menulateral.php');
-        // }
+        if( $this->renderMenuLateral() && $this->isLogged() )
+        {
+            //  Menú lateral
+            require_once(ABSPATH.'views/' . security[$rol]['folder'] . '/menulateral.php');
+        }
 
         //  FIXME:  Meter la apertura del container en un fichero independiente
         //          Llamamos al método getContainerView()

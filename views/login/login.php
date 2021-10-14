@@ -25,7 +25,7 @@
 										<input autocomplete="new-password" type="text" style="display:none;">
 										<div class="mb-3">
 											<label class="form-label">Email</label>
-											<input autocomplete="off" class="form-control form-control-lg form-required data no-autofill" id="email" type="email" hs-entity="Login" hs-field="email" hs-error-msg="" name="email" placeholder="Login de acceso" required />
+											<input autocomplete="off" class="form-control form-control-lg form-required data no-autofill" id="email" type="email" hs-entity="Login" hs-field="email" hs-error-msg="" name="email" placeholder="Login de acceso" pattern="[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{1,5}" required />
 										</div>
 										<div class="mb-3">
 											<label class="form-label">Password</label>

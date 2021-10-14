@@ -16,8 +16,7 @@ Options +Indexes
   
   # If the above doesn't work you might need to set the `RewriteBase` directive manually, it should be the
   # absolute physical path to the directory that contains this htaccess file.
-  # RewriteBase /fincatech/
-  RewriteBase /
+  RewriteBase /fincatech/
 
   RewriteCond %{REQUEST_FILENAME} !-f
   #RewriteRule ^ public/index.php [QSA,L]

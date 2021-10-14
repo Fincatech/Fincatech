@@ -80,7 +80,7 @@
 
                         <div class="col-12 col-md-10">
                             <label for="email"><i class="bi bi-envelope pr-2"></i>Email</label>                          
-                            <input type="text" maxlength="255" class="form-control data text-left" id="email" name="email" placeholder="Email" hs-entity="Empleado" hs-field="email">
+                            <input type="text" maxlength="255" class="form-control data text-left" id="email" name="email" placeholder="Email" hs-entity="Empleado" hs-field="email" pattern="[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{1,5}">
                         </div>                     
 
                     </div>                    

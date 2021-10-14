@@ -1,6 +1,18 @@
 
 <form class="form-data form-floating form-comunidad">
 
+<?php if( $App->isSudo() ): ?>
+    
+    <!-- Estado del usuario -->
+    <div class="form-group row mb-2">
+        <div class="col-12 col-md-2 text-left">
+            <label for="estado"><i class="bi bi-geo-alt pr-2"></i>Estado</label>
+            <select id="estado" name="estado" class="select-data data custom-select form-control selectpicker" data-live-search="true" hs-entity="Comunidad" hs-field="estado" hs-list-entity="Estado" hs-list-field="nombre" hs-list-value="sId"></select>
+        </div>
+    </div>
+
+<?php endif; ?>
+
 <!-- Código - CIF - Nombre -->
 <div class="form-group row mb-2">
 
@@ -16,41 +28,42 @@
             <input type="text" class="form-control data text-center form-required" id="cif" name="cif" placeholder="CIF/NIF" hs-entity="Comunidad" hs-field="cif" required>
     </div>  
 
+    <!-- Nombre de la comunidad -->
+    <div class="col-12 col-md-8 text-left">
+        <label for="nombre"><i class="bi bi-building pr-2"></i>Nombre*</label>
+        <input type="text" class="form-control data form-required" id="nombre" name="nombre" placeholder="Nombre de la comunidad"  hs-entity="Comunidad" hs-field="nombre" aria-label="nombre" aria-describedby="addon-nombre" required>
+    </div> 
+
+</div>
+
+<?php if( $App->isSudo() ): ?>
+<!-- Nombre de la comunidad - Nombre del presidente -->
+<div class="form-group row mb-2">
+
     <!-- Administrador asignado -->
     <!-- Sólo pueden los sudo -->
-    <?php if( $App->isSudo() ): ?>
     <div class="col-12 col-md-8">
         <label for="usuarioId"><i class="bi bi-person-fill pr-2"></i>Administrador asignado</label>
         <select id="usuarioId" name="usuarioId" class="select-data custom-select data form-control selectpicker" data-live-search="true" hs-entity="Comunidad" hs-field="usuarioId" hs-list-entity="Administrador" hs-list-field="Usuario.nombre" hs-list-value="Usuario.id"></select>
     </div>                 
-    <?php endif; ?>
-
-</div>
-
-<!-- Nombre de la comunidad - Nombre del presidente -->
-<div class="form-group row mb-2">
-
-    <!-- Nombre de la comunidad -->
-    <div class="col-12 col-md-9 text-left">
-        <label for="nombre"><i class="bi bi-building pr-2"></i>Nombre*</label>
-        <input type="text" class="form-control data form-required" id="nombre" name="nombre" placeholder="Nombre de la comunidad"  hs-entity="Comunidad" hs-field="nombre" aria-label="nombre" aria-describedby="addon-nombre" required>
-    </div>                      
-
+                         
     <!-- Nombre del presidente -->
-    <div class="col-12 col-md-3 text-left">
+    <!-- <div class="col-12 col-md-3 text-left">
         <label for="presidente"><i class="bi bi-person pr-2"></i>Nombre del presidente</label>
         <input type="text" class="form-control data" id="presidente" name="presidente" placeholder="Nombre del presidente"  hs-entity="Comunidad" hs-field="presidente" aria-label="nombre" aria-describedby="addon-nombre">
-    </div>  
-
+    </div>   -->
+    
 </div>
 
+<?php endif; ?>
+
 <!-- Spa -->
-<div class="form-group row mb-2">
+<!-- <div class="form-group row mb-2">
     <div class="col-12">
         <label for="nombre"><i class="bi bi-shield-check pr-2"></i>SPA Asignado*</label>
         <select id="idspa" name="idspa" class="select-data data custom-select form-control selectpicker form-required" data-live-search="true" hs-entity="Comunidad" hs-field="idspa" hs-list-entity="Spa" hs-list-field="nombre" hs-list-value="id"></select>
     </div>
-</div> 
+</div>  -->
 
 <!-- dirección -->
 <div class="form-group row mb-2">
@@ -77,7 +90,7 @@
 </div> 
 
 <!-- Teléfono y e-mail -->
-<div class="form-group row mb-2">
+<!-- <div class="form-group row mb-2">
     <div class="col-12 col-md-2">
         <label for="telefono"><i class="bi bi-phone pr-2"></i>Teléfono</label>                          
             <input type="text" class="form-control data text-center" id="telefono" name="telefono" placeholder="Teléfono"  hs-entity="Comunidad" hs-field="telefono">
@@ -87,7 +100,7 @@
         <input type="text" class="form-control data text-left form-required" id="email" name="email" placeholder="E-mail"  hs-entity="Comunidad" hs-field="emailcontacto" required>
     </div>                       
 
-</div>                    
+</div>                     -->
 
 <!-- IBAN -->
 <div class="form-group row mb-2">

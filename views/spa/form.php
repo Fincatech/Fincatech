@@ -21,8 +21,8 @@
                             <input type="text" class="form-control data text-center text-uppercase" id="cif" name="cif" maxlength="20" placeholder="CIF/NIF"  hs-entity="Spa" hs-field="cif" required>
                         </div>
                         <div class="col-12 col-md-4">
-                            <label for="emailcontacto"><i class="bi bi-envelope pr-2"></i>E-Mail de contacto</label>              
-                            <input type="text" class="form-control data text-left" id="email" name="email" maxlength="255" placeholder="example@fincatech.es"  hs-entity="Spa" hs-field="email" required>
+                            <label for="email"><i class="bi bi-envelope pr-2"></i>E-Mail de contacto</label>              
+                            <input type="text" class="form-control data text-left" id="email" name="email" maxlength="255" placeholder="example@fincatech.es"  hs-entity="Spa" hs-field="email" pattern="[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{1,5}" required>
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="nombre"><i class="bi bi-person pr-2"></i>SPA</label>

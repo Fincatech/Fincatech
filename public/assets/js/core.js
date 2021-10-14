@@ -1,7 +1,7 @@
 
 let clickEventType = ((document.ontouchstart!==null)?'click':'touchstart');
 let environment = 'd';
-let baseURL = '/fincatech/';
+let baseURL = '/';
 var role = null;
 var showingLoadComunidades = false;
 
@@ -1019,9 +1019,9 @@ console.log('accion: ' + actionSave);
               if(respuesta.data.logout == 'ok')
               {
                 //  Logout correcto
-                CoreUI.Modal.Success('La sesión se ha cerrado correctamente', 'Fincatech', function(){
+                // CoreUI.Modal.Success('La sesión se ha cerrado correctamente', 'Fincatech', function(){
                   window.location.href = baseURL + 'login';
-                });
+                // });
               }
 
           });
@@ -1039,9 +1039,9 @@ console.log('accion: ' + actionSave);
                 CoreUI.Modal.Error("El e-mail y/o contraseña proporcionada es incorrecto");
               }else{
                 //  Login correcto
-                CoreUI.Modal.Success('Login Correcto', 'Fincatech', function(){
+                // CoreUI.Modal.Success('Login Correcto', 'Fincatech', function(){
                   window.location.href = 'dashboard';
-                });
+                // });
               }
 
             });
@@ -1102,6 +1102,98 @@ console.log('accion: ' + actionSave);
       }
 
   },
+
+  /** Componente de validaciones diversas */
+  Validator: {
+
+    /**
+     * Funcion para verificar si una cuenta IBAN es correcta
+     * @param string iban
+     * @return boolean
+     */
+    checkIBAN: function(iban)
+    {
+        if (iban == '')
+          return false;
+
+        if(iban.length==24)
+        {
+            var digitoControl=getCodigoControl_IBAN(iban.substr(0,2).toUpperCase(), iban.substr(4));
+            if(digitoControl==iban.substr(2,2))
+                return true;
+        }
+        return false;
+    },
+ 
+    /**
+     * Funcion que devuelve el codigo de verificacion de una cuenta bancaria
+     * @param string codigoPais los dos primeros caracteres del IBAN
+     * @param string cc la cuenta corriente, que son los ultimos 20 caracteres del IBAN
+     * @return string devuelve el codigo de control
+     */
+    getCodigoControl_IBAN: function (codigoPais,cc)
+    {
+        // cada letra de pais tiene un valor
+        valoresPaises = {
+            'A':'10',
+            'B':'11',
+            'C':'12',
+            'D':'13',
+            'E':'14',
+            'F':'15',
+            'G':'16',
+            'H':'17',
+            'I':'18',
+            'J':'19',
+            'K':'20',
+            'L':'21',
+            'M':'22',
+            'N':'23',
+            'O':'24',
+            'P':'25',
+            'Q':'26',
+            'R':'27',
+            'S':'28',
+            'T':'29',
+            'U':'30',
+            'V':'31',
+            'W':'32',
+            'X':'33',
+            'Y':'34',
+            'Z':'35'
+        };
+    
+        // reemplazamos cada letra por su valor numerico y ponemos los valores mas dos ceros al final de la cuenta
+        var dividendo = cc+valoresPaises[codigoPais.substr(0,1)]+valoresPaises[codigoPais.substr(1,1)]+'00';
+    
+        // Calculamos el modulo 97 sobre el valor numerico y lo restamos al valor 98
+        var digitoControl = 98-modulo(dividendo, 97);
+    
+        // Si el digito de control es un solo numero, añadimos un cero al delante
+        if(digitoControl.length==1)
+        {
+            digitoControl='0'+digitoControl;
+        }
+        return digitoControl;
+    },
+ 
+    /**
+     * Funcion para calcular el modulo
+     * @param string valor
+     * @param integer divisor
+     * @return integer
+     */
+    modulo: function(valor, divisor) {
+        var resto=0;
+        var dividendo=0;
+        for (var i=0;i<valor.length;i+=10) {
+            dividendo = resto + "" + valor.substr(i, 10);
+            resto = dividendo % divisor;
+        }
+        return resto;
+    },
+ 
+}
 
 
 };

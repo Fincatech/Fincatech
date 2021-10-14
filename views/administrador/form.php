@@ -30,7 +30,7 @@
                         </div>
                         <div class="col-12 col-md-8">
                             <label for="emailcontacto"><i class="bi bi-envelope pr-2"></i>E-Mail de contacto / Login</label>              
-                            <input type="text" class="form-control data text-left" id="emailcontacto" name="emailcontacto" placeholder="E-mail"  hs-entity="Usuario" hs-field="emailcontacto" required>
+                            <input type="text" class="form-control data text-left" id="emailcontacto" name="emailcontacto" placeholder="E-mail"  hs-entity="Usuario" hs-field="emailcontacto" pattern="[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{1,5}" required>
                         </div>
                         <div class="col-12 col-md-2">
                             <label for="email"><i class="bi bi-key pr-2"></i>Contraseña</label>              

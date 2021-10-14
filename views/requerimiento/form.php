@@ -24,7 +24,7 @@
 
                         <!-- Tipo -->
                         <div class="col-12 col-md-2">
-                            <label for="email"><i class="bi bi-key pr-2"></i>Tipo</label>              
+                            <label for="idrequerimientotipo"><i class="bi bi-key pr-2"></i>Tipo</label>              
                             <select id="idrequerimientotipo" name="idrequerimientotipo" class="select-data data custom-select form-control selectpicker" data-live-search="true" hs-entity="Requerimiento" hs-field="idrequerimientotipo" hs-list-entity="Requerimientotipo" hs-list-field="nombre" hs-list-value="id"></select>
                         </div>  
 
@@ -33,7 +33,7 @@
                     <!-- Comunidad asociada -->
                     <div class="form-group row">
                         <div class="col-12">
-                            <label for="email"><i class="bi bi-building pr-2"></i>Comunidad asociada<small><i class="bi bi-info-circle ml-3 pl-1"></i> </span> Elija una opción solo si desea que el requerimiento sea asociado únicamente a una comunidad</label>              
+                            <label for="idcomunidad"><i class="bi bi-building pr-2"></i>Comunidad asociada<small><i class="bi bi-info-circle ml-3 pl-1"></i> </span> Elija una opción solo si desea que el requerimiento sea asociado únicamente a una comunidad</label>              
                             <select id="idcomunidad" name="idcomunidad" class="select-data data custom-select form-control selectpicker" data-placeholder="Selecciona una opcion" data-allow-clear="true" data-live-search="true" hs-entity="Requerimiento" hs-field="idcomunidad" hs-list-entity="Comunidad" hs-list-field="nombre" hs-list-value="id">
                             </select>
                         </div>

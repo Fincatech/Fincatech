@@ -11,14 +11,14 @@ let comunidadesCore = {
     {
         //  Bindeamos los eventos de los diferentes botones de comunidades
         this.events();
-
+        await comunidadesCore.renderMenuLateral();
         //  Comprobamos si se está cargando el listado
         if(core.actionModel == "list" && core.model.toLowerCase() == "comunidad")
         {
 
             //  Recuperamos el listado de comunidades
                 await comunidadesCore.listadoDashboard();
-                // await comunidadesCore.renderMenuLateral();
+                
 
         }else{
 
@@ -108,6 +108,17 @@ let comunidadesCore = {
 
     guardarComunidad: function()
     {   
+
+        //  Lo primero es validar que el código iban sea correcto
+        if( $('#ibancomunidad').val() != '')
+        {
+            if(!core.Validator.checkIBAN( $('#ibancomunidad').val() ) )
+            {
+                CoreUI.Modal.Error('El código IBAN no es correcto. Por favor, revise el número proporcionado');
+                return;
+            }
+
+        }
 
         if(core.Forms.Validate('form-comunidad'))
         {
@@ -243,13 +254,20 @@ let comunidadesCore = {
 
     renderMenuLateral: async function()
     {
+
+        apiFincatech.get('comunidad/list').then( (result) => {
+
+            comunidadesCore.comunidades = JSON.parse(result);
+            console.log(comunidadesCore.comunidades);
+
         $('.navComunidades').append('<li class="sidebar-header">Comunidades</li>');
-        comunidadesCore.comunidades.forEach( function(valor, indice, array){
+
+            comunidadesCore.comunidades.data.Comunidad.forEach( function(valor, indice, array){
             var html = `<li class="sidebar-item">
-                            <a class="sidebar-link" href="/fincatech/comunidad/${valor['id']}">
+                            <a class="sidebar-link" href="/comunidad/${valor['id']}">
                                 <div class="row">
                                     <div class="col-2">
-                                        <img src="/fincatech/public/assets/img/icon_edificio.png" class="img-responsive feather">
+                                        <img src="/public/assets/img/icon_edificio.png" class="img-responsive feather">
                                     </div>
                                     <div class="col-10 pr-0">
                                         <span class="align-middle comunidad-${valor['id']}">${valor['codigo']} - ${valor['nombre']}</span>
@@ -260,7 +278,11 @@ let comunidadesCore = {
             $('.navComunidades').append(html);
             
         });
-        feather.replace();
+
+            feather.replace();    
+
+        });
+
     },
 
     /**
@@ -274,12 +296,15 @@ let comunidadesCore = {
                 CoreUI.tableData.init();
 
             //  Columna con información adicional de estado de documentación
-                CoreUI.tableData.addColumnRow('listadoComunidad', 'documentacioncomunidad');
+                // CoreUI.tableData.addColumnRow('listadoComunidad', 'documentacioncomunidad');
 
             //  Código
-                CoreUI.tableData.addColumn('listadoComunidad', "codigo","COD");
+                CoreUI.tableData.addColumn('listadoComunidad', "codigo","COD", null, null, '40px');
             //  Nombre
-                CoreUI.tableData.addColumn('listadoComunidad', "nombre", "NOMBRE");
+                CoreUI.tableData.addColumn('listadoComunidad', "nombre", "NOMBRE", null, null, '40%');
+
+            if(core.Security.getRole() == 'SUDO')
+            {
 
             //  Administrador
                 CoreUI.tableData.addColumn('listadoComunidad', "usuario[0].nombre", "Administrador");            
@@ -291,6 +316,7 @@ let comunidadesCore = {
             //  Teléfono
                 CoreUI.tableData.addColumn('listadoComunidad', "telefono", "TELEFONO");
 
+            }
             //  Documentos pendientes de subir
                 CoreUI.tableData.addColumn('listadoComunidad',function(row, type, val, meta)
                 {
@@ -337,13 +363,15 @@ let comunidadesCore = {
 
                 }, "doc verificados", null, 'text-center');
 
-            //  Fecha de alta
-                var html = 'data:created$';
-                CoreUI.tableData.addColumn('listadoComunidad', null, "Fecha alta", html);
-
+                if(core.Security.getRole() == 'SUDO')
+                {
+                //  Fecha de alta
+                    var html = 'data:created$';
+                    CoreUI.tableData.addColumn('listadoComunidad', null, "Fecha alta", html);
+                }
             // Estado
                 var html = 'data:estado$';
-                CoreUI.tableData.addColumn('listadoComunidad', null, "Estado", html);
+                CoreUI.tableData.addColumn('listadoComunidad', null, "Estado", html, null, '80px');
 
             //  Columna de acciones
                 var html = '<ul class="nav justify-content-center accionesTabla">';

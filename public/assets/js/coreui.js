@@ -345,8 +345,7 @@ let CoreUI = {
 
         formatEmpleado: function(d)
         {
-console.log('Format empleados');
-console.log(d);
+
             //  Debemos comprobar el rol para subir fichero
                 var canUploadFile = false;
                 var needFileUpload = false;
@@ -575,7 +574,7 @@ console.log(d);
 
         },
 
-        tableEventsClick: function(id, detailRows)
+        tableEventsClick: function(id, detailRows, endpoint = null)
         {
                // On each draw, loop over the `detailRows` array and show any child rows
             window['table' + id].on( 'draw', function () {
@@ -678,7 +677,7 @@ console.log(d);
 
             window['table' + id] = $(`#${id}`).DataTable(opciones);
 
-            CoreUI.tableData.tableEventsClick(id, detailRows);
+            CoreUI.tableData.tableEventsClick(id, detailRows, endpoint);
 
         }        
 

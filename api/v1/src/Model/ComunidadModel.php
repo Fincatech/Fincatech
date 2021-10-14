@@ -8,7 +8,7 @@ use Fincatech\Entity\Comunidad;
 
 use Fincatech\Model\Requerimiento;
 use Fincatech\Model\ServiciosModel;
-
+use HappySoftware\Controller\HelperController;
 use HappySoftware\Controller\Traits\SecurityTrait;
 
 class ComunidadModel extends \HappySoftware\Model\Model{
@@ -78,7 +78,12 @@ class ComunidadModel extends \HappySoftware\Model\Model{
     /** Recupera el listado de comunidades asociadas a un administrador */
     public function ListComunidadesByAdministradorId($id)
     {
-        $sql = "select * from comunidad where usuarioid = $id order by nombre asc";
+        $sql = "select * from comunidad where usuarioid = $id ";
+
+        if(!$this->isSudo())
+            $sql = " and estado = 'A' ";
+
+        $sql .= " order by nombre asc";
         $data = $this->query($sql);
         return $data;  
     }
@@ -106,6 +111,11 @@ class ComunidadModel extends \HappySoftware\Model\Model{
             $useLoggedUserId = true;
 
         $data = parent::List($params, $useLoggedUserId);
+
+        if(!$this->isSudo())
+        {
+            $data = $this->filterresults($data, 'Comunidad', 'estado', 'A');
+        }
 
         if(count($data['Comunidad']) > 0)
         {
