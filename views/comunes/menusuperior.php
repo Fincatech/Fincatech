@@ -1,12 +1,12 @@
 <nav class="navbar navbar-expand navbar-light navbar-bg">
 
-<?php if($App->isAdminFincas()): ?>
+    <?php if($App->isAdminFincas()): ?>
     
-    <a class="sidebar-toggle d-flex">
+    <!-- <a class="sidebar-toggle d-flex">
         <i class="hamburger align-self-center"></i>
     </a>
     
-    <!-- <form class="d-none d-sm-inline-block">
+    <form class="d-none d-sm-inline-block">
         <div class="input-group input-group-navbar">
             <input type="text" class="form-control search-input" placeholder="Buscar" data-target="" aria-label="Buscar">
             <button class="btn btnBuscarComunidad" type="button">
@@ -17,17 +17,22 @@
 
     <?php endif; ?>
 
-    <img src="<?php echo HOME_URL ;?>public/assets/img/logo-fincatech.png" style="max-width: 130px;">    
+    
 
     <div class="navbar-collapse collapse">
+
+        <img src="<?php echo HOME_URL ;?>public/assets/img/logo-fincatech.png" style="max-width: 130px;">    
+
+        <h3 class="card-title mb-0 ml-4"><i class="bi bi-building" style="color: #17a2b8;"></i> <span class="titulo titulo-modulo pl-0"></span></h3>
+
         <ul class="navbar-nav navbar-align">
-            <!-- <li class="nav-item">
-                <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Dashboard" href="<?php echo APPFOLDER . "dashboard"; ?>" id="home">
+            <li class="nav-item">
+                <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Dashboard" href="<?php echo HOME_URL . "dashboard"; ?>" id="home">
                     <div class="position-relative text-center text-info">
                         <i class="bi bi-house-door mr-2"></i><span style="font-size: 12px;display: block;">Ir al inicio</span>
                     </div>
                 </a>
-            </li> -->
+            </li>
             <!-- Notas informativas, Documentación Básica e Informes de valoración y seguimiento solo si es administrador de fincas -->
             <?php if($App->isAdminFincas()): ?>
                 <!-- <li class="nav-item">

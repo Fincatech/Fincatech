@@ -72,25 +72,38 @@
 
                                         <div class="card h-100 infoAmpliadaCAE rounded-0">
 
-                                            <a href="javascript:void(0);" class="align-self-end mr-3 position-absolute btnCerrarEmpleadosComunidad btn btn-outline-danger rounded-pill" aria-label="Close">
-                                                <span><i class="bi bi-x-circle mr-2"></i>VOLVER AL LISTADO DE EMPRESAS DE LA COMUNIDAD</span></a>
-
                                             <div class="card-header bg-transparent pb-3 pt-0">
-                                                <ul class="nav nav-tabs border-bottom-0" role="tablist">
-                                                    <li class="nav-item">
-                                                        <a class="nav-link active text-dark" data-toggle="tab" href="#tab-1"><i class="bi bi-folder-check mr-2"></i>Documentos</a>
-                                                    </li>
-                                                    <li class="nav-item ">
-                                                        <a class="nav-link text-dark" data-toggle="tab" href="#tab-2"><i class="bi bi-person mr-2"></i>Empleados</a>
-                                                    </li>
-                                                </ul>                                                
-                                            </div>
+
+                                                <div class="row">
+
+                                                    <div class="col-12 col-md-6">
+                                                        <ul class="nav nav-tabs border-bottom-0" role="tablist">
+                                                            <li class="nav-item">
+                                                                <a class="nav-link active text-dark" data-toggle="tab" href="#tab-1"><i class="bi bi-folder-check mr-2"></i>Documentos</a>
+                                                            </li>
+                                                            <li class="nav-item ">
+                                                                <a class="nav-link text-dark" data-toggle="tab" href="#tab-2"><i class="bi bi-person mr-2"></i>Empleados</a>
+                                                            </li>
+                                                        </ul>     
+                                                    </div>
+
+                                                    <div class="col-12 col-md-6 text-right">
+
+                                                        <a href="javascript:void(0);" class="d-block mr-3 btnCerrarEmpleadosComunidad btn btn-outline-danger rounded-pill" aria-label="Close">
+                                                        <span><i class="bi bi-x-circle mr-2"></i>VOLVER AL LISTADO DE EMPRESAS DE LA COMUNIDAD</span></a>
+
+                                                    </div>
+
+                                                </div>
+                                                                                            </div>
 
                                             <div class="card-body border pt-3 shadow-neumorphic ml-3 mr-3 mt-0">
                                                 <div class="tab-content">
                                                     <div class="tab-pane fade show active" id="tab-1" role="tabpanel">
-                                                        <h5 class="card-title">Documentos</h5>
-                                                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                                        <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoDocumentacionEmpresa" id="listadoDocumentacionEmpresa" data-model="documentacioncae">
+                                                            <thead class="thead"></thead>
+                                                            <tbody class="tbody"></tbody>
+                                                        </table>
                                                     </div>
                                                     <div class="tab-pane fade text-center" id="tab-2" role="tabpanel">
                                                         <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoEmpleadosComunidad" id="listadoEmpleadosComunidad" data-order='[[ 2, "asc" ]]'  data-model="Empleado">

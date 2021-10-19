@@ -5,7 +5,7 @@
     }else{
         $imagen = '
         <svg class="bi text-secondary img-fluid" width="32" height="32" fill="currentColor">
-            <use xlink:href="' . APPFOLDER . 'public/assets/icons/bootstrap-icons.svg#'.$icono.'"/>
+            <use xlink:href="' . APPFOLDER . '/public/assets/icons/bootstrap-icons.svg#'.$icono.'"/>
         </svg>        
         ';
     }
@@ -18,7 +18,7 @@
     }
 
 ?>  
-<a href="<?php echo APPFOLDER . $urlDestino; ?>" class="">
+<a href="<?php echo HOME_URL . $urlDestino; ?>" class="">
 <div class="card card-dashboard <?php echo $destino; ?> icono-menu <?php echo $classBoton; ?>">
     <div class="card-body d-flex align-self-center w-100">
         <div class="row w-100 d-flex">
