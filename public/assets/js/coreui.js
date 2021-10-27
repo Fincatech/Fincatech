@@ -276,7 +276,7 @@ let CoreUI = {
                     }
                 };
             }else{
-                columna = {"data": nombre, "width": widthColumn, "render": _render, "title":titulo};
+                columna = {"data": nombre, "className": clase, "width": widthColumn, "render": _render, "title":titulo};
             }
 
             CoreUI.tableData.columns[id].push(columna);
@@ -629,7 +629,8 @@ let CoreUI = {
                             var data = window['table' + id].row( this ).data();
                             //  Redirigimos a la pantalla correspondiente que está basada en el endpoint
                             //  quitando "list" ya que es el endpoint que se utiliza para el listado ajax
-                            window.location.href = baseURL + endpoint.toLowerCase().replace('list', data.id);
+                            if(typeof data !== 'undefined')
+                                window.location.href = baseURL + endpoint.toLowerCase().replace('list', data.id);
                         }
 
                     });
@@ -637,7 +638,7 @@ let CoreUI = {
         },
 
         /** Renderiza la tabla */
-        render: function(id, entity, endpoint, allColumns, usePagination = true, _search = true, customRender = null)
+        render: async function(id, entity, endpoint, allColumns, usePagination = true, _search = true, customRender = null)
         {
             // console.log(this.columns.length);
             CoreUI.tableData.init();
@@ -647,22 +648,23 @@ let CoreUI = {
             }
 
             var detailRows = [];
-
+console.log('render table: ' + entity);
             var opciones = {
                 "serverSide": false,
                 "autoWidth": false,
                 "select": true,
-                "retrieve": true,
+                // "retrieve": true,
                 "paging": usePagination,
                 "searching": _search,
                 ajax: {
                     "url": config.baseURLEndpoint + endpoint,
-                    "dataSrc": "data." + entity 
+                    "dataSrc": `data.${entity}`
                 },
+                "deferRender": true,
                 "columns": CoreUI.tableData.columns[id],  
                 "columnDefs": [{
                     "targets": CoreUI.tableData.columns[id].length -1,
-                    "className": "text-center"
+                    "className": CoreUI.tableData.columns[id].className
                 }],
                 "drawCallback": function(settings){
                     feather.replace();
@@ -674,6 +676,11 @@ let CoreUI = {
 
             if(customRender != null)
                 opciones['render'] = customRender;
+
+            //  Comprobamos si ya está inicializada la tabla
+            if ( $.fn.DataTable.isDataTable( `#${id}` ) ) {
+                window['table' + id].destroy();
+            }
 
             window['table' + id] = $(`#${id}`).DataTable(opciones);
 
@@ -728,7 +735,7 @@ let CoreUI = {
         Info: function(texto, titulo, callback)
         {
             Swal.fire({
-                text: `${texto}`,
+                html: `${texto}`,
                 title: '',
                 icon: 'info',
                 showCancelButton: false
@@ -755,6 +762,91 @@ let CoreUI = {
                 }
             });  
         },
+
+    },
+
+    Sidebar: {
+
+        Comunidades: {
+
+            cargarMenuComunidades: function()
+            {
+
+                var endpointComunidades = '';
+                console.log('Usuario---');
+                console.log(core.Security.user);
+
+                core.Security.getUserInfo().then( (result) =>
+                {
+
+                    switch( core.Security.getRole() )
+                    {
+                        case 'CONTRATISTA':
+                            endpointComunidades = `empresa/${core.Security.user}/comunidades`;
+                            break;
+                        case 'ADMINFINCAS':
+    
+                            break;
+                        default:
+                            return;
+                    }
+    
+                    apiFincatech.get( endpointComunidades ).then ( (result) =>
+                    {
+                        var datos = JSON.parse(result);
+                        var comunidades = datos.data.Comunidades;
+                        console.log(comunidades);
+    
+                        var outHTML = ``;
+                        if( comunidades.length > 0 )
+                        {             
+
+
+
+                            for(x = 0; x < comunidades.length; x++)
+                            {
+                                outHTML = `<li class="sidebar-item">
+                                    <a class="sidebar-link comunidad-${comunidades[x].id}" href="/comunidad/${comunidades[x].id}">
+                                        <img src="/assets/img/icon_edificio.png" class="img-responsive feather">
+                                        <span class="align-middle pl-3">${comunidades[x].codigo} - ${comunidades[x].nombre}</span>
+                                    </a>
+                                </li>`;
+                                $('.navComunidades').append(outHTML);
+                            }
+                        }else{
+                            $('.navComunidades').append('<p class="text-center text-white">No tiene comunidades asignadas</p>');
+                        }
+                    });                    
+
+                });
+
+            },
+
+            buscarComunidad: function()
+            {
+                var textoBusqueda = $('.busquedaComunidad').val().toLowerCase();
+
+                if(textoBusqueda == '')
+                {
+                    $('.navComunidades .sidebar-item').removeClass('d-none');
+                    return;
+                }
+
+                $('.navComunidades .sidebar-item').each( function(e)
+                {
+                    if( $(this).attr('data-nombre').toLowerCase().indexOf(textoBusqueda) >= 0 ||
+                        $(this).attr('data-codigo').toLowerCase().indexOf(textoBusqueda) >= 0)
+                        {
+                            $(this).removeClass('d-none');
+                        }else{
+                            $(this).addClass('d-none');
+                        }
+                });
+            }
+
+        }
+
+
 
     }
 

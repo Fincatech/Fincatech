@@ -25,7 +25,7 @@ let documentalCore = {
         //  Documentación básica
         if($('#listadoDocumentacionBasica').length)
         {
-            documentalCore.renderTablaDocumentacionBasica();
+            // documentalCore.renderTablaDocumentacionBasica();
         }
 
         documentalCore.Events();
@@ -233,10 +233,11 @@ let documentalCore = {
             {
 
                 //  Cargamos el listado de comunidades
-                CoreUI.tableData.init();
+                    CoreUI.tableData.init();
+                    CoreUI.tableData.columns = [];
 
                 //  Requerimiento
-                    CoreUI.tableData.addColumn('listadoDocumentacionComunidad', "requerimiento","Documento", null, 'text-justify', '70%');
+                    CoreUI.tableData.addColumn('listadoDocumentacionComunidad', "requerimiento", 'Requerimiento', null, 'text-justify', '70%');
 
                 //  Estado del requerimiento
                     CoreUI.tableData.addColumn('listadoDocumentacionComunidad', 
@@ -268,18 +269,19 @@ let documentalCore = {
                             }
 
                             //  Validamos que solo el admin de fincas o el sudo pueda subir el fichero
-                            if((core.Security.getRole() == 'SUDO' || core.Security.getRole() == 'ADMINFINCAS') && row.idficherorequerimiento == null)
+                            // if((core.Security.getRole() == 'SUDO' || core.Security.getRole() == 'ADMINFINCAS') && row.idficherorequerimiento == null)
+                            if((core.Security.getRole() == 'SUDO' || core.Security.getRole() == 'ADMINFINCAS') || core.Security.getRole() == 'TECNICOCAE')
                             {
-                                htmlSalida += `<a href="javascript:void(0)" class="btnAdjuntarFicheroDocumento" data-toggle="tooltip" data-idcomunidad="${row.idcomunidad}" data-idempresa="" data-idempleado="" data-idrequerimiento="${row.idrequerimiento}" data-idrelacionrequerimiento="${row.idrelacion}" data-entidad="comunidad"><i class="bi bi-cloud-arrow-up text-success" style="font-size: 24px;"></i></a>`;
+                                htmlSalida += `<a href="javascript:void(0)" class="btnAdjuntarFicheroDocumento ml-2" data-toggle="tooltip" data-idcomunidad="${row.idcomunidad}" data-idempresa="" data-idempleado="" data-idrequerimiento="${row.idrequerimiento}" data-idrelacionrequerimiento="${row.idrelacion}" data-entidad="comunidad"><i class="bi bi-cloud-arrow-up text-success" style="font-size: 24px;"></i></a>`;
                             }
 
                             return htmlSalida; // row.requerimiento;
 
                         }, 
-                    "Documento", null, 'text-center', '20%');
+                    "Fichero", null, 'text-center', '20%');
 
                     $('#listadoDocumentacionComunidad').addClass('no-clicable');
-                    CoreUI.tableData.render("listadoDocumentacionComunidad", "documentacioncomunidad", `comunidad/${id}/documentacioncomunidad`);
+                    CoreUI.tableData.render("listadoDocumentacionComunidad", "documentacioncomunidad", `comunidad/${id}/documentacioncomunidad`, false, false, false );
             }    
         },
 
@@ -291,6 +293,72 @@ let documentalCore = {
         {
         
         },
+
+        /**
+         * 
+         * @param {*} idEmpleado 
+         * @param {*} tablaDestino 
+         */
+        renderTablaDocumentacionEmpleado: function(idEmpleado, tablaDestino)
+        {
+
+            CoreUI.tableData.init();
+            CoreUI.tableData.columns = [];
+            
+            //  Nombre
+            CoreUI.tableData.addColumn(tablaDestino, 'nombre' ,"Nombre Requerimiento", null, 'text-left');
+            
+                //  Estado del requerimiento
+                CoreUI.tableData.addColumn(tablaDestino, 
+                function(row, type, val, meta)
+                {
+                    if(row.idficherorequerimiento == null)
+                    {
+                        return '<span class="badge rounded-pill bg-danger pl-3 pr-3 pt-2 pb-2 d-block">No adjuntado</span>';
+                    }else{
+                        return '<span class="badge rounded-pill bg-success pl-3 pr-3 pt-2 pb-2 d-block">Subido</span>';
+                    }
+                },
+            "Estado", null, 'text-center', '10%');
+
+                //  Fichero asociado
+                CoreUI.tableData.addColumn(tablaDestino, 
+                function(row, type, val, meta)
+                {
+                    var ficheroAdjuntado = false;
+                    var htmlSalida = '';
+                    var estado = '';
+
+                    //  Enlace de descarga
+                    if(row.idficherorequerimiento != null)
+                    {
+                        ficheroAdjuntado = true;
+                        //  Tiene fichero ya subido
+                        htmlSalida += `<a href="${config.baseURL}public/storage/${row.storagefichero}" target="_blank"><i class="bi bi-cloud-arrow-down mr-2" style="font-size:24px;"></i></a>`;
+                    }
+
+                    //  Validamos que solo el admin de fincas o el sudo pueda subir el fichero
+                    if(core.Security.getRole() == 'CONTRATISTA')
+                    {
+                        htmlSalida += `<a href="javascript:void(0)" class="btnAdjuntarFicheroDocumento" data-toggle="tooltip" data-idcomunidad="" data-idempresa="" data-idempleado="${idEmpleado}" data-idrequerimiento="${row.idrequerimiento}" data-idrelacionrequerimiento="${row.idrelacion}" data-entidad="empleado"><i class="bi bi-cloud-arrow-up text-success" style="font-size: 24px;"></i></a>`;
+                    }
+
+                    return htmlSalida; // row.requerimiento;
+
+                }, 
+            "Documento", null, 'text-center', '20%');
+
+            //  
+/**
+ * 
+ *                                 <th class="text-center" style="background: #dee2e6 !important;">Documento</th>
+                                <th class="text-center" style="background: #dee2e6 !important;">Fecha de caducidad</th>
+                                <th class="text-center" style="background: #dee2e6 !important;">Observaciones</th>
+ */
+
+            $('#'+tablaDestino).addClass('no-clicable');
+            CoreUI.tableData.render(tablaDestino, "documentacioncae",`empleado/${idEmpleado}/documentacion`, false, false, false);
+        }
 
     },
 
@@ -312,16 +380,48 @@ let documentalCore = {
             core.Modelo.Delete(tipo, id, nombre, destinoTablaHTML);
         },
 
+        cargarDocumentacionCamarasSeguridad: async function()
+        {
+            if($('.wrapperDocumentosCamarasSeguridad'))
+            {
+
+                //  Llamamos al endpoint que carga la documentación de las cámaras de seguridad
+                    apiFincatech.get('rgpd/requerimiento/2/list').then( (result) =>
+                    {
+
+                        var documentos = JSON.parse(result);
+                        var outputHTML = '<div class="row">';
+
+                        for(x=0; x < documentos.data.Requerimiento.length;x++)
+                        {
+                            outputHTML += `
+                                <div class="col-12 col-sm-4">
+                                    <a href="public/storage/" target="_blank"><i class="bi bi-cloud-arrow-down mr-2" style="font-size:24px;"></i>${documentos.data.Requerimiento[x].nombre}</a>
+                                </div>
+                            `;
+                        }
+
+                        outputHTML += '</div>';
+                        $('.wrapperDocumentosCamarasSeguridad').html(outputHTML);
+
+                    });
+
+            }
+            return true;
+        },
+
     },
 
     /** Carga los datos del listado de documentación básica */
     renderTablaDocumentacionBasica: async function()
     {
+
         if($('#listadoDocumentacionBasica').length)
         {
 
             //  Cargamos el listado de comunidades
                 CoreUI.tableData.init();
+                CoreUI.tableData.columns = [];
 
             //  Titulo
                 CoreUI.tableData.addColumn('listadoDocumentacionBasica', "nombre","Nombre documento", null, 'text-justify');
@@ -331,8 +431,10 @@ let documentalCore = {
                 CoreUI.tableData.addColumn('listadoDocumentacionBasica', null, "Fichero", html, 'text-center');
 
                 $('#listadoDocumentacionBasica').addClass('no-clicable');
-                CoreUI.tableData.render("listadoDocumentacionBasica", "Requerimiento", "rgpd/documentacionbasica");
+                await CoreUI.tableData.render("listadoDocumentacionBasica", "Requerimiento", "rgpd/documentacionbasica", null, false, false);
+
         }  
+
     },
 
     /** Carga los datos del listado */
@@ -342,8 +444,9 @@ let documentalCore = {
         {
 
             //  Cargamos el listado de comunidades
-            CoreUI.tableData.init();
-
+                CoreUI.tableData.init();
+                CoreUI.tableData.columns = [];
+                
             //  Fecha de creación
                 var html = 'data:created$';
                 CoreUI.tableData.addColumn('listadoNotasinformativas', null, "Fecha", html, 'text-center');
@@ -359,7 +462,7 @@ let documentalCore = {
                 CoreUI.tableData.addColumn('listadoNotasinformativas', null, "Fichero", html, 'text-center');
 
                 // $('#listadoNotasinformativas').addClass('no-clicable');
-                CoreUI.tableData.render("listadoNotasinformativas", "Notasinformativas", "notasinformativas/list");
+                await CoreUI.tableData.render("listadoNotasinformativas", "Notasinformativas", "notasinformativas/list");
         }
     },
 

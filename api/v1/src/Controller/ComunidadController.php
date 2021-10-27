@@ -107,9 +107,9 @@ class ComunidadController extends FrontController{
         return $this->ComunidadModel->Get($id);
     }
 
-    public function List($params = null)
+    public function List($params = null, $useLoggedUserId = true)
     {
-       return $this->ComunidadModel->List($params);
+       return $this->ComunidadModel->List($params, $useLoggedUserId);
     }
 
     public function GetTable($params)

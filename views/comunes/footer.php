@@ -9,13 +9,13 @@
             <div class="col-6 text-right">
                 <ul class="list-inline">
                     <li class="list-inline-item">
-                        <a class="text-muted" href="#">Soporte</a>
+                        <a class="text-muted" href="https://fincatech.es/contacta-con-nosotros/" target="_blank">Soporte</a>
                     </li>
                     <li class="list-inline-item">
-                        <a class="text-muted" href="#">Contacto</a>
+                        <a class="text-muted" href="https://fincatech.es/contacta-con-nosotros/" target="_blank">Contacto</a>
                     </li>
                     <li class="list-inline-item">
-                        <a class="text-muted" href="#">Términos y condiciones</a>
+                        <a class="text-muted" href="https://fincatech.es/terminos-y-condiciones-de-fincatech/" target="_blank">Términos y condiciones</a>
                     </li>
                     <li class="list-inline-item">
                         <a class="text-muted" href="#">Aviso legal</a>

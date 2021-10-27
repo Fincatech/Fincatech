@@ -118,7 +118,13 @@ trait EntityTrait{
                    //  Recuperamos los datos y la información de cada una de las entidades relacionadas con la principal
                    foreach($this->entityRelations as $relacion)
                    {
-                       $valor = $this->entityData[$this->mainEntity][$x][$relacion->targetColumn];
+                       if(isset($this->entityData[$this->mainEntity][$x][$relacion->targetColumn]))
+                       {
+                           $valor = $this->entityData[$this->mainEntity][$x][$relacion->targetColumn];
+                       }else{
+                           $valor = '';
+                       }
+                    //    echo 'Valor: ', $valor, ' + MainEntity: ', $this->mainEntity, ' x: ', $x, ' TargetColumn: ',$relacion->targetColumn, '<br><br>';
                        $relationQuery = null;
 
                        //  Generamos la query para la relación y nos traemos los datos contra la entidad principal
@@ -140,6 +146,7 @@ trait EntityTrait{
                                //  Tenemos que acotar la búsqueda al campo de la relación principal                                
                                $relationQuery .= " and pri." . $relacion->sourceColumn . " = ";
                                break;
+                            //  Se busca en la entidad principal la coincidencia con la entidad relacionada
                            case RELACION_OUTSIDE:
                                //  outside
                                $relationQuery = "
@@ -153,6 +160,7 @@ trait EntityTrait{
                                //  Tenemos que acotar la búsqueda al campo de la relación principal
                                $relationQuery .= " and principal." . $relacion->targetColumn . "= ";   
                                break;
+                            //  Se busca en la entidad relacionada por el campo seleccionado del sourcecolumn
                            case RELACION_INVERSA:
                                //  INVERSA
                                if ( !is_null($this->entityData[$this->mainEntity][$x][$relacion->sourceColumn]) && $this->entityData[$this->mainEntity][$x][$relacion->sourceColumn] != "")
@@ -169,8 +177,8 @@ trait EntityTrait{
                                break;
                             //  TODO se utiliza para poder especificar los alias para salir del estándar
                             case RELACION_CUSTOM:
-                                if ( !is_null($this->entityData[$this->mainEntity][$x][$relacion->sourceColumn]) && $this->entityData[$this->mainEntity][$x][$relacion->sourceColumn] != "")
-                                {
+                                // if ( !is_null($this->entityData[$this->mainEntity][$x][$relacion->sourceColumn]) && $this->entityData[$this->mainEntity][$x][$relacion->sourceColumn] != "")
+                                // {
                                     $relationQuery = "
                                     select 
                                         rel.* 
@@ -178,11 +186,12 @@ trait EntityTrait{
                                         " . $relacion->table . " rel
                                     where 
                                         rel." . $relacion->targetColumn . "= " . $this->entityData[$this->mainEntity][$x][$relacion->sourceColumn];
-                                }
+                                // }
+                                // die($relationQuery);
                                 break;
                        }
 
-                       if($relacion->relationType != RELACION_INVERSA)
+                       if($relacion->relationType != RELACION_INVERSA && $relacion->relationType != RELACION_CUSTOM)
                            $relationQuery .= $this->getFormatedKeyValue($relacion->fieldType, $valor);
 
 

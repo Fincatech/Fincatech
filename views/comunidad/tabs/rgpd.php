@@ -33,25 +33,25 @@
                                     <ul class="nav nav-tabs border-bottom-0" id="tablaRGPD" role="tablist">
                                         <!-- Documentación básica -->
                                         <li class="nav-item" role="presentation">
-                                            <a class="nav-link text-dark active" data-toggle="tab" href="#rgpddocumentacionbasica" role="tab" aria-selected="true"><i class="bi bi-folder2-open pr-2"></i>Documentación básica</a>
+                                            <a class="nav-link text-dark active enlaceRGPDDocumentacionBasica" data-toggle="tab" href="#rgpddocumentacionbasica" role="tab" aria-selected="true"><i class="bi bi-folder2-open pr-2"></i>Documentación básica</a>
                                         </li> 
                                         <!-- Notas informativas -->                                       
                                         <li class="nav-item" role="presentation">
-                                            <a class="nav-link text-dark" data-toggle="tab" href="#rgpdnotasinformativas" role="tab" aria-selected="false"><i class="bi bi-journals pr-2"></i>Notas informativas</a>
+                                            <a class="nav-link text-dark enlaceRGPDNotasInformativas" data-toggle="tab" href="#rgpdnotasinformativas" role="tab" aria-selected="false"><i class="bi bi-journals pr-2"></i>Notas informativas</a>
                                         </li>
                                         <!-- Informes de evaluación y seguimiento -->                                       
                                         <li class="nav-item" role="presentation">
-                                            <a class="nav-link text-dark" data-toggle="tab" href="#rgpdinformesevaluacion" role="tab" aria-selected="false"><i class="bi bi-journal-bookmark pr-2"></i>Informes de evaluación y seguimiento</a>
+                                            <a class="nav-link text-dark enlaceRGPDInformeEvaluacionSeguimiento" data-toggle="tab" href="#rgpdinformesevaluacion" role="tab" aria-selected="false"><i class="bi bi-journal-bookmark pr-2"></i>Informes de evaluación y seguimiento</a>
                                         </li>    
                                         <li class="nav-item" role="presentation">
-                                            <a class="nav-link text-dark" data-toggle="tab" href="#rgpdconsultasdpd" role="tab" aria-selected="false"><i class="bi bi-chat-right-text pr-2"></i>Consultas al dpd</a>
+                                            <a class="nav-link text-dark enlaceRGPDConsultasDPD" data-toggle="tab" href="#rgpdconsultasdpd" role="tab" aria-selected="false"><i class="bi bi-chat-right-text pr-2"></i>Consultas al dpd</a>
                                         </li>                                           
                                         <!-- Consultas al DPD -->                                       
                                         <li class="nav-item" role="presentation">
-                                            <a class="nav-link text-dark" data-toggle="tab" href="#rgpdcontratoscesion" role="tab" aria-selected="false"><i class="bi bi-pen pr-2"></i>Contratos de cesión de datos a terceros</a>
+                                            <a class="nav-link text-dark enlaceRGPDContratosCesionTerceros" data-toggle="tab" href="#rgpdcontratoscesion" role="tab" aria-selected="false"><i class="bi bi-pen pr-2"></i>Contratos de cesión de datos a terceros</a>
                                         </li>                                                                              
                                         <li class="nav-item" role="presentation">
-                                            <a class="nav-link text-dark" data-toggle="tab" href="#rgpdcamarasseguridad" role="tab" aria-selected="false"><i class="bi bi-camera-video pr-2"></i>Cámaras de seguridad</a>
+                                            <a class="nav-link text-dark enlaceRGPDCamarasSeguridad" data-toggle="tab" href="#rgpdcamarasseguridad" role="tab" aria-selected="false"><i class="bi bi-camera-video pr-2"></i>Cámaras de seguridad</a>
                                         </li>
                                     </ul>
                                 </div>

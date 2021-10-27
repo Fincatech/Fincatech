@@ -25,6 +25,7 @@ class RequerimientoModel extends \HappySoftware\Model\Model{
 
     }
 
+    // TODO: Falta la implementación
     public function ListRequerimientosComunidad($comunidadId)
     {
 
@@ -46,6 +47,13 @@ class RequerimientoModel extends \HappySoftware\Model\Model{
         $data = $this->List(null, false);
         $data = $this->filterResults($data, 'Requerimiento', 'idrequerimientotipo', $idTipo);
         return $data;
+    }
+
+    public function GetRequerimientosEmpresa($idEmpresa)
+    {
+        $sql = "SELECT * FROM view_documentoscaeempresa where @p1:=" . $idEmpresa; 
+        return $this->query($sql);
+
     }
 
     // /** Recupera todos los registros */

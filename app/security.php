@@ -69,6 +69,7 @@ define("security", [
             "titulo" => "Administrador de fincas",
             "menulateral"=> true,
             "js"=>[
+                "adminfincas",
                 "dashboard",
                 "comunidades",
                 "dpd",
@@ -77,6 +78,7 @@ define("security", [
                 'informevaloracionseguimiento',
                 "notasinformativas",
                 "documental",
+                "rgpd",
                 "requerimiento",
                 "servicios",
             ],
@@ -87,7 +89,16 @@ define("security", [
             ],            
         ],
         "ROLE_CONTRATISTA"=>[
-            "folder"=>"contratista"
+            "folder"=>"contratista",
+            "titulo" => "Empresa contratista",
+            "menulateral" => true,
+            "js" =>[
+                "contratista",
+                "documental",
+                "empresa",
+                "empleado",
+                'servicios'
+            ]
         ],
         "ROLE_EMPLEADO"=>[
             "folder"=>"empleado",

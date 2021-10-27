@@ -36,7 +36,9 @@ trait DatabaseTrait{
 
         // if($this->getEntidad() == 'empleadoempresa')
         // {
+            // echo('-----------antes de fields');
             // print_r($this->fields);
+            // die('----------fields');
             // die('3s');
         // }
 
@@ -147,6 +149,7 @@ trait DatabaseTrait{
     /** Inicializa la sentencia de insert */
     public function createInsert($table)
     {
+        $table = strtolower($table);
         $this->setAction(true, false, false); 
         $this->builder("INSERT INTO $table(");
     }
@@ -203,6 +206,7 @@ trait DatabaseTrait{
      */
     public function fixFieldValue($field, $value)
     {       
+
         //  Accedemos a la entidad
         if( isset( $this->entityData['schema'][$this->mainEntity]['definitions'][$field] ) )
         {

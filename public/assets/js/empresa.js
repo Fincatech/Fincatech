@@ -1,3 +1,4 @@
+// const moment = require("moment");
 
 let empresaCore = {
 
@@ -17,7 +18,7 @@ let empresaCore = {
         }
 
         //  Comprobamos si hay que renderizar el listado de empleados por empresa
-        empresaCore.renderTablaEmpleados(core.modelId);
+            empresaCore.renderTablaEmpleados(core.modelId);
 
         //  Título del módulo
             if($('.titulo-modulo').length && core.model == 'Empresa')
@@ -25,7 +26,7 @@ let empresaCore = {
 
     },
 
-    events: async function()
+    events: function()
     {   
         $('body').on(core.helper.clickEventType, '.btnEliminarEmpresa', (evt)=>{
             evt.stopImmediatePropagation();
@@ -41,15 +42,24 @@ let empresaCore = {
         {
             e.stopImmediatePropagation();
             $('.wrapperEmpresasComunidad').hide();
-            
+            var idEmpresa = window['tablelistadoEmpresaComunidad'].row( $(this).attr('id')).data().id;
+            console.log('idEmpresa: ' + idEmpresa);
             //  Cargamos el listado de empleados para la comunidad y empresa seleccionada
-                $('.wrapperEmpleadosEmpresaComunidad').css('opacity','1');
+                empresaCore.renderTablaRequerimientosEmpresa( idEmpresa ).then( ()=>{
+                    $('.wrapperEmpleadosEmpresaComunidad').css('opacity','1');
+                });
         })
 
         $('body').on(core.helper.clickEventType, '.btnCerrarEmpleadosComunidad', function(e)
         {
             $('.wrapperEmpleadosEmpresaComunidad').css('opacity','0');
             $('.wrapperEmpresasComunidad').show();
+        });
+
+        $('body').on(core.helper.clickEventType, '.enlaceCae', function(e)
+        {
+            //  Cargamos las empresas asociadas a la comunidad en pantalla
+                empresaCore.renderTablaEmpresasComunidad(core.modelId);
         });
 
     },
@@ -240,10 +250,12 @@ let empresaCore = {
         }  
     },
 
-    renderTablaEmpleados: async function(idempresa)
+    renderTablaEmpleados: async function(idempresa, tabla = 'listadoEmpleadosEmpresa')
     {
     
-        if($('#listadoEmpleadosEmpresa').length)
+        var tablaDestino = `#${tabla}`;
+
+        if( $(tablaDestino).length)
         {
             // //  Fecha de creación
             //     var html = 'data:created$';
@@ -251,38 +263,94 @@ let empresaCore = {
             CoreUI.tableData.init();
 
             //  Nombre y apellidos
-            CoreUI.tableData.addColumn('listadoEmpleadosEmpresa', "nombre","Nombre", null, 'text-left');
+            CoreUI.tableData.addColumn( tabla , "nombre","Nombre", null, 'text-left');
 
             //  CIF
-            CoreUI.tableData.addColumn('listadoEmpleadosEmpresa', "numerodocumento", "DNI/NIE", null, 'text-left');
+            CoreUI.tableData.addColumn( tabla , "numerodocumento", "DNI/NIE", null, 'text-left');
 
             //  Empresa
-                CoreUI.tableData.addColumn('listadoEmpleadosEmpresa', "razonsocial", "Empresa", null, 'text-left');
+                CoreUI.tableData.addColumn( tabla , "razonsocial", "Empresa", null, 'text-left');
 
             //  Puesto
-                CoreUI.tableData.addColumn('listadoEmpleadosEmpresa', "puesto", "Puesto", null, 'text-left');
+                CoreUI.tableData.addColumn( tabla , "puesto", "Puesto", null, 'text-left');
 
             //  Email
-                CoreUI.tableData.addColumn('listadoEmpleadosEmpresa', "email", "EMAIL", null, 'text-left');
+                CoreUI.tableData.addColumn( tabla , "email", "EMAIL", null, 'text-left');
 
             //  Teléfono
-                CoreUI.tableData.addColumn('listadoEmpleadosEmpresa', "telefono", "TELEFONO", null, 'text-left');
+                CoreUI.tableData.addColumn( tabla , "telefono", "TELEFONO", null, 'text-left');
 
             //  Fecha de alta
-                CoreUI.tableData.addColumn('listadoEmpleadosEmpresa', "fechaalta", "Fecha alta", null, 'text-left');
+                CoreUI.tableData.addColumn( tabla , "fechaalta", "Fecha alta", null, 'text-left');
 
             //  Fecha de baja
-                CoreUI.tableData.addColumn('listadoEmpleadosEmpresa', "fechabaja", "Fecha baja", null, 'text-left');
+                CoreUI.tableData.addColumn( tabla , "fechabaja", "Fecha baja", null, 'text-left');
 
             // Estado
                 var html = 'data:estado$';
-                CoreUI.tableData.addColumn('listadoEmpleadosEmpresa', null, "Estado", html);
+                CoreUI.tableData.addColumn( tabla , null, "Estado", html);
+
+            CoreUI.tableData.render( tabla , "Empleados", `empresa/${idempresa}/empleados`, false, false, false);
+        }
+
+    },
+
+    /**
+     * Carga el listado de empleados que tiene un contratista
+     * @param {*} idempresa 
+     * @param {*} tabla 
+     */
+    renderTablaEmpleadosContratista: async function(idempresa, tabla = 'listadoEmpleadosEmpresa')
+    {
+    
+        var tablaDestino = `#${tabla}`;
+
+        if( $(tablaDestino).length)
+        {
+            // //  Fecha de creación
+            //     var html = 'data:created$';
+            //     CoreUI.tableData.addColumn(null, "Fecha", html, 'text-center');
+                CoreUI.tableData.init();
+
+                CoreUI.tableData.addColumn( tabla, function(row, type, val, meta){
+                    var salida = `<a href="/contratista/empleado?id=${row.idempleado}"><i class="bi bi-pencil-square"></i> ${row.nombre}</a>`
+                    return salida;
+                },'Nombre del empleado', null, 'text-left', '30%');
+
+            // //  Nombre y apellidos
+            //     CoreUI.tableData.addColumn( tabla , "nombre","Nombre", null, 'text-left');
+
+            //  CIF
+                CoreUI.tableData.addColumn( tabla , "numerodocumento", "DNI/NIE", null, 'text-left');
+
+            //  Puesto
+                CoreUI.tableData.addColumn( tabla , "puesto", "Puesto", null, 'text-left');
+
+            //  Email
+                CoreUI.tableData.addColumn( tabla , "email", "EMAIL", null, 'text-left');
+
+            //  Teléfono
+                CoreUI.tableData.addColumn( tabla , "telefono", "TELEFONO", null, 'text-left');
 
             //  Fecha de alta
-                // var html = 'data:created$';
-                // CoreUI.tableData.addColumn(null, "Fecha", html, 'text-center');
+                CoreUI.tableData.addColumn( tabla , "fechaalta", "Fecha alta", null, 'text-left');
 
-            CoreUI.tableData.render("listadoEmpleadosEmpresa", "Empleados", `empresa/${idempresa}/empleados`, false, false, false);
+            //  Fecha de baja
+                CoreUI.tableData.addColumn( tabla , "fechabaja", "Fecha baja", null, 'text-left');
+
+            //  Estado
+                var html = 'data:estado$';
+                CoreUI.tableData.addColumn( tabla , null, "Estado", html);
+
+            //  Eliminar
+                CoreUI.tableData.addColumn( tabla, function(row, type, val, meta)
+                {
+                    var html = `<a href="javascript:void(0);" class="btnEliminarEmpleado d-inline-block" data-id="${row.idempleado}" data-nombre="${row.nombre}"><i data-feather="trash-2" class="text-danger img-fluid"></i></a>`;
+                    return html;
+                }, '&nbsp;',null, 'text-center', '20px');
+
+            $(tablaDestino).addClass('no-clicable');
+            CoreUI.tableData.render( tabla , "Empleados", `empresa/${idempresa}/empleados`, false, false, false);
         }
 
     },
@@ -330,6 +398,90 @@ let empresaCore = {
 
                 $('#listadoEmpresaComunidad').addClass('no-clicable');
                 CoreUI.tableData.render("listadoEmpresaComunidad", "empresascomunidad", `comunidad/${idcomunidad}/empresas`, null, false, false);
+        }  
+    },
+
+    renderTablaRequerimientosEmpresa: async function(idEmpresa)
+    {
+        if($('#listadoDocumentacionEmpresa').length)
+        {
+
+                CoreUI.tableData.init();
+                CoreUI.tableData.columns = [];
+
+            //  Nombre del documento
+                CoreUI.tableData.addColumn('listadoDocumentacionEmpresa', "requerimiento","Requerimiento", null, 'text-left');
+
+            //  Fecha última actuación
+                CoreUI.tableData.addColumn('listadoDocumentacionEmpresa', function(row, type, val, meta)
+                {
+                    if(row.fechaultimaactuacion == '' || row.fechaultimaactuacion == 'null' || !row.fechaultimaactuacion)
+                    {
+                        return 'No se ha realizado ninguna actuación';
+                    }else{
+                        return moment(row.fechaultimaactuacion).locale('es').format('L')
+                    }
+                }, "Fecha última actuación", null, 'text-justify');
+
+            //  Estado
+                CoreUI.tableData.addColumn('listadoDocumentacionEmpresa', function(row, type, val, meta)
+                {
+                    return (!row.idficherorequerimiento ? '<span class="badge rounded-pill bg-danger pl-3 pr-3 pt-2 pb-2">No adjuntado</span>' : '<span class="badge rounded-pill bg-success pl-3 pr-3 pt-2 pb-2">Disponible para descargar</span>') + '</td>';
+                }, "Fichero", null, 'text-left');
+
+            //  Columna de acciones
+                CoreUI.tableData.addColumn('listadoDocumentacionEmpresa', function(row, type, val, meta)
+                {
+                    var canUploadFile = false;
+                    var salida = '';
+
+                    if(core.Security.getRole() == 'CONTRATISTA')
+                        canUploadFile = true;
+    
+                //  Enlace al fichero de descarga si está ya adjuntado o bien para subir si tiene permiso
+                    ficheroAdjuntado = (!row.idficherorequerimiento ? false : true);
+
+                    if(ficheroAdjuntado)   //  DESCARGAR FICHERO YA SUBIDO
+                    {
+                        var enlaceDescarga = baseURL + '/public/storage/' + row.storageficherorequerimiento;
+                        salida += ` <td class="text-center">
+                                        <a href="${enlaceDescarga}" target="_blank" title="Ver documento">
+                                            <i class="bi bi-cloud-arrow-down text-primary mr-1" style="font-size: 30px;"></i>
+                                        </a>
+                                    </td>`;
+                    }
+
+
+                    var _idempresa = (row.idempresa == null ? idEmpresa : row.idempresa);
+
+                //  Construimos el enlace de salida para que pueda descargar el fichero adjuntado
+                    if(canUploadFile)
+                    // if(!ficheroAdjuntado && canUploadFile)
+                    {  //  SUBIR FICHERO SOLO PARA CONTRATISTA (EMPRESA)
+                        dataset = ` data-idcomunidad="${row.idcomunidad}" data-idempresa="${_idempresa}" data-idempleado="" data-idrequerimiento="${row.idrequerimiento}" data-idrelacionrequerimiento="${row.idrelacion}" data-entidad="empresa" `;
+                        salida += `<td class="text-center" ><a href="javascript:void(0)" class="btnAdjuntarFicheroDocumento" data-toggle="tooltip" ${dataset} data-placement="bottom" title="" id="home" data-original-title="Adjuntar documento"><i class="bi bi-cloud-arrow-up text-success" style="font-size: 30px;"></i></a></td>`;
+                    }
+
+                    if(!ficheroAdjuntado && !canUploadFile)
+                    {
+                        salida += '<td>&nbsp;</td>';
+                    }
+                    return salida;
+
+                }, '&nbsp;', null, 'text-center');
+
+                $('#listadoDocumentacionEmpresa').addClass('no-clicable');
+
+                //  Si ya está inicializada destruimos para volver a generarla¿?
+                //  FIXME: Cambiar url ajax simplemente
+                if(typeof window['tablelistadoDocumentacionEmpresa'] !== 'undefined' )
+                {
+                    window['tablelistadoDocumentacionEmpresa'].destroy();
+                }
+
+
+                CoreUI.tableData.render("listadoDocumentacionEmpresa", "documentacioncae", `empresa/${idEmpresa}/documentacion`, null, false, false);
+
         }  
     },
 

@@ -1,7 +1,7 @@
 
 let clickEventType = ((document.ontouchstart!==null)?'click':'touchstart');
 let environment = 'd';
-let baseURL = '/';
+let baseURL = (environment == 'd' ? '/fincatech/' : '/');
 var role = null;
 var showingLoadComunidades = false;
 
@@ -243,9 +243,9 @@ let Constantes = {
 
 }
 
-
 let core =
 {
+  
   model: null,
   actionModel: null,
   modelId: null,
@@ -287,8 +287,7 @@ let core =
   Events: function()
   {
       //  Logout
-      $("body").on(core.helper.clickEventType, ".btnLogout", function()
-      {
+      $("body").on(core.helper.clickEventType, ".btnLogout", function(){
         core.Security.logout();
       });
 
@@ -334,12 +333,12 @@ let core =
 
       });
 
-        /** Botón de cambiar contraseña */
-        $('body').on(core.helper.clickEventType, '.btnChangePassword', function(e)
-        {
-            //  Lanzamos el modal de cambiar contraseña
-                core.Security.changePassword();
-        });
+      /** Botón de cambiar contraseña */
+      $('body').on(core.helper.clickEventType, '.btnChangePassword', function(e)
+      {
+          //  Lanzamos el modal de cambiar contraseña
+              core.Security.changePassword();
+      });
 
   },
 
@@ -446,42 +445,32 @@ let core =
 
     init: async function()
     {
-      //  Cargamos el esquema para la entidad
-      await core.Forms.getSchema().then( (result)=>
-      {
-        // console.log(result);
-        core.Modelo.schema = result;
-
         //  Recuperamos los valores de los posible combos que haya en la pantalla
-        core.Forms.initializeSelectData();
+            core.Forms.initializeSelectData();
 
         // Si hay un id informado recuperamos la entidad desde el endpoint
-        if(core.modelId != "")
-        {
-           apiFincatech.get(core.model.toLowerCase() + "/" + core.modelId).then( (result) =>{
+          if(core.modelId != "")
+          {
+            await apiFincatech.get(core.model.toLowerCase() + "/" + core.modelId).then( (result) =>{
 
-            //  Mapeamos los datos en el formulario
-            core.Modelo.entity[core.model] = JSON.parse(result)["data"][core.model];
-            // console.log(core.Modelo.entity[core.model]);
-            core.Forms.mapData();
-            if($('#password').length)
-            {
-              $('#password').val('');
-            }
-            //  Pintamos el titulo según el campo que hemos establecido en el componente correspondiente
+              //  Mapeamos los datos en el formulario
+              core.Modelo.entity[core.model] = JSON.parse(result)["data"][core.model];
 
-            //  Si no está definido, entonces dejamos por defecto el que viene
-                if(CoreUI.tituloModulo !== null)
-                {
-                  // console.log(core.Modelo.entity[core.model]);
-                  // console.log( core.Modelo.entity[core.model][CoreUI.tituloModulo] );
-                  CoreUI.Utils.setTituloPantalla(null, null, core.Modelo.entity[core.model][0][CoreUI.tituloModulo]);
-                }
-          });
+              core.Forms.mapData();
 
-        }
+              if($('#password').length)
+              {
+                $('#password').val('');
+              }
 
-      });
+              //  Si no está definido, entonces dejamos por defecto el que viene
+                  if(CoreUI.tituloModulo !== null)
+                  {
+                    CoreUI.Utils.setTituloPantalla(null, null, core.Modelo.entity[core.model][0][CoreUI.tituloModulo]);
+                  }
+            });
+
+          }
 
     },
 
@@ -527,6 +516,74 @@ let core =
           });
 
         }
+    },
+
+    //TODO: Implementar mejora de mapeo de formulario
+    mapDataFromModel: function(nombreFormulario, datosModelo)
+    {
+        //  Validamos que exista el formulario antes de procesar
+            if( !$(`#${nombreFormulario}`).length )
+              return;
+
+        //  Iteramos sobre todos los campos del formulario
+            $( `#${nombreFormulario} .data` ).each( function(){
+
+                var entidad = $(this).attr('hs-entity');
+                var campo = $(this).attr('hs-field') ;
+                var valor = '';
+                
+                //  Comprobamos si el dato pertenece a una subentidad
+                    if( typeof datosModelo[entidad] === 'undefined')
+                    {
+                        valor = datosModelo[campo];
+                    }else{
+                        valor = datosModelo[entidad][campo];
+                    }
+
+                    if( campo != 'password' )
+                    {
+                    //  FIXME: Arregla el if para evitar tantas anidaciones
+                        if( $(this).hasClass("select-data") )
+                        {
+                          //  Leemos el id
+                              var id = $(this).attr("id");
+                          //  Validamos que exista el valor en el modelo antes de mapear
+                          if(typeof datosModelo[id] !== 'undefined' && datosModelo[id] !== -1)
+                          {
+                            if(valor !== '')
+                            {
+                              $(`#${id}`).val(valor);
+                              $(`#${id}`).trigger('change');
+
+                              // $(`#${id} option[value=${valor}]`).attr('selected','selected');
+
+                            }
+                          }
+
+                        }else{
+          
+                          //  ¿ Es un checkbox ? 
+                          if($(this).hasClass("form-check-input"))
+                          {
+                            console.log('Valor checkbox campo : ' + campo + ' - ' +  valor);
+                            if(valor == 1)
+                            {
+                              console.log('Intentando checar')  ;
+                              $(this).attr('checked', true);
+                            }else{
+                            console.log('Intentando checar false')  ;
+                              $(this).attr('checked', false);
+                            }
+                          }else{
+                            $(this).val( valor );
+                          }
+          
+                        }
+                    }else{
+                      $(this).val('');
+                    }
+
+            });
     },
 
     /** Mapeamos la información devuelta por el endpoint con los datos del formulario */
@@ -600,10 +657,12 @@ let core =
             $('.selectpicker').select2({
               theme: 'bootstrap4',           
             });
+
             $('.selectpicker').each(function()
             {
               $(this).trigger('change');
             });
+            
             $('body input[type="number"]').each(function(e)
             {
                 $(this).val( $(this).attr('value') );
@@ -629,8 +688,67 @@ let core =
             return e.val();  
     },
 
+    prepareFormDataBeforeSend: function(formName)
+    {
+
+        core.Forms.data = Object();
+
+        var modelo = $(`body #${formName}`).attr('data-model');
+        // core.Forms.data[modelo] = {};
+        //  Recorremos todos los input del form para procesarlo
+        //  Recorremos todos los input del form para procesarlo
+        $(`body .${formName} .data`).each(function()
+        {
+        
+          var fieldName = $(this).attr("hs-field");
+          var entity = $(this).attr("hs-entity");
+          var entityRelated = null;
+
+          if( $(this).attr("hs-entity-related") !== undefined && 
+              $(this).attr("hs-entity-related") !== null )
+          {
+            entityRelated = $(this).attr("hs-entity-related");
+          }
+
+          // console.log('Entity: ' + entity);
+          // console.log('Modelo: ' + modelo);
+          // console.log('FieldName: ' + fieldName);
+
+          if( (entity == modelo) && entityRelated == null)
+          { 
+            
+            if(fieldName != "id")
+              core.Forms.data[fieldName] = $(this).val();
+
+            core.Forms.data[fieldName] = core.Forms.getValueByTipoCampo( $(this) );
+
+          }else{
+
+            if(fieldName != "id")
+            {
+              //  Si la entidad no existe, debemos inicializar
+              if( core.Forms.data[entityRelated] === undefined )
+                  core.Forms.data[entityRelated] = {};
+
+              //  Obtenemos el valor del campo según el tipo que sea (text, select,...)
+              core.Forms.data[entityRelated][fieldName] = core.Forms.getValueByTipoCampo( $(this) );
+
+            }
+
+          }
+
+          // core.Forms.data[fieldName] = core.Forms.getValueByTipoCampo( $(this) );
+
+        });
+
+        console.log(core.Forms.data);
+
+
+    },
+
+
     /** Mapea el formulario para montar el json de envío al endpoint */
-    mapFormDataToSave: function(formularioProceso)
+    mapFormDataToSave: function(formularioProceso, modelo = null)
     {
         core.Forms.data = {};
 
@@ -740,7 +858,7 @@ let core =
               keyValue = entidadSeleccionada[1];
             }
 
-            htmlOutput = '<option value="-1" disabled selected="selected">SELECCIONE UNA OPCIÓN</option>';
+            // htmlOutput = '<option value="-1" disabled selected="selected">SELECCIONE UNA OPCIÓN</option>';
             $("body #" + elementoDOM).append(htmlOutput);
 
             // console.log('El: ' + responseData[entidad][][keyValue]);
@@ -753,7 +871,7 @@ let core =
             }
 
             $('body #' + elementoDOM).select2({
-              theme: 'bootstrap4'
+              theme: 'bootstrap4',
             });
 
         });
@@ -777,11 +895,12 @@ let core =
         //  Mapeamos los datos para poder enviar la info
         if(dataAlreadyMapped == false)
         {
-console.log('dataAlreadymapped false');
           core.Forms.data = {};
           core.Forms.mapDataToSave();
         }
+
 console.log('accion: ' + actionSave);
+
         //  Comprobamos la acción del modelo
         switch(actionSave)
         {
@@ -800,9 +919,10 @@ console.log('accion: ' + actionSave);
     {
       var result = true;
 
+      $('.form-error').removeClass('form-error');
+
       if(nombreFormulario == null)
         nombreFormulario = 'form-data'
-
 
       if( $(`body .${nombreFormulario} .form-required`).length == 0)
         return true;
@@ -810,8 +930,16 @@ console.log('accion: ' + actionSave);
       //  Recorre todos los elementos del dom que sean susceptibles de ser validados
       $(`body .${nombreFormulario} .form-required`).each(function()
       {
-        if($(this).val() == '')
+
+        if( $(this).val() == '' )
+        {
+          if( !$(this).hasClass('form-error') )
+            $(this).addClass('form-error');
+
           result = false;
+
+        }
+
       });
 
       return result;
@@ -956,6 +1084,8 @@ console.log('accion: ' + actionSave);
 
   Security: {
 
+      user: null,
+
       init: function(){
         this.events();
         core.model = 'Login';
@@ -969,6 +1099,7 @@ console.log('accion: ' + actionSave);
       },
 
       events: function(){
+
         $('body').on(core.helper.clickEventType, '.btnAuthenticate', function(e)
         {
           //  Validamos los campos obligatorios
@@ -1001,7 +1132,10 @@ console.log('accion: ' + actionSave);
       {
           await apiFincatech.get('userinfo' ).then( response => 
           {
+
               respuesta = JSON.parse(response);
+              core.Security.user = respuesta.user.id;
+
               if(respuesta.user.nombre != null && respuesta.user.nombre != '')
               {
                   $('.usuarioFincatech').text(respuesta.user.nombre);
@@ -1039,9 +1173,7 @@ console.log('accion: ' + actionSave);
                 CoreUI.Modal.Error("El e-mail y/o contraseña proporcionada es incorrecto");
               }else{
                 //  Login correcto
-                // CoreUI.Modal.Success('Login Correcto', 'Fincatech', function(){
                   window.location.href = 'dashboard';
-                // });
               }
 
             });
@@ -1118,7 +1250,7 @@ console.log('accion: ' + actionSave);
 
         if(iban.length==24)
         {
-            var digitoControl=getCodigoControl_IBAN(iban.substr(0,2).toUpperCase(), iban.substr(4));
+            var digitoControl = core.Validator.getCodigoControl_IBAN(iban.substr(0,2).toUpperCase(), iban.substr(4));
             if(digitoControl==iban.substr(2,2))
                 return true;
         }
@@ -1164,10 +1296,10 @@ console.log('accion: ' + actionSave);
         };
     
         // reemplazamos cada letra por su valor numerico y ponemos los valores mas dos ceros al final de la cuenta
-        var dividendo = cc+valoresPaises[codigoPais.substr(0,1)]+valoresPaises[codigoPais.substr(1,1)]+'00';
+        var dividendo = cc + valoresPaises[codigoPais.substr(0,1)] + valoresPaises[codigoPais.substr(1,1)] + '00';
     
         // Calculamos el modulo 97 sobre el valor numerico y lo restamos al valor 98
-        var digitoControl = 98-modulo(dividendo, 97);
+        var digitoControl = 98 - core.Validator.modulo(dividendo, 97);
     
         // Si el digito de control es un solo numero, añadimos un cero al delante
         if(digitoControl.length==1)

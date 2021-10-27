@@ -26,7 +26,7 @@
                     <div class="form-group row mb-2">
                         <div class="col-12 col-md-8">
                             <label for="direccion"><i class="bi bi-shop pr-2"></i>Empresa</label>                        
-                            <select id="idempresa" name="idempresa" class="select-data data custom-select form-control selectpicker" data-live-search="true" hs-entity="Empleado" hs-entity-related="empleadoempresa" hs-field="idempresa" hs-list-entity="Empresa" hs-list-field="razonsocial" hs-list-value="id"></select>
+                            <select id="idempresa" name="idempresa" class="select-data data custom-select form-control selectpicker" data-live-search="true" hs-entity="Empleado" hs-entity-related="empleadoempresa" hs-field="idempresa" hs-list-entity="Empresa" hs-list-field="razonsocial" hs-list-value="idusuario"></select>
                         </div>
                         <div class="col-12 col-md-4">
                             <label for="direccion"><i class="bi bi-wrench pr-2"></i>Puesto de trabajo</label>                        

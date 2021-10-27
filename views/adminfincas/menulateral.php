@@ -2,9 +2,11 @@
 
 <div class="sidebar-content js-simplebar">
 
-    <a class="sidebar-brand" href="<?php echo HOME_URL; ?>dashboard">
+    <?php include_once(ABSPATH.'views/componentes/menulateral/busqueda.php'); ?>
+
+    <!-- <a class="sidebar-brand" href="<?php echo HOME_URL; ?>dashboard">
         <span class="align-middle">Fincatech</span>
-    </a>
+    </a> -->
 
     <ul class="sidebar-nav navComunidades"></ul>
 

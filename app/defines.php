@@ -4,6 +4,8 @@
 global $App;
 global $appSettings;
 
+ini_set('memory_limit', '1024M');
+
 //  Rutas para los assets
 define( 'ASSETS', ROOT_URL . 'assets/' );
 define( 'ASSETS_JS', ROOT_URL . 'assets/js/' );

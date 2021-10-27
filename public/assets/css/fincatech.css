@@ -34,11 +34,15 @@ span.select2-dropdown.select2-dropdown--below {
 }
 
 .select2-results__option--disabled {
-  background-color: #ccfbc4;
-  font-weight: 700;
+  background-color: #e6e6e6;
+  font-weight: 400;
   text-align: center;
   border-bottom: 1px solid #a2ca9b;
-  border-top: 1px solid #a2ca9b;
+  font-size: 12px;
+}
+
+.form-error {
+  border-color: red !important;
 }
 
 /* Capa loading */
@@ -153,10 +157,6 @@ a:hover {
   font-family: "Dosis";
 }
 
-.card {
-  border-radius: 15px;
-}
-
 .shadow-neumorphic {
   -webkit-box-shadow: 4px 4px 10px #c9c9c9, -4px -4px 10px #ffffff;
   box-shadow: 4px 4px 10px #c9c9c9, -4px -4px 10px #ffffff;
@@ -246,9 +246,39 @@ input[type="password"],
 input[type="number"] {
   -webkit-box-shadow: inset 4px 4px 10px #dadada;
   box-shadow: inset 4px 4px 10px #dadada;
-  border-color: white !important;
+  border-color: white;
   padding-top: 7px;
   padding-bottom: 7px;
+}
+
+.sidebar-item:hover, .sidebar-item:hover a {
+  text-decoration: underline;
+}
+
+.sidebar-nav .btnEliminarComunidad {
+  border: 1px solid white;
+  border-radius: 15px;
+  background-color: white;
+  width: 30px;
+  height: 30px;
+  padding: 5px;
+  -webkit-transition: all 300ms ease-in;
+  transition: all 300ms ease-in;
+}
+
+.sidebar-nav .btnEliminarComunidad svg {
+  -webkit-transition: all 250ms ease-in;
+  transition: all 250ms ease-in;
+}
+
+.sidebar-nav .btnEliminarComunidad:hover svg {
+  -webkit-transform: scale(0.9);
+          transform: scale(0.9);
+}
+
+.sidebar-nav .btnEliminarComunidad:hover {
+  border-width: 1px;
+  border-color: red;
 }
 
 .form-data label {
@@ -327,7 +357,7 @@ td.p-0.text-center {
 }
 
 .list-group-item.active {
-  background-color: #1ccbe626 !important;
+  background-color: #a5dc8661 !important;
   border-color: #000000 !important;
   color: black !important;
   font-size: 0.9rem;
@@ -363,6 +393,10 @@ body div.dataTables_wrapper div.dataTables_filter input {
   font-size: 14px;
   font-weight: 300;
   text-indent: 5px;
+}
+
+.sidebar-nav a {
+  font-weight: 300;
 }
 
 .shown .abrir {

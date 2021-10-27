@@ -100,11 +100,12 @@
         <input type="text" class="form-control data text-left form-required" id="email" name="email" placeholder="E-mail"  hs-entity="Comunidad" hs-field="emailcontacto" required>
     </div>                       
 
-</div>                     -->
+</div>                     
+-->
 
 <!-- IBAN -->
 <div class="form-group row mb-2">
-    <div class="col-12">
+    <div class="col-12 col-sm-3">
         <label for="ibancomunidad"><i class="bi bi-bank pr-2"></i>IBAN</label>              
         <input type="text" class="form-control data text-center text-uppercase" id="ibancomunidad" name="ibancomunidad" placeholder="Código Cuenta IBAN"  hs-entity="Comunidad" hs-field="ibancomunidad" maxlength="30">
     </div>                       

@@ -127,9 +127,19 @@ class DocumentalModel extends \HappySoftware\Model\Model{
     
     }
 
-    public function actualizarRequerimiento($id, $datos)
+    public function updateRequerimiento($idRequerimiento, $idFicheroNuevo, $tabla)
     {
-    
+        //  TODO: Tenemos que meter el registro en la tabla de historial
+
+        //  Actualizamos el ID del fichero por el nuevo
+            $sqlUpdate = "update " . $tabla . " set idfichero = " . $idFicheroNuevo . ", updated = now() where id = " . $idRequerimiento;
+            $this->getRepositorio()->queryRaw($sqlUpdate);
+            return 'ok';
+    }
+
+    private function moveRequerimientoToHistorial($idRequerimiento, $tablaDestino)
+    {
+        // Tabla Destino: $tablaDestino . 'historial'
     }
 
     /** Comprueba si un requerimiento ya existe en el sistema */
@@ -147,8 +157,8 @@ class DocumentalModel extends \HappySoftware\Model\Model{
             $destino = ($destino == 'camarasseguridad' ? 'CamarasSeguridad' : 'ContratosCesion');
 
        //   Instanciamos el controller correspondiente
-            $this->InitController( $destino );
-            $modelo = $destino.'Controller';
+            $this->InitController( ucfirst($destino) );
+            $modelo =  ucfirst($destino).'Controller';
 
         //  Recuperamos el listado general
         //  FIXME: Utilizar el filtro de resultados por idcomunidad

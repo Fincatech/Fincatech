@@ -259,8 +259,9 @@ let dpdCore = {
         {
 
             //  Cargamos el listado de comunidades
-            CoreUI.tableData.init();
-
+                CoreUI.tableData.init();
+                CoreUI.tableData.columns = [];
+                
             //  Comunidad
             // CoreUI.tableData.addColumn('listadoDpd', "comunidad[0].nombre","COMUNIDAD");
 
@@ -295,7 +296,7 @@ let dpdCore = {
                 }
 
             $('#listadoDpd').addClass('no-clicable');
-            CoreUI.tableData.render("listadoDpd", "Dpd", "dpd/list");
+            await CoreUI.tableData.render("listadoDpd", "Dpd", "dpd/list");
         }
         return true;
     }

@@ -8,7 +8,7 @@
 
                 <div class="card-header pl-1 mb-2">
 
-                    <h5 class="card-title mb-0"><i class="bi bi-folder-check mr-2"></i> <span class="titulo">Requerimientos comunidad</span></h5>
+                    <h5 class="card-title mb-0"><i class="bi bi-folder-check mr-2"></i> <span class="titulo">Documentos comunidad CAE</span></h5>
 
                 </div>
         

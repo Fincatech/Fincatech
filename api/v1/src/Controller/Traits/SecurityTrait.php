@@ -18,6 +18,17 @@ trait SecurityTrait{
         return ( $this->getLoggedUserRole() == 'ROLE_ADMINFINCAS' );
     }
 
+    public function isContratista()
+    {
+        return ( $this->getLoggedUserRole() == 'ROLE_CONTRATISTA' );
+    }
+
+    // TODO:
+    public function isDPD()
+    {
+
+    }
+
     public function getJWTUserData()
     {
         return $this->checkSecurity();

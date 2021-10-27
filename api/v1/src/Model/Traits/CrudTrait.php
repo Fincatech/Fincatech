@@ -13,9 +13,9 @@ trait CrudTrait{
         {
             $this->constructInsertSQL();
             //  Ejecutamos sobre la propiedad SQL
-            //die($this->getSQL());
+
                 $this->repositorio->queryRaw( $this->getSQL() );
-                $data['id'] = $this->repositorio->getLastID($this->getEntidad()) - 1;
+                $data['id'] = $this->repositorio->getLastID(strtolower($this->getEntidad())) - 1;
                 return $data;
         }else{
             //  Ejecutamos sobre la propiedad SQL
@@ -56,8 +56,8 @@ trait CrudTrait{
              
             }
             unset($data['fichero']);
-        //  Recuperamos todos los valores del post que hemos recibido
 
+        //  Recuperamos todos los valores del post que hemos recibido
             $this->processJSONPostData($data);
 
         //  Auditoría
@@ -150,6 +150,9 @@ trait CrudTrait{
             }
             unset($data['fichero']);
 
+        //  Hay que meter el ID de la entidad principal
+            $data['id'] = $entidadId;
+
         //  Recuperamos todos los valores del post que hemos recibido
             $this->processJSONPostData($data);
 
@@ -184,9 +187,9 @@ trait CrudTrait{
             $this->queryToExecute = "select * from ";
             if(isset($params['view']))
             {
-                $this->queryToExecute .= $params['view'] . " ";        
+                $this->queryToExecute .= strtolower($params['view']) . " ";        
             }else{
-                $this->queryToExecute .= $this->mainEntity . " ";        
+                $this->queryToExecute .= strtolower($this->mainEntity) . " ";        
             }
 
         //  Nos traemos los datos de la entidad principal teniendo en cuenta los criterios de selección 

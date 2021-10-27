@@ -11,7 +11,7 @@ let informeValoracionSeguimientoCore = {
 
         if($('#listadoInformevaloracionseguimiento').length)
         {
-            informeValoracionSeguimientoCore.renderTabla();
+            // await informeValoracionSeguimientoCore.renderTabla();
         }else{
             core.Files.init();
             core.Files.Fichero.entidadId = core.modelId;       
@@ -44,6 +44,7 @@ let informeValoracionSeguimientoCore = {
 
             //  Cargamos el listado de comunidades
                 CoreUI.tableData.init();
+                CoreUI.tableData.columns = [];
                 
             //  Fecha de creación
                 var html = 'data:created$';

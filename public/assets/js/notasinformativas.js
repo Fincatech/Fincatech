@@ -11,7 +11,7 @@ let notasInformativasCore = {
 
         if($('#listadoNotasInformativas').length)
         {
-            notasInformativasCore.renderTabla();
+            // notasInformativasCore.renderTabla();
         }else{
             core.Files.init();
             core.Files.Fichero.entidadId = core.modelId;        
@@ -32,7 +32,8 @@ let notasInformativasCore = {
         {
             //  Cargamos el listado de comunidades
                 CoreUI.tableData.init();
-
+                CoreUI.tableData.columns = [];
+                
             //  Fecha de creación
                 var html = 'data:created$';
                 CoreUI.tableData.addColumn('listadoNotasInformativas', null, "Fecha", html, 'text-center', '80px');
@@ -48,7 +49,7 @@ let notasInformativasCore = {
                 CoreUI.tableData.addColumn('listadoNotasInformativas', null, "Fichero", html, 'text-center');
 
                 // $('#listadoNotasinformativas').addClass('no-clicable');
-                CoreUI.tableData.render("listadoNotasInformativas", "Notasinformativas", "notasinformativas/list");
+                await CoreUI.tableData.render("listadoNotasInformativas", "Notasinformativas", "notasinformativas/list");
         }
     }
 

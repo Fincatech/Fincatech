@@ -10,8 +10,9 @@ let comunidadesCore = {
     init: async function()
     {
         //  Bindeamos los eventos de los diferentes botones de comunidades
-        this.events();
-        await comunidadesCore.renderMenuLateral();
+            this.events();
+        // await comunidadesCore.renderMenuLateral();
+
         //  Comprobamos si se está cargando el listado
         if(core.actionModel == "list" && core.model.toLowerCase() == "comunidad")
         {
@@ -21,34 +22,27 @@ let comunidadesCore = {
                 
 
         }else{
-
-            //  Título del módulo
-                if($('.titulo-modulo').length && core.model == 'Comunidad')
-                {
-                    //  Cargamos el listado de consultas al dpd
-                        dpdCore.renderTabla();
-
-                    //  Cargamos el listado de empresas asociadas a comunidad
-                        empresaCore.renderTablaEmpresasComunidad(core.modelId);
-                        
-                    //  Cargamos el listado de empleados asociados a comunidad 
-                        empleadoCore.renderTablaEmpleadosComunidad(core.modelId);
-                
-                    //  Cargamos la documentación de la comunidad
-                        documentalCore.Comunidad.renderTablaDocumentacionComunidad(core.modelId);
-
-
-                }
-
-                CoreUI.setTitulo('nombre');
-
+            CoreUI.setTitulo('nombre');
         }
+
+        //  Inicialización del masked para la cuenta IBAN
+            $('#ibancomunidad').mask('SS00 0000 0000 00 0000000000');
 
     },
 
     // Gestión de eventos
     events: function()
     {
+
+        $('body').on(core.helper.clickEventType,'.btnLimpiarBusqueda', function(evt){
+            $('.busquedaComunidad').val('');
+            CoreUI.Sidebar.Comunidades.buscarComunidad();
+        });
+
+        $('body').on('keyup', '.busquedaComunidad', function(evt)
+        {
+            CoreUI.Sidebar.Comunidades.buscarComunidad();
+        });
 
         /** Override del método de guardar para poder enganchar los servicios */
         if(core.model.toLowerCase() == "comunidad")
@@ -59,11 +53,13 @@ let comunidadesCore = {
             });    
         }
 
+    //  Botón ver comunidad
         $('body').on(core.helper.clickEventType, '.btnVerComunidad', (evt)=>{
             evt.stopImmediatePropagation();
             comunidadesCore.verModalComunidad( $(evt.currentTarget).attr('data-id'), $(evt.currentTarget).attr('data-nombre') );
         });
 
+    //  Eliminar comunidad
         $('body').on(core.helper.clickEventType, '.btnEliminarComunidad', (evt)=>{
             evt.stopImmediatePropagation();
             comunidadesCore.eliminar( $(evt.currentTarget).attr('data-id'), $(evt.currentTarget).attr('data-nombre') );
@@ -98,11 +94,36 @@ let comunidadesCore = {
             $('.sidebar-item .comunidad-' + core.modelId).text(`${$('.form-comunidad #codigo').val()} - ${$(this).val()}`);
         });
 
+    //  Cambio de nombre/código de comunidad
         $('body .form-comunidad #codigo').on('keyup', function(e)
         {
             //  Cambiamos el nombre en el menú lateral siempre que tenga id
-            $('.sidebar-item .comunidad-' + core.modelId).text(`${$('.form-comunidad #codigo').val()} - ${$(this).val()}`);
+                $('.sidebar-item .comunidad-' + core.modelId).text(`${$('.form-comunidad #codigo').val()} - ${$(this).val()}`);
         });
+
+    //  Validación de cuenta IBAN
+        $('body').on('blur', '#ibancomunidad', function(e)
+        {
+            comunidadesCore.validarCuentaIBAN();
+        });
+
+    //  Tab de documentación de comunidad (Requerimientos)
+        $('body').on(core.helper.clickEventType, '.enlaceDocumentacionComunidad', function(evt)
+        {
+            documentalCore.Comunidad.renderTablaDocumentacionComunidad(core.modelId);
+        });
+
+    //  Enlace CAE No contratado
+        $('body').on(core.helper.clickEventType, '.enlaceKOCae', function(evt)
+        {
+            CoreUI.Modal.Info('Actualmente no tiene contratado el servicio de CAE para esta comunidad.<br><br>Si desea contratarlo, por favor contacte con el departamento comercial de Fincatech o escriba a comercial@fincatech.es','Servicio no contratado');
+        });
+
+    //  Enlace RGPD No contratado
+        $('body').on(core.helper.clickEventType, '.enlaceKORGPD', function(evt)
+        {
+            CoreUI.Modal.Info('Actualmente no tiene contratado el servicio de RGPD para esta comunidad.<br><br>Si desea contratarlo, por favor contacte con el departamento comercial de Fincatech o escriba a comercial@fincatech.es','Servicio no contratado');
+        });    
 
     },
 
@@ -112,12 +133,11 @@ let comunidadesCore = {
         //  Lo primero es validar que el código iban sea correcto
         if( $('#ibancomunidad').val() != '')
         {
-            if(!core.Validator.checkIBAN( $('#ibancomunidad').val() ) )
+            if( !comunidadesCore.validarCuentaIBAN() )
             {
                 CoreUI.Modal.Error('El código IBAN no es correcto. Por favor, revise el número proporcionado');
                 return;
             }
-
         }
 
         if(core.Forms.Validate('form-comunidad'))
@@ -143,6 +163,21 @@ let comunidadesCore = {
         core.Modelo.Delete("comunidad", id, nombre, "listadoComunidades");
     },
 
+
+    validarCuentaIBAN: function()
+    {
+        var iban = $('#ibancomunidad').unmask().val().trim();
+        $('#ibancomunidad').mask('SS00 0000 0000 00 0000000000');
+
+        if( !core.Validator.checkIBAN ( iban ))
+        {
+            $('body #ibancomunidad').css('border-color', 'red');
+            return false;
+        }else{
+            $('body #ibancomunidad').css('border-color', '');
+            return true;
+        }
+    },
 
     /**
      * Asigna una empresa a una comunidad
@@ -260,27 +295,58 @@ let comunidadesCore = {
             comunidadesCore.comunidades = JSON.parse(result);
             console.log(comunidadesCore.comunidades);
 
-        $('.navComunidades').append('<li class="sidebar-header">Comunidades</li>');
+            // // $('.navComunidades').append('<li class="sidebar-header text-uppercase" style="font-size:1.3rem;">Mis comunidades</li>');
+            // $('.navComunidades').append(`
+            //     <li class="pl-3 pr-3 pb-2 pt-2 mb-3 mt-2">
+            //         <p class="text-white text-uppercase mt-0 mb-0"><small>Buscar comunidad</small></p>
+            //         <div class="row">
+            //             <div class="col-10">
+            //                 <input type="text" class="form-control busquedaComunidad" placeholder="Escriba cód o nombre">
+            //             </div>
+            //             <div class="col-2 align-self-center">
+            //                 <a href="javascript:void(0);" class="btnLimpiarBusqueda"><i class="bi bi-x-circle text-white"></i></a>
+            //             </div>
+            //     </li>`);
+        
+                $('.sidebar-nav').prepend(`
+                <div class="row pl-3 pr-3">
+                    <div class="col-12 pb-2 pt-2 mb-3 mt-2">
+                        <p class="text-white text-uppercase mt-0 mb-0"><small>Buscar comunidad</small></p>
+                        <div class="row">
+                            <div class="col-10">
+                                <input type="text" class="form-control busquedaComunidad" placeholder="Escriba cód o nombre">
+                            </div>
+                            <div class="col-2 align-self-center">
+                                <a href="javascript:void(0);" class="btnLimpiarBusqueda"><i class="bi bi-x-circle text-white"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>`);
 
             comunidadesCore.comunidades.data.Comunidad.forEach( function(valor, indice, array){
-            var html = `<li class="sidebar-item">
-                            <a class="sidebar-link" href="/comunidad/${valor['id']}">
+            var html = `<li class="sidebar-item pl-3 pr-3 pb-2 pt-2" data-codigo="${valor['codigo']}" data-nombre="${valor['nombre']}">
                                 <div class="row">
-                                    <div class="col-2">
+                                    <div class="col-2 pr-0">
                                         <img src="/public/assets/img/icon_edificio.png" class="img-responsive feather">
                                     </div>
-                                    <div class="col-10 pr-0">
-                                        <span class="align-middle comunidad-${valor['id']}">${valor['codigo']} - ${valor['nombre']}</span>
+
+                                    <div class="col-8 pl-0">
+                                        <a href="/comunidad/${valor['id']}" class="text-white">   
+                                            <span class="align-middle comunidad-${valor['id']}">${valor['codigo']} - ${valor['nombre']}</span>
+                                        </a>
+                                    </div>
+
+                                    <div class="col-2 pr-0 text-center pl-0">
+                                        <a href="javascript:void(0);" class="btnEliminarComunidad" data-id="${valor['id']}" data-nombre="${valor['nombre']}">
+                                            <i data-feather="trash-2" class="text-danger"></i>
+                                        </a>
                                     </div>
                                 </div>
-                            </a>
                         </li>`;
             $('.navComunidades').append(html);
             
         });
-
-            feather.replace();    
-
+            feather.replace();
         });
 
     },
@@ -376,11 +442,11 @@ let comunidadesCore = {
             //  Columna de acciones
                 var html = '<ul class="nav justify-content-center accionesTabla">';
                     // html += '<li class="nav-item"><a href="javascript:void(0);" class="btnVerComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="eye" class="text-info img-fluid"></i></a></li>';
-                    html += `<li class="nav-item"><a href="${baseURL}comunidad/data:id$" class="btnEditarComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid pr-2" style="width:32px;height:32px;"></i></a></li>`;
+                    // html += `<li class="nav-item"><a href="${baseURL}comunidad/data:id$" class="btnEditarComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid pr-2" style="width:32px;height:32px;"></i></a></li>`;
                     html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid" style="width:26px;height:26px;"></i></li></ul>';
                 CoreUI.tableData.addColumn('listadoComunidad', null, "", html);
 
-            $('#listadoComunidad').addClass('no-clicable');
+            // $('#listadoComunidad').addClass('no-clicable');
             CoreUI.tableData.render("listadoComunidad", "Comunidad", "comunidad/list");
         }
 

@@ -87,7 +87,15 @@ class EmpleadoController extends FrontController{
     {
         $data = [];
         $data = $this->EmpleadoModel->Get($id);
-        $data['Empleado'][0]['idempresa'] = $data['Empleado'][0]['empleadoempresa'][0]['idempresa'];
+
+        //  Comprobamos si tiene empresa asociada el empleado. Teóricamente sí que debe tener la relación pero
+        //  hay que verificar porque puede ser un empleado de comunidad
+        if(!isset( $data['Empleado'][0]['empleadoempresa'][0]['idempresa'] ))
+        {
+            $data['Empleado'][0]['idempresa'] = null; 
+        }else{
+            $data['Empleado'][0]['idempresa'] = $data['Empleado'][0]['empleadoempresa'][0]['idempresa'];
+        }
         return $data;
     }
 
@@ -114,11 +122,25 @@ class EmpleadoController extends FrontController{
         return HelperController::successResponse( $data );
     }
 
+    public function ListEmpleadosByComunidadAndEmpresa($idComunidad, $idEmpresa)
+    {
+        $data = [];
+        $data['Empleados'] = $this->EmpleadoModel->GetEmpleadosByComunidadAndEmpresa($idComunidad, $idEmpresa);
+        return HelperController::successResponse( $data );
+    }
+
     /** Devuelve el listado de empresas por id de empleado */
     public function ListEmpresasByEmpleadoId($id)
     {
         $data = [];
         $data['Empresasempleado'] = $this->EmpleadoModel->GetEmpresasByEmpleadoId($id);
+        return HelperController::successResponse( $data );
+    }
+
+    public function ListDocumentacionCAEEmpleado($id)
+    {
+        $data = [];
+        $data['documentacioncae'] = $this->EmpleadoModel->GetDocumentacionEmpleado($id);
         return HelperController::successResponse( $data );
     }
 

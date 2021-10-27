@@ -4,6 +4,47 @@ let empleadoCore = {
     Empresa: Object(),
     empresa: Object(),
 
+    Model: {
+
+        Empleado: Object(),
+        Empleados: Object(),
+
+        /**
+         * Obtiene los datos para un empleado
+         * @param {int} idEmpleado 
+         */
+        get: async function(idEmpleado, callback)
+        {
+            
+            await apiFincatech.get(`empleado/${idEmpleado}`).then( ( result ) =>
+            {
+                console.log('----');
+                if(!result)
+                {
+                    //  No se ha podido recuperar la información del empleado
+                        CoreUI.Modal.Error('No se ha podido recuperar la información del empleado', 'Error');
+                        return false;
+                }else{
+                    var datosEmpleado = JSON.parse(result);
+                        empleadoCore.Model.Empleado = datosEmpleado.data.Empleado[0];    
+                        callback();
+                        return true;
+                }
+            });
+        },
+
+        getAll: function(idEmpresa = null, idComunidad = null)
+        {
+
+        },
+
+        save: function()
+        {
+            core.Forms.Save(true);
+        }
+
+    },
+
     init: async function()
     {
 
@@ -133,7 +174,7 @@ let empleadoCore = {
 
     },
 
-    /** Elimina una comunidad previa confirmación */
+    /** Elimina un empleado previa confirmación */
     eliminar: function(id, nombre)
     {
         core.Modelo.Delete("empleado", id, nombre, "listadoEmpleado");
@@ -161,9 +202,7 @@ let empleadoCore = {
         });
     },
 
-    /**
-     * Carga los datos del listado
-     */
+    /** Carga los datos del listado */
     renderTabla: async function()
     {
         if($('#listadoEmpleado').length)
@@ -206,7 +245,7 @@ let empleadoCore = {
         }
     },
 
-    renderTablaEmpresasEmpleado: async function(idempleado)
+    renderTablaEmpresasEmpleado: function(idempleado)
     {
         if($('#listadoEmpresasEmpleado').length)
         {
@@ -232,7 +271,7 @@ let empleadoCore = {
         }
     },
 
-    renderTablaEmpleadosComunidad: async function(idcomunidad)
+    renderTablaEmpleadosComunidad: function(idcomunidad)
     {
         if($('#listadoEmpleadosComunidad').length &&
             typeof idcomunidad !== 'undefined' &&
@@ -329,6 +368,28 @@ let empleadoCore = {
                 CoreUI.tableData.render("listadoEmpleadosComunidad", "Empleado", `comunidad/${idcomunidad}/empleados`, false, false, false);
         }    
     
+    },
+
+    renderTablaEmpleadosEmpresa: function(idEmpresa)
+    {
+
+    },
+
+    /**
+     * Carga la tabla de documentos que debe aportar el empleado
+     * @param {int} idEmpleado 
+     * @param {string} tablaDestino 
+     */
+    renderTablaDocumentacionEmpleado: function(idEmpleado, tablaDestino)
+    {
+
+        if( $(`#${tablaDestino}`).length )
+        {
+            documentalCore.CAE.renderTablaDocumentacionEmpleado(idEmpleado, tablaDestino);
+        }else{
+            console.log('No hay tabla sobre la que renderizar');
+        }
+
     }
 
 }

@@ -16,13 +16,14 @@ CREATE TABLE `comunidadempresa` (
   `created` DATETIME NULL,
   PRIMARY KEY (`id`));
 
-CREATE 
+CREATE OR REPLACE
 VIEW `view_empresascomunidad` AS
     SELECT 
         `e`.`id` AS `id`,
         `e`.`razonsocial` AS `razonsocial`,
         `e`.`cif` AS `cif`,
         `e`.`telefono` AS `telefono`,
+        `e`.`idusuario` AS `idusuario`,
         `e`.`personacontacto` AS `personacontacto`,
         `e`.`email` AS `email`,
         `e`.`direccion` AS `direccion`,
@@ -517,3 +518,10 @@ VIEW `view_documentosempleado` AS
 
 ALTER TABLE `fincatech`.`empleadorequerimiento` 
 ADD COLUMN `idcomunidad` INT(11) NULL AFTER `idempresa`;
+
+
+######## 23/10/2021
+
+ALTER TABLE `dbs4285272`.`empleado` 
+ADD COLUMN `fechaalta` DATE NULL AFTER `idavatar`;
+

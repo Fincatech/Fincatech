@@ -43,7 +43,7 @@ class DocumentalController extends FrontController{
                 $relaciones[ $datos['entidad'] ]['campo'], 
                 $datos[ $relaciones[ $datos['entidad'] ]['campo'] ]))
             {
-                return HelperController::successResponse($this->DocumentalModel->updateRequerimiento());
+                return HelperController::successResponse($this->DocumentalModel->updateRequerimiento($datos['idrelacionrequerimiento'], $idFichero, $tablaDestino));
             }else{
                 // Destino, idFichero, datos
                 return HelperController::successResponse($this->DocumentalModel->createRequerimiento(

@@ -23,28 +23,51 @@ trait UtilsTrait{
     }
 
     /** Filtra los resultados según el campo y valor deseado para una entidad */
-    protected function filterResults($datos, $entity, $key, $value)
+    protected function filterResults($datos, $entity, $key, $value, $relEntity = null)
     {
 
         if(is_array($datos))
         {  
-            $x = 0;
-            foreach ($datos[$entity] as $index => $object) 
+            //  Comprobamos si la entidad sobre la que se va a comprobar es un array
+            if( is_null($relEntity))
             {
-                if($object[$key] != $value)
+
+                foreach ($datos[$entity] as $index => $object) 
                 {
-                    unset($datos[$entity][$index]);
-                    // array_splice($datos, $x);
+                    if($object[$key] != $value)
+                    {
+                        unset($datos[$entity][$index]);
+                    }
                 }
-                $x++;
+    
+                $datos[$entity] = array_values($datos[$entity]);
+
+            }else{
+
+                $datosFiltrados = [];
+
+                foreach ($datos[$entity] as $index => $object) 
+                {
+                    $indiceTemporal = $index;
+                    $eliminar = false;
+
+                    foreach($object[$relEntity] as $relIndex => $relObject)
+                    {
+
+                        if($relObject[$key] == $value)
+                        {
+                            $datosFiltrados[] = $object;
+                            break;
+                        }
+                    }
+                }
+                return $datosFiltrados;
             }
-            $datos[$entity] = array_values($datos[$entity]);
+
         }
 
-        // $datosTmp = array_values($datos[$entity]);
-        // $datos[$entity] = [];
-        // $datos[$entity] = [$datosTmp];
         return $datos;
+
     }
 
     /** Convierte los resultados devueltos por la conexión MySQLi a un objeto

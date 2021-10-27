@@ -6,7 +6,6 @@
     define('PROTOCOL',(!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS'] == 'on')) ? 'https://' : 'http://');
     define('DOMAIN',$_SERVER['HTTP_HOST']);
     define('ROOT_URL', preg_replace("/\/$/",'',PROTOCOL.DOMAIN.str_replace(array('\\',"index.php","index.html"), '', dirname(htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES))),1).'/');// Remove backslashes for Windows compatibility
-    //define('ROOT_URL', preg_replace("/\/$/",'',PROTOCOL.DOMAIN.str_replace(array('\\',"index.php","index.html"), '', dirname(htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES))),1).'/');// Remove backslashes for Windows compatibility
 
     define('HOME_URL', (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/' . $folder);
 
@@ -29,6 +28,7 @@
     require_once(ABSPATH . 'src/Controller/Traits/SecurityTrait.php');
     require_once(ABSPATH . 'src/Controller/Traits/TableTrait.php');
     require_once(ABSPATH . 'src/Controller/Traits/ViewTrait.php');
+    require_once(ABSPATH . 'src/Controller/Traits/UtilsTrait.php');
 
     require_once(ABSPATH . 'src/Controller/FrontController.php');
     

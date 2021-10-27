@@ -99,22 +99,19 @@
 
                                             <div class="card-body border pt-3 shadow-neumorphic ml-3 mr-3 mt-0">
                                                 <div class="tab-content">
+                                                    <!-- Documentación CAE -->
                                                     <div class="tab-pane fade show active" id="tab-1" role="tabpanel">
                                                         <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoDocumentacionEmpresa" id="listadoDocumentacionEmpresa" data-model="documentacioncae">
                                                             <thead class="thead"></thead>
                                                             <tbody class="tbody"></tbody>
                                                         </table>
                                                     </div>
+                                                    <!-- Empleados de la comunidad -->
                                                     <div class="tab-pane fade text-center" id="tab-2" role="tabpanel">
                                                         <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoEmpleadosComunidad" id="listadoEmpleadosComunidad" data-order='[[ 2, "asc" ]]'  data-model="Empleado">
                                                             <thead class="thead"></thead>
                                                             <tbody class="tbody"></tbody>
                                                         </table>
-                                                    </div>
-                                                    <div class="tab-pane fade" id="tab-3" role="tabpanel">
-                                                        <h5 class="card-title">Card with tabs</h5>
-                                                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                                        <a href="#" class="btn btn-primary">Go somewhere</a>
                                                     </div>
                                                 </div>
                                             </div>

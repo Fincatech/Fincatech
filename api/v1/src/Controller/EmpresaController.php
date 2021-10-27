@@ -71,4 +71,30 @@ class EmpresaController extends FrontController{
        return $this->EmpresaModel->List($params);
     }
 
+    /** Recupera las comunidades que tiene asignadas un contratista */
+    public function GetComunidades($idEmpresa)
+    {
+
+        //---------------------------
+        //  Validación de seguridad
+        //---------------------------
+
+        //  Si no es un usuario de tipo SUDO, se comprueba si es un usuario de tipo contratista
+            // if(!$this->isSudo())
+            //     $idEmpresa = ($this->isContratista() ? $this->getLoggedUserId() : -1);
+
+        //FIXME: Revisar seguridad de usuario autenticado
+
+        if($this->isContratista())
+        {
+            $idEmpresa = $this->getLoggedUserId();
+        }
+
+        $data = [];
+        $data['Comunidades'] = $this->EmpresaModel->GetComunidades($idEmpresa);
+        $data['total'] = count($data);
+        return HelperController::successResponse( $data );
+        
+    }
+
 }

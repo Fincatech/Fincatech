@@ -105,14 +105,14 @@ let usuarioCore = {
             //  Fecha de alta
                 var html = 'data:created$';
                 CoreUI.tableData.addColumn('listadoUsuario', null, "Fecha de alta", html);
-console.log('Base url: ' + baseURL);
+
             //  Columna de acciones
                 var html = '<ul class="nav justify-content-center">';
                     html += `<li class="nav-item"><a href="${baseURL}usuario/data:id$" class="btnEditarUsuario d-inline-block mr-2" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid"></i></a></li>`;
                     html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarUsuario d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid"></i></li></ul>';
                 CoreUI.tableData.addColumn('listadoUsuario', null, "", html);
 
-            $('#listadoUsuario').addClass('no-clicable');
+            // $('#listadoUsuario').addClass('no-clicable');
             CoreUI.tableData.render("listadoUsuario", "Usuario", "usuario/list");
         }
 

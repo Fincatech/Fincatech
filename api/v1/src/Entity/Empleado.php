@@ -59,16 +59,16 @@ class Empleado extends EntityHelper{
         $this->relations[] = $this->addRelation([
             'table' => 'empleadoempresa',
             //  Columna de la entidad que se está relacionando con la entidad principal
-            'sourceColumn' =>'idempleado',
+            'sourceColumn' =>'id',
             //  Columna de la entidad principal con la que se va a relacionar
-            'targetColumn' => 'id',
+            'targetColumn' => 'idempleado',
             'fieldType' => 'int',
             'canReturnSchema' => false,
             'readOnly' => true,
             //  Indica si se debe eliminar el registro relacionado o no
             'deleteOnCascade' => false,
             //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
-            'relationType' => RELACION_OUTSIDE
+            'relationType' => RELACION_INVERSA
         ]);
 
         //  Entidad empleadocomunidad

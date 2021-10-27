@@ -62,14 +62,15 @@ let apiFincatech =
     /** Lanza una petición GET al webservice y devuelve los datos en formato JSON
      * @param endpoint String Nombre del endpoint que se va a consultar
      */
-    get: async function(entity)
+    get: function(entity)
     {
 
         $('.loading').show();
 
         // https://es.stackoverflow.com/questions/3582/diferencias-entre-ajax-anidadas-y-promises
-        return await $.ajax({
+        return $.ajax({
             url: apiFincatech.baseUrlEndpoint + entity,
+            async: true,
             success: function(respuesta)
             {
                 apiFincatech.response = respuesta.data;

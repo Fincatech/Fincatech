@@ -108,10 +108,11 @@ class ComunidadModel extends \HappySoftware\Model\Model{
     {
         //  Si el usuario autenticado es un sudo, no acotamos
         if($this->isSudo())
-            $useLoggedUserId = true;
+            $useLoggedUserId = false;
 
         $data = parent::List($params, $useLoggedUserId);
 
+        //  Acotamos por aquellas comunidades que estén en estado "Activo"
         if(!$this->isSudo())
         {
             $data = $this->filterresults($data, 'Comunidad', 'estado', 'A');
@@ -124,15 +125,16 @@ class ComunidadModel extends \HappySoftware\Model\Model{
                 $data['Comunidad'][$x]['comunidadservicioscontratados'] = $this->GetListadoServiciosContratados($data['Comunidad'][$x]['id']);
 
                 //  Recuperamos los documentos asociados a una comunidad
-                //$sql = "SELECT * FROM fincatech.view_documentoscomunidad where @IDEMPRESAREQUERIMIENTO:=" . $data['Comunidad'][$x]['id']; 
                 $data['Comunidad'][$x]['documentacioncomunidad'] = $this->GetDocumentacionComunidad($data['Comunidad'][$x]['id']);
                 //  TODO: Comprobamos si la comunidad tiene alguna empresa de tipo Autónomo asignada
+
+                //  Recuperamos las empresas asociadas a la comunidad
+                // $data['Comunidad'][$x]['empresas'] = $this->GetEmpresasByComunidadId( $data['Comunidad'][$x]['id'] );
             }
 
 
         }
       
-
         //  Recuperamos los servicios contratados por la comunidad
             return $data;
     }
@@ -213,30 +215,22 @@ class ComunidadModel extends \HappySoftware\Model\Model{
 
     }
 
+    /** Recupera las empresas asignadas a la comunidad */
     public function GetEmpresasByComunidadId($id)
     {
-        //  Instanciamos el controller de empresa
-        $this->InitController('Empresa');
+        $sql = "select * from view_empresascomunidad where idcomunidad = $id";
+        $data = $this->query($sql);
 
-            $sql = "select * from view_empresascomunidad where idcomunidad = $id";
-            $data = $this->query($sql);
-
-            if($data)
+        if($data)
+        {
+            for($x = 0; $x < count($data); $x++)
             {
-                for($x = 0; $x < count($data); $x++)
-                {
-                    //  Recuperamos los documentos asociados a CAE de empresa y su estado
-                        $sql = "SELECT * FROM view_documentoscaeempresa where @p1:=" . $data[$x]['id']; 
-                        $data[$x]['documentacioncae'] = $this->query($sql);
-                }
+                //  Recuperamos los documentos asociados a CAE de empresa y su estado
+                    $sql = "SELECT * FROM view_documentoscaeempresa where @p1:=" . $data[$x]['id']; 
+                    $data[$x]['documentacioncae'] = $this->query($sql);
             }
-
-
-            // $data = $this->EmpresaController->List(null)['Empresa'];
-        // // $datos, $entity, $key, $value    
-        // //  Filtramos los resultados por id de comunidad            
-            // $data = $this->filterResults($data, 'Empresa', 'idcomunidad', $id);
-            return $data;
+        }
+        return $data;
     }
 
     /** Asigna una empresa a una comunidad */

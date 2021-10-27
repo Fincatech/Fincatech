@@ -1,24 +1,18 @@
-<div class="row flex-grow-1">
-
-    <div class="col-md-3 col-xl-2 pb-4">
+<div class="row">
+<?php if($App->getAction() == 'get' ):?>
+    <div class="col-12 pb-4">
 
         <div class="row h-100">
 
             <div class="col-12 rounded-lg mb-1">
 
-                <div class="card h-100 mb-1 shadow-neumorphic bg-light">
+                <div class="card mb-1 shadow-neumorphic bg-white p-2">
 
-                    <div class="card-header bg-info">
-                        <h5 class="card-title mb-0 titulo font-weight-light text-uppercase text-light"><i class="bi bi-three-dots-vertical"></i> Menú</h5>
-                    </div>
-
-                    <div class="list-group list-group-flush" role="tablist">
+                    <div class="list-group list-group-horizontal list-group-flush" role="tablist">
                         <a class="list-group-item list-group-item-action active d-none" data-toggle="list" href="#datos" role="tab" aria-selected="true"><i class="bi bi-archive mr-2"></i> Datos</a>
-                        <!-- <a class="list-group-item list-group-item-action" data-toggle="list" href="#documentos" role="tab" aria-selected="false"><i class="bi bi-folder-check mr-2"></i> Documentos</a> -->
-                        <a class="list-group-item list-group-item-action" data-toggle="list" href="#empresa" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> CAE</a>
-                        <a class="list-group-item list-group-item-action" data-toggle="list" href="#rgpd" role="tab" aria-selected="false"><i class="bi bi-shield-lock mr-2"></i> RGPD</a>
-                        <!-- <a class="list-group-item list-group-item-action disabled" data-toggle="list" href="#maquinaria" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> Maquinaria / Químicos</a> -->
-                        <!-- <a class="list-group-item list-group-item-action disabled" data-toggle="list" href="#controlhorario" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> Control horario</a> -->
+                        <a class="list-group-item list-group-item-action enlaceCae" data-toggle="list" href="#empresa" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> CAE</a>
+                        <a class="list-group-item list-group-item-action enlaceDocumentacionComunidad" data-toggle="list" href="#documentos" role="tab" aria-selected="false"><i class="bi bi-folder-check"></i> DOC. COMUNIDAD CAE</a>
+                        <a class="list-group-item list-group-item-action enlaceRGPD" data-toggle="list" href="#rgpd" role="tab" aria-selected="false"><i class="bi bi-shield-lock mr-2"></i> RGPD</a>
                     </div>
                     
                 </div>
@@ -28,8 +22,8 @@
         </div>
 
     </div>
-
-    <div class="col-md-9 col-xl-10">
+<?php endif; ?>
+    <div class="col-12">
 
         <div class="tab-content h-100">
 
@@ -67,6 +61,8 @@
 
             </div>
 
+<?php if($App->getAction() == 'get' ):?>
+
             <!-- Datos de documentos asociados -->
             <?php include('tabs/documentos.php'); ?>            
 
@@ -78,6 +74,8 @@
 
             <!-- RGPD -->
             <?php include('tabs/rgpd.php'); ?>
+
+<?php endif; ?>
 
         </div>
 

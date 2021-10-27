@@ -18,6 +18,7 @@ class EmpleadoModel extends \HappySoftware\Model\Model{
 
     public function __construct($params = null)
     {
+        parent::__construct();
         //  Inicializamos la entidad
         $this->InitEntity( $this->entidad );
 
@@ -26,12 +27,22 @@ class EmpleadoModel extends \HappySoftware\Model\Model{
 
     }
 
+    /** Elimina un empleado y todas sus asociaciones */
+    public function Delete($id, $entity = null)
+    {
+        $sql = "delete from empleadocomunidad where idempleado = $id";
+        $this->getRepositorio()->queryRaw($sql);
+        $sql = "delete from empleadoempresa where idempleado = $id";
+        $this->getRepositorio()->queryRaw($sql);
+        return parent::Delete($id);
+    }
+
     public function Update($entidadPrincipal, $datos, $usuarioId)
     {
-
+            $idEmpresaTemporal = null;
         //  Hay que comprobar si está asociado a una empresa
         //  Este valor viene infomado de: idempresa
-            if(@isset($datos['empleadoempresa']['idempresa']))
+            if(isset($datos['empleadoempresa']['idempresa']))
             {
                 $idEmpresaTemporal = $datos['empleadoempresa']['idempresa'];
                 //  Quitamos el valor del array
@@ -42,8 +53,11 @@ class EmpleadoModel extends \HappySoftware\Model\Model{
         //  Guardamos la entidad principal
             parent::Update($entidadPrincipal, $datos, $usuarioId);
 
-        //  Guardamos la relación entre el empleado y la empresa
-            $this->SaveRelationBetweenEmpleadoAndEmpresa( $usuarioId, $idEmpresaTemporal, $datos['estado']);
+            if(!is_null($idEmpresaTemporal))
+            {
+                //  Guardamos la relación entre el empleado y la empresa
+                    $this->SaveRelationBetweenEmpleadoAndEmpresa( $usuarioId, $idEmpresaTemporal, $datos['estado']);
+            }
 
     }
 
@@ -114,10 +128,25 @@ class EmpleadoModel extends \HappySoftware\Model\Model{
     public function GetEmpleadosByEmpresaId($idEmpresa)
     {
         $sql = "select * from view_empleadosempresa where idempresa = " . $idEmpresa;
-        return $this->query($sql);
+        $data = $this->query($sql);
 
-        //  TODO: Si tiene datos hay que recuperar el estado los documentos, para eso hay que instanciar el controller
+        //  Si tiene datos hay que recuperar el estado los documentos, para eso hay que instanciar el controller
         //  de documentos
+        //  Documentación del empleado
+        for($x = 0; $x < count($data); $x++)
+        {
+            //  Recuperamos los documentos asociados a PRL de empleado
+            $data[$x]['documentacionprl'] = $this->GetDocumentacionEmpleado($data[$x]['id']);
+        }           
+
+        return $data;
+
+        // return $this->query($sql);
+    }
+
+    public function GetEmpleadosByComunidadAndEmpresa($idComunidad, $idEmpresa)
+    {
+
     }
 
     /** Devuelve las empresass asociadas a un empleado */
@@ -158,7 +187,6 @@ class EmpleadoModel extends \HappySoftware\Model\Model{
     public function GetDocumentacionEmpleado($id)
     {
         $sql = "SELECT * FROM view_documentosempleado where @p1:=" . $id; 
-
         return $this->query($sql);
     }
 

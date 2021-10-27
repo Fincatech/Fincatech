@@ -43,8 +43,9 @@ class EmpresaModel extends \HappySoftware\Model\Model{
         $datosNuevoUsuario['estado'] = 'P';
         $datosNuevoUsuario['salt'] = '';
 
-    //  Recuperamos el ID del usuario para poder asignarlo a la hora de crear la empresa
-        $idNuevoUsuario = parent::Create('Usuario', $datosNuevoUsuario);
+        //  Recuperamos el ID del usuario para poder asignarlo a la hora de crear la empresa
+            $idNuevoUsuario = parent::Create('usuario', $datosNuevoUsuario);
+
         $datos['idusuario'] = $idNuevoUsuario['id'];
 
         //TODO: $this->createRelationBetweenEmpresaAndComunidad($idComunidad, $idEmpresa);
@@ -86,8 +87,22 @@ class EmpresaModel extends \HappySoftware\Model\Model{
         if(count($data['Empresa']) <= 0)
         {
         }
-// die();
+
         return $data;
+    }
+
+    /** Recupera las comunidades para las que trabaja una empresa */
+    public function GetComunidades($idEmpresa)
+    {
+        
+        //  Instanciamos el controller de comunidad para recuperar el listado
+            $this->InitController('Comunidad');
+
+        //  Listamos todas las comunidades
+            $listadoComunidades = $this->ComunidadController->List(null, true);
+            $listadoComunidades = $this->filterResults($listadoComunidades, "Comunidad", 'idusuario', $idEmpresa, "view_empresascomunidad");
+            return $listadoComunidades;
+
     }
 
 }

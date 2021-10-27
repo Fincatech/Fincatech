@@ -2,7 +2,6 @@
 <html lang="es">
 
 <head>
-
 	<title><?php echo $appSettings['title']; ?></title>
 
     <?php include_once('metas.php'); ?>

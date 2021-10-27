@@ -6,10 +6,11 @@ use Firebase\JWT\JWT;
 use HappySoftware\Controller\Traits\SecurityTrait;
 use HappySoftware\Controller\Traits\ViewTrait;
 use HappySoftware\Controller\Traits\TableTrait;
+use HappySoftware\Controller\Traits\UtilsTrait;
 
 class MainController{
 
-    use SecurityTrait, TableTrait, ViewTrait;
+    use SecurityTrait, TableTrait, UtilsTrait, ViewTrait;
 
     private $userRol;
     private $pageTitle;
@@ -39,6 +40,12 @@ class MainController{
     public function isAdminFincas()
     {
         return ( $this->getUserRol() == 'ROLE_ADMINFINCAS' );
+    }
+
+    /** Comprueba si el usuario autenticado es un contratista */
+    public function isContratista()
+    {
+        return ( $this->getUserRol() == 'ROLE_CONTRATISTA' ); 
     }
 
     public function getFullControllerRoute()
@@ -133,11 +140,14 @@ class MainController{
             {
                 MainController::redirectToLogin();
             }
-
+            
             $resultValidation = $this->checkSecurity();
+
+            // print_r($resultValidation);die();
 
             if($resultValidation['status'] === true && !empty($resultValidation['data']))
             {
+                // die('a');
                 $userData = $resultValidation['data']->userData;
                 $this->userRol = $userData->role;
                 $this->getController();

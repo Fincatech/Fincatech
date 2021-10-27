@@ -57,5 +57,14 @@ class RequerimientoController extends FrontController{
         return helperController::successResponse( $this->RequerimientoModel->ListRequerimientoByIdTipo($idTipo) );
     }
 
+    /** Devuelve los requerimientos adjuntados para una empresa */
+    public function GetRequerimientosEmpresa($idEmpresa)
+    {
+        $data = [];
+        $data['documentacioncae'] = $this->RequerimientoModel->GetRequerimientosEmpresa($idEmpresa);
+        // return HelperController::successResponse( $this->RequerimientoModel->GetRequerimientosEmpresa($idEmpresa) );
+        return HelperController::successResponse( $data );
+    }
+
 
 }

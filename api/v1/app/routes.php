@@ -176,7 +176,7 @@ return function (App $app) {
 
         $response->getBody()->write( $frontController->Delete($params['id']) );
 
-        return $response;  
+        return $response->withHeader('Content-Type', 'application/json');  
 
     });
 
@@ -214,7 +214,7 @@ return function (App $app) {
         $data = json_decode($body, true);
 
         $response->getBody()->write( $frontController->List($data) );
-        return $response;
+        return $response->withHeader('Content-Type', 'application/json');
 
     });
 
@@ -228,7 +228,7 @@ return function (App $app) {
         $frontController->Init('Requerimiento');
 
         $response->getBody()->write( $frontController->context->ListRequerimientoByIdTipo(1)  );
-        return $response;  
+        return $response->withHeader('Content-Type', 'application/json');  
 
     });
 
@@ -241,8 +241,8 @@ return function (App $app) {
         
         $frontController->Init('Notasinformativas');
 
-        $response->getBody()->write( $frontController->context->List($params)  );
-        return $response;  
+        $response->getBody()->write( $frontController->context->List($params)  )->withHeader('Content-Type', 'application/json');
+        return $response->withHeader('Content-Type', 'application/json');  
 
     });
 
@@ -256,7 +256,7 @@ return function (App $app) {
         $frontController->Init('InformeValoracionSeguimiento');
 
         $response->getBody()->write( $frontController->context->List($params)  );
-        return $response;  
+        return $response->withHeader('Content-Type', 'application/json');  
 
     });
 
@@ -434,7 +434,7 @@ return function (App $app) {
 
     });
 
-    //  Servicios contratados por una comunidad
+    //  Documentación de comunidad
     $app->get('/comunidad/{id}/documentacioncomunidad', function (Request $request, Response $response, array $params)
     {
 
@@ -508,6 +508,7 @@ return function (App $app) {
 
     });
 
+    
     $app->get('/empleado/{id}/empresas', function (Request $request, Response $response, array $params)
     {
 
@@ -525,6 +526,27 @@ return function (App $app) {
 
     });
 
+    $app->get('/empleado/{id}/documentacion', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Empleado');
+
+        $id = $params['id'];
+
+        $response->getBody()->write( $frontController->context->ListDocumentacionCAEEmpleado($id) );
+
+        return $response;  
+
+    });
+/////    nuevo
+
+    ////////////////////////////////////////////////////////////////////
+    ////                            EMPRESA                         ////
+    ////////////////////////////////////////////////////////////////////
     $app->get('/empresa/{id}/empleados', function (Request $request, Response $response, array $params)
     {
 
@@ -541,6 +563,65 @@ return function (App $app) {
         return $response;  
 
     });
+
+    /** Recupera los empleados de una empresa para una comunidad */
+    $app->get('/empresa/{idempresa}/comunidad/{idcomunidad}/empleados', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Empleado');
+
+        $idEmpresa = $params['idempresa'];
+        $idComunidad = $params['idcomunidad'];
+
+        $response->getBody()->write( $frontController->context->ListEmpleadosByComunidadAndEmpresa($idComunidad, $idEmpresa) );
+
+        return $response;  
+
+    });
+
+    $app->get('/empresa/{id}/documentacion', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Requerimiento');
+
+        $idEmpresa = $params['id'];
+
+        $response->getBody()->write( $frontController->context->GetRequerimientosEmpresa($idEmpresa) );
+
+        return $response;  
+
+    });
+
+
+    /**
+     * Devuelve el listado de comunidades asociadas a una empresa
+     */
+    $app->get('/empresa/{id}/comunidades', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Empresa');
+
+        $idEmpresa = $params['id'];
+
+        $response->getBody()->write( $frontController->context->GetComunidades($idEmpresa) );
+
+        return $response;  
+
+    });
+
+///  fin nuevo
 
     //  Punto de entrada para get con ID
     $app->get('/{controller}/{id:[0-9]+}', function (Request $request, Response $response, array $params)

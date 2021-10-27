@@ -3,6 +3,9 @@ let serviciosCore = {
     servicios: Object(),
     servicio: Object(),
 
+    caeContratado: false,
+    rgpdContratado: false,
+
     init: async function()
     {
         //  Bindeamos los eventos de los diferentes botones de comunidades
@@ -123,10 +126,10 @@ let serviciosCore = {
         {
             //  Si es un sudo recuperamos el listado de servicios
             case 'SUDO':
-                console.log('sudo servicios contratados');
+                // console.log('sudo servicios contratados');
                 if($('.form-servicioscontratados').length)
                 {
-                    console.log('servicios detectados');
+                    // console.log('servicios detectados');
                     //  Comprobamos si está editando o creando una comunidad
                     switch(core.actionModel)
                     {
@@ -146,7 +149,7 @@ let serviciosCore = {
                     }
 
                     //  Recuperamos el listado de servicios
-                    await apiFincatech.get(endpointServicios).then(async (data)=>
+                    await apiFincatech.get(endpointServicios).then( (data)=>
                     {
                         result = JSON.parse(data);
                         responseStatus = result.status;
@@ -178,12 +181,13 @@ let serviciosCore = {
 
             //  Si es admin de fincas recuperamos el listado de servicios contratados por una comunidad
             default:
+
                 //  Recuperamos los datos del modelo y pintamos los valores
                 if(typeof core.modelId === 'undefined' || core.modelId === '')
                     return;
 
                 endpointServicios = `comunidad/${core.modelId}/servicioscontratados`;
-                console.log(endpointServicios);
+                // console.log(endpointServicios);
                 nombreEntidad = 'comunidadservicioscontratados';
 
                 await apiFincatech.get(endpointServicios).then(async (data)=>
@@ -191,6 +195,54 @@ let serviciosCore = {
                     result = JSON.parse(data);
                     responseStatus = result.status;
                     responseData = result.data.Comunidad[0];
+
+                    //  0: CAE
+                    //  4: RGPD
+                        caeContratado = false;
+                        rgpdContratado = false;
+                    //  Si el usuario es de tipo ADMINFINCAS COMPROBAMOS SI TIENE CONTRATADO
+                    //  CAE Y/O RGPD PARA ANULAR LOS ENLACES
+                    if(core.Security.getRole() == 'ADMINFINCAS')
+                    {
+                        if(typeof responseData.comunidadservicioscontratados[0]['contratado'] !== 'undefined')
+                        {
+                            // console.log('CAE Contratado ---> ' + responseData.comunidadservicioscontratados[0]['contratado']);
+                            caeContratado = ( responseData.comunidadservicioscontratados[0]['contratado'] == '0' ? false : true);
+                        }
+
+                        if(typeof responseData.comunidadservicioscontratados[4]['contratado'] !== 'undefined')
+                        {
+                            // console.log('RGPD Contratado ---> ' + responseData.comunidadservicioscontratados[4]['contratado']);
+                            rgpdContratado = (responseData.comunidadservicioscontratados[4]['contratado'] == '0' ? false : true);
+                        }
+                    }
+
+
+                    if(core.Security.getRole() == 'CONTRATISTA' || core.Security.getRole() == 'TECNICOCAE')
+                    {
+                        console.log('hola');
+                        $('.enlaceCae').remove();
+                        $('.enlaceRGPD').remove();
+                        return;
+                    }
+
+                    // console.log( responseData.comunidadservicioscontratados[0] );
+                    // console.log('Cae Contratado: ' + caeContratado);
+                    // console.log( responseData.comunidadservicioscontratados[4] );
+                    // console.log('RGPD Contratado: ' + rgpdContratado);
+
+                    if(caeContratado === false)
+                    {
+                        $('.enlaceCae').attr('href','#');
+                        $('.enlaceCae').removeClass('enlaceCae').addClass('enlaceKOCae');
+                    }
+
+
+                    if(rgpdContratado === false)
+                    {
+                        $('.enlaceRGPD').attr('href','#');
+                        $('.enlaceRGPD').removeClass('enlaceRGPD').addClass('enlaceKORGPD');
+                    }
 
                     $('body .form-servicioscontratados-info table tbody').html('');
                     //  Recorremos todos los servicios devueltos por el sistema

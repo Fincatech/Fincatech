@@ -219,7 +219,7 @@ class DatabaseCore {
 
 		if(mysqli_num_rows($schemaResults) == 0)
 		{
-			$this->liberarConexionBBDD();
+			// $this->liberarConexionBBDD();
 			return null;
 		}else{
 
