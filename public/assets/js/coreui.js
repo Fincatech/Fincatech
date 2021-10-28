@@ -798,24 +798,63 @@ console.log('render table: ' + entity);
                         console.log(comunidades);
     
                         var outHTML = ``;
+                        $('.sidebar-nav').prepend(`
+                        <div class="row pl-3 pr-3">
+                            <div class="col-12 pb-2 pt-2 mb-3 mt-2">
+                                <p class="text-white text-uppercase mt-0 mb-0"><small>Buscar comunidad</small></p>
+                                <div class="row">
+                                    <div class="col-10">
+                                        <input type="text" class="form-control busquedaComunidad" placeholder="Escriba cód o nombre">
+                                    </div>
+                                    <div class="col-2 align-self-center">
+                                        <a href="javascript:void(0);" class="btnLimpiarBusqueda"><i class="bi bi-x-circle text-white"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`);     
+
                         if( comunidades.length > 0 )
                         {             
 
-
-
                             for(x = 0; x < comunidades.length; x++)
                             {
-                                outHTML = `<li class="sidebar-item">
-                                    <a class="sidebar-link comunidad-${comunidades[x].id}" href="/comunidad/${comunidades[x].id}">
-                                        <img src="/assets/img/icon_edificio.png" class="img-responsive feather">
-                                        <span class="align-middle pl-3">${comunidades[x].codigo} - ${comunidades[x].nombre}</span>
-                                    </a>
-                                </li>`;
+                                outHTML = `<li class="sidebar-item pl-3 pr-3 pb-2 pt-2" data-codigo="${comunidades[x].codigo}" data-nombre="${comunidades[x].nombre}">
+                                                <div class="row">
+                                                    <div class="col-2 pr-0">
+                                                        <img src="/public/assets/img/icon_edificio.png" class="img-responsive feather">
+                                                    </div>   
+                                                    
+                                                    <div class="col-8 pl-0">
+                                                        <a href="/comunidad/${comunidades[x].id}" class="text-white">   
+                                                            <span class="align-middle comunidad-${comunidades[x].id}">${comunidades[x].codigo} - ${comunidades[x].nombre}</span>
+                                                        </a>
+                                                    </div>  
+
+                                                    <div class="col-2 pr-0 text-center pl-0">
+                                                        <a href="javascript:void(0);" class="btnEliminarComunidad" data-id="${comunidades[x].codigo}" data-nombre="${comunidades[x].nombre}">
+                                                            <i data-feather="trash-2" class="text-danger"></i>
+                                                        </a>
+                                                    </div>
+
+                                            </li>`;
                                 $('.navComunidades').append(outHTML);
                             }
                         }else{
                             $('.navComunidades').append('<p class="text-center text-white">No tiene comunidades asignadas</p>');
                         }
+
+                        $('body').on(core.helper.clickEventType,'.btnLimpiarBusqueda', function(evt){
+                            $('.busquedaComunidad').val('');
+                            CoreUI.Sidebar.Comunidades.buscarComunidad();
+                        });
+                
+                        $('body').on('keyup', '.busquedaComunidad', function(evt)
+                        {
+                            CoreUI.Sidebar.Comunidades.buscarComunidad();
+                        });
+
+                        feather.replace();
+
                     });                    
 
                 });
