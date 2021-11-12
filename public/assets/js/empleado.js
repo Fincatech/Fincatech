@@ -202,6 +202,25 @@ let empleadoCore = {
         });
     },
 
+    asignarEmpleadoComunidad: function(idComunidad, idEmpleado)
+    {
+        var data = Object();
+        apiFincatech.post('comunidad/'+idComunidad+'/empleado/'+idEmpleado+'/asignar', data).then( result =>{
+
+            var resultado = JSON.parse(result);
+            if(resultado.data == 'error')
+            {
+                CoreUI.Modal.Error('El empleado ya está asignado a esta comunidad', 'Empleados', function()
+                {
+                    contratista.mostrarModalAsignarEmpleadoComunidad();
+                });
+            }else{
+                CoreUI.Modal.Success('El empleado ha sido asignado correctamente a esta comunidad', 'Empleados');
+            }
+            
+        });
+    },
+
     /** Carga los datos del listado */
     renderTabla: async function()
     {
@@ -279,7 +298,8 @@ let empleadoCore = {
         {
 
                 CoreUI.tableData.init();
-
+                CoreUI.tableData.columns = [];
+                
                 CoreUI.tableData.addColumnRow('listadoEmpleadosComunidad', 'documentacionprl');
 
             //  Tipo
@@ -370,9 +390,107 @@ let empleadoCore = {
     
     },
 
-    renderTablaEmpleadosEmpresa: function(idEmpresa)
+    renderTablaEmpleadosEmpresaComunidad: function(idEmpresa, idComunidad)
     {
 
+        if($('#listadoEmpleadosComunidad').length && typeof idComunidad !== 'undefined' && 
+            idComunidad != '' && idComunidad != null)
+    {
+
+            CoreUI.tableData.init();
+
+            CoreUI.tableData.addColumnRow('listadoEmpleadosComunidad', 'documentacionprl');
+
+        //  Tipo
+            CoreUI.tableData.addColumn('listadoEmpleadosComunidad', function(row, type, val, meta){
+
+                var icono = '<i class="bi bi-shop pr-2"></i>';
+                var clase = '';
+                if(row.tipoempleado == 'Comunidad')
+                {
+                    icono = '<i class="bi bi-building pr-2"></i>';
+                    clase = 'text-info';
+
+                }
+
+                return `<span class="text-uppercase ${clase}">${icono} <span style="font-size: 12px;">${row.tipoempleado}</span></span>`;
+
+            } , "Contratación", null, 'text-center', '100px');
+
+        //  Empresa
+            CoreUI.tableData.addColumn('listadoEmpleadosComunidad', "razonsocial", "Empresa / Comunidad", null, 'text-left');
+
+        //  Nombre
+            CoreUI.tableData.addColumn('listadoEmpleadosComunidad', "nombre", "Nombre y apellidos", null, 'text-left');
+
+        //  Puesto
+            CoreUI.tableData.addColumn('listadoEmpleadosComunidad', "puesto", "Puesto", null, 'text-left');
+
+        //  Email
+            CoreUI.tableData.addColumn('listadoEmpleadosComunidad', "email", "Correo electrónico", null, 'text-left');
+
+        //  Fecha de alta
+            CoreUI.tableData.addColumn('listadoEmpleadosComunidad', "fechaalta", "Fecha alta", null, 'text-center', '80px');
+
+        //  Fecha de baja
+            CoreUI.tableData.addColumn('listadoEmpleadosComunidad', "fechabaja", "Fecha baja", null, 'text-center', '80px');
+
+        //  Documentación completada
+            CoreUI.tableData.addColumn('listadoEmpleadosComunidad', function(row, type, val, meta){
+
+                //  Contamos el número de documentos frente al número de documentos adjuntados
+                var iDoc = 0;
+                var iDocAdjuntos = 0;
+
+                if(!row.Empleados)
+                {
+                    return;
+                }
+
+                for(i = 0; i < row.documentacionprl.length; i++)
+                {
+                    iDoc++;
+                    if(row.documentacionprl[i].idficherorequerimiento != null)
+                        iDocAdjuntos++;
+                }
+
+                var icono = '<i class="bi bi-x-circle text-danger" style="font-size:24px;"></i>';
+
+                if(iDocAdjuntos == iDoc)
+                    icono = '<i class="bi bi-check2-square text-success" style="font-size:24px;"></i>';
+
+
+                return `<p class="m-0 text-center">${icono}</p>`;
+
+            } , "DOC. ADJUNTADA", null, 'text-center');
+        //  Estado
+            var html = 'data:estado$';
+            CoreUI.tableData.addColumn('listadoEmpleadosComunidad', null, "Estado", html, 'text-center', '80px');
+
+        //  Acciones
+            CoreUI.tableData.addColumn('listadoEmpleadosComunidad', function(row, type, val, meta)
+            {
+                var salida =  '';
+
+                if(row.tipoempleado == 'Comunidad')
+                {
+                    salida = `<ul class="nav justify-content-center accionesTabla">
+                                    <li class="nav-item">
+                                        <a href="${baseURL}empleado/${row.idempleado}" class="btnEditarEmpleado d-inline-block" data-id="${row.idempleado}" data-nombre="${row.nombre}"><i data-feather="edit" class="text-success img-fluid mr-2"></i></a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="javascript:void(0);" class="btnEliminarEmpleado d-inline-block" data-id="${row.idempleado}" data-nombre="${row.nombre}"><i data-feather="trash-2" class="text-danger img-fluid"></i></a>
+                                    </li>
+                            </ul>`;
+                }
+
+                return salida;
+
+            } , "&nbsp;", null, 'text-center', '70px');
+
+            $('#listadoEmpleadosComunidad').addClass('no-clicable');
+            CoreUI.tableData.render("listadoEmpleadosComunidad", "Empleado", `empresa/${idEmpresa}/comunidad/${idComunidad}/empleados`, false, false, false);
+    }    
     },
 
     /**

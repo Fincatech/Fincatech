@@ -1,4 +1,4 @@
-<div class="tab-pane fade h-100" id="rgpd" role="tabpanel">
+<div class="tab-pane fade h-100 tabRGPD" id="rgpd" role="tabpanel">
 
     <div class="row h-100">
 

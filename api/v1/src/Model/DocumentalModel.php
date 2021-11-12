@@ -122,6 +122,11 @@ class DocumentalModel extends \HappySoftware\Model\Model{
 
     }
 
+    public function compruebaRequerimientoCamara($idComunidad)
+    {
+        return $this->getRepositorio()->ExisteRegistro('camarasseguridad', " idcomunidad=$idComunidad");
+    }
+
     public function cambiarEstadoRequerimiento($idrequerimiento, $destino, $nuevoEtado)
     {
     

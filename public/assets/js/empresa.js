@@ -42,25 +42,104 @@ let empresaCore = {
         {
             e.stopImmediatePropagation();
             $('.wrapperEmpresasComunidad').hide();
-            var idEmpresa = window['tablelistadoEmpresaComunidad'].row( $(this).attr('id')).data().id;
-            console.log('idEmpresa: ' + idEmpresa);
+            console.log(window['tablelistadoEmpresaComunidad'].row( $(this).attr('id')).data());
+            var idEmpresa = window['tablelistadoEmpresaComunidad'].row( $(this).attr('id')).data().idusuario;
+            var nombre = window['tablelistadoEmpresaComunidad'].row( $(this).attr('id')).data().razonsocial;
+
+                $('.tituloEmpresasComunidad').text(nombre);
             //  Cargamos el listado de empleados para la comunidad y empresa seleccionada
                 empresaCore.renderTablaRequerimientosEmpresa( idEmpresa ).then( ()=>{
-                    $('.wrapperEmpleadosEmpresaComunidad').css('opacity','1');
+                    $('.wrapperDocumentacionBasica').hide();
+                    $('.wrapperEmpleadosEmpresaComunidad').show();
                 });
+
+                empleadoCore.renderTablaEmpleadosEmpresaComunidad(idEmpresa, core.modelId);
+
         })
 
         $('body').on(core.helper.clickEventType, '.btnCerrarEmpleadosComunidad', function(e)
         {
-            $('.wrapperEmpleadosEmpresaComunidad').css('opacity','0');
+            $('.wrapperEmpleadosEmpresaComunidad').hide();
             $('.wrapperEmpresasComunidad').show();
+            $('.wrapperDocumentacionBasica').show();
+            $('.tituloEmpresasComunidad').text('Empresas externas');
+
         });
 
         $('body').on(core.helper.clickEventType, '.enlaceCae', function(e)
         {
             //  Cargamos las empresas asociadas a la comunidad en pantalla
+                documentalCore.Comunidad.renderTablaDocumentacionComunidadCAE(core.modelId);                
                 empresaCore.renderTablaEmpresasComunidad(core.modelId);
+                $('.tituloEmpresasComunidad').text('Empresas externas');
         });
+
+        //  Búsqueda de empresa 
+        $('body').on(core.helper.clickEventType, '.btnBuscarEmpresaCAE', function(ev)
+        {
+
+            $('.wrapperBusquedaEmpresa .mensaje').hide();
+            $('.wrapperInfoEmpresa').hide();
+
+            //  Validamos que haya proporcionado un e-mail
+            if( !core.helper.validarEmail($('#searchEmpresa').val()))
+            {
+                $('.wrapperBusquedaEmpresa .mensaje').addClass('text-danger');
+                $('.wrapperBusquedaEmpresa .mensaje').text('El e-mail proporcionado no es válido');
+                $('.wrapperBusquedaEmpresa .mensaje').show();
+                return;
+            }
+
+            //  Buscamos el e-mail en la tabla de empresas
+                var resultadoBusqueda = empresaCore.buscarEmailEmpresa( $('#searchEmpresa').val() );
+                if( resultadoBusqueda === false )
+                {
+                    //CoreUI.Modal.Error('No existe ninguna empresa asociada al e-mail proporcionado', 'Empresas');
+                    if( !$('.wrapperBusquedaEmpresa .mensaje').hasClass('text-danger'))
+                    {
+                        $('.wrapperBusquedaEmpresa .mensaje').addClass('text-danger');
+                    }
+                    $('.wrapperBusquedaEmpresa .mensaje').text('No existe ninguna empresa asociada al e-mail proporcionado');
+                    $('.wrapperBusquedaEmpresa .mensaje').show();
+                    $('.bntCrearNuevaEmpresaCAE').show();
+                }else{
+                    $('.bntCrearNuevaEmpresaCAE').hide();
+
+                    //  Cargamos los datos
+                    var infoEmpresa = window['tablelistadoSimpleEmpresas'].row(resultadoBusqueda).data();
+                    $('.wrapperInfoEmpresa .nombreEmpresa').text(infoEmpresa.razonsocial);
+                    $('.wrapperInfoEmpresa .cifEmpresa').text(infoEmpresa.cif);
+                    $('.wrapperInfoEmpresa .emailEmpresa').text(infoEmpresa.email);
+                    $('.wrapperInfoEmpresa .btnConfirmarEmpresaCAE').attr('data-id', infoEmpresa.id);
+                    $('.wrapperInfoEmpresa .btnConfirmarEmpresaCAE').attr('data-nombre', infoEmpresa.razonsocial);
+                    //  Mostramos la información
+                    $('.wrapperInfoEmpresa').show();
+                   
+                }
+            //  Si existe mostramos los datos
+
+            //  Si no existe, mostramos un alert informando de la situación
+        });
+
+    },
+
+    buscarEmailEmpresa: function(emailEmpresa)
+    {
+        var resultado = false;
+
+        var nFilas = $('#listadoSimpleEmpresas tbody tr').length;
+        if(nFilas > 0)
+        {
+            for(var x = 0; x < nFilas; x++)
+            {
+                var infoEmpresa = window['tablelistadoSimpleEmpresas'].row(x).data();
+                if(infoEmpresa.email == emailEmpresa)
+                {
+                    resultado = x;
+                }
+            }
+        }
+        return resultado;
 
     },
 

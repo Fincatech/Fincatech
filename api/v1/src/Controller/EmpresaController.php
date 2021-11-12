@@ -88,6 +88,7 @@ class EmpresaController extends FrontController{
         if($this->isContratista())
         {
             $idEmpresa = $this->getLoggedUserId();
+            // die($idEmpresa);
         }
 
         $data = [];

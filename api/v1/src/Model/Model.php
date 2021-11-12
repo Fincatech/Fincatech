@@ -152,8 +152,23 @@ class Model extends FrontController{
     /**
     * Ejecuta una consulta sobre el repositorio previamente construida
     */
+    public function queryRaw($sqlToExecute)
+    {
+        
+        $resultData = $this->repositorio->queryRaw( $sqlToExecute );
+
+        //  Validamos que haya datos
+        if(!$resultData)
+            return null;
+
+    }
+
+    /**
+    * Ejecuta una consulta sobre el repositorio previamente construida
+    */
     public function query($sqlToExecute)
     {
+
         $resultData = $this->repositorio->queryRaw( $sqlToExecute );
 
         //  Validamos que haya datos
@@ -175,15 +190,15 @@ class Model extends FrontController{
 
             $resultData = $this->repositorio->queryRaw( $this->queryToExecute );
             // error_log("Query: " . $this->queryToExecute,0);
-// die($this->queryToExecute);
+            // die($this->queryToExecute);
             $this->entityData[$this->mainEntity] = [];
             $this->entityData[$this->mainEntity] = $this->mapMysqliResultsToObject($resultData);
             //  Obtiene las relaciones de la entidad principal si las hay
-            if($relations)
-                $this->getDataRelations($includeSchema);
+                if($relations)
+                    $this->getDataRelations($includeSchema);
 
-            if($includeSchema == true)
-                $this->getSchemaEntity();
+                if($includeSchema == true)
+                    $this->getSchemaEntity();
 
         }catch(\Exception $ex)
         {
@@ -209,7 +224,8 @@ class Model extends FrontController{
      */
     public function getById($id)
     {
-        $this->queryToExecute = "select * from $this->mainEntity where id = $id";
+        $this->queryToExecute = "select * from " . strtolower($this->mainEntity) . " where id = $id";
+
         $this->execute(true, true);
         return $this->entityData;
     }

@@ -40,18 +40,23 @@ class ComunidadModel extends \HappySoftware\Model\Model{
     /** Obtiene el listado de servicios contratados por una comunidad */
     private function GetListadoServiciosContratados($id)
     {
-        $data = $this->GetServiciosContratados($id);
-        
-        //  Validamos que haya servicioscontratados para si no crear el mismo modelo
-        if(count($data) == 0)
+        if(is_null($id))
         {
-                //  Recuperamos los precios base del producto
-                $data = $this->ServiciosController->List(null)['Tiposservicios'];
-            // print_r($data);
-            // die();
+            return;
+        }
+
+        $data = $this->GetServiciosContratados($id);
+
+        //  Validamos que haya servicioscontratados para si no crear el mismo modelo
+        // if(count($data) == 0)
+        if(is_null($data) || @count($data) == 0)
+        {
+            //  Recuperamos los precios base del producto
+            $data = $this->ServiciosController->List(null)['Tiposservicios'];
         }  
             
         return $data;
+
     }
 
     /** Route endpoint: FIXME: Recupera los servicios contratados por una comunidad */
@@ -91,14 +96,14 @@ class ComunidadModel extends \HappySoftware\Model\Model{
     /** @Override del método principal para obtener la comunidad */
     public function Get($id)
     {
+
         $data = parent::Get($id);
 
-        // if(count($data['Comunidad']) > 0)
         $data['Comunidad'][0]['comunidadservicioscontratados'] = $this->GetListadoServiciosContratados($data['Comunidad'][0]['id']);
 
-        //  Cargamos los documentos de la comunidad
         //  Recuperamos los documentos asociados a una comunidad
-        $data['Comunidad'][0]['documentacioncomunidad'] = $this->GetDocumentacionComunidad($data['Comunidad'][0]['id']);
+        $data['Comunidad'][0]['documentacioncomunidad'] = $this->GetDocumentacionComunidad($id);
+
         return $data;
 
     }
@@ -115,7 +120,9 @@ class ComunidadModel extends \HappySoftware\Model\Model{
         //  Acotamos por aquellas comunidades que estén en estado "Activo"
         if(!$this->isSudo())
         {
-            $data = $this->filterresults($data, 'Comunidad', 'estado', 'A');
+            // 10/11/2021 -> Cristóbal pide quitar el filtro de sólo las activas
+            // $data = $this->filterresults($data, 'Comunidad', 'estado', 'A');
+            // $data = $this->filterresults($data, 'Comunidad', 'estado', 'P');
         }
 
         if(count($data['Comunidad']) > 0)

@@ -361,6 +361,24 @@ return function (App $app) {
 
     }); 
 
+    $app->post('/comunidad/{idcomunidad}/camaraseguridad', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // $data = $request->getParsedBody();
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Documental');
+
+        $idComunidad = $params['idcomunidad'];
+
+        $response->getBody()->write( $frontController->context->createRequerimientoCamara($idComunidad) );
+        return $response;
+
+    }); 
+
     /** Punto de entrada para get. Se utiliza para listar todo
      *
     */
@@ -451,6 +469,28 @@ return function (App $app) {
         return $response;  
 
     });
+
+    $app->post('/comunidad/{idcomunidad}/empleado/{idempleado}/asignar', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // $data = $request->getParsedBody();
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Empleado');
+
+        $idComunidad = $params['idcomunidad'];
+        $idEmpleado = $params['idempleado'];
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        $response->getBody()->write( $frontController->context->AsignarComunidad($idEmpleado, $idComunidad ) );
+        return $response;
+
+    });  
 
     /** Asigna una empresa a una comunidad */
     $app->post('/comunidad/{idcomunidad}/empresa/{idempresa}/asignar', function(Request $request, Response $response, array $params ): Response

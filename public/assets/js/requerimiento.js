@@ -190,13 +190,18 @@ let requerimientoCore = {
             //  Fichero
                 CoreUI.tableData.addColumn('listadoCamarasSeguridad', 'ficheroscomunes[0]', "DOCUMENTO", null, 'text-center', null, function(data, type, row, meta)
                 {
-                    var salida = `<a href="${baseURL}public/storage/${row.ficheroscomunes[0].nombrestorage}" class="mr-2" data-toggle="tooltip" data-placement="bottom" title="Ver documento" data-original-title="Ver documento" target="_blank">
-                                    <i class="bi bi-cloud-arrow-down text-success" style="font-size: 30px;"></i>
-                                  </a>
-                                  <a href="javascript:void(0);" class="btnAdjuntarDocumentoRGPD" data-tipo="camarasseguridad" data-idrequerimiento="${row.id}">
+                    var salida = '';
+                    if(row.ficheroscomunes.length > 0)
+                    {
+                        salida = `
+                        <a href="${baseURL}public/storage/${row.ficheroscomunes[0].nombrestorage}" class="mr-2" data-toggle="tooltip" data-placement="bottom" title="Ver documento" data-original-title="Ver documento" target="_blank">
+                            <i class="bi bi-cloud-arrow-down text-success" style="font-size: 30px;"></i>
+                        </a>`;
+                    }
+
+                    salida += `<a href="javascript:void(0);" class="btnAdjuntarDocumentoRGPD" data-tipo="camarasseguridad" data-idrequerimiento="${row.id}">
                                     <i class="bi bi-cloud-arrow-up text-danger" style="font-size: 30px;"></i>
-                                  </a>
-                                  `;
+                                  </a>`;
                     return salida;
                 });
 

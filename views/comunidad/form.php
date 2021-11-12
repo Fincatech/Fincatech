@@ -11,8 +11,13 @@
                     <div class="list-group list-group-horizontal list-group-flush" role="tablist">
                         <a class="list-group-item list-group-item-action active d-none" data-toggle="list" href="#datos" role="tab" aria-selected="true"><i class="bi bi-archive mr-2"></i> Datos</a>
                         <a class="list-group-item list-group-item-action enlaceCae" data-toggle="list" href="#empresa" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> CAE</a>
-                        <a class="list-group-item list-group-item-action enlaceDocumentacionComunidad" data-toggle="list" href="#documentos" role="tab" aria-selected="false"><i class="bi bi-folder-check"></i> DOC. COMUNIDAD CAE</a>
-                        <a class="list-group-item list-group-item-action enlaceRGPD" data-toggle="list" href="#rgpd" role="tab" aria-selected="false"><i class="bi bi-shield-lock mr-2"></i> RGPD</a>
+                        <!-- <a class="list-group-item list-group-item-action enlaceDocumentacionComunidad" data-toggle="list" href="#documentos" role="tab" aria-selected="false"><i class="bi bi-folder-check"></i> DOC. COMUNIDAD CAE</a> -->
+                        <?php if( $App->isContratista()): ?>
+                            <a class="list-group-item list-group-item-action enlaceEmpleadosComunidadContratista" data-toggle="list" href="#empleadoscomunidadcontratista" role="tab" aria-selected="false"><i class="bi bi-people-fill mr-2"></i> Empleados Comunidad</a>
+                        <?php endif; ?>
+                        <?php if( !$App->isContratista() ): ?>
+                            <a class="list-group-item list-group-item-action enlaceRGPD" data-toggle="list" href="#rgpd" role="tab" aria-selected="false"><i class="bi bi-shield-lock mr-2"></i> RGPD</a>
+                        <?php endif; ?>
                     </div>
                     
                 </div>
@@ -28,7 +33,7 @@
         <div class="tab-content h-100">
 
             <!-- Datos de la comunidad -->
-            <div class="tab-pane fade show active h-100" id="datos" role="tabpanel">
+            <div class="tab-pane fade show active h-100 tabDatos" id="datos" role="tabpanel" style="display:none;">
 
                 <div class="row">
 
@@ -71,6 +76,9 @@
 
             <!-- DPD -->
             <?php //include('tabs/dpd.php'); ?>
+
+            <!-- Comunidades del empleado -->
+            <?php include('tabs/empleadoscomunidad.php'); ?>            
 
             <!-- RGPD -->
             <?php include('tabs/rgpd.php'); ?>

@@ -24,6 +24,26 @@ class DocumentalController extends FrontController{
         $this->InitModel('Documental', $params);
     }
 
+    public function createRequerimientoCamara($idcomunidad)
+    {
+        $datos = [];
+        $datos['titulo'] = 'Registro de actividades de tratamiento';
+        $datos['observaciones'] = '';
+        $datos['idcomunidad'] = $idcomunidad;
+
+        //  Comprobamos si la comunidad ya tiene este documento subido
+        if($this->DocumentalModel->compruebaRequerimientoCamara($idcomunidad) == false)
+        {
+            return HelperController::successResponse($this->DocumentalModel->createRequerimientoRGPD('camarasseguridad', '-1', $datos));
+        }else{
+            return HelperController::successResponse('ok');
+        }
+
+        
+    }
+
+    
+
     /** Sube un requerimiento al tipo que corresponda */
     public function uploadRequerimiento($destino, $datos)
     {

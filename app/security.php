@@ -97,7 +97,8 @@ define("security", [
                 "documental",
                 "empresa",
                 "empleado",
-                'servicios'
+                'servicios',
+                'comunidades',
             ]
         ],
         "ROLE_EMPLEADO"=>[

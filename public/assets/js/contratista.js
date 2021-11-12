@@ -3,9 +3,48 @@ let contratista = {
 
     idContratista: null,
 
+    Constantes: {
+
+        AsignarEmpleado: `
+            <div class="row">
+
+                <div class="col-12 text-center text-uppercase align-self-center">
+                    <p class="m-0" style="display: block; font-size: 18px;"> Asignar empleado a la comunidad</p>
+                </div>
+
+            </div>
+
+            <div class="form-group row mb-2 justify-content-center wrapperSeleccionarEmpleado">
+
+                <div class="col-12">  
+
+                    <div class="row mt-5">
+                        <div class="col-12">
+                            <p class="text-left">Empleados disponibles:</p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <select class="form-select listEmpleados" aria-label="Default select">
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- boton asignar -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <a href="javascript:void(0);" class="btn d-block btn-success btnAsignarEmpleado pt-3 pb-3" data-idempleado="" data-idempresa="">Asignar empleado a comunidad</a>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>`,
+    },
+
     Init: function()
     {
-        
         //  Cargamos las comunidades que tengan asignado al contratista en sesión
             CoreUI.Sidebar.Comunidades.cargarMenuComunidades();
             contratista.Events();
@@ -15,8 +54,10 @@ let contratista = {
     Events: async function()
     {
 
+        comunidadesCore.events();
+
         //  Creación / Actualización de empleado
-        $("body .btnSaveData").off(core.helper.clickEventType).on(core.helper.clickEventType, function(evt)
+        $("body .form-empleado .btnSaveData").off(core.helper.clickEventType).on(core.helper.clickEventType, function(evt)
         {
             evt.stopImmediatePropagation();
 
@@ -47,7 +88,7 @@ let contratista = {
         {
             await core.Security.getUserInfo().then( function()
             {
-                 empresaCore.renderTablaEmpleadosContratista(core.Security.user, 'listadoEmpleadosContratista');
+                empresaCore.renderTablaEmpleadosContratista(core.Security.user, 'listadoEmpleadosContratista');
             });
         }
 
@@ -140,9 +181,63 @@ let contratista = {
 
         }
 
+        //  Carga de empleados de la comunidad
+        $('body').on(core.helper.clickEventType, '.enlaceEmpleadosComunidadContratista', function(ev)
+        {
+            var idComunidad = $('body').attr('hs-model-id');
+            var idEmpresa = core.Security.user;
+            empleadoCore.renderTablaEmpleadosEmpresaComunidad(idEmpresa, idComunidad);
+        });
+
+        $('body').on(core.helper.clickEventType, '.btnModalAsignarEmpleado', function(ev)
+        {
+            contratista.mostrarModalAsignarEmpleadoComunidad();
+        });     
+
+        /** Asignación de empleado a empresa y comunidad */
+        $('body').on(core.helper.clickEventType, '.btnAsignarEmpleado', function(ev)
+        {
+
+            var idEmpleado = $('body .listEmpleados option:selected').val();
+            var idComunidad = $('body').attr('hs-model-id');
+            empleadoCore.asignarEmpleadoComunidad(idComunidad, idEmpleado);
+        });
+
     },
 
+    mostrarModalAsignarEmpleadoComunidad: function()
+    {
+        const { value: file } = Swal.fire({
+            title: '',
+            html: contratista.Constantes.AsignarEmpleado,
+            showCancelButton: false,
+            showConfirmButton: false,
+            width: 800,
+            grow: 'row',
+            showCloseButton: true,
+            didOpen: function(e)
+            {
+    
+                //  Iniciamos la tabla de empresas simple
+                //    empresaCore.renderTablaSimple();
+                contratista.listarEmpleadosEmpresa();
+            }});         
+    },
 
+    listarEmpleadosEmpresa: function()
+    {
+        apiFincatech.get('empresa/' + core.Security.user + '/empleados').then( (result) =>
+        {
+            var datos = JSON.parse(result);
+            var empleados = datos.data['Empleados'];
+
+            for(var x = 0; x < empleados.length; x++)
+            {
+                $('body .listEmpleados').append(`<option value="${empleados[x].idempleado}">${empleados[x].nombre}</option>`)
+            }
+
+        });
+    },
 
 }
 

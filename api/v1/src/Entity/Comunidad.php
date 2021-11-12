@@ -12,7 +12,7 @@ class Comunidad extends EntityHelper{
     private $tableName = 'comunidad';
     public $primaryKey = 'id';
     public $tipoEliminacion = DELETE_FISICO;
-    public $moveToHistorial = false;
+    public $moveToHistorial = true;
 
     public $orderBy = "nombre";
     public $orderType = ORDER_BY_ASC;

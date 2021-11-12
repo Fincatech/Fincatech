@@ -648,7 +648,7 @@ let CoreUI = {
             }
 
             var detailRows = [];
-console.log('render table: ' + entity);
+
             var opciones = {
                 "serverSide": false,
                 "autoWidth": false,
@@ -773,7 +773,7 @@ console.log('render table: ' + entity);
             {
 
                 var endpointComunidades = '';
-                console.log('Usuario---');
+
                 console.log(core.Security.user);
 
                 core.Security.getUserInfo().then( (result) =>

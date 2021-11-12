@@ -181,7 +181,6 @@ let serviciosCore = {
 
             //  Si es admin de fincas recuperamos el listado de servicios contratados por una comunidad
             default:
-
                 //  Recuperamos los datos del modelo y pintamos los valores
                 if(typeof core.modelId === 'undefined' || core.modelId === '')
                     return;
@@ -192,6 +191,7 @@ let serviciosCore = {
 
                 await apiFincatech.get(endpointServicios).then(async (data)=>
                 {
+                    // console.log(data);
                     result = JSON.parse(data);
                     responseStatus = result.status;
                     responseData = result.data.Comunidad[0];
@@ -220,9 +220,12 @@ let serviciosCore = {
 
                     if(core.Security.getRole() == 'CONTRATISTA' || core.Security.getRole() == 'TECNICOCAE')
                     {
-                        console.log('hola');
-                        $('.enlaceCae').remove();
+                        // $('.enlaceCae').remove();
                         $('.enlaceRGPD').remove();
+                        $('.btnAsociarEmpresaCAE').remove();
+                        $('.empresasComunidadHeader').remove();
+                        $('.wrapperEmpresasComunidad').remove();
+                        $('.wrapperEmpleadosEmpresaComunidad').remove();
                         return;
                     }
 
@@ -230,18 +233,27 @@ let serviciosCore = {
                     // console.log('Cae Contratado: ' + caeContratado);
                     // console.log( responseData.comunidadservicioscontratados[4] );
                     // console.log('RGPD Contratado: ' + rgpdContratado);
+                    $('.enlaceCae').removeClass('text-success');
+                    $('.enlaceCae').removeClass('text-danger');
 
                     if(caeContratado === false)
                     {
                         $('.enlaceCae').attr('href','#');
                         $('.enlaceCae').removeClass('enlaceCae').addClass('enlaceKOCae');
+                        $('.enlaceKOCae').addClass('text-danger');
+                    }else{
+                        $('.enlaceCae').addClass('text-success');
                     }
 
-
+                    $('.enlaceRGPD').removeClass('text-success');
+                    $('.enlaceRGPD').removeClass('text-danger');
                     if(rgpdContratado === false)
                     {
                         $('.enlaceRGPD').attr('href','#');
                         $('.enlaceRGPD').removeClass('enlaceRGPD').addClass('enlaceKORGPD');
+                        $('.enlaceKORGPD').addClass('text-danger');
+                    }else{
+                        $('.enlaceRGPD').addClass('text-success');
                     }
 
                     $('body .form-servicioscontratados-info table tbody').html('');

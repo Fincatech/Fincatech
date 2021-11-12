@@ -10,7 +10,7 @@ let comunidadesCore = {
     init: async function()
     {
         //  Bindeamos los eventos de los diferentes botones de comunidades
-            this.events();
+            comunidadesCore.events();
         // await comunidadesCore.renderMenuLateral();
 
         //  Comprobamos si se está cargando el listado
@@ -23,10 +23,31 @@ let comunidadesCore = {
 
         }else{
             CoreUI.setTitulo('nombre');
+            //  Si es un usuario de tipo adminfincas se quita el panel de datos de la comunidad
+            if(core.Security.getRole() == 'ADMINFINCAS' && core.actionModel != 'add')
+            {
+                $('.tabDatos').addClass('d-none');
+            }
         }
 
         //  Inicialización del masked para la cuenta IBAN
             $('#ibancomunidad').mask('SS00 0000 0000 00 0000000000');
+
+            if(core.Security.getRole() == 'CONTRATISTA')
+            {
+                $('.tabDatos').hide();
+            }
+
+            if(core.Security.getRole() == 'SUDO')
+            {
+                $('.tabDatos').show();
+            }
+
+            if(core.actionModel == 'add')
+            {
+                $('.tabDatos').show();
+            }
+
 
     },
 
@@ -45,13 +66,14 @@ let comunidadesCore = {
         });
 
         /** Override del método de guardar para poder enganchar los servicios */
-        if(core.model.toLowerCase() == "comunidad")
-        {
-            $('body').on(core.helper.clickEventType, '.btnSaveData', (evt)=>{
+        // if(core.model.toLowerCase() == "comunidad")
+        // {
+
+            $('body .form-comunidad').off(core.helper.clickEventType).on(core.helper.clickEventType, '.btnSaveData', (evt)=>{
                 evt.stopImmediatePropagation();
                 comunidadesCore.guardarComunidad();
             });    
-        }
+        // }
 
     //  Botón ver comunidad
         $('body').on(core.helper.clickEventType, '.btnVerComunidad', (evt)=>{
@@ -116,19 +138,50 @@ let comunidadesCore = {
     //  Enlace CAE No contratado
         $('body').on(core.helper.clickEventType, '.enlaceKOCae', function(evt)
         {
-            CoreUI.Modal.Info('Actualmente no tiene contratado el servicio de CAE para esta comunidad.<br><br>Si desea contratarlo, por favor contacte con el departamento comercial de Fincatech o escriba a comercial@fincatech.es','Servicio no contratado');
+            CoreUI.Modal.Info('Actualmente no tiene contratado el servicio de CAE para esta comunidad.<br><br>Si desea contratarlo, por favor contacte con el departamento de administración de Fincatech o escriba a admin@fincatech.es','Servicio no contratado');
         });
 
     //  Enlace RGPD No contratado
         $('body').on(core.helper.clickEventType, '.enlaceKORGPD', function(evt)
         {
-            CoreUI.Modal.Info('Actualmente no tiene contratado el servicio de RGPD para esta comunidad.<br><br>Si desea contratarlo, por favor contacte con el departamento comercial de Fincatech o escriba a comercial@fincatech.es','Servicio no contratado');
+            CoreUI.Modal.Info('Actualmente no tiene contratado el servicio de RGPD para esta comunidad.<br><br>Si desea contratarlo, por favor contacte con el departamento de administración de Fincatech o escriba a admin@fincatech.es','Servicio no contratado');
         });    
+
+    //  Cámaras de seguridad
+        $('body').on(core.helper.clickEventType, '#chkTieneCamarasSeguridad', function(ev)
+        {
+            if( $(this).prop('checked'))
+            {
+                //CoreUI.Modal.Info('Ha indicado que la comunidad tiene cámara de seguridad.<br><br>Le recordamos que es obligatorio que suba el documento <strong>Registro de actividades de tratamiento</strong> según el requerimiento de Instrucciones Generales para cumplir con la normativa relativa a la Ley de Protección de datos.', 'RGPD');
+                //  Mandamos al endpoint la información
+                apiFincatech.post(`comunidad/${core.modelId}/camaraseguridad`,'').then( result =>{
+                    //  Recargamos el listado de cámaras de seguridad
+                    requerimientoCore.renderTablaContratosCesion(core.modelId);
+                });
+            }
+        });
+
+    //  Comunidad pendiente
+        $('body').on(core.helper.clickEventType, '.btnAvisoEstado', function(ev)
+        {
+            CoreUI.Modal.Info('En breve estará activada la comunidad','Comunidad pendiente activación');
+        });
+
+    //  Ver empleados de la comunidad
+        $('body').on(core.helper.clickEventType, '.btnVerEmpleadosComunidad', function(ev)
+        {
+           // empleadoCore.renderTablaEmpleadosEmpresaComunidad(core.modelId);
+        });
 
     },
 
     guardarComunidad: function()
     {   
+        if(core.Security.getRole() != 'ADMINFINCAS' && core.Security.getRole() != 'SUDO')
+        {
+            CoreUI.Modal.Error('Su tipo de usuario no tiene privilegios suficientes para poder modificar los datos de la comunidad','Permisos insuficientes');
+            return false;
+        }
 
         //  Lo primero es validar que el código iban sea correcto
         if( $('#ibancomunidad').val() != '')
@@ -136,7 +189,7 @@ let comunidadesCore = {
             if( !comunidadesCore.validarCuentaIBAN() )
             {
                 CoreUI.Modal.Error('El código IBAN no es correcto. Por favor, revise el número proporcionado');
-                return;
+                return false;
             }
         }
 
@@ -147,7 +200,15 @@ let comunidadesCore = {
             core.Forms.mapDataToSave();
 
         //  Mapeamos los datos de los servicios contratados
-            serviciosCore.mapServiciosContratados();
+            if(core.Security.getRole() != 'ADMINFINCAS')
+                serviciosCore.mapServiciosContratados();
+
+        //  Si es una nueva mapeamos si desea contratar servicios
+            if($('#chkServicioCae').length && $('#chkServicioRGPD').length)
+            {
+                core.Forms.data.servicioRGPD = ($('#chkServicioCae').is(':checked') ? 0 : 1);
+                core.Forms.data.servicioCAE = ($('#chkServicioRGPD').is(':checked') ? 0 : 1);
+            }
 
         //  Guardamos los datos ya mapeados correctamente
             core.Forms.Save( true );
@@ -246,7 +307,9 @@ let comunidadesCore = {
      */
     eliminarEmpresaComunidad: async function(id, nombre)
     {
-        core.Modelo.Delete(`comunidad/${id}/empresa/${id}`, id, nombre, "listadoEmpresaComunidad", '¿Desea eliminar la relación de la empresa con la comunidad?');
+        core.Modelo.Delete(`comunidad/${id}/empresa/${id}`, id, nombre, "listadoEmpresaComunidad", '¿Desea eliminar la relación de la empresa con la comunidad?').then( () =>{
+            comunidadesCore.renderMenuLateral();
+        });
     },
 
     mostrarModalAsociarEmpresa: async function()
@@ -293,7 +356,7 @@ let comunidadesCore = {
         apiFincatech.get('comunidad/list').then( (result) => {
 
             comunidadesCore.comunidades = JSON.parse(result);
-            console.log(comunidadesCore.comunidades);
+            // console.log(comunidadesCore.comunidades);
 
             // // $('.navComunidades').append('<li class="sidebar-header text-uppercase" style="font-size:1.3rem;">Mis comunidades</li>');
             // $('.navComunidades').append(`
@@ -311,7 +374,7 @@ let comunidadesCore = {
                 $('.sidebar-nav').prepend(`
                 <div class="row pl-3 pr-3">
                     <div class="col-12 pb-2 pt-2 mb-3 mt-2">
-                        <p class="text-white text-uppercase mt-0 mb-0"><small>Buscar comunidad</small></p>
+                        <p class="text-uppercase mt-0 mb-0 text-white"><small>Buscar comunidad</small></p>
                         <div class="row">
                             <div class="col-10">
                                 <input type="text" class="form-control busquedaComunidad" placeholder="Escriba cód o nombre">
@@ -324,26 +387,33 @@ let comunidadesCore = {
                 </div>`);
 
             comunidadesCore.comunidades.data.Comunidad.forEach( function(valor, indice, array){
-            var html = `<li class="sidebar-item pl-3 pr-3 pb-2 pt-2" data-codigo="${valor['codigo']}" data-nombre="${valor['nombre']}">
-                                <div class="row">
-                                    <div class="col-2 pr-0">
-                                        <img src="/public/assets/img/icon_edificio.png" class="img-responsive feather">
-                                    </div>
 
-                                    <div class="col-8 pl-0">
-                                        <a href="/comunidad/${valor['id']}" class="text-white">   
-                                            <span class="align-middle comunidad-${valor['id']}">${valor['codigo']} - ${valor['nombre']}</span>
-                                        </a>
-                                    </div>
+            var enlaceEstado = (valor['estado'] == 'P' ? 'javascript:void(0);' : `${config.baseURL}comunidad/${valor['id']}`);
 
-                                    <div class="col-2 pr-0 text-center pl-0">
-                                        <a href="javascript:void(0);" class="btnEliminarComunidad" data-id="${valor['id']}" data-nombre="${valor['nombre']}">
-                                            <i data-feather="trash-2" class="text-danger"></i>
-                                        </a>
+            var claseSegunEstado = (valor['estado'] == 'P' ? 'btnAvisoEstado' : '');
+            if(valor['estado'] != 'H')
+            {
+                var html = `<li class="sidebar-item pl-3 pr-3 pb-2 pt-2" data-codigo="${valor['codigo']}" data-nombre="${valor['nombre']}">
+                                    <div class="row">
+                                        <div class="col-2 pr-0">
+                                            <img src="${config.baseURL}public/assets/img/icon_edificio.png" class="img-responsive feather">
+                                        </div>
+
+                                        <div class="col-8 pl-0">
+                                            <a href="${enlaceEstado}" class=" text-white ${claseSegunEstado}">   
+                                                <span class="align-middle comunidad-${valor['id']}">${valor['codigo']} - ${valor['nombre']}</span>
+                                            </a>
+                                        </div>
+
+                                        <div class="col-2 pr-0 text-center pl-0">
+                                            <a href="javascript:void(0);" class="btnEliminarComunidad" data-id="${valor['id']}" data-nombre="${valor['nombre']}">
+                                                <i data-feather="trash-2" class="text-danger"></i>
+                                            </a>
+                                        </div>
                                     </div>
-                                </div>
-                        </li>`;
-            $('.navComunidades').append(html);
+                            </li>`;
+                $('.navComunidades').append(html);
+            }
             
         });
             feather.replace();

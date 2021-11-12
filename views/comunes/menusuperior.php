@@ -20,13 +20,18 @@
         <h3 class="card-title mb-0 ml-4"><i class="bi bi-building" style="color: #17a2b8;"></i> <span class="titulo titulo-modulo pl-0"></span></h3>
 
         <ul class="navbar-nav navbar-align">
-            <li class="nav-item align-self-center">
-                <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Dashboard" href="<?php echo HOME_URL . "dashboard"; ?>" id="home">
-                    <div class="position-relative text-center text-info">
-                        <i class="bi bi-house-door mr-2"></i><span class="text-uppercase" style="font-size: 12px;">Ir al inicio</span>
-                    </div>
-                </a>
-            </li>
+
+            <?php if( !$App->isContratista() ): ?>
+
+                <li class="nav-item align-self-center">
+                    <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Dashboard" href="<?php echo HOME_URL . "dashboard"; ?>" id="home">
+                        <div class="position-relative text-center text-info">
+                            <i class="bi bi-house-door mr-2"></i><span class="text-uppercase" style="font-size: 12px;">Ir al inicio</span>
+                        </div>
+                    </a>
+                </li>
+
+            <?php endif; ?>
 
             <?php if( $App->isContratista() ): ?>
                 <!-- CONTRATISTA -->
@@ -49,14 +54,14 @@
 
             <!-- Notas informativas, Documentación Básica e Informes de valoración y seguimiento solo si es administrador de fincas -->
             <?php if($App->isAdminFincas()): ?>
-                <!-- <li class="nav-item">
-                    <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Documentación básica" href="<?php echo APPFOLDER . "rgpd/documentacionbasica"; ?>" id="documentacionbasica_nav">
-                        <div class="position-relative">
-                            <i class="bi bi-folder2-open"></i>
+                <li class="nav-item">
+                    <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Añadir nueva comunidad" href="<?php echo HOME_URL . "comunidad/add"; ?>">
+                        <div class="position-relative pt-1">
+                            <i class="bi bi-building mr-2" style="font-size:14px;"></i><span class="text-uppercase" style="font-size: 12px;">Añadir comunidad</span>
                         </div>
                     </a>                    
                 </li>                            
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Informes de evaluación y seguimiento" href="<?php echo APPFOLDER . "rgpd/informevaloracionseguimiento"; ?>" id="informevaloracionseguimiento_nav">
                         <div class="position-relative">
                             <i class="bi bi-journal-bookmark"></i>
@@ -163,11 +168,6 @@
                         <a class="dropdown-item disabled d-none" href="javascript:void(0);"><i class="align-middle mr-1" data-feather="user"></i> Perfil</a>
                     <?php endif; ?>
 
-                    <!-- Sólo para usuarios de tipo administrador de fincas -->
-                    <?php if($App->isAdminFincas() ) : ?>
-                        <!-- <a class="dropdown-item disabled" href="#"><i class="align-middle mr-1" data-feather="eye"></i> SPA Asignado</a> -->
-                    <?php endif; ?>
-
                     <div class="dropdown-divider"></div>
                     <?php if($App->isSudo()): ?>
                         <a class="dropdown-item btnCargarComunidadesExcel" href="javascript:void(0);"><i class="align-middle mr-1" data-feather="folder-plus"></i> Cargar comunidades desde plantilla</a>
@@ -175,6 +175,13 @@
                     <?php if(!$App->isSudo()): ?>
                         <a class="dropdown-item disabled" href="pages-settings.html"><i class="align-middle mr-1" data-feather="settings"></i> Editar perfil</a>
                     <?php endif; ?>
+
+                    <!-- Sólo para usuarios de tipo administrador de fincas -->
+                    <?php if($App->isAdminFincas() ) : ?>
+                        <a class="dropdown-item disabled" href="#"><i class="align-middle mr-1" data-feather="eye"></i> RGPD empleados administración</a>
+                        <!-- <a class="dropdown-item disabled" href="#"><i class="align-middle mr-1" data-feather="eye"></i> SPA Asignado</a> -->
+                    <?php endif; ?>
+
                     <!-- <a class="dropdown-item" href="#"><i class="align-middle mr-1" data-feather="help-circle"></i> Ayuda</a> -->
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item btnLogout" href="javascript:void(0);">Cerrar sesión</a>

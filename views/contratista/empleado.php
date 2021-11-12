@@ -16,7 +16,7 @@
 
             <div class="card-header pl-1 mb-2">
 
-                <h5 class="card-title mb-0"><i class="bi bi-person-lines-fill"></i> <span class="titulo titulo-modulo">Nuevo Empleado</span></h5>
+                <h5 class="card-title mb-0"><i class="bi bi-person-lines-fill"></i> <span class="titulo titulo-modulo">Datos de Empleado</span></h5>
 
             </div>
     
@@ -43,7 +43,7 @@
                         <!-- Fecha de alta -->
                         <div class="col-12 col-md-2">
                             <label for="fechaalta"><i class="bi bi-wrench pr-2"></i>Fecha de alta</label>                        
-                            <input type="date" class="form-control" id="fechaalta" name="fechaalta" hs-entity="Empleado" hs-field="fechaalta" placeholder="dd/mm/aaaa">
+                            <input type="date" class="form-control data" id="fechaalta" name="fechaalta" hs-entity="Empleado" hs-field="fechaalta" placeholder="dd/mm/aaaa">
                         </div> 
 
                     </div>

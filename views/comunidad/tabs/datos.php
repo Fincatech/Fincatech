@@ -19,19 +19,19 @@
     <!-- Código de comunidad -->
     <div class="col-12 col-md-2">
         <label for="codigo" class="pl-0"><i class="bi bi-key-fill pr-2"></i>Código*</label>
-            <input type="text" class="form-control data text-center form-required" id="codigo" name="codigo" placeholder="Código interno" hs-entity="Comunidad" hs-field="codigo" required>
+            <input type="text" maxlength="10" class="form-control data text-center form-required" id="codigo" name="codigo" placeholder="Código interno" hs-entity="Comunidad" hs-field="codigo" required>
     </div>
 
     <!-- CIF -->
     <div class="col-12 col-md-2 text-left">
         <label for="cif" class="pl-0"><i class="bi bi-credit-card-2-front pr-2"></i>CIF*</label>
-            <input type="text" class="form-control data text-center form-required" id="cif" name="cif" placeholder="CIF/NIF" hs-entity="Comunidad" hs-field="cif" required>
+            <input type="text" maxlength="15" class="form-control data text-center form-required" id="cif" name="cif" placeholder="CIF/NIF" hs-entity="Comunidad" hs-field="cif" required>
     </div>  
 
     <!-- Nombre de la comunidad -->
     <div class="col-12 col-md-8 text-left">
         <label for="nombre"><i class="bi bi-building pr-2"></i>Nombre*</label>
-        <input type="text" class="form-control data form-required" id="nombre" name="nombre" placeholder="Nombre de la comunidad"  hs-entity="Comunidad" hs-field="nombre" aria-label="nombre" aria-describedby="addon-nombre" required>
+        <input type="text" maxlength="100" class="form-control data form-required" id="nombre" name="nombre" placeholder="Nombre de la comunidad"  hs-entity="Comunidad" hs-field="nombre" aria-label="nombre" aria-describedby="addon-nombre" required>
     </div> 
 
 </div>
@@ -46,12 +46,6 @@
         <label for="usuarioId"><i class="bi bi-person-fill pr-2"></i>Administrador asignado</label>
         <select id="usuarioId" name="usuarioId" class="select-data custom-select data form-control selectpicker" data-live-search="true" hs-entity="Comunidad" hs-field="usuarioId" hs-list-entity="Administrador" hs-list-field="Usuario.nombre" hs-list-value="Usuario.id"></select>
     </div>                 
-                         
-    <!-- Nombre del presidente -->
-    <!-- <div class="col-12 col-md-3 text-left">
-        <label for="presidente"><i class="bi bi-person pr-2"></i>Nombre del presidente</label>
-        <input type="text" class="form-control data" id="presidente" name="presidente" placeholder="Nombre del presidente"  hs-entity="Comunidad" hs-field="presidente" aria-label="nombre" aria-describedby="addon-nombre">
-    </div>   -->
     
 </div>
 
@@ -69,7 +63,7 @@
 <div class="form-group row mb-2">
     <div class="col-12">
         <label for="direccion"><i class="bi bi-map pr-2"></i>Dirección</label>                        
-        <input type="text" class="form-control data" id="direccion" name="direccion" placeholder="Dirección"  hs-entity="Comunidad" hs-field="direccion" required>
+        <input type="text" maxlength="100" class="form-control data" id="direccion" name="direccion" placeholder="Dirección"  hs-entity="Comunidad" hs-field="direccion" required>
     </div>
 </div> 
 
@@ -77,7 +71,7 @@
 <div class="form-group row mb-2">
     <div class="col-12 col-md-2">
         <label for="codpostal"><i class="bi bi-mailbox pr-2"></i>Código postal</label>
-                <input type="text" class="form-control data text-center" id="codpostal" name="codpostal" placeholder="Código postal"  hs-entity="Comunidad" hs-field="codpostal">
+         <input type="text" maxlength="5" class="form-control data text-center" id="codpostal" name="codpostal" placeholder="Código postal"  hs-entity="Comunidad" hs-field="codpostal">
     </div>
     <div class="col-12 col-md-7">
         <label for="localidad"><i class="bi bi-geo-alt pr-2"></i>Localidad*</label>
@@ -109,8 +103,20 @@
         <label for="ibancomunidad"><i class="bi bi-bank pr-2"></i>IBAN</label>              
         <input type="text" class="form-control data text-center text-uppercase" id="ibancomunidad" name="ibancomunidad" placeholder="Código Cuenta IBAN"  hs-entity="Comunidad" hs-field="ibancomunidad" maxlength="30">
     </div>                       
-
 </div> 
+<?php if($App->getAction() =='add'): ?>
+<div class="form-group row mt-4">
+    <!-- Contrato de servicios -->
+    <div class="col-12 col-sm-3">
+        <input class="form-check-input" type="checkbox" id="chkServicioCae">
+        <label for="chkServicioCae">Contratar servicio CAE</label>              
+    </div>
+    <div class="col-12 col-sm-3">
+        <input class="form-check-input" type="checkbox" id="chkServicioRGPD">
+        <label for="chkServicioRGPD">Contratar servicio RGPD</label>              
+    </div>        
+</div>
+<?php endif; ?>
 
 <!-- Servicios contratados -->
 <?php if($App->isSudo()): ?>

@@ -77,12 +77,14 @@
                                 </div>
                             </div> -->
                         </div>
+                        
                     </div>
+
                 </div>
 
             </div>
             <!-- Listado de comunidades -->
-            <div class="row">
+            <div class="row d-none">0
 
                 <div class="col-12 d-flex">
 

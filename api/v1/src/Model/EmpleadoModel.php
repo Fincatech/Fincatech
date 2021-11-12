@@ -146,7 +146,14 @@ class EmpleadoModel extends \HappySoftware\Model\Model{
 
     public function GetEmpleadosByComunidadAndEmpresa($idComunidad, $idEmpresa)
     {
-
+        $sql = "SELECT * FROM `view_empleadoscomunidadempresa` where idempresa = $idEmpresa and idcomunidad = $idComunidad";
+        $data = $this->query($sql);
+        for($x = 0; $x < count($data); $x++)
+        {
+            //  Recuperamos los documentos asociados a PRL de empleado
+            $data[$x]['documentacionprl'] = $this->GetDocumentacionEmpleado($data[$x]['idempleado']);
+        }   
+        return $data;
     }
 
     /** Devuelve las empresass asociadas a un empleado */
@@ -158,8 +165,6 @@ class EmpleadoModel extends \HappySoftware\Model\Model{
         //  de documentos
 
         return $this->query($sql);
-
-
 
     }
 
@@ -188,6 +193,29 @@ class EmpleadoModel extends \HappySoftware\Model\Model{
     {
         $sql = "SELECT * FROM view_documentosempleado where @p1:=" . $id; 
         return $this->query($sql);
+    }
+
+    /** Asigna un empleado a una comunidad */
+    public function AsignarComunidad($idEmpleado, $idComunidad)
+    {
+        //  Comprobamos si ya existe el empleado asignado a la comunidad
+        if($this->getRepositorio()->ExisteRegistro('empleadocomunidad', " idempleado = $idEmpleado and idcomunidad = $idComunidad" ) )
+        {
+            return false;
+        }else{
+            //  Inserta el registro en base de dtos y devuelve ok
+            $sql = "insert into empleadocomunidad(idempleado, idcomunidad, estado, fechaalta, created, usercreate) values(";
+            $sql .= $idEmpleado . ", ";
+            $sql .= $idComunidad . ", ";
+            $sql .= "'A', ";
+            $sql .= "now(), ";
+            $sql .= "now(), ";
+            $sql .= $this->getLoggedUserId() . ") ";
+
+            $this->queryRaw($sql);
+            return 'ok';
+        }
+
     }
 
 }

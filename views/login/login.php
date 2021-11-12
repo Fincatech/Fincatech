@@ -19,6 +19,7 @@
 
 									<div class="text-center pb-2">
 							            <img src="public/assets/img/logo-fincatech.png" alt="Fincatech" style="max-height: 70px;">
+										<p>Plataforma digital para el control normativo en comunidades de propietarios</p>
 									</div>
 
 									<form class="form-data" id="formLogin" name="formLogin" autocomplete="off" style="border: 1px solid #e4e4e4;padding: 24px;border-radius: 10px;box-shadow: inset 0px 0px 16px #efefef;">

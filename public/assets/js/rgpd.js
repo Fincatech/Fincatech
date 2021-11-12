@@ -10,6 +10,7 @@ let rgpdCore = {
         $('body').on(core.helper.clickEventType, '.enlaceRGPD', function(e)
         {
             $('.loading').show();
+            $('.tituloEmpresasComunidad').text('Empresas externas');
             //  Documentación Cámaras de seguridad
                 documentalCore.RGPD.cargarDocumentacionCamarasSeguridad().then( 
             //  Cámaras de seguridad de la comunidad

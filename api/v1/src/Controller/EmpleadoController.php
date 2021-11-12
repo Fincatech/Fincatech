@@ -125,7 +125,7 @@ class EmpleadoController extends FrontController{
     public function ListEmpleadosByComunidadAndEmpresa($idComunidad, $idEmpresa)
     {
         $data = [];
-        $data['Empleados'] = $this->EmpleadoModel->GetEmpleadosByComunidadAndEmpresa($idComunidad, $idEmpresa);
+        $data['Empleado'] = $this->EmpleadoModel->GetEmpleadosByComunidadAndEmpresa($idComunidad, $idEmpresa);
         return HelperController::successResponse( $data );
     }
 
@@ -142,6 +142,20 @@ class EmpleadoController extends FrontController{
         $data = [];
         $data['documentacioncae'] = $this->EmpleadoModel->GetDocumentacionEmpleado($id);
         return HelperController::successResponse( $data );
+    }
+
+    public function AsignarComunidad($idEmpleado, $idComunidad)
+    {
+
+        $resultado = $this->EmpleadoModel->AsignarComunidad($idEmpleado, $idComunidad);
+
+        if($resultado !== false)
+        {
+            return HelperController::successResponse( 'ok' );
+        }else{
+            return HelperController::errorResponse( 'error', 'El empleado ya está asignado a la comunidad', '200' );
+        }
+        
     }
 
 }

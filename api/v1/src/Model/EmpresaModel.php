@@ -40,7 +40,7 @@ class EmpresaModel extends \HappySoftware\Model\Model{
         $datosNuevoUsuario['email'] = $datos['email'];
         $datosNuevoUsuario['rolid'] = 6;
         $datosNuevoUsuario['password'] = md5('finca123456');
-        $datosNuevoUsuario['estado'] = 'P';
+        $datosNuevoUsuario['estado'] = 'A';
         $datosNuevoUsuario['salt'] = '';
 
         //  Recuperamos el ID del usuario para poder asignarlo a la hora de crear la empresa

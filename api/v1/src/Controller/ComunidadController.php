@@ -20,6 +20,19 @@ class ComunidadController extends FrontController{
     public function Create($entidadPrincipal, $datos)
     {
 
+        //  Servicios contratados en el alta
+        if(isset($datos['servicioCAE']))
+        {
+            $servicioCaeContratado = ($datos['servicioCAE'] == '0' ? 0 : 1);
+            unset($datos['servicioCAE']);
+        }
+
+        if(isset($datos['servicioRGPD']))
+        {
+            $servicioRGPDContratado = ($datos['servicioRGPD'] == '0' ? 0 : 1);
+            unset($datos['servicioRGPD']);
+        }
+
         //  Llamamos al método de crear
         //  Si no está informado, cogemos el usuario autenticado en el sistema
         if(!isset($datos['usuarioId']))
@@ -47,6 +60,23 @@ class ComunidadController extends FrontController{
         }
 
         $idComunidad = $this->ComunidadModel->Create($entidadPrincipal, $datos);
+
+        if(isset($servicioCaeContratado))
+        {
+            $this->ComunidadModel->InsertServicioContratado($idComunidad['id'], 1, '0', '0', $servicioCaeContratado);
+        }
+
+        if(isset($servicioRGPDContratado))
+        {
+            $this->ComunidadModel->InsertServicioContratado($idComunidad['id'], 2, '0', '0', $servicioRGPDContratado);
+        }
+
+        if(isset($servicioCaeContratado) && isset($servicioRGPDContratado))
+        {
+            $this->ComunidadModel->InsertServicioContratado($idComunidad['id'], 3, '0', '0', '0');
+            $this->ComunidadModel->InsertServicioContratado($idComunidad['id'], 4, '0', '0', '0');
+            $this->ComunidadModel->InsertServicioContratado($idComunidad['id'], 5, '0', '0', '0');
+        }
 
         //  Insertamos los servicios contratados por la comunidad
         if(!is_null($datosServiciosContratados))

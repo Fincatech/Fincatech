@@ -44,15 +44,15 @@ class Requerimiento extends EntityHelper{
         $this->relations[] = $this->addRelation([
             'table' => 'ficheroscomunes',
             //  Columna de la entidad que se está relacionando con la entidad principal
-            'sourceColumn' =>'id',
+            'sourceColumn' =>'idfichero',
             //  Columna de la entidad principal con la que se va a relacionar
-            'targetColumn' => 'idfichero',
+            'targetColumn' => 'id',
             'fieldType' => 'int',
             'readOnly' => true,
             'canReturnSchema' => false,
             'deleteMode' => DELETE_FISICO,
             //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
-            'relationType' => RELACION_OUTSIDE
+            'relationType' => RELACION_INVERSA
         ]);
 
         //  Comunidad asociada

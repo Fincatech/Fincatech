@@ -124,14 +124,45 @@ let Constantes = {
     </div>
     <div class="row mb-2 wrapperInformacion">
       <div class="col-12">
-          <p class="mt-3 text-justify" style="font-size: 14px;">Para asignar una empresa, puede buscar por nombre, e-mail o CIF/NIF en el listado de empresas que tiene en pantalla.</p>
-          <p class="mt-3 text-justify" style="font-size: 14px;">Si no encuentra la empresa que desea asociar, puede crear una nueva clicando sobre el botón CREAR NUEVA EMPRESA. Una vez creada la empresa, ésta será asignada automáticamente a la comunidad actual.</p>
+          <p class="mt-3 text-center" style="font-size: 14px;">Para asignar una empresa, puede buscar e-mail.</p>
+          <p class="mt-3 text-center" style="font-size: 14px;">Si no encuentra la empresa que desea asociar, puede crear una nueva clicando sobre el botón <strong>CREAR NUEVA EMPRESA</strong>. Una vez creada la empresa, ésta será asignada automáticamente a la comunidad actual.</p>
       </div>
+    </div>
+
+    <!-- input de empresa -->
+    <div class="row mb-4 wrapperBusquedaEmpresa">
+      <div class="col-12 col-sm-10">
+        <div class="form-group">
+          <input type="text" class="form-control" id="searchEmpresa" name="searchEmpresa" placeholder="Escriba el e-mail de la empresa que desea buscar">
+        </div>
+      </div>
+      <div class="col-12 col-sm-2">
+        <a href="javascript:void(0);" class="btn btn-primary btnBuscarEmpresaCAE pt-1 pb-1 d-block"><i class="bi bi-search"></i> BUSCAR EMPRESA</a>
+      </div>
+      <div class="col-12">
+        <p class="m-0 mensaje">&nbsp;</p>
+      </div>
+    </div>
+
+    <!-- Información de la empresa -->
+    <div class="row mb-4 wrapperInfoEmpresa" style="display: none;">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body shadow-inset">
+                <p class="font-weight-bold"><span class="nombreEmpresa"></p>
+                <p><span class="cifEmpresa"></p>
+                <p><span class="emailEmpresa"></p>
+                <div class="clearfix mt-3">&nbsp;</div>
+                <p>Si los datos son correctos, clique sobre el botón <strong>ASIGNAR</strong> para asociarla a la comunidad</p>
+                <a href="javascript:void(0);" class="btnConfirmarEmpresaCAE d-inline-block btn btn-sm btn-success" data-id="" data-nombre="">ASIGNAR</a>
+            </div>
+          </div>
+        </div>
     </div>
 
     <!-- Listado simple de empresas del sistema-->
 
-    <div class="row mb-4 wrapperSelectorEmpresa">
+    <div class="row mb-4 wrapperSelectorEmpresa d-none">
 
       <div class="col-12 text-left">
 
@@ -181,7 +212,7 @@ let Constantes = {
           <!-- Botón de crear empresa y asignar a comunidad -->
           <div class="row mt-3">
             <div class="col-12 text-center">
-              <a href="javascript:void(0);" class="btn btn-success bntCrearNuevaEmpresaCAE pt-1 pb-1">CREAR NUEVA EMPRESA</a>
+              <a href="javascript:void(0);" class="btn btn-success bntCrearNuevaEmpresaCAE pt-1 pb-1" style="display: none;">CREAR NUEVA EMPRESA</a>
             </div>
           </div>
       </div>
@@ -353,7 +384,13 @@ let core =
       }).each(function(index, el) {
           $(el).parent().append(el);
       });
-    }
+    },
+
+    validarEmail(email)
+    {
+      var validRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return validRegex.test(email.toLowerCase());
+    },
 
   },
 
@@ -898,8 +935,6 @@ let core =
           core.Forms.data = {};
           core.Forms.mapDataToSave();
         }
-
-console.log('accion: ' + actionSave);
 
         //  Comprobamos la acción del modelo
         switch(actionSave)

@@ -1,5 +1,5 @@
 <!-- CONFIG COMPONENT -->
-<script type="text/javascript" src="<?php echo ASSETS_JS; ?>config.js"></script>
+<script type="text/javascript" src="<?php echo ASSETS_JS; ?>config.js?v=<?php echo time(); ?>"></script>
 
 <!-- THIRD PARTY COMPONENTS -->
 <script type="text/javascript" src="<?php echo ASSETS; ?>vendor/node_modules/jquery/dist/jquery.min.js"></script>
