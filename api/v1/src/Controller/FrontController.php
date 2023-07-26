@@ -264,7 +264,7 @@ class FrontController{
     public function ExecuteTest()
     {
         $this->InitController('Certificadodigital');
-        $this->CertificadodigitalController->Test();
+        //$this->CertificadodigitalController->Test();
         return true;
     }
 
