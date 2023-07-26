@@ -70,20 +70,52 @@ class Dpd extends EntityHelper{
             'relationType' => RELACION_OUTSIDE
         ]);
 
-        //  Entidad fichero
+        //  Entidad Ficheros
         $this->relations[] = $this->addRelation([
             'table' => 'ficheroscomunes',
             //  Columna de la entidad que se está relacionando con la entidad principal
-            'sourceColumn' =>'id',
+            'sourceColumn' =>'idfichero',
             //  Columna de la entidad principal con la que se va a relacionar
-            'targetColumn' => 'idfichero',
+            'targetColumn' => 'id',
             'fieldType' => 'int',
-            'readOnly' => true,
             'canReturnSchema' => false,
-            'deleteMode' => DELETE_FISICO,
+            'readOnly' => true,
+            //  Indica si se debe eliminar el registro relacionado o no
+            'deleteOnCascade' => true,
             //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
-            'relationType' => RELACION_OUTSIDE
+            'relationType' => RELACION_INVERSA
         ]);
+
+        //  Usuario
+        $this->relations[] = $this->addRelation([
+            'table' => 'usuario',
+            //  Columna de la entidad que se está relacionando con la entidad principal
+            'sourceColumn' =>'usercreate',
+            //  Columna de la entidad principal con la que se va a relacionar
+            'targetColumn' => 'id',
+            'fieldType' => 'int',
+            'canReturnSchema' => false,
+            'readOnly' => true,
+            //  Indica si se debe eliminar el registro relacionado o no
+            'deleteOnCascade' => true,
+            //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
+            'relationType' => RELACION_INVERSA
+        ]);        
+
+        // //  Entidad fichero
+        // $this->relations[] = $this->addRelation([
+        //     'table' => 'ficheroscomunes',
+        //     //  Columna de la entidad que se está relacionando con la entidad principal
+        //     'sourceColumn' =>'id',
+        //     //  Columna de la entidad principal con la que se va a relacionar
+        //     'targetColumn' => 'idfichero',
+        //     'fieldType' => 'int',
+        //     'readOnly' => true,
+        //     'canReturnSchema' => false,
+        //     'deleteMode' => DELETE_FISICO,
+        //     //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
+        //     'relationType' => RELACION_OUTSIDE
+        // ]);
 
         // //  Entidad administrador
         // $this->relations[] = $this->addRelation([

@@ -75,7 +75,7 @@ class ShutdownHandler
 
             $exception = new HttpInternalServerErrorException($this->request, $message);
             $response = $this->errorHandler->__invoke($this->request, $exception, $this->displayErrorDetails, false, false);
-
+            error_clear_last();
             $responseEmitter = new ResponseEmitter();
             $responseEmitter->emit($response);
         }

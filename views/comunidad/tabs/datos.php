@@ -44,7 +44,7 @@
     <!-- Sólo pueden los sudo -->
     <div class="col-12 col-md-8">
         <label for="usuarioId"><i class="bi bi-person-fill pr-2"></i>Administrador asignado</label>
-        <select id="usuarioId" name="usuarioId" class="select-data custom-select data form-control selectpicker" data-live-search="true" hs-entity="Comunidad" hs-field="usuarioId" hs-list-entity="Administrador" hs-list-field="Usuario.nombre" hs-list-value="Usuario.id"></select>
+        <select id="usuarioId" name="usuarioId" class="select-data custom-select data form-control selectpicker" data-live-search="false" hs-seleccionar="false" hs-entity="Comunidad" hs-field="usuarioId" hs-list-entity="Administrador" hs-list-field="Usuario.nombre" hs-list-value="Usuario.id"></select>
     </div>                 
     
 </div>
@@ -73,14 +73,18 @@
         <label for="codpostal"><i class="bi bi-mailbox pr-2"></i>Código postal</label>
          <input type="text" maxlength="5" class="form-control data text-center" id="codpostal" name="codpostal" placeholder="Código postal"  hs-entity="Comunidad" hs-field="codpostal">
     </div>
-    <div class="col-12 col-md-7">
+    <div class="col-12 col-md-6">
         <label for="localidad"><i class="bi bi-geo-alt pr-2"></i>Localidad*</label>
             <input type="text" class="form-control data form-required" id="localidad" name="localidad" placeholder="Localidad"  hs-entity="Comunidad" hs-field="localidad" required>
     </div>
-    <div class="col-12 col-md-3">
+    <div class="col-12 col-md-4">
+        <label for="localidad"><i class="bi bi-geo-alt pr-2"></i>Provincia*</label>
+        <input type="text" class="form-control data form-required" id="provincia" name="provincia" placeholder="Provincia"  hs-entity="Comunidad" hs-field="provincia" required>
+    </div>    
+    <!-- <div class="col-12 col-md-3">
         <label for="provincia"><i class="bi bi-geo-alt pr-2"></i>Provincia</label>
         <select id="provinciaid" name="provinciaid" class="select-data custom-select data form-control selectpicker" data-live-search="true" hs-entity="Comunidad" hs-field="provinciaid" hs-list-entity="Provincia" hs-list-field="Nombre" hs-list-value="Id"></select>
-    </div>                        
+    </div>                         -->
 </div> 
 
 <!-- Teléfono y e-mail -->
@@ -97,12 +101,12 @@
 </div>                     
 -->
 
-<!-- IBAN -->
+<!-- IBAN y mes de facturación -->
 <div class="form-group row mb-2">
     <div class="col-12 col-sm-3">
         <label for="ibancomunidad"><i class="bi bi-bank pr-2"></i>IBAN</label>              
         <input type="text" class="form-control data text-center text-uppercase" id="ibancomunidad" name="ibancomunidad" placeholder="Código Cuenta IBAN"  hs-entity="Comunidad" hs-field="ibancomunidad" maxlength="30">
-    </div>                       
+    </div>                     
 </div> 
 <?php if($App->getAction() =='add'): ?>
 <div class="form-group row mt-4">

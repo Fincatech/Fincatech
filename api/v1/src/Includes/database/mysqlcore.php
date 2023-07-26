@@ -56,7 +56,7 @@ class DatabaseCore {
 	public $esquemaBBDD;
 	public $puertoMySQL;
 	public $cErrores;
-	public $enlaceBBDD;
+	protected $enlaceBBDD;
 	public $filaDatos;
 	public $defTablaBBDD;
 	public $mysqli;
@@ -92,38 +92,38 @@ class DatabaseCore {
 		$this->esquemaBBDD = $database['schema'];
 		$this->createMissingTables = $database['config']['createmissingtables'];
 
-		if($this->comprobarConexionBBDD()){
-			if($this->conectarBBDD()){
-				$this->conectado = true;
-			}else{
-				$this->conectado = false;
-				throw new \Exception("Error de conexión a la base de datos");
-			}
-			
-		}else{
-			throw new \Exception("Error de conexión a la base de datos");
-		}
+		$this->conectado = $this->conectarBBDD();
 
 	}
 	
+	public function __destruct()
+	{
+		//	Liberamos la conexión a la base de datos
+		//	Para asegurarnos que lo libera por completo hay que matar todas las sesiones activas
+		$thread =$this->enlaceBBDD->thread_id;
+		$this->enlaceBBDD->kill($thread);
+		$this->enlaceBBDD->close();
+	}
+
 // 	Método que conecta con la base de datos.
 	public function conectarBBDD()
 	{
 		
-		$conexionCorrecta = false;
-		
-		$this->enlaceBBDD = new \mysqli($this->urlServidor, $this->usuario,$this->password, $this->esquemaBBDD);
-		
-		if (!$this->enlaceBBDD)
+		$connectionStatus = false;
+
+		// if(!$this->comprobarConexionBBDD())
+		if(!$this->estaConectado())
 		{
-		  //$this->cErrores->registrarError('Error de base de datos: ' . mysql_error(), 'MySqlCore.comprobarConexionBBDD()');
-		  $conexionCorrecta = false;
-		}else{
-			$conexionCorrecta = true;
+			$this->enlaceBBDD = new \mysqli($this->urlServidor, $this->usuario,$this->password, $this->esquemaBBDD);
+		}
+	
+		if ($this->enlaceBBDD)
+		{
+			$connectionStatus = true;
 			$this->enlaceBBDD->query("SET NAMES '" . $this->codificacion . "'");
 		}
 		
-		return $conexionCorrecta;
+		return $connectionStatus;
 		
 	}
 	
@@ -134,7 +134,15 @@ class DatabaseCore {
 	{
 		
 		$conexionCorrecta = false;
-		
+
+		if(!is_null($this->enlaceBBDD) && !empty($this->enlaceBBDD))
+		{
+			if($this->enlaceBBDD->ping())
+			{
+				return true;
+			}
+		}
+
 		$this->enlaceBBDD = new \mysqli($this->urlServidor, $this->usuario,$this->password, $this->esquemaBBDD);
 		
 		if (!$this->enlaceBBDD)
@@ -144,7 +152,7 @@ class DatabaseCore {
 		}else{
 			$conexionCorrecta = true;
 		}
-		$this->liberarConexionBBDD();
+		// $this->liberarConexionBBDD();
 		return $conexionCorrecta;
 		
 	}
@@ -152,7 +160,12 @@ class DatabaseCore {
 //	Funcion que libera la conexion a base de datos.	
 	public function liberarConexionBBDD()
 	{
-		mysqli_close($this->enlaceBBDD);
+		if($this->estaConectado())
+		{
+			// mysqli_close($this->enlaceBBDD);
+			// $this->enlaceBBDD->close();
+			// $this->conectado = false;
+		}
 	}
 
 //	Metodo que comprueba si la conexion esta activa.	
@@ -261,19 +274,19 @@ class DatabaseCore {
 	public function queryRaw($sentenciaSQL, $debug = false)
 	{
 		
-		//	Comprobamos que haya conexion a la base de datos, si no devolvemos false
-			if(!$this->estaConectado()){
-				if(!$this->conectarBBDD()){
-					return false;
-				}
-			}	
+		// //	Comprobamos que haya conexion a la base de datos, si no devolvemos false
+		// 	if(!$this->estaConectado()){
+		// 		if(!$this->conectarBBDD()){
+		// 			return false;
+		// 		}
+		// 	}	
 
 			$datos = mysqli_query($this->enlaceBBDD, $sentenciaSQL  );
 			if($debug == true)
 			{
 				echo($sentenciaSQL) . '<br>';
 			}
-			
+			// $this->liberarConexionBBDD();
 			return $datos;
 		
 	}
@@ -282,20 +295,13 @@ class DatabaseCore {
 	public function ejecutarSQL($sentenciaSQL, $debug = false)
 	{
 		
-		//	Comprobamos que haya conexion a la base de datos, si no devolvemos false
-			if(!$this->estaConectado()){
-				if(!$this->conectarBBDD()){
-					return false;
-				}
-			}	
-
-		//$datos = mysqli_query($this->enlaceBBDD, "/*" . MYSQLND_QC_ENABLE_SWITCH . "*/" . $sentenciaSQL  );
 			$datos = mysqli_query($this->enlaceBBDD, $sentenciaSQL  );
+
 			if($debug == true)
 			{
 				echo($sentenciaSQL) . '<br>';
 			}
-			
+
 			return $datos;
 		
 	}
@@ -354,13 +360,7 @@ class DatabaseCore {
 
 	public function sqlSelect($tabla, $campos, $condicion = null, $orden = null, $tipoOrden = null, $limit = 10, $sqlLeftJoin = false, $tablaLeftJoin = null, $condicionLeftJoin = null)
 	{
-		// 		Comprobamos que haya conexión a la base de datos, si no devolvemos false
-		if(!$this->estaConectado()){
-			if(!$this->conectarBBDD()){
-				return false;
-			}
-		}
-		//mysqli_query($this->enlaceBBDD, "set names 'utf8'");
+
 		$this->enlaceBBDD->set_charset("utf8");
 			$constructorSQL = "SELECT " . $campos . ' ' ;
 		
@@ -403,12 +403,7 @@ class DatabaseCore {
 //	Método que lanza un insert sobre la base de datos.	
 	public function insert($tabla, $campos, $value, $debug = false)
 	{
-		if(!$this->estaConectado()){
-		//			Probamos a conectar a la base de datos			
-			if(!$this->conectarBBDD()){
-				return false;
-			}
-		}
+
 		try{
 			
 		//	TODO: Antes de nada hay que validar que el registro no exista ya en base de datos
@@ -518,11 +513,11 @@ class DatabaseCore {
 	public function getValue($tabla, $campo, $valorCampoCondicion = "", $campoCondicion = null)
 	{
 		// 		Comprobamos que haya conexion a la base de datos, si no devolvemos false
-		if(!$this->estaConectado()){
-			if(!$this->conectarBBDD()){
-				return false;
-			}
-		}
+		// if(!$this->estaConectado()){
+		// 	if(!$this->conectarBBDD()){
+		// 		return false;
+		// 	}
+		// }
 
 		$sqlValue = "SELECT " . $campo . " FROM " . $tabla . " WHERE " ;
 		
@@ -537,13 +532,20 @@ class DatabaseCore {
 
 		if($datos){
 			
-			$valor = mysqli_fetch_assoc($datos);
-			if(trim($valor[$campo]) == '')
+			if(mysqli_num_rows($datos) > 0)
 			{
+				$valor = mysqli_fetch_assoc($datos);
+				if(trim($valor[$campo]) == '')
+				{
+					return -1;
+				} else {
+					return $valor[$campo];
+				}
+			}else{
 				return -1;
-			} else {
-				return $valor[$campo];
 			}
+
+
 		}else{
 
 			return -1;//null;
@@ -595,7 +597,7 @@ class DatabaseCore {
 					}
 				}
 				
-				$sql = "UPDATE " . $tabla . " SET ";
+				$sql = "UPDATE " . strtolower($tabla) . " SET ";
 				$sql .= $camposUpdate;
 				
 				if($campoCondicionUpdate == null)
@@ -637,6 +639,7 @@ class DatabaseCore {
 			
 		}
 		//	echo 'error: ' . $sql;
+		
 		return $total;
 		
 	}
@@ -755,6 +758,12 @@ class DatabaseCore {
 		$saneado = str_replace("base64", "", $saneado);
 		$saneado = str_replace("eval('", "", $saneado);
 		$saneado = str_replace("''","``", $saneado);		
+		$saneado = str_replace("select","", $saneado);		
+		$saneado = str_replace("update","", $saneado);		
+		$saneado = str_replace("delete","", $saneado);		
+		$saneado = str_replace("truncate","", $saneado);	
+		$saneado = str_replace("drop","", $saneado);	
+		$saneado = str_replace(" or ","", $saneado);	
 				
 		return $saneado;
 

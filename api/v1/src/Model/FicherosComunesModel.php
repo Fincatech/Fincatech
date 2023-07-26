@@ -4,7 +4,7 @@ namespace Fincatech\Model;
 
 use Fincatech\Entity\FicherosComunes;
 
-class UsuarioModel extends \HappySoftware\Model\Model{
+class FicherosComunesModel extends \HappySoftware\Model\Model{
 
     private $entidad = 'FicherosComunes';
 

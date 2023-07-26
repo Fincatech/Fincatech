@@ -1,23 +1,13 @@
 <nav class="navbar navbar-expand navbar-light navbar-bg">
-    
+<?php if (!$App->isSudo()): ?>
     <a class="sidebar-toggle d-flex">
         <i class="hamburger align-self-center"></i>
     </a>
-    <!-- 
-    <form class="d-none d-sm-inline-block">
-        <div class="input-group input-group-navbar">
-            <input type="text" class="form-control search-input" placeholder="Buscar" data-target="" aria-label="Buscar">
-            <button class="btn btnBuscarComunidad" type="button">
-                <i class="align-middle" data-feather="search"></i>
-            </button>
-        </div>
-    </form> -->
-    
+<?php endif; ?>
+   
     <div class="navbar-collapse collapse">
 
         <img src="<?php echo HOME_URL ;?>public/assets/img/logo-fincatech.png" style="max-width: 130px;">    
-
-        <h3 class="card-title mb-0 ml-4"><i class="bi bi-building" style="color: #17a2b8;"></i> <span class="titulo titulo-modulo pl-0"></span></h3>
 
         <ul class="navbar-nav navbar-align">
 
@@ -26,7 +16,7 @@
                 <li class="nav-item align-self-center">
                     <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Dashboard" href="<?php echo HOME_URL . "dashboard"; ?>" id="home">
                         <div class="position-relative text-center text-info">
-                            <i class="bi bi-house-door mr-2"></i><span class="text-uppercase" style="font-size: 12px;">Ir al inicio</span>
+                            <i class="bi bi-house-door mr-2"></i><span class="text-uppercase" style="font-size: 12px;">Dashboard</span>
                         </div>
                     </a>
                 </li>
@@ -34,6 +24,14 @@
             <?php endif; ?>
 
             <?php if( $App->isContratista() ): ?>
+                <!-- CONTRATISTA -->
+                <li class="nav-item align-self-center">
+                    <a href="<?php echo HOME_URL;?>videotutoriales" class="nav-icon" role="button">
+                        <div class="position-relative text-center text-info">
+                            <i class="bi bi-camera-video mr-2"></i><span class="text-uppercase" style="font-size: 12px;">Videotutoriales</span>
+                        </div>
+                    </a>
+                </li>                
                 <!-- CONTRATISTA -->
                 <li class="nav-item align-self-center">
                     <a href="<?php echo HOME_URL;?>contratista/documentos" class="nav-icon" role="button">
@@ -54,31 +52,34 @@
 
             <!-- Notas informativas, Documentación Básica e Informes de valoración y seguimiento solo si es administrador de fincas -->
             <?php if($App->isAdminFincas()): ?>
+                <!-- Home -->
+                <li class="nav-item align-self-center">
+                    <a href="<?php echo HOME_URL;?>videotutoriales" class="nav-icon" role="button">
+                        <div class="position-relative text-center text-info">
+                            <i class="bi bi-camera-video mr-2"></i><span class="text-uppercase" style="font-size: 12px;">Videotutoriales</span>
+                        </div>
+                    </a>
+                </li>     
+                <!-- Requerimientos pendientes -->              
                 <li class="nav-item">
+                    <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Listado requerimientos pendientes" href="<?php echo HOME_URL . "requerimiento/pendientes"; ?>">
+                        <div class="position-relative pt-1">
+                            <i class="bi bi-shield-exclamation mr-2"></i><span class="text-uppercase" style="font-size: 12px;">Requerimientos pendientes</span>
+                        </div>
+                    </a>                    
+                </li>        
+                <!-- Nueva comunidad -->          
+                <li class="nav-item d-none">
                     <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Añadir nueva comunidad" href="<?php echo HOME_URL . "comunidad/add"; ?>">
                         <div class="position-relative pt-1">
                             <i class="bi bi-building mr-2" style="font-size:14px;"></i><span class="text-uppercase" style="font-size: 12px;">Añadir comunidad</span>
                         </div>
                     </a>                    
                 </li>                            
-                <!-- <li class="nav-item">
-                    <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Informes de evaluación y seguimiento" href="<?php echo APPFOLDER . "rgpd/informevaloracionseguimiento"; ?>" id="informevaloracionseguimiento_nav">
-                        <div class="position-relative">
-                            <i class="bi bi-journal-bookmark"></i>
-                        </div>
-                    </a>                    
-                </li>  
-                <li class="nav-item">
-                    <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Notas informativas" title="Notas informativas" href="<?php echo APPFOLDER . "rgpd/notasinformativas"; ?>" id="notasinformativas_nav">
-                        <div class="position-relative">
-                            <i class="bi bi-journals"></i>
-                        </div>
-                    </a>                    
-                </li> -->
+
             <?php endif; ?>
             <!-- Notificaciones -->
             <?php $App->renderView('componentes/notificaciones/notificacionesmenu.php'); ?>
-            <!-- Mensajes: Consultas al DPD -->
 
             <!-- Solo para DPD y ADMINFINCAS -->
             <?php if($App->getUserRol() == 'ROLE_DPD' || $App->getUserRol() == 'ROLE_ADMINFINCAS'): ?>
@@ -162,7 +163,6 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-right">
                     <!-- Cambiar contraseña -->
-                    
                     <a class="dropdown-item btnChangePassword" href="javascript:void(0);"><i class="align-middle mr-1" data-feather="unlock"></i> Cambiar contraseña</a>
                     <?php if(!$App->isSudo()): ?>
                         <a class="dropdown-item disabled d-none" href="javascript:void(0);"><i class="align-middle mr-1" data-feather="user"></i> Perfil</a>
@@ -178,8 +178,17 @@
 
                     <!-- Sólo para usuarios de tipo administrador de fincas -->
                     <?php if($App->isAdminFincas() ) : ?>
-                        <a class="dropdown-item disabled" href="#"><i class="align-middle mr-1" data-feather="eye"></i> RGPD empleados administración</a>
-                        <!-- <a class="dropdown-item disabled" href="#"><i class="align-middle mr-1" data-feather="eye"></i> SPA Asignado</a> -->
+                        <?php if(!$App->isAuhorizedUser()): ?>
+
+                            <a class="dropdown-item" href="<?php echo HOME_URL ;?>autorizado/list"><i class="align-middle mr-1" data-feather="users"></i> Usuarios autorizados</a>
+                            <a class="dropdown-item" href="<?php echo HOME_URL ;?>empleado/rgpd"><i class="align-middle mr-1" data-feather="eye"></i> RGPD empleados administración</a>
+
+                            <div class="dropdown-divider"></div>
+
+                            <a class="dropdown-item" href="<?php echo HOME_URL ;?>certificadodigital/solicitudes"><i class="align-middle mr-1" data-feather="lock"></i> Certificados digitales</a>
+                            <a class="dropdown-item" href="<?php echo HOME_URL ;?>certificados/dashboard"><i class="align-middle mr-1" data-feather="mail"></i> Envíos certificados</a>
+
+                        <?php endif; ?>
                     <?php endif; ?>
 
                     <!-- <a class="dropdown-item" href="#"><i class="align-middle mr-1" data-feather="help-circle"></i> Ayuda</a> -->

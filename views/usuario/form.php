@@ -12,7 +12,7 @@
     
             <div class="card-body shadow-inset rounded-lg border mb-1 border-white">
 
-                <form class="form-data form-floating" autocomplete="off">
+                <form class="form-data form-floating" autocomplete="chrome-off">
 
                     <!-- Estado del usuario -->
                     <div class="form-group row mb-2">
@@ -29,7 +29,7 @@
                         </div>
                         <div class="col-12 col-md-4">
                             <label for="email"><i class="bi bi-envelope pr-2"></i>E-Mail de contacto / Login*</label>              
-                            <input type="text" class="form-control data text-left form-required" id="emailcontacto" name="emailcontacto" placeholder="Correo electrónico"  hs-entity="Usuario" hs-field="emailcontacto" required>
+                            <input type="text" class="form-control data text-left form-required" id="email" name="email" placeholder="Correo electrónico"  hs-entity="Usuario" hs-field="email" required>
                         </div>
                         <div class="col-12 col-md-2">
                             <label for="email"><i class="bi bi-key pr-2"></i>Contraseña*</label>              
@@ -78,16 +78,32 @@
 
                         <div class="col-12 col-md-2">
                             <label for="telefono"><i class="bi bi-phone pr-2"></i>Teléfono</label>                          
-                            <input type="text" class="form-control data text-center" maxlength="20"  id="telefono" name="telefono" maxlength="20" placeholder="Teléfono"  hs-entity="Usuario" hs-field="telefono">
+                            <input type="text" class="form-control data text-center" maxlength="20"  id="telefono" name="telefono" placeholder="Teléfono"  hs-entity="Usuario" hs-field="telefono">
                         </div>
 
                         <div class="col-12 col-md-2">
-                            <label for="telefono"><i class="bi bi-phone pr-2"></i>Móvil</label>                          
-                            <input type="text" class="form-control data text-center" maxlength="20" id="movil" name="movil" placeholder="Móvil" maxlength="20" hs-entity="Usuario" hs-field="movil">
+                            <label for="movil"><i class="bi bi-phone pr-2"></i>Móvil</label>                          
+                            <input type="text" class="form-control data text-center" maxlength="20" id="movil" name="movil" placeholder="Móvil" hs-entity="Usuario" hs-field="movil">
                         </div>                     
 
                     </div>                    
+                    <!-- Datos API Mensatek -->
+                    <h4 class="mt-4 font-weight-bold">API Mensatek - E-mails certificados</h4>
 
+                    <div class="form-group row mb-2">
+
+                        <div class="col-12 col-md-6">
+                            <label for="apiuser"><i class="bi bi-person pr-2"></i>Usuario API</label>                          
+                            <input type="text" class="form-control data text-center" autocomplete="chrome-off" maxlength="70"  id="apiuser" name="apiuser" placeholder="Usuario API Mensatek"  hs-entity="Usuario" hs-field="apiuser">
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="apitoken"><i class="bi bi-key pr-2"></i>API Token</label>                          
+                            <input type="text" class="form-control data text-center" autocomplete="chrome-off" maxlength="70" id="apitoken" name="apitoken" placeholder="Api Token Mensatek" hs-entity="Usuario" hs-field="apitoken">
+                        </div>                     
+
+                    </div> 
+                    
                     <?php $App->renderActionButtons(); ?>
 
                 </form>
@@ -97,3 +113,9 @@
     </div>
 
 </div>
+<script>
+      let tagArr = document.getElementsByTagName("input");
+      for (let i = 0; i < tagArr.length; i++) {
+        tagArr[i].autocomplete = 'off';
+      }
+    </script>

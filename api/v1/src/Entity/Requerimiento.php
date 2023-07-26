@@ -13,7 +13,7 @@ class Requerimiento extends EntityHelper{
     public $primaryKey = 'id';
     public $tipoEliminacion = DELETE_FISICO;
     public $moveToHistorial = false;
-    public $orderBy = "nombre";
+    public $orderBy = "orden";
     public $orderType = ORDER_BY_ASC;
 
     /**

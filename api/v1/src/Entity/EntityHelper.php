@@ -67,9 +67,16 @@ class EntityHelper{
         // Validamos las propiedades opcionales y establecemos las mismas si se han especificado en cada entidad
         //  o bien cogemos las propiedades por defecto de la relación que esté establecida en DataaseHelperEntity
         $relaciones->canReturnSchema = ( isset($tableRelation['canReturnSchema']) ? $tableRelation['canReturnSchema'] : $relaciones->canReturnSchema);
+        //  Sólo lectura
         $relaciones->readOnly = ( isset($tableRelation['readOnly']) ? $tableRelation['readOnly'] : $relaciones->readOnly);
+        //  Eliminación en cascada
         $relaciones->deleteOnCascade = ( isset($tableRelation['deleteOnCascade']) ? $tableRelation['deleteOnCascade'] : $relaciones->canReturnSchema);
+        //  Modo de eliminación
         $relaciones->deleteMode = ( isset($tableRelation['deleteMode']) ? $tableRelation['deleteMode'] : $relaciones->canReturnSchema);
+        //  Alias de la tabla
+        $relaciones->alias = ( isset($tableRelation['alias']) ? $tableRelation['alias'] : null);
+        //  Tipo de relación de registros
+        $relaciones->resultsRelationType = ( isset($tableRelation['resultsRelationType']) ? $tableRelation['resultsRelationType'] : ONE_TO_MANY);
 
         $this->entityRelations[] = $relaciones;
 

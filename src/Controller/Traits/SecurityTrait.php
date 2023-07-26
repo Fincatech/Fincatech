@@ -13,7 +13,7 @@ trait SecurityTrait{
 
     public function getLoggedUserId()
     {
-        $usuarioId = get_object_vars( $this->getJWTUserData()['data']->userData )['id'];;
+        $usuarioId = get_object_vars( $this->getJWTUserData()['data']->userData )['id'];
         return $usuarioId;
     }
 
@@ -21,6 +21,21 @@ trait SecurityTrait{
     {
         $usuarioRol = get_object_vars( $this->getJWTUserData()['data']->userData )['role'];
         return $usuarioRol;
+    }
+
+    public function isAuhorizedUser()
+    {
+        $usuarioAutorizado = true;
+
+        $authorized = get_object_vars( $this->getJWTUserData()['data']->userData );
+
+        if(isset($authorized['authorized']))
+        {
+            $authorized = $authorized['authorized'];
+            $usuarioAutorizado = ($authorized === -1 ? false : true);
+        }
+
+        return ($usuarioAutorizado);  
     }
 
     /** Comprueba si un usuario está autenticado en el sistema */
@@ -91,7 +106,7 @@ trait SecurityTrait{
                 'id' => 1,
                 'login' => 'admin',
                 'email' => 'admin@fincatech.es',
-                'role' => 'ROLE_SUDO'
+                'role' => 'ROLE_SUDO',
             ]
         );        
 

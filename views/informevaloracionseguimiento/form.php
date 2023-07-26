@@ -6,7 +6,7 @@
 
             <div class="card-header pl-1 mb-2">
 
-                <h5 class="card-title mb-0"><i data-feather="<?php echo $iconoAccion; ?>"></i> <span class="titulo titulo-modulo">Informe de valoración y seguimiento</span></h5>
+                <h5 class="card-title mb-0"><i data-feather="<?php echo $iconoAccion; ?>"></i> <span class="titulo titulo-modulo">Informe de evaluación y seguimiento</span></h5>
 
             </div>
     
@@ -14,7 +14,17 @@
 
                 <form class="form-data form-floating" autocomplete="off">
                     <input autocomplete="new-password" name="hidden" type="text" style="display:none;">
-                   
+                  
+                    <!-- Administrador de fincas -->
+                    <div class="form-group row mb-3">
+
+                        <div class="col-12">            
+                            <label for="usuarioId"><i class="bi bi-person-fill pr-2"></i>Administrador de fincas</label>
+                            <select id="usuarioId" name="usuarioId" class="select-data custom-select data form-control selectpicker form-required" data-live-search="true" hs-entity="Informevaloracionseguimiento" hs-field="usuarioId" hs-list-entity="Administrador" hs-list-field="Usuario.nombre" hs-list-value="Usuario.id" hs-seleccionar="1"></select>
+                        </div>  
+
+                    </div>                    
+
                     <!-- Título -->
                     <div class="form-group row mb-3">
                         <div class="col-12 col-md-10 text-left">
@@ -22,17 +32,13 @@
                             <input type="text" class="form-control data text-left form-required" id="nombre" name="nombre" placeholder="Título del informe" hs-entity="Informevaloracionseguimiento" hs-field="titulo" required>
                             <input type="hidden" class="form-control data text-left d-none" id="estado" name="estado" hs-entity="Informevaloracionseguimiento" hs-field="estado" value="A">
                         </div>
+                        <!-- Fecha -->
+                        <div class="col-12 col-md-2 text-left">
+                            <label for="titulo" class="pl-0"><i class="bi bi-calendar pr-2"></i>Fecha*</label>
+                            <input type="date" class="form-control data text-left form-required" id="fecha" name="fecha" placeholder="dd/mm/aaaa" hs-entity="Informevaloracionseguimiento" hs-field="fecha" required>
+                        </div>                        
                     </div>
 
-                    <!-- Administrador de fincas -->
-                    <div class="form-group row mb-3">
-
-                        <div class="col-12">            
-                            <label for="usuarioId"><i class="bi bi-person-fill pr-2"></i>Administrador de fincas</label>
-                            <select id="usuarioId" name="usuarioId" class="select-data custom-select data form-control selectpicker form-required" data-live-search="true" hs-entity="Informevaloracionseguimiento" hs-field="usuarioId" hs-list-entity="Administrador" hs-list-field="Usuario.nombre" hs-list-value="Usuario.id"></select>
-                        </div>  
-
-                    </div>
 
                     <div class="form-group row mt-3">
                         <div class="col-12 text-left">
@@ -48,7 +54,7 @@
                                     <i class="bi bi-cloud-arrow-up text-info" style="font-size: 30px;"></i>
                                 </div>
                                 <div class="col-11 pl-0 align-self-center">
-                                    <input accept=".pdf, .docx, .doc" class="form-control form-control-sm ficheroadjuntar border-0" hs-fichero-entity="Informevaloracionseguimiento" id="ficheroadjuntar" type="file">
+                                    <input accept=".pdf, .docx, .doc" class="form-control form-control-sm ficheroadjuntar border-0" hs-fichero-entity="InformeValoracionSeguimiento" id="ficheroadjuntar" type="file">
                                 </div>       
                             </div>
                         </div>

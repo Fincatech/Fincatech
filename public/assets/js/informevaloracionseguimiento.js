@@ -9,12 +9,16 @@ let informeValoracionSeguimientoCore = {
 
         this.events();
 
-        if($('#listadoInformevaloracionseguimiento').length)
+        if($('#listadoInformevaloracionseguimiento').length && core.model.toLowerCase() == 'informevaloracionseguimiento')
         {
-            // await informeValoracionSeguimientoCore.renderTabla();
+            await informeValoracionSeguimientoCore.renderTabla();
         }else{
             core.Files.init();
-            core.Files.Fichero.entidadId = core.modelId;       
+            core.Files.Fichero.entidadId = core.modelId; 
+            if(core.actionModel=='add' && core.model.toLowerCase() == 'informevaloracionseguimiento')
+            {
+                $('#nombre').val('Informe de evaluación y seguimiento ');
+            }      
         }
 
     },
@@ -47,8 +51,15 @@ let informeValoracionSeguimientoCore = {
                 CoreUI.tableData.columns = [];
                 
             //  Fecha de creación
-                var html = 'data:created$';
-                CoreUI.tableData.addColumn('listadoInformevaloracionseguimiento', null, "Fecha", html, 'text-center', '80px');
+
+                CoreUI.tableData.addColumn('listadoInformevaloracionseguimiento', 
+                    function(row, type, val, meta)
+                    {
+                        var timeStamp = moment(row.fecha, 'YYYY-MM-DD hh:mm').unix();
+                        var fechaCreacion = moment(row.fecha).locale('es').format('L')
+                        return `<span style="display:none;">${timeStamp}</span>${fechaCreacion}`;
+                    },
+                "Fecha", null, 'text-center', '80px');
 
             //  Nombre
                 CoreUI.tableData.addColumn('listadoInformevaloracionseguimiento', "titulo","TITULO", null, 'text-justify');
@@ -57,20 +68,20 @@ let informeValoracionSeguimientoCore = {
                 CoreUI.tableData.addColumn('listadoInformevaloracionseguimiento', "usuario[0].nombre", "Administrador de fincas", null,'text-left');
 
             //  Fichero asociado
-                var html = '<a href="' + config.baseURL + 'public/storage/data:ficheroscomunes.nombrestorage$" target="_blank"><i class="bi bi-cloud-arrow-down" style="font-size:24px;"></i></a>'
+                var html = '<a href="' + config.baseURL + 'public/storage/data:ficheroscomunes.nombrestorage$" download="data:ficheroscomunes.nombre$" target="_blank"><i class="bi bi-cloud-arrow-down" style="font-size:26px;"></i></a>'
                 CoreUI.tableData.addColumn('listadoInformevaloracionseguimiento', null, "Fichero", html, 'text-center', '120px');
 
             //  Columna de acciones sólo para sudo y dpd
                 if(core.Security.getRole() == 'SUDO' || core.Security.getRole() == 'DPD')
                 {
                     var html = '<ul class="nav justify-content-center accionesTabla">';
-                        html += `<li class="nav-item"><a href="${baseURL}informevaloracionseguimiento/data:id$" class="d-inline-block" data-id="data:id$" data-titulo="data:titulo$"><i data-feather="edit" class="text-success img-fluid"></i></a></li>`;
-                        html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarInformeValoracionSeguimiento d-inline-block" data-id="data:id$" data-titulo="data:titulo$"><i data-feather="trash-2" class="text-danger img-fluid"></i></li></ul>';
+                        html += `<li class="nav-item"><a href="${baseURL}informevaloracionseguimiento/data:id$" class="d-inline-block" data-id="data:id$" data-titulo="data:titulo$"><i data-feather="edit" class="text-success img-fluid" style="height:26px;width:26px;"></i></a></li>`;
+                        html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarInformeValoracionSeguimiento d-inline-block" data-id="data:id$" data-titulo="data:titulo$"><i data-feather="trash-2" class="text-danger img-fluid" style="height:26px;width:26px;"></i></li></ul>';
                     CoreUI.tableData.addColumn('listadoInformevaloracionseguimiento', null, "", html);
                 }
 
-                // $('#listadoInformevaloracionseguimiento').addClass('no-clicable');
-                CoreUI.tableData.render("listadoInformevaloracionseguimiento", "InformeValoracionSeguimiento", "informevaloracionseguimiento/list");
+                $('#listadoInformevaloracionseguimiento').addClass('no-clicable');
+                CoreUI.tableData.render("listadoInformevaloracionseguimiento", "Informevaloracionseguimiento", "informevaloracionseguimiento/list");
         }
     }
 

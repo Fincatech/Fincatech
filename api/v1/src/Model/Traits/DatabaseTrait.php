@@ -192,7 +192,7 @@ trait DatabaseTrait{
             }
 
         }else{
-            if($valor === '')
+            if($valor === '' || is_null($valor))
             {
                 return "null";
             }else{

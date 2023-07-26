@@ -1,0 +1,132 @@
+--- [30-12-2022 09:18] --- ( MailTrait -> SendEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>-3</Res><Error>DESTINATARIOS[0][NOMBRE] should have a length lower than 20</Error></result>
+
+
+--- [30-12-2022 09:18] --- ( Emails Certificados -> procesarRespuestaEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>-3</Res><Error>DESTINATARIOS[0][NOMBRE] should have a length lower than 20</Error></result>
+
+
+--- [30-12-2022 09:19] --- ( MailTrait -> SendEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>-3</Res><Error>DESTINATARIOS[0][NOMBRE] should have a length lower than 20</Error></result>
+
+
+--- [30-12-2022 09:19] --- ( Emails Certificados -> procesarRespuestaEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>-3</Res><Error>DESTINATARIOS[0][NOMBRE] should have a length lower than 20</Error></result>
+
+
+--- [30-12-2022 09:21] --- ( MailTrait -> SendEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>1</Res><Destinatarios><item0><NOMBRE>oscar.rodriguez.rodr</NOMBRE><EMAIL>oscar.rodriguez.rodrigo@gmail.com</EMAIL><IDMENSAJE>343147</IDMENSAJE></item0></Destinatarios><Cred>3087</Cred><Enviados>1</Enviados><NoEnviados>0</NoEnviados><Duplicados>0</Duplicados><CreditosUsados>9</CreditosUsados></result>
+
+
+--- [30-12-2022 09:21] --- ( Emails Certificados -> procesarRespuestaEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>1</Res><Destinatarios><item0><NOMBRE>oscar.rodriguez.rodr</NOMBRE><EMAIL>oscar.rodriguez.rodrigo@gmail.com</EMAIL><IDMENSAJE>343147</IDMENSAJE></item0></Destinatarios><Cred>3087</Cred><Enviados>1</Enviados><NoEnviados>0</NoEnviados><Duplicados>0</Duplicados><CreditosUsados>9</CreditosUsados></result>
+
+
+--- [30-12-2022 09:22] --- ( MailTrait -> SendEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>1</Res><Destinatarios><item0><NOMBRE>oscar.rodriguez.rodr</NOMBRE><EMAIL>oscar.rodriguez.rodrigo@gmail.com</EMAIL><IDMENSAJE>343150</IDMENSAJE></item0></Destinatarios><Cred>3078</Cred><Enviados>1</Enviados><NoEnviados>0</NoEnviados><Duplicados>0</Duplicados><CreditosUsados>9</CreditosUsados></result>
+
+
+--- [30-12-2022 09:22] --- ( Emails Certificados -> procesarRespuestaEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>1</Res><Destinatarios><item0><NOMBRE>oscar.rodriguez.rodr</NOMBRE><EMAIL>oscar.rodriguez.rodrigo@gmail.com</EMAIL><IDMENSAJE>343150</IDMENSAJE></item0></Destinatarios><Cred>3078</Cred><Enviados>1</Enviados><NoEnviados>0</NoEnviados><Duplicados>0</Duplicados><CreditosUsados>9</CreditosUsados></result>
+
+
+--- [30-12-2022 09:26] --- ( MailTrait -> SendEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>1</Res><Destinatarios><item0><NOMBRE>oscar.rodriguez.rodr</NOMBRE><EMAIL>oscar.rodriguez.rodrigo@gmail.com</EMAIL><IDMENSAJE>343153</IDMENSAJE></item0></Destinatarios><Cred>3069</Cred><Enviados>1</Enviados><NoEnviados>0</NoEnviados><Duplicados>0</Duplicados><CreditosUsados>9</CreditosUsados></result>
+
+
+--- [30-12-2022 09:26] --- ( Emails Certificados -> procesarRespuestaEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>1</Res><Destinatarios><item0><NOMBRE>oscar.rodriguez.rodr</NOMBRE><EMAIL>oscar.rodriguez.rodrigo@gmail.com</EMAIL><IDMENSAJE>343153</IDMENSAJE></item0></Destinatarios><Cred>3069</Cred><Enviados>1</Enviados><NoEnviados>0</NoEnviados><Duplicados>0</Duplicados><CreditosUsados>9</CreditosUsados></result>
+
+
+--- [30-12-2022 10:38] --- ( MailTrait -> SendEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>1</Res><Destinatarios><item0><NOMBRE>oscar.rodriguez.rodr</NOMBRE><EMAIL>oscar.rodriguez.rodrigo@gmail.com</EMAIL><IDMENSAJE>343184</IDMENSAJE></item0></Destinatarios><Cred>3051</Cred><Enviados>1</Enviados><NoEnviados>0</NoEnviados><Duplicados>0</Duplicados><CreditosUsados>9</CreditosUsados></result>
+
+
+--- [30-12-2022 10:38] --- ( Emails Certificados -> procesarRespuestaEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>1</Res><Destinatarios><item0><NOMBRE>oscar.rodriguez.rodr</NOMBRE><EMAIL>oscar.rodriguez.rodrigo@gmail.com</EMAIL><IDMENSAJE>343184</IDMENSAJE></item0></Destinatarios><Cred>3051</Cred><Enviados>1</Enviados><NoEnviados>0</NoEnviados><Duplicados>0</Duplicados><CreditosUsados>9</CreditosUsados></result>
+
+
+--- [30-12-2022 10:42] --- ( MailTrait -> SendEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>1</Res><Destinatarios><item0><NOMBRE>oscar.rodriguez.rodr</NOMBRE><EMAIL>oscar.rodriguez.rodrigo@gmail.com</EMAIL><IDMENSAJE>343191</IDMENSAJE></item0></Destinatarios><Cred>3042</Cred><Enviados>1</Enviados><NoEnviados>0</NoEnviados><Duplicados>0</Duplicados><CreditosUsados>9</CreditosUsados></result>
+
+
+--- [30-12-2022 10:42] --- ( Emails Certificados -> procesarRespuestaEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>1</Res><Destinatarios><item0><NOMBRE>oscar.rodriguez.rodr</NOMBRE><EMAIL>oscar.rodriguez.rodrigo@gmail.com</EMAIL><IDMENSAJE>343191</IDMENSAJE></item0></Destinatarios><Cred>3042</Cred><Enviados>1</Enviados><NoEnviados>0</NoEnviados><Duplicados>0</Duplicados><CreditosUsados>9</CreditosUsados></result>
+
+
+--- [30-12-2022 10:45] --- ( MailTrait -> SendEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>1</Res><Destinatarios><item0><NOMBRE>oscar.rodriguez.rodr</NOMBRE><EMAIL>oscar.rodriguez.rodrigo@gmail.com</EMAIL><IDMENSAJE>343198</IDMENSAJE></item0></Destinatarios><Cred>3033</Cred><Enviados>1</Enviados><NoEnviados>0</NoEnviados><Duplicados>0</Duplicados><CreditosUsados>9</CreditosUsados></result>
+
+
+--- [30-12-2022 10:45] --- ( Emails Certificados -> procesarRespuestaEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>1</Res><Destinatarios><item0><NOMBRE>oscar.rodriguez.rodr</NOMBRE><EMAIL>oscar.rodriguez.rodrigo@gmail.com</EMAIL><IDMENSAJE>343198</IDMENSAJE></item0></Destinatarios><Cred>3033</Cred><Enviados>1</Enviados><NoEnviados>0</NoEnviados><Duplicados>0</Duplicados><CreditosUsados>9</CreditosUsados></result>
+
+
+--- [30-12-2022 10:45] --- ( MailTrait -> SendEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>1</Res><Destinatarios><item0><NOMBRE>oscar.rodriguez.rodr</NOMBRE><EMAIL>oscar.rodriguez.rodrigo@gmail.com</EMAIL><IDMENSAJE>343199</IDMENSAJE></item0></Destinatarios><Cred>3024</Cred><Enviados>1</Enviados><NoEnviados>0</NoEnviados><Duplicados>0</Duplicados><CreditosUsados>9</CreditosUsados></result>
+
+
+--- [30-12-2022 10:45] --- ( Emails Certificados -> procesarRespuestaEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>1</Res><Destinatarios><item0><NOMBRE>oscar.rodriguez.rodr</NOMBRE><EMAIL>oscar.rodriguez.rodrigo@gmail.com</EMAIL><IDMENSAJE>343199</IDMENSAJE></item0></Destinatarios><Cred>3024</Cred><Enviados>1</Enviados><NoEnviados>0</NoEnviados><Duplicados>0</Duplicados><CreditosUsados>9</CreditosUsados></result>
+
+
+--- [04-04-2023 01:13] --- ( MailTrait -> SendEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>-5</Res><Error>The sender you are using is not validated. You must validate it in your user account.</Error></result>
+
+
+--- [04-04-2023 01:13] --- ( Emails Certificados -> procesarRespuestaEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>-5</Res><Error>The sender you are using is not validated. You must validate it in your user account.</Error></result>
+
+
+--- [04-04-2023 01:17] --- ( MailTrait -> SendEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>1</Res><Destinatarios><item0><NOMBRE>oscar.livin@gmail.co</NOMBRE><EMAIL>oscar.livin@gmail.com</EMAIL><IDMENSAJE>377534</IDMENSAJE></item0></Destinatarios><Cred>32</Cred><Enviados>1</Enviados><NoEnviados>0</NoEnviados><Duplicados>0</Duplicados><CreditosUsados>9</CreditosUsados></result>
+
+
+--- [04-04-2023 01:17] --- ( Emails Certificados -> procesarRespuestaEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>1</Res><Destinatarios><item0><NOMBRE>oscar.livin@gmail.co</NOMBRE><EMAIL>oscar.livin@gmail.com</EMAIL><IDMENSAJE>377534</IDMENSAJE></item0></Destinatarios><Cred>32</Cred><Enviados>1</Enviados><NoEnviados>0</NoEnviados><Duplicados>0</Duplicados><CreditosUsados>9</CreditosUsados></result>
+
+

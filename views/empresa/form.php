@@ -84,6 +84,12 @@
 
                     <!-- Si es una edición y además es sudo, listamos los empleados de la empresa -->
                     <?php if($App->getAction() == 'get' && $App->getUserRol() == 'ROLE_SUDO'): ?>
+                    <div class="form-group row mb-2">
+                    <div class="col-12">
+                            <label for="observaciones"><i class="bi bi-pencil pr-2"></i>Observaciones</label>                          
+                            <textarea id="observaciones" name="observaciones" class="form-control data text-left shadow-inset border-0" rows="5" hs-entity="Empresa" hs-field="observaciones"></textarea>
+                        </div>
+                    </div>
                     <div class="form-group row mb-2 mt-3">
                         <div class="col-12">
                             <div class="card">

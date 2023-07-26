@@ -28,6 +28,12 @@ let empresaCore = {
 
     events: function()
     {   
+
+        //  Descargar email certificado
+        $('body').on(core.helper.clickEventType, '.btnDescargarEmailCertificado', (ev)=>{
+            ev.stopImmediatePropagation();
+        });
+
         $('body').on(core.helper.clickEventType, '.btnEliminarEmpresa', (evt)=>{
             evt.stopImmediatePropagation();
             empresaCore.eliminar( $(evt.currentTarget).attr('data-id'), $(evt.currentTarget).attr('data-nombre') );
@@ -35,26 +41,31 @@ let empresaCore = {
 
         $('body').on(core.helper.clickEventType, '.bntCrearNuevaEmpresaCAE', function(evt)
         {
-            empresaCore.mostrarModalNuevaEmpresaCAE();
+            empresaCore.mostrarModalNuevaEmpresaCAE( $('body #searchEmpresa').val() );
         });
 
         $('body').on(core.helper.clickEventType, '#listadoEmpresaComunidad tr', function(e)
         {
             e.stopImmediatePropagation();
             $('.wrapperEmpresasComunidad').hide();
-            console.log(window['tablelistadoEmpresaComunidad'].row( $(this).attr('id')).data());
+            $('.wrapperDocumentacionEmpleado').hide();
+            
             var idEmpresa = window['tablelistadoEmpresaComunidad'].row( $(this).attr('id')).data().idusuario;
             var nombre = window['tablelistadoEmpresaComunidad'].row( $(this).attr('id')).data().razonsocial;
 
                 $('.tituloEmpresasComunidad').text(nombre);
+                $('.empresaDeclaracion').text(nombre);
+
             //  Cargamos el listado de empleados para la comunidad y empresa seleccionada
                 empresaCore.renderTablaRequerimientosEmpresa( idEmpresa ).then( ()=>{
                     $('.wrapperDocumentacionBasica').hide();
                     $('.wrapperEmpleadosEmpresaComunidad').show();
+                    empleadoCore.renderTablaEmpleadosEmpresaComunidad(idEmpresa, core.modelId).then (() =>{
+                        empresaCore.renderTablaInfoDescargas(idEmpresa, core.modelId);
+                    });
                 });
 
-                empleadoCore.renderTablaEmpleadosEmpresaComunidad(idEmpresa, core.modelId);
-
+                empresaCore.comprobarAceptacionOperatoria(idEmpresa, core.modelId);
         })
 
         $('body').on(core.helper.clickEventType, '.btnCerrarEmpleadosComunidad', function(e)
@@ -69,13 +80,24 @@ let empresaCore = {
         $('body').on(core.helper.clickEventType, '.enlaceCae', function(e)
         {
             //  Cargamos las empresas asociadas a la comunidad en pantalla
-                documentalCore.Comunidad.renderTablaDocumentacionComunidadCAE(core.modelId);                
-                empresaCore.renderTablaEmpresasComunidad(core.modelId);
+                documentalCore.Comunidad.renderTablaDocumentacionComunidadCAE(core.modelId).then( () =>{
+                    empresaCore.renderTablaEmpresasComunidad(core.modelId);
+                });                
                 $('.tituloEmpresasComunidad').text('Empresas externas');
+
+            //  Operatoria y aceptación de condiciones
+                empresaCore.comprobarAceptacionOperatoria(core.Security.user, core.modelId);
+        });
+
+        //  Edición de empleado desde contratista listado
+        $('body').on(core.helper.clickEventType, '.btnRedirect', function(ev)
+        {
+            ev.stopImmediatePropagation();
+            CoreUI.Utils.redirectTo( $(this).attr('data-url'));
         });
 
         //  Búsqueda de empresa 
-        $('body').on(core.helper.clickEventType, '.btnBuscarEmpresaCAE', function(ev)
+        $('body').on(core.helper.clickEventType, '.btnBuscarEmpresaCAE', async function(ev)
         {
 
             $('.wrapperBusquedaEmpresa .mensaje').hide();
@@ -91,62 +113,109 @@ let empresaCore = {
             }
 
             //  Buscamos el e-mail en la tabla de empresas
-                var resultadoBusqueda = empresaCore.buscarEmailEmpresa( $('#searchEmpresa').val() );
-                if( resultadoBusqueda === false )
-                {
-                    //CoreUI.Modal.Error('No existe ninguna empresa asociada al e-mail proporcionado', 'Empresas');
-                    if( !$('.wrapperBusquedaEmpresa .mensaje').hasClass('text-danger'))
+                await empresaCore.buscarEmailEmpresa( $('#searchEmpresa').val() ).then( (resultado) =>{
+                    if( resultado === false )
                     {
-                        $('.wrapperBusquedaEmpresa .mensaje').addClass('text-danger');
+                        if( !$('.wrapperBusquedaEmpresa .mensaje').hasClass('text-danger'))
+                        {
+                            $('.wrapperBusquedaEmpresa .mensaje').addClass('text-danger');
+                        }
+                        $('.wrapperBusquedaEmpresa .mensaje').text('No existe ninguna empresa asociada al e-mail proporcionado');
+                        $('.wrapperBusquedaEmpresa .mensaje').show();
+                        $('.bntCrearNuevaEmpresaCAE').show();
+                    }else{
+                        $('.bntCrearNuevaEmpresaCAE').hide();
+    
+                        //  Cargamos los datos
+                        let infoEmpresa = resultado;
+                        // console.log(infoEmpresa);
+                        $('.wrapperInfoEmpresa .nombreEmpresa').text(infoEmpresa.razonsocial);
+                        $('.wrapperInfoEmpresa .cifEmpresa').text(infoEmpresa.cif);
+                        $('.wrapperInfoEmpresa .emailEmpresa').text(infoEmpresa.email);
+                        $('.wrapperInfoEmpresa .btnConfirmarEmpresaCAE').attr('data-id', infoEmpresa.id);
+                        $('.wrapperInfoEmpresa .btnConfirmarEmpresaCAE').attr('data-nombre', infoEmpresa.razonsocial);
+                        //  Mostramos la información
+                        $('.wrapperInfoEmpresa').show();
+                       
                     }
-                    $('.wrapperBusquedaEmpresa .mensaje').text('No existe ninguna empresa asociada al e-mail proporcionado');
-                    $('.wrapperBusquedaEmpresa .mensaje').show();
-                    $('.bntCrearNuevaEmpresaCAE').show();
-                }else{
-                    $('.bntCrearNuevaEmpresaCAE').hide();
-
-                    //  Cargamos los datos
-                    var infoEmpresa = window['tablelistadoSimpleEmpresas'].row(resultadoBusqueda).data();
-                    $('.wrapperInfoEmpresa .nombreEmpresa').text(infoEmpresa.razonsocial);
-                    $('.wrapperInfoEmpresa .cifEmpresa').text(infoEmpresa.cif);
-                    $('.wrapperInfoEmpresa .emailEmpresa').text(infoEmpresa.email);
-                    $('.wrapperInfoEmpresa .btnConfirmarEmpresaCAE').attr('data-id', infoEmpresa.id);
-                    $('.wrapperInfoEmpresa .btnConfirmarEmpresaCAE').attr('data-nombre', infoEmpresa.razonsocial);
-                    //  Mostramos la información
-                    $('.wrapperInfoEmpresa').show();
-                   
-                }
-            //  Si existe mostramos los datos
-
-            //  Si no existe, mostramos un alert informando de la situación
+                });
         });
 
     },
 
-    buscarEmailEmpresa: function(emailEmpresa)
+    buscarEmailEmpresa: async function(emailEmpresa)
     {
-        var resultado = false;
 
-        var nFilas = $('#listadoSimpleEmpresas tbody tr').length;
-        if(nFilas > 0)
+        let datos = Object();
+        let resultados;
+        datos = {
+            fields: Array()
+        }
+
+        datos.fields.push({
+            field: 'email',
+            search: emailEmpresa,
+            type: 'string',
+            searchtype: 'eq'
+        });
+
+        await apiFincatech.post('empresa/search', datos).then( (response) =>
         {
-            for(var x = 0; x < nFilas; x++)
+            var responseData = JSON.parse(response);
+            resultados = responseData;
+        });
+
+        return resultados.data.Empresa.length >= 1 ? resultados.data.Empresa[0] : false;
+
+    },
+
+    /**
+     * Comprueba si la empresa ha enviado el documento de aceptación de opratoria con la comunidad
+     * @param {int} idEmpresa ID de la empresa
+     * @param {int} idComunidad ID de la comunidad
+     */
+    comprobarAceptacionOperatoria: function(_idEmpresa, _idComunidad)
+    {
+        //  Validamos que esté la tabla de operatoria
+        if( $('.tablaOperatoriaCondiciones').length < 1)
+        {
+            return;
+        }
+
+        apiFincatech.get(`empresa/${_idEmpresa}/comunidad/${_idComunidad}/operatoria`).then( result => {
+            
+            var datos = JSON.parse(result);
+            
+            $('.fechaSubida').html('');
+            $('.tablaOperatoriaCondiciones .estado').html('');
+
+            if(!datos.data)
             {
-                var infoEmpresa = window['tablelistadoSimpleEmpresas'].row(x).data();
-                if(infoEmpresa.email == emailEmpresa)
+
+            }else{
+                datos = datos.data;
+                $('.btnAdjuntarOperatoria').attr('data-idrelacionrequerimiento', datos.id);
+                $('.tablaOperatoriaCondiciones .estado').html( CoreUI.Utils.renderLabelByEstado(datos.estado) );
+                if(datos.estado == 'Verificado')
                 {
-                    resultado = x;
+                    var fechaSubida = moment(datos.created).locale('es').format('L');
+                    var htmlSubida = `
+                        <p class="mb-0 text-center"><a href="${baseURL}public/storage/${datos.nombrestorage}" class="text-success" download="${datos.nombre}"><i class="bi bi-file-earmark-arrow-down" style="font-size: 24px;"></i></a> </p>Subido el ${fechaSubida}`
+                    $('.fechaSubida').html(htmlSubida);
+                    
+                }else{
+
+                    var htmlSubida = `<span class="badge rounded-pill bg-danger pl-3 pr-3 pt-2 pb-2 d-block" style="font-size: 12px; font-weight: 300;">Pendiente de adjuntar</span>`;
+                    $('.fechaSubida').html(htmlSubida);
                 }
             }
-        }
-        return resultado;
-
+        });
     },
 
     /**
      * Muestra el modal de crear nueva empresa desde el CAE
      */
-    mostrarModalNuevaEmpresaCAE: async function()
+    mostrarModalNuevaEmpresaCAE: async function(_emailEmpresa = null)
     {
 
         apiFincatech.getView("empresa", "form").then((resultHTML)=>{
@@ -172,13 +241,17 @@ let empresaCore = {
                     },                    
                     didOpen: function(e)
                     {
-
+                        //  Email buscado
+                        $('.formEmpresaComunidad #email').val(_emailEmpresa);
                         //  Cargamos los combos 
                             core.Forms.getSelectData( 'Empresatipo', 'Empresatipo.nombre', 'Empresatipo.id', '', '', 'tipoEmpresaComunidad', true ).then(()=>{
                                 $('body .formEmpresaComunidad #tipoEmpresaComunidad').select2({
                                     dropdownParent: $('.swal2-container'),
                                     theme: 'bootstrap4', 
                                 });
+                                //  Seleccionamos Empresa por defecto
+                                $('body .formEmpresaComunidad #tipoEmpresaComunidad').val('1');
+                                $('body .formEmpresaComunidad #tipoEmpresaComunidad').trigger('change');
                             });  
 
                             core.Forms.getSelectData( 'Provincia', 'Provincia.Nombre', 'Provincia.Id', '', '', 'provinciaEmpresaComunidad', true ).then(()=>{
@@ -207,11 +280,29 @@ let empresaCore = {
                     if (result.isConfirmed) 
                     {
                             core.Forms.mapFormDataToSave('formEmpresaComunidad');
-                            core.Modelo.Insert('empresa', core.Forms.data, false).then( ()=>{
+                            core.Forms.data['fromcae'] = '1';
+                            core.Forms.data['comunidad'] = core.Modelo.entity.Comunidad[0].nombre;
+                            core.Modelo.Insert('empresa', core.Forms.data, false, 'El registro se ha creado correctamente. Hemos remitido un e-mail al proveedor para que acceda y aporte los documentos requeridos.').then( (result)=>{
+                                //  Tenemos que asignar la empresa a la comunidad
+                                apiFincatech.post(`comunidad/${core.modelId}/empresa/${core.Modelo.insertedId}/asignar`, null).then(async ( response ) =>
+                                {
+                                    var responseData = JSON.parse(response);
+                
+                                    if(responseData.status['response'] == "ok")
+                                    {                
+                                        //  Recargamos la tabla de empresas para reflejar el cambio
+                                            window['tablelistadoEmpresaComunidad'].ajax.reload();
+                                            
+                                    }else{
+                                        //  TODO: Ver cuál es el error en el json
+                                        Modal.Error("No se ha podido asignar por el siguiente motivo:<br><br>" + responseData.status.response);
+                
+                                    }
+                                });                                
+                                
                                 //  Recargamos el listado de empresas de la comunidad
                                     window['tablelistadoEmpresaComunidad'].ajax.reload();
-                            }).catch(function(e){
-                                return false;
+                                    $('.loading').hide();
                             });
                     }
                 }); 
@@ -256,7 +347,7 @@ let empresaCore = {
         {
             CoreUI.tableData.init();
 
-            CoreUI.tableData.addColumnRow('listadoEmpresa', 'documentacioncae');
+            CoreUI.tableData.addColumnRow('listadoEmpresa', 'comunidades');
 
             //  Razón social
             CoreUI.tableData.addColumn('listadoEmpresa', "razonsocial","Nombre", null, 'text-left');
@@ -276,8 +367,55 @@ let empresaCore = {
             //  Localidad
             CoreUI.tableData.addColumn('listadoEmpresa', "localidad", "Localidad", null, 'text-left');
 
-            //  Persona de contacto
+            //  Tipo
             CoreUI.tableData.addColumn('listadoEmpresa', "empresatipo[0].nombre", "Tipo", null, 'text-left');
+
+            //  Fecha de creación
+            // CoreUI.tableData.addColumn('listadoEmpresa', 
+            // function(row, type, val, meta)
+            // {
+            //     var timeStamp;
+            //     var fechaCreacion;
+
+            //     if(!row.usuario[0].lastlogin)
+            //     {
+            //         timeStamp = '';
+            //         fechaCreacion = '<span class="badge badge-pill bg-danger text-white">Nunca</span>';
+            //     }else{
+            //         timeStamp = moment(row.usuario[0].lastlogin, 'YYYY-MM-DD hh:mm').unix();
+            //         fechaCreacion = moment(row.usuario[0].lastlogin).locale('es').format('L');
+            //     }
+
+            //     return `<span style="display:none;">${timeStamp}</span>${fechaCreacion}`;
+            // },
+            // "Último acceso", null, 'text-center');
+
+            //  Último acceso
+            CoreUI.tableData.addColumn('listadoEmpresa', 
+            function(row, type, val, meta)
+            {
+                var timeStamp;
+                var fechaCreacion;
+
+                if(!row.lastlogin)
+                {
+                    //  Comprobamos si tiene ID de mensaje ya enviado
+                    btnReenvio = '';
+                    if(row.idmensajeregistro != '-1' && typeof(row.idmensajeregistro) !== 'undefined')
+                    {
+                        btnReenvio = `<a href="javascript:void(0);" class="btnReenviarMensaje d-inline-block btn btn-primary ml-2 pt-0 pb-0" title="Reenviar mensaje de registro" data-id="${row.idmensajeregistro}"><i data-feather="send" style="width:12px;height:12px;"></i></a>`;
+                    }
+                    timeStamp = '';
+                    fechaCreacion = `<span class="badge badge-pill bg-danger text-white pt-2 pl-3 pr-3 pb-2">Nunca</span>${btnReenvio}`;
+                }else{
+                    timeStamp = moment(row.lastlogin, 'YYYY-MM-DD hh:mm').unix();
+                    fechaCreacion = moment(row.lastlogin).locale('es').format('L');
+                }
+
+                return `<span style="display:none;">${timeStamp}</span>${fechaCreacion}`;
+                
+            },
+            "Último acceso", null, 'text-left');   
 
             //  Columna de acciones
                 var html = '<ul class="nav justify-content-center accionesTabla">';
@@ -286,6 +424,7 @@ let empresaCore = {
                 CoreUI.tableData.addColumn('listadoEmpresa', null, "", html);
 
                 $('#listadoEmpresa').addClass('no-clicable');
+                // CoreUI.tableData.render("listadoEmpresa", "Empresa", "empresa/list", false, true, true, null, false, false, null, true);
                 CoreUI.tableData.render("listadoEmpresa", "Empresa", "empresa/list");
         }
     },
@@ -314,7 +453,6 @@ let empresaCore = {
 
             //  Tipo de empresa
             CoreUI.tableData.addColumn('listadoSimpleEmpresas', "empresatipo[0].nombre", "Tipo", null, 'text-left');
-
 
             //  Columna de acciones
                 var html = '<ul class="nav justify-content-center accionesTabla">';
@@ -392,7 +530,7 @@ let empresaCore = {
                 CoreUI.tableData.init();
 
                 CoreUI.tableData.addColumn( tabla, function(row, type, val, meta){
-                    var salida = `<a href="/contratista/empleado?id=${row.idempleado}"><i class="bi bi-pencil-square"></i> ${row.nombre}</a>`
+                    var salida = `${row.nombre}`;
                     return salida;
                 },'Nombre del empleado', null, 'text-left', '30%');
 
@@ -424,7 +562,7 @@ let empresaCore = {
             //  Eliminar
                 CoreUI.tableData.addColumn( tabla, function(row, type, val, meta)
                 {
-                    var html = `<a href="javascript:void(0);" class="btnEliminarEmpleado d-inline-block" data-id="${row.idempleado}" data-nombre="${row.nombre}"><i data-feather="trash-2" class="text-danger img-fluid"></i></a>`;
+                    var html = `<a href="javascript:void(0);" class="btnRedirect" data-url="/contratista/empleado?id=${row.idempleado}"><i class="bi bi-pencil-square text-success pt-2" style="font-size: 17px;"></i></a>&nbsp;<a href="javascript:void(0);" class="btnEliminarEmpleado d-inline-block" data-id="${row.idempleado}" data-nombre="${row.nombre}"><i class="bi bi-trash text-danger" style="font-size: 17px;"></i></a>`;
                     return html;
                 }, '&nbsp;',null, 'text-center', '20px');
 
@@ -466,14 +604,74 @@ let empresaCore = {
             //  Localidad
             CoreUI.tableData.addColumn('listadoEmpresaComunidad', "localidad", "Localidad", null, 'text-left');
 
-            //  Persona de contacto
+            //  Tipo
             CoreUI.tableData.addColumn('listadoEmpresaComunidad', "tipoempresa", "Tipo", null, 'text-left');
 
+            //  Último acceso
+            // CoreUI.tableData.addColumn('listadoEmpresaComunidad', 
+            // function(row, type, val, meta)
+            // {
+            //     var timeStamp;
+            //     var fechaCreacion;
 
-            //  Columna de acciones
-                var html = '<ul class="nav justify-content-center accionesTabla">';
-                    html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarEmpresaComunidad d-inline-block" data-id="data:id$" data-nombre="data:razonsocial$"><i data-feather="trash-2" class="text-danger img-fluid"></i></li></ul>';
-                CoreUI.tableData.addColumn('listadoEmpresaComunidad', null, "", html);
+            //     if(!row.lastlogin)
+            //     {
+            //         //  Comprobamos si tiene ID de mensaje ya enviado
+            //         btnReenvio = '';
+            //         if(row.idmensajeregistro != '-1')
+            //         {
+            //             btnReenvio = `<a href="javascript:void(0);" class="btnReenviarMensaje d-inline-block btn btn-primary ml-2 pt-0 pb-0" title="Reenviar mensaje de registro" data-id="${row.idmensajeregistro}"><i data-feather="send" style="width:12px;height:12px;"></i></a>`;
+            //         }
+            //         timeStamp = '';
+            //         fechaCreacion = `<span class="badge badge-pill bg-danger text-white">Nunca</span>${btnReenvio}`;
+            //     }else{
+            //         timeStamp = moment(row.lastlogin, 'YYYY-MM-DD hh:mm').unix();
+            //         fechaCreacion = moment(row.lastlogin).locale('es').format('L');
+            //     }
+
+            //     return `<span style="display:none;">${timeStamp}</span>${fechaCreacion}`;
+            // },
+            // "Último acceso", null, 'text-center');    
+
+            CoreUI.tableData.addColumn('listadoEmpresaComunidad', function(row, type, val, meta)
+            {
+                var enlaceEmailCertificado = '';
+                if(row.emailcertificado !== '' && row.emailcertificado !== 'null'  && row.emailcertificado !== null)
+                {
+                    enlaceEmailCertificado = `<a class="btnDescargarEmailCertificado" href="${baseURL}public/storage/emailcertificados/${row.emailcertificado}" target="_blank" title="Email certificado"><i data-feather="mail" class="text-success img-fluid"></i></a> `;
+                }
+
+                //  Email certificado 
+
+                var html = `<ul class="nav justify-content-center accionesTabla">`;
+
+                if(enlaceEmailCertificado != '')
+                {
+                    html = `${html}
+                            <li class="nav-item">
+                                ${enlaceEmailCertificado}
+                            </li>`;
+                }
+
+                html=`${html}<li class="nav-item">
+                                    <a href="javascript:void(0);" class="btnEliminarEmpresaComunidad d-inline-block" data-id="${row.id}" data-nombre="${row.razonsocial}">
+                                        <i data-feather="trash-2" class="text-danger img-fluid"></i>
+                                    </a>
+
+                                </li>
+                            </ul>`;
+
+                return html;
+                // var checked='';
+                //     if(row.cae_contratado === true)
+                //     {
+                //        checked = ' checked="checked" ';
+                //     }
+                //     return '<input type="checkbox" ' + checked + '>';
+            }, "&nbsp;", null, 'text-center');    
+
+            // //  Columna de acciones
+            //     CoreUI.tableData.addColumn('listadoEmpresaComunidad', null, "", html);
 
                 $('#listadoEmpresaComunidad').addClass('no-clicable');
                 CoreUI.tableData.render("listadoEmpresaComunidad", "empresascomunidad", `comunidad/${idcomunidad}/empresas`, null, false, false);
@@ -494,19 +692,56 @@ let empresaCore = {
             //  Fecha última actuación
                 CoreUI.tableData.addColumn('listadoDocumentacionEmpresa', function(row, type, val, meta)
                 {
-                    if(row.fechaultimaactuacion == '' || row.fechaultimaactuacion == 'null' || !row.fechaultimaactuacion)
+                    if(row.fechasubida == '' || row.fechasubida == 'null' || !row.fechasubida)
                     {
                         return 'No se ha realizado ninguna actuación';
                     }else{
-                        return moment(row.fechaultimaactuacion).locale('es').format('L')
+                        return '<p class="mb-0 text-center">' + moment(row.fechasubida).locale('es').format('L') + '</p>';
                     }
-                }, "Fecha última actuación", null, 'text-justify');
+                }, "Fecha última actuación", null, 'text-center');
 
             //  Estado
                 CoreUI.tableData.addColumn('listadoDocumentacionEmpresa', function(row, type, val, meta)
                 {
-                    return (!row.idficherorequerimiento ? '<span class="badge rounded-pill bg-danger pl-3 pr-3 pt-2 pb-2">No adjuntado</span>' : '<span class="badge rounded-pill bg-success pl-3 pr-3 pt-2 pb-2">Disponible para descargar</span>') + '</td>';
-                }, "Fichero", null, 'text-left');
+                    var valor;
+                    var _idEstado = row.idestado;
+
+                    if(!_idEstado)
+                    {
+                        _idEstado = 1;
+                    }else{
+                        _idEstado = parseInt(_idEstado);
+                    }
+
+                    switch (_idEstado)
+                    {
+                        case 1:
+                            valor = 'no adjuntado';
+                            break;
+                        case 2:
+                            valor = 'no descargado';
+                            break;
+                        case 3:
+                            valor = 'no verificado';
+                            break;
+                        case 4:
+                            valor = 'verificado';
+                            break;
+                        case 5:
+                            valor = 'descargado';
+                            break;
+                        case 6:
+                            valor = 'verificado';
+                            break;
+                        case 7:
+                            valor = 'rechazado';
+                            break;
+                    }
+
+                    var salida = CoreUI.Utils.renderLabelByEstado(valor);
+                    return salida;
+
+                }, "Estado", null, 'text-center');
 
             //  Columna de acciones
                 CoreUI.tableData.addColumn('listadoDocumentacionEmpresa', function(row, type, val, meta)
@@ -522,14 +757,13 @@ let empresaCore = {
 
                     if(ficheroAdjuntado)   //  DESCARGAR FICHERO YA SUBIDO
                     {
-                        var enlaceDescarga = baseURL + '/public/storage/' + row.storageficherorequerimiento;
+                        var enlaceDescarga = config.baseURL + 'public/storage/' + row.storageficherorequerimiento;
                         salida += ` <td class="text-center">
                                         <a href="${enlaceDescarga}" target="_blank" title="Ver documento">
                                             <i class="bi bi-cloud-arrow-down text-primary mr-1" style="font-size: 30px;"></i>
                                         </a>
                                     </td>`;
                     }
-
 
                     var _idempresa = (row.idempresa == null ? idEmpresa : row.idempresa);
 
@@ -563,6 +797,46 @@ let empresaCore = {
 
         }  
     },
+
+    renderTablaInfoDescargas: async function(idempresa, idcomunidad)
+    {
+
+        if($('#listadoDocumentacionDescargaEmpresa').length )
+        {
+
+            CoreUI.tableData.init();
+            CoreUI.tableData.columns = [];
+
+            //  Nombre del requerimiento
+                CoreUI.tableData.addColumn('listadoDocumentacionDescargaEmpresa', "nombre","Requerimiento", null, 'text-left');
+                
+            //  Fecha de descarga
+                CoreUI.tableData.addColumn('listadoDocumentacionDescargaEmpresa', function(row, type, val, meta)
+                {
+                    if(row.fechadescarga == '' || row.fechadescarga == 'null' || !row.fechadescarga)
+                    {
+                        return 'N/D'
+                    }else{
+                        return '<p class="mb-0 text-center">' + moment(row.fechadescarga).locale('es').format('LLLL') + '</p>';
+                    }
+                }, "Fecha descarga", null, 'text-center');
+
+                
+                //  Estado del requerimiento (Descargado o pendiente de descargar)
+                CoreUI.tableData.addColumn('listadoDocumentacionDescargaEmpresa', function(row, type, val, meta)
+                {
+                    if(row.fechadescarga == '' || row.fechadescarga == 'null' || !row.fechadescarga)
+                    {
+                        return '<span class="badge rounded-pill bg-danger pl-3 pr-3 pt-2 pb-2 d-block">No descargado</span>';
+                    }else{
+                        return '<span class="badge rounded-pill bg-success pl-3 pr-3 pt-2 pb-2 d-block">Descargado</span>';
+                    }
+                }, "Estado", null, 'text-center');
+                
+                CoreUI.tableData.render("listadoDocumentacionDescargaEmpresa", "infodescargas", `requerimiento/comunidad/${idcomunidad}/empresa/${idempresa}/infodescarga`, null, false, false);
+        }
+
+    }
 
 }
 

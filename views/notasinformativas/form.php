@@ -17,10 +17,15 @@
                    
                     <!-- Título -->
                     <div class="form-group row mb-3">
-                        <div class="col-12 text-left">
+                        <div class="col-12 col-md-10 text-left">
                             <label for="titulo" class="pl-0"><i class="bi bi-credit-card-2-front pr-2"></i>Título*</label>
                             <input type="text" class="form-control data text-left form-required" id="titulo" name="titulo" placeholder="Titulo de la nota informativa" hs-entity="Notasinformativas" hs-field="titulo" required>
                         </div>
+                        <!-- Fecha -->
+                        <div class="col-12 col-md-2 text-left">
+                            <label for="titulo" class="pl-0"><i class="bi bi-calendar pr-2"></i>Fecha*</label>
+                            <input type="date" class="form-control data text-left form-required" id="fecha" name="fecha" placeholder="dd/mm/aaaa" hs-entity="Notasinformativas" hs-field="fecha" required>
+                        </div>                          
                     </div>
                     <!-- Contenido de la nota -->
                     <div class="form-group row">

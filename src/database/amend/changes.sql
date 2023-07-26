@@ -525,3 +525,28 @@ ADD COLUMN `idcomunidad` INT(11) NULL AFTER `idempresa`;
 ALTER TABLE `dbs4285272`.`empleado` 
 ADD COLUMN `fechaalta` DATE NULL AFTER `idavatar`;
 
+
+### 23/11/2021
+
+ALTER TABLE `dbs4285272`.`empresarequerimiento` 
+DROP FOREIGN KEY `FK_EMPREQ_EMPRESA`;
+ALTER TABLE `dbs4285272`.`empresarequerimiento` 
+DROP INDEX `FK_EMPREQ_EMPRESA_idx` ;
+;
+
+CREATE TABLE `dbs4285272`.`ficherosdescargas` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `idrequerimiento` INT(11) NULL,
+  `idcomunidad` INT(11) NULL,
+  `idempresa` INT(11) NULL,
+  `idusuario` INT(11) NULL,
+  `fechadescarga` DATETIME NULL,
+  PRIMARY KEY (`id`));
+
+ALTER TABLE `dbs4285272`.`ficherosdescargas` 
+CHANGE COLUMN `idrequerimiento` `idfichero` INT(11) NULL DEFAULT NULL ;
+
+### 24/11/2021
+
+ALTER TABLE `dbs4285272`.`ficherosdescargas` 
+ADD COLUMN `fechaultimadescarga` DATETIME NULL AFTER `fechadescarga`;

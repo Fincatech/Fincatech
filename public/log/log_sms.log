@@ -1,0 +1,116 @@
+--- [29-12-2022 11:10] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=hola oscar, esto es una prueba&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [29-12-2022 11:12] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=hola oscar, esto es una prueba&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [29-12-2022 11:12] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=hola oscar, esto es una prueba&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [29-12-2022 11:15] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=hola oscar, esto es una prueba&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [29-12-2022 01:31] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=holiii&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [29-12-2022 01:33] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=probnado&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [03-01-2023 01:04] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=Aquí tiene su contrato para firmar.&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [03-01-2023 01:20] --- ( SendSMSContractCertified ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=684086020&Mensaje=Aquí tiene su contrato para firmar. (FILE:2:https://app.fincatech.es//public/storage/cv oscar rodriguez rodrigo.pdf)&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Report=1&Referencia=&TipoContrato=18&Links=1&Resp=JSON
+
+--- [03-01-2023 01:22] --- ( SendSMSContractCertified ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=684086020&Mensaje=Aquí tiene su contrato para firmar. (FILE:2:https://app.fincatech.es//public/storage/dd685500aebfa6c88694218d8a8da3ee.pdf)&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Report=1&Referencia=&TipoContrato=18&Links=1&Resp=JSON
+
+--- [03-01-2023 01:28] --- ( SendSMSContractCertified ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=684086020&Mensaje=Aquí tiene su contrato para firmar. (FILE:2:app.fincatech.es//public/storage/51b1f12037b521771abb707121cfea41.pdf)&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Report=1&Referencia=51b1f12037b521771abb707121cfea41.pdf&TipoContrato=18&Links=1&Resp=JSON
+
+--- [03-01-2023 01:29] --- ( SendSMSContractCertified ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=684086020&Mensaje=Aquí tiene su contrato para firmar. (FILE:2:app.fincatech.es//public/storage/2dba3472a07d88745a939534aa8fd0c6.pdf)&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Report=1&Referencia=2dba3472a07d88745a939534aa8fd0c6.pdf&TipoContrato=18&Links=1&Resp=JSON
+
+--- [03-01-2023 01:39] --- ( SendSMSContractCertified ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=684086020&Mensaje=Aquí tiene su contrato para firmar. (FILE:2:app.fincatech.es//public/storage/c9a13479977a2d42dadd69ebea50abf2.pdf)&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Report=1&Referencia=c9a13479977a2d42dadd69ebea50abf2.pdf&TipoContrato=18&Links=1&Resp=JSON
+
+--- [03-01-2023 01:40] --- ( SendSMSContractCertified ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=684086020&Mensaje=Aquí tiene su contrato para firmar. (FILE:2:app.fincatech.es//public/storage/6e1d1b80b2e57a643f18a4e40494270d.pdf)&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Report=1&Referencia=6e1d1b80b2e57a643f18a4e40494270d.pdf&TipoContrato=18&Links=1&Resp=JSON
+
+--- [03-01-2023 02:03] --- ( SendSMSContractCertified ) --- 
+
+Array
+
+--- [03-01-2023 02:03] --- ( SendSMSContractCertified - JSON Recibido ) --- 
+
+{"Res":"-16","Msgid":"0","Cred":"0","File":"2:8977e5b417cb468fd5d0067fa0454970.pdf"}
+
+--- [03-01-2023 02:04] --- ( SendSMSContractCertified ) --- 
+
+Array
+
+--- [03-01-2023 02:04] --- ( SendSMSContractCertified - JSON Recibido ) --- 
+
+{"Res":"-16","Msgid":"0","Cred":"0","File":"2:03063cc77f33384e65e9971d3081f2f4.pdf"}
+
+--- [03-01-2023 02:05] --- ( SendSMSContractCertified ) --- 
+
+{"Correo":"info@fincatech.es","Passwd":"1758264","Remitente":"Fincatech","Destinatarios":"684086020","Mensaje":"Aqu\u00ed tiene su contrato para firmar. (FILE:2:fdebba44095e4129754182cd4ac07a4f.pdf)","Contacto":"Fincatech","TelContacto":"952792038","CIFContacto":"B93594992","Report":1,"Referencia":"fdebba44095e4129754182cd4ac07a4f.pdf","File=":{"name":"\/Users\/oscar\/Proyectos\/fincatech\/public\/storage\/fdebba44095e4129754182cd4ac07a4f.pdf","mime":"","postname":""},"TipoContrato":"18","Links":"1","Resp":"JSON"}
+
+--- [03-01-2023 02:05] --- ( SendSMSContractCertified - JSON Recibido ) --- 
+
+{"Res":"-16","Msgid":"0","Cred":"0","File":"2:fdebba44095e4129754182cd4ac07a4f.pdf"}
+
+--- [03-01-2023 02:07] --- ( SendSMSContractCertified ) --- 
+
+{"Correo":"info@fincatech.es","Passwd":"1758264","Remitente":"Fincatech","Destinatarios":"684086020","Mensaje":"Aqu\u00ed tiene su contrato para firmar. (FILE:2:946c863d37b9b20d53ae619736fa71d6.pdf)","Contacto":"Fincatech","TelContacto":"952792038","CIFContacto":"B93594992","Report":1,"Referencia":"946c863d37b9b20d53ae619736fa71d6.pdf","File=":{"name":"\/Users\/oscar\/Proyectos\/fincatech\/public\/storage\/946c863d37b9b20d53ae619736fa71d6.pdf","mime":"application\/pdf","postname":"\/Users\/oscar\/Proyectos\/fincatech\/public\/storage\/946c863d37b9b20d53ae619736fa71d6.pdf"},"TipoContrato":"18","Links":"1","Resp":"JSON"}
+
+--- [03-01-2023 02:07] --- ( SendSMSContractCertified - JSON Recibido ) --- 
+
+{"Res":"-16","Msgid":"0","Cred":"0","File":"2:946c863d37b9b20d53ae619736fa71d6.pdf"}
+
+--- [03-01-2023 02:07] --- ( SendSMSContractCertified ) --- 
+
+{"Correo":"info@fincatech.es","Passwd":"1758264","Remitente":"Fincatech","Destinatarios":"684086020","Mensaje":"Aqu\u00ed tiene su contrato para firmar. (FILE:2:e62409365572d5fa8f75ac3f9ac05b27.pdf)","Contacto":"Fincatech","TelContacto":"952792038","CIFContacto":"B93594992","Report":1,"Referencia":"e62409365572d5fa8f75ac3f9ac05b27.pdf","File=":{"name":"\/Users\/oscar\/Proyectos\/fincatech\/public\/storage\/e62409365572d5fa8f75ac3f9ac05b27.pdf","mime":"application\/pdf","postname":"e62409365572d5fa8f75ac3f9ac05b27.pdf"},"TipoContrato":"18","Links":"1","Resp":"JSON"}
+
+--- [03-01-2023 02:07] --- ( SendSMSContractCertified - JSON Recibido ) --- 
+
+{"Res":"-16","Msgid":"0","Cred":"0","File":"2:e62409365572d5fa8f75ac3f9ac05b27.pdf"}
+
+--- [03-01-2023 02:09] --- ( SendSMSContractCertified ) --- 
+
+{"Correo":"info@fincatech.es","Passwd":"1758264","Remitente":"Fincatech","Destinatarios":"684086020","Mensaje":"Aqu\u00ed tiene su contrato para firmar. (FILE:2:41f3582856cb2d51c7c14ce0128cccc3.pdf)","Contacto":"Fincatech","TelContacto":"952792038","CIFContacto":"B93594992","Report":1,"Referencia":"41f3582856cb2d51c7c14ce0128cccc3.pdf","file":{"name":"\/Users\/oscar\/Proyectos\/fincatech\/public\/storage\/41f3582856cb2d51c7c14ce0128cccc3.pdf","mime":"application\/pdf","postname":"41f3582856cb2d51c7c14ce0128cccc3.pdf"},"TipoContrato":"18","Links":"1","Resp":"JSON"}
+
+--- [03-01-2023 02:09] --- ( SendSMSContractCertified - JSON Recibido ) --- 
+
+{"Res":"-16","Msgid":"0","Cred":"0","File":"2:41f3582856cb2d51c7c14ce0128cccc3.pdf"}
+
+--- [03-01-2023 02:10] --- ( SendSMSContractCertified ) --- 
+
+{"Correo":"info@fincatech.es","Passwd":"1758264","Remitente":"Fincatech","Destinatarios":"684086020","Mensaje":"Aqu\u00ed tiene su contrato para firmar. (FILE:2:32f2628eb03d043b5c144498fc288ef7.pdf)","Contacto":"Fincatech","TelContacto":"952792038","CIFContacto":"B93594992","Report":1,"Referencia":"32f2628eb03d043b5c144498fc288ef7.pdf","file":{"name":"\/Users\/oscar\/Proyectos\/fincatech\/public\/storage\/32f2628eb03d043b5c144498fc288ef7.pdf","mime":"application\/pdf","postname":"32f2628eb03d043b5c144498fc288ef7.pdf"},"TipoContrato":"18","Links":"1","Resp":"JSON"}
+
+--- [03-01-2023 02:10] --- ( SendSMSContractCertified - JSON Recibido ) --- 
+
+{"Res":"-16","Msgid":"0","Cred":"0","File":"2:32f2628eb03d043b5c144498fc288ef7.pdf"}
+
+--- [04-01-2023 07:23] --- ( SendSMSContractCertified ) --- 
+
+{"Correo":"info@fincatech.es","Passwd":"1758264","Remitente":"Fincatech","Destinatarios":"684086020","Mensaje":"Aqu\u00ed tiene su contrato para firmar. (FILE:2:06446bad438fc00a7edf22df048dae7d.pdf)","Contacto":"Fincatech","TelContacto":"952792038","CIFContacto":"B93594992","Report":1,"Referencia":"06446bad438fc00a7edf22df048dae7d.pdf","file":{"name":"\/Users\/oscar\/Proyectos\/fincatech\/public\/storage\/06446bad438fc00a7edf22df048dae7d.pdf","mime":"application\/pdf","postname":"06446bad438fc00a7edf22df048dae7d.pdf"},"TipoContrato":"18","Links":"1","Resp":"JSON"}
+
+--- [04-01-2023 07:23] --- ( SendSMSContractCertified - JSON Recibido ) --- 
+
+{"Res":"-16","Msgid":"0","Cred":"0","File":"2:06446bad438fc00a7edf22df048dae7d.pdf"}
+

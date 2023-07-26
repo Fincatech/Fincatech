@@ -40,11 +40,10 @@
                         
                         <p class="m-0 mensajeInformacion"><i class="bi bi-info-circle"></i> Seleccione un empleado del listado para ver los requerimientos asociados</p>
                         <p class="m-0 empleadoRequerimientosInfo font-weight-bold text-uppercase shadow-neumorphic pt-2 pb-2 rounded-pill bg-secondary text-white" style="display:none;"></p>
-                        <table class="table table-hover my-0 hs-tabla d-none" name="listadoDocumentacionEmpleado" id="listadoDocumentacionEmpleado" data-model="empleado">
-                            <thead class="thead"></thead>
-                            <tbody class="tbody"></tbody>
-                        </table>
-
+                        
+                        <div id="wrapperContratistaDocumentacionEmpleado" class="wrapperContratistaDocumentacionEmpleado mt-3 ml-2 mr-2 border rounded-3 row d-none">
+                            <div class="col-12 contenido"></div>
+                        </div>                        
 
                     </div>
 

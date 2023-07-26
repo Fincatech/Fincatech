@@ -10,14 +10,18 @@ define("security", [
             "menulateral"=> false,
             "js"=>[
                 "administrador",
+                "certificadodigital",
                 "comunidades",
+                "contratista",
                 "dpd",
                 "documental",
                 "empresa",
                 "empleado",
+                "facturacion",
                 'informevaloracionseguimiento',
                 'notasinformativas',
                 "requerimiento",
+                "rgpd",
                 "servicios",
                 "spa",
                 "sudo",
@@ -41,11 +45,14 @@ define("security", [
             "titulo" => "Control documental DPD",
             "menulateral"=> false,
             "js"=>[
+                "administrador",
+                "comunidades",
                 "dpd",
                 "empresa",
                 "empleado",
                 'informevaloracionseguimiento',                
                 "notasinformativas",
+                "documental",
                 "requerimiento",
             ],
             "permissions" => [
@@ -58,12 +65,31 @@ define("security", [
             "folder"=>"revdoc",
             "titulo" => "Revisión documental",
             "menulateral"=> false,
+            "js" =>[
+                "documental",
+                "tecnico",
+            ],
             "permissions" => [
                 "create" => "all",
                 "delete" => "all",
                 "update" => "all"
             ],            
         ],
+        "ROLE_REVCERT"=>[
+            "folder"=>"revcert",
+            "titulo" => "Revisión documental",
+            "menulateral"=> false,
+            "js" =>[
+                "documental",
+                "tecnicocertificado",
+                "certificadodigital",
+            ],
+            "permissions" => [
+                "create" => "all",
+                "delete" => "all",
+                "update" => "all"
+            ],            
+        ],        
         "ROLE_ADMINFINCAS"=>[
             "folder"=>"adminfincas",
             "titulo" => "Administrador de fincas",
@@ -71,16 +97,18 @@ define("security", [
             "js"=>[
                 "adminfincas",
                 "dashboard",
+                "certificadodigital",
                 "comunidades",
                 "dpd",
+                "documental",
                 "empresa",
                 "empleado",
                 'informevaloracionseguimiento',
                 "notasinformativas",
-                "documental",
-                "rgpd",
                 "requerimiento",
+                "rgpd",
                 "servicios",
+                "usuario",
             ],
             "permissions" => [
                 "create" => ['comunidad', 'dpd'],

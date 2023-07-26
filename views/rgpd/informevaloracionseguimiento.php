@@ -24,7 +24,7 @@
 
                         <div class="col-12">
 
-                            <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoInformevaloracionseguimiento" id="listadoInformevaloracionseguimiento" data-model="Informevaloracionseguimiento" >
+                            <table class="table table-hover my-0 hs-tabla w-100 no-clicable" data-order='[[ 0, "desc"]]' name="listadoInformevaloracionseguimiento" id="listadoInformevaloracionseguimiento" data-model="Informevaloracionseguimiento" >
                                 <thead class="thead"></thead>
                                 <tbody class="tbody"></tbody>
                             </table>

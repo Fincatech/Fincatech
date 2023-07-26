@@ -1,4 +1,1 @@
-<div class="row">
-    <div class="col-12">
-    </div>
-</div>
+<?php include('mensajergpd.php'); ?>

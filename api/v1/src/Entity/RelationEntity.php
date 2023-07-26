@@ -40,7 +40,7 @@ class Relation{
     public $deleteMode = 'P';
 
     /**
-     * TODO: Permite utilizar un alias para la entidad
+     * Permite utilizar un alias para la entidad
      */
     public $alias;
 

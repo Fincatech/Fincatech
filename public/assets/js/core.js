@@ -243,13 +243,13 @@ let Constantes = {
            </div>
            <span class="pb-3 d-block text-center pt-2" style="font-size: 13px;">Sólo se permiten ficheros con extensión pdf, doc o docx</span>    
            
-          <div class="row form-group text-left">
+          <div class="row form-group wrapperTituloDocumento text-left">
             <div class="col-12">
               <label>Título</label>
               <input type="text" class="form-control w-100 tituloDocumentoRGPD mt-2" id="tituloDocumentoRGPD" maxlength="40" name="tituloDocumentoRGPD">
             </div>
           </div>
-          <div class="row form-group text-left mt-2">
+          <div class="row form-group wrapperObservaciones text-left mt-2">
             <div class="col-12">
               <label>Descripción</label>
               <textarea class="form-control w-100 observacionesDocumentoRGPD shadow-inset border-0 mt-2" id="observacionesDocumentoRGPD" rows="3" name="observacionesDocumentoRGPD"></textarea>
@@ -301,8 +301,10 @@ let core =
           await core.Forms.init();
           break;
         case "list":
-          if(core.model != 'Dashboard')
-            await core.Modelo.getAll();
+          if(core.model != 'Dashboard'){
+
+          }
+            // await core.Modelo.getAll();
           break;
       }    
 
@@ -371,6 +373,13 @@ let core =
               core.Security.changePassword();
       });
 
+      /** Botón de reestablecer contraseña */
+      $('body').on(core.helper.clickEventType, '.btnResetpassword', function(e)
+      {
+          //  Lanzamos el modal de cambiar contraseña
+              core.Security.resetPassword();
+      });
+
   },
 
   helper:
@@ -407,6 +416,7 @@ let core =
         core.Files.Fichero.nombre = null;
         core.Files.Fichero.base64 = null;
         core.Files.events();
+        
     },
 
     events: function()
@@ -423,7 +433,6 @@ let core =
           const file = e.target.files[0];
           if(file !== undefined)
           {
-// console.log(file);
             // encode the file using the FileReader API
             const reader = new FileReader();
             reader.onloadend = () => {
@@ -479,36 +488,100 @@ let core =
   {
 
     data: null,
+    promiseInitialization: null,
+    errorMessage: '',
+
+    /**
+     * Dispara el evento de formulario cargado (Pantalla cargada)
+     * @param {*} formularioDestino 
+     */
+    triggerEventLoaded: function(_formularioDestino){
+
+      var formularioDestino = 'body .form-data';
+      if(_formularioDestino)
+      { 
+        formularioDestino = _formularioDestino;
+      }
+
+      $('body').trigger('hsFormDataLoaded',$(formularioDestino).attr('id'));
+
+    },
 
     init: async function()
     {
-        //  Recuperamos los valores de los posible combos que haya en la pantalla
-            core.Forms.initializeSelectData();
 
-        // Si hay un id informado recuperamos la entidad desde el endpoint
-          if(core.modelId != "")
+      // var promesa = new Promise(function(resolve, reject){
+      var promesa = new Promise(function(resolve, reject){
+          core.Forms.initializeSelectData( (resultado) =>{
+            console.log('----Resultado-----');
+            resolve(true);
+          });
+      });
+
+      promesa.then(function(){
+
+        console.log('Ha terminado el initialize y entra en la promesa.then');
+      
+        console.log(' *** Promesa terminada ***');
+      });
+
+    },
+
+    getModelo: function(){
+
+      // console.log('getModelo');
+      if(core.modelId != "")
+      {
+
+        apiFincatech.get(core.model.toLowerCase() + "/" + core.modelId).then( (result) =>{
+
+          //  Primero controlamos el código de estado
+          var estado = JSON.parse(result)["status"];
+          if(estado.response === 'error')
           {
-            await apiFincatech.get(core.model.toLowerCase() + "/" + core.modelId).then( (result) =>{
 
-              //  Mapeamos los datos en el formulario
-              core.Modelo.entity[core.model] = JSON.parse(result)["data"][core.model];
+              if(estado.error === '403')
+                apiFincatech.getView('comunes','403','','.content .container-fluid');
 
-              core.Forms.mapData();
-
-              if($('#password').length)
-              {
-                $('#password').val('');
-              }
-
-              //  Si no está definido, entonces dejamos por defecto el que viene
-                  if(CoreUI.tituloModulo !== null)
-                  {
-                    CoreUI.Utils.setTituloPantalla(null, null, core.Modelo.entity[core.model][0][CoreUI.tituloModulo]);
-                  }
-            });
+              return;
 
           }
 
+          //  Mapeamos los datos en el formulario
+          core.Modelo.entity[core.model] = JSON.parse(result)["data"][core.model];
+
+          //console.log(core.Modelo.entity[core.model]);
+          core.Forms.mapData();
+
+          if($('#password').length)
+          {
+            $('#password').val('');
+          }
+
+          //  Si no está definido, entonces dejamos por defecto el que viene
+              if(CoreUI.tituloModulo !== null)
+              {
+                var tituloPantalla = '';
+
+                if(Array.isArray(CoreUI.tituloModulo))
+                {
+                  for(var i = 0; i<CoreUI.tituloModulo.length; i++)
+                  {
+                    tituloPantalla += (core.Modelo.entity[core.model][0][CoreUI.tituloModulo[i]]) + ' ' ;
+                  }
+                }else{
+                  tituloPantalla = core.Modelo.entity[core.model][0][CoreUI.tituloModulo];
+                }
+
+                CoreUI.Utils.setTituloPantalla(null, null, tituloPantalla);
+              }
+
+            //  Disparamos el evento de modelo cargado
+            core.Forms.triggerEventLoaded(null);
+
+        });
+
+      }  
     },
 
     /** Recuperamos el modelo para la entidad que se está cargando */
@@ -520,8 +593,15 @@ let core =
     },
 
     /** Inicializa los combos del formulario */
-    initializeSelectData: function()
+    initializeSelectData: async function()
     {
+
+      var promesaSelect;
+      var numeroCombos = $("body .form-data .select-data").length;
+      var iCombo = 0;
+
+      promesaSelect = new Promise(async function(resolve, reject){
+
         if($("body .form-data .select-data").length)
         {
 
@@ -539,25 +619,114 @@ let core =
 
               if($(this).attr('hs-seleccionar') !== undefined)
               {
-                insertarOpcionSeleccionar = $(this).attr('hs-seleccionar');              
+                insertarOpcionSeleccionar = ($(this).attr('hs-seleccionar') == 'false' ? false : true);              
               }
 
-              core.Forms.getSelectData( entidadCombo, keyField, keyValue, null, null, elDOM, insertarOpcionSeleccionar );
-              $('.selectpicker').select2({
-                theme: 'bootstrap4',          
+              var promesaSelectActual = new Promise(async function(resolve2, reject2){
+                // console.log('Llamada a getselectdata');
+                core.Forms.getSelectData( entidadCombo, keyField, keyValue, null, null, elDOM, insertarOpcionSeleccionar ).then((result)=>{
+                  // console.log('--- Ha resuelto GetSelectData ---');
+                  iCombo++;
+                  // console.log('numeroCombos: ' + numeroCombos);
+                  // console.log('iCombo: ' + iCombo);
+                  if(iCombo >= numeroCombos)
+                  {
+                    // console.log('icombo>=n')
+                    resolve(true);
+                  }
+                });
+
               });
+
           });
 
-          $('.selectpicker').select2({
-            theme: 'bootstrap4',          
-          });
-
+        }else{
+          // console.log('resolve2')
+          resolve(true);
         }
+        
+      });
+
+        promesaSelect.then(function(){
+          // console.log('------------ promSelect2');
+          core.Forms.getModelo();
+          return promesaSelect;
+        }); 
+
     },
+
+
+    /** Carga los datos en el combo especificado y la entidad que se va a recuperar */
+    getSelectData: async function(entidad, keyField, keyValue, keyOriginField, keyOriginValue, elementoDOM, insertarOpcionSeleccionar)
+    {
+        //  Vaciamos el combo
+            $("body #" + elementoDOM).html("");
+        //  Recuperamos los registros que correspondan según la entidad
+       var promSelect = new Promise( function(resolve, reject)
+        {
+           apiFincatech.get(`${entidad}/list?target=cbo`).then( (data) =>
+          // await apiFincatech.get(`${entidad}/list?target=cbo`).then( async (data) =>
+          {
+
+              var htmlOutput = "";
+              var result = JSON.parse(data);
+              responseData = result.data;
+
+              //  Comprobamos si el valor viene de una entidad asociada a la entidad principal
+              //  Para eso buscamos si hay un . en el string del keyField
+              if(keyField.indexOf('.') >= 0)
+              {
+                //  Actualizamos el valor de entidad para coger la que corresponde a la relación
+                var entidadSeleccionada = keyField.split(".");
+                entidad = entidadSeleccionada[0];
+                keyField = entidadSeleccionada[1];
+              }
+
+              //  Comprobamos lo mismo pero para el campo valor
+              //  TODO: Evaluar si debe ir dentro del for por el hecho de ser un valor y no el key 
+              if(keyValue.indexOf('.') >= 0)
+              {
+                //  Actualizamos el valor de entidad para coger la que corresponde a la relación
+                var entidadSeleccionada = keyValue.split(".");
+                entidad = entidadSeleccionada[0];
+                keyValue = entidadSeleccionada[1];
+              }
+
+              if(insertarOpcionSeleccionar)
+              {
+                htmlOutput = '<option value="-1" disabled selected="selected">Seleccione una opción</option>';
+                $("body #" + elementoDOM).append(htmlOutput);
+              }
+
+              // console.log('El: ' + responseData[entidad][keyValue]);
+              for(x = 0; x < responseData[entidad].length; x++)
+              {
+                  var valueId = responseData[entidad][x][keyValue];
+                  var value = responseData[entidad][x][keyField];
+                  htmlOutput = `<option value="${valueId}">${value}</option>`;
+                  $("body #" + elementoDOM).append(htmlOutput);
+              }
+
+              $('body #' + elementoDOM).select2({
+                theme: 'bootstrap4',
+                placeholder: "Seleccione una opción",
+              });
+
+              // console.log('--- Ha recuperado los datos desde el WS ---');
+              resolve(true);
+          });
+       });
+
+       return promSelect.then(function(){
+         return true;
+       });
+    },
+
 
     //TODO: Implementar mejora de mapeo de formulario
     mapDataFromModel: function(nombreFormulario, datosModelo)
     {
+
         //  Validamos que exista el formulario antes de procesar
             if( !$(`#${nombreFormulario}`).length )
               return;
@@ -627,6 +796,7 @@ let core =
     mapData: async function(formularioMapeo = null)
     {
       var formularioDestino = 'body .form-data';
+      var valor = '';
       if(formularioMapeo !== null)
         formularioDestino = `body .${formularioMapeo}`;
 
@@ -638,17 +808,26 @@ let core =
         // $("body .data").each( function(){
         $(`${formularioDestino} .data`).each( function(){
 
-
           var entidad = $(this).attr('hs-entity') ;
           var campo = $(this).attr('hs-field') ;
-          var valor = '';
-          //  console.log('Entidad: ' + entidad + ' Campo: ' + campo);
+          var entidadRelacionada = $(this).attr('hs-entity-related');
+         
           //  Validamos que el campo venga informado desde el endpoint
-          
-          if(typeof core.Modelo.entity[ entidad ][0][campo] !== 'undefined')
+          if( typeof entidadRelacionada === 'undefined' )
           {
-            valor = core.Modelo.entity[ entidad ][0][campo];
+
+            if(typeof core.Modelo.entity[ entidad ][0][campo] !== 'undefined')
+            {
+              valor = core.Modelo.entity[ entidad ][0][campo];
+            }
+          }else{
+            if(typeof core.Modelo.entity[ entidad ][0][entidadRelacionada][0][campo] !== 'undefined')
+            {
+               valor = core.Modelo.entity[ entidad ][0][entidadRelacionada][0][campo];
+            }
           }
+
+
 
           //var valor = core.Modelo.entity[ entidad ][0][campo];
           if( campo != 'password' )
@@ -657,47 +836,54 @@ let core =
               if($(this).hasClass("select-data"))
               {
                 //  Leemos el id
-                var id = $(this).attr("id");
+                    var id = $(this).attr("id");
+
                 //  Validamos que exista el valor en el modelo antes de mapear
-                if(typeof id !== 'undefined' && id !== -1)
-                {
-                  if(valor !== '')
-                    $(`#${id} option[value=${valor}]`).attr('selected','selected');
-                }else{
-                
-                }
-              }else{
+                    if(typeof id !== 'undefined' && id !== -1){
+                        if(valor !== '' && valor !== null){
+                          // console.log('Valor: ' + valor);
+                          // console.log(`Campo: #${id} option[value=${valor}]`);
+                          $(`body #${id} option[value=${valor}]`).attr('selected','selected');
+                          $(`body #${id}`).val(valor);
+                          $(`body #${id}`).trigger('change');
+                          // console.log($(`body #${id} option:selected`).val());
+                        }
+                      }
+                    }else{
 
-                //  ¿ Es un checkbox ? 
-                if($(this).hasClass("form-check-input"))
-                {
-                  console.log('Valor checkbox campo : ' + campo + ' - ' +  valor);
-                  if(valor == 1)
-                  {
-                    console.log('Intentando checar')  ;
-                    $(this).attr('checked', true);
-                  }else{
-                  console.log('Intentando checar false')  ;
-                    $(this).attr('checked', false);
-                  }
-                }else{
-                  $(this).val( valor );
-                }
+                      //  ¿ Es un checkbox ? 
+                      if($(this).hasClass("form-check-input"))
+                      {
+                        console.log('Valor checkbox campo : ' + campo + ' - ' +  valor);
+                        if(valor == 1)
+                        {
+                          console.log('Intentando checar')  ;
+                          $(this).attr('checked', true);
+                        }else{
+                        console.log('Intentando checar false')  ;
+                          $(this).attr('checked', false);
+                        }
+                      }else{
+                        $(this).val( valor );
+                      }
 
-              }
+                    }
           }else{
             $(this).val('');
           }
+          
         });
 
             //  Inicializamos el selectpicker
-            $('.selectpicker').select2({
-              theme: 'bootstrap4',           
-            });
+            // $('.selectpicker').select2({
+            //   theme: 'bootstrap4',           
+            // });
 
             $('.selectpicker').each(function()
             {
-              $(this).trigger('change');
+             // $(this).trigger('change');
+              // console.log($(this).val());
+              // console.log(valor);
             });
             
             $('body input[type="number"]').each(function(e)
@@ -705,8 +891,6 @@ let core =
                 $(this).val( $(this).attr('value') );
             });
       }
-
-
 
     },
 
@@ -782,7 +966,6 @@ let core =
 
 
     },
-
 
     /** Mapea el formulario para montar el json de envío al endpoint */
     mapFormDataToSave: function(formularioProceso, modelo = null)
@@ -861,60 +1044,6 @@ let core =
 
     },
 
-    /** Carga los datos en el combo especificado y la entidad que se va a recuperar */
-    getSelectData: async function(entidad, keyField, keyValue, keyOriginField, keyOriginValue, elementoDOM, insertarOpcionSeleccionar)
-    {
-        //  Vaciamos el combo
-            $("body #" + elementoDOM).html("");
-
-        //  Recuperamos los registros que correspondan según la entidad
-        await apiFincatech.get(`${entidad}/list?target=cbo`).then(async (data) =>
-        {
-
-            var htmlOutput = "";
-            var result = JSON.parse(data);
-            responseData = result.data;
-
-            //  Comprobamos si el valor viene de una entidad asociada a la entidad principal
-            //  Para eso buscamos si hay un . en el string del keyField
-            if(keyField.indexOf('.') >= 0)
-            {
-              //  Actualizamos el valor de entidad para coger la que corresponde a la relación
-              var entidadSeleccionada = keyField.split(".");
-              entidad = entidadSeleccionada[0];
-              keyField = entidadSeleccionada[1];
-            }
-
-            //  Comprobamos lo mismo pero para el campo valor
-            //  TODO: Evaluar si debe ir dentro del for por el hecho de ser un valor y no el key 
-            if(keyValue.indexOf('.') >= 0)
-            {
-              //  Actualizamos el valor de entidad para coger la que corresponde a la relación
-              var entidadSeleccionada = keyValue.split(".");
-              entidad = entidadSeleccionada[0];
-              keyValue = entidadSeleccionada[1];
-            }
-
-            // htmlOutput = '<option value="-1" disabled selected="selected">SELECCIONE UNA OPCIÓN</option>';
-            $("body #" + elementoDOM).append(htmlOutput);
-
-            // console.log('El: ' + responseData[entidad][][keyValue]);
-            for(x = 0; x < responseData[entidad].length; x++)
-            {
-                var valueId = responseData[entidad][x][keyValue];
-                var value = responseData[entidad][x][keyField];
-                htmlOutput = `<option value="${valueId}">${value}</option>`;
-                $("body #" + elementoDOM).append(htmlOutput);
-            }
-
-            $('body #' + elementoDOM).select2({
-              theme: 'bootstrap4',
-            });
-
-        });
-
-    },
-
     /**
      * Guarda y mapea los datos para enviar al endpoint
      * @param {boolean} dataAlreadyMapped Optional. Indica si los datos ya han sido previamente mapeados. De esa forma no vuelve a mapear
@@ -949,11 +1078,29 @@ let core =
 
     },
 
+    GetErrorMessage: function()
+    {
+      return core.Forms.errorMessage;
+    },
+
+    SetError: function(_message)
+    {
+        core.Forms.errorMessage = `${core.Forms.errorMessage}<br/><i class="bi bi-x-circle mr-3 text-danger"></i>${_message} `;
+    },
+
+    ShowErrorMessage: function(){
+      let errormsg = core.Forms.GetErrorMessage();
+      if(errormsg !== '')
+      {
+        CoreUI.Modal.Error(`Se han detectado los siguientes errores, por favor, corríjalos para continuar:<br><br><p class="text-left">${errormsg}</p>`,'Error');
+      }
+    },
+
     /** Valida el formulario y devuelve la respuesta correspondiente */
     Validate: function(nombreFormulario = null)
     {
       var result = true;
-
+      core.Forms.errorMessage = '';
       $('.form-error').removeClass('form-error');
 
       if(nombreFormulario == null)
@@ -969,7 +1116,14 @@ let core =
         if( $(this).val() == '' )
         {
           if( !$(this).hasClass('form-error') )
+          {
+            //  Comprobamos si tiene establecido el texto del mensaje de error
+            if(typeof($(this).attr('form-error-message')) !== 'undefined')
+              core.Forms.SetError($(this).attr('form-error-message'));
+
             $(this).addClass('form-error');
+
+          }
 
           result = false;
 
@@ -987,6 +1141,7 @@ let core =
 
     entity: Object(),
     schema: Object(),
+    insertedId: null,
 
     getAll: async function(params)
     {
@@ -1010,19 +1165,17 @@ let core =
      * @param {*} entidadSave 
      * @param {*} postData 
      */
-    Insert: async function(entidadSave, postData, updateModel = true)
+    Insert: async function(entidadSave, postData, updateModel = true, mensaje = '', showMessage = true, showLoading = true)
     {
-      await apiFincatech.post(`${entidadSave}/create`, postData).then(async (response) =>
+      await apiFincatech.post(`${entidadSave}/create`, postData, showLoading).then(async (response) =>
       {
-
+console.log(response);
           var responseData = JSON.parse(response);
-
-          // console.log('Resultado inserción1: ' + responseData.data);
-          // console.log('Resultado inserción2: ' + responseData.status);
-          // console.log('Result status: ' + responseData.status);
 
           if(responseData.status['response'] == "ok")
           {
+              core.Modelo.insertedId = responseData.data['id'];
+
               if(updateModel)
               {
                   var idInsercion = responseData.data['id'];
@@ -1034,11 +1187,24 @@ let core =
                   core.modelId = idInsercion;
 
               }
-              CoreUI.Modal.Success("El registro se ha creado correctamente");              
+              if(mensaje !== '' && mensaje !== false)
+              {
+                CoreUI.Modal.Success(mensaje);    
+              }else{
+
+                if(showMessage)
+                  CoreUI.Modal.Success("El registro se ha creado correctamente");    
+              }
+
+              if(entidadSave.toLowerCase() == 'comunidad' && core.Security.getRole() == 'ADMINFINCAS')          
+              {
+                comunidadesCore.renderMenuLateral();
+              }
+
           }else{
 
             //  TODO: Ver cuál es el error en el json
-                Modal.Error("No se ha podido guardar por el siguiente motivo:<br><br>" + responseData.status.response);
+            CoreUI.Modal.Error("No se ha podido guardar por el siguiente motivo:<br><br>" + responseData.status.error);
 
           }
 
@@ -1075,7 +1241,18 @@ let core =
                         '',
                         'success'
                       );
-                      window[`table${nombreListadoDOM}`].ajax.reload();
+
+                      if(typeof window[`table${nombreListadoDOM}`] !== 'undefined')
+                      {
+                        window[`table${nombreListadoDOM}`].ajax.reload();
+                      }
+
+                      //  Refrescamos el menú lateral para reflejar la eliminación de la comunidad
+                      if(core.Security.getRole()=='ADMINFINCAS' && endpoint.toLowerCase()=='comunidad')
+                      {
+                        comunidadesCore.renderMenuLateral();
+                      }
+                 
                 });
             }
         });
@@ -1165,11 +1342,14 @@ let core =
       /** Información del usuario autenticado */
       getUserInfo: async function()
       {
+
           await apiFincatech.get('userinfo' ).then( response => 
           {
 
               respuesta = JSON.parse(response);
+
               core.Security.user = respuesta.user.id;
+              core.Security.rgpd = respuesta.user.rgpd;
 
               if(respuesta.user.nombre != null && respuesta.user.nombre != '')
               {
@@ -1177,7 +1357,9 @@ let core =
               }else{
                   $('.usuarioFincatech').text('Fincatech');
               }
+
           });
+
       },
 
       /** Logout del sistema */
@@ -1216,15 +1398,122 @@ let core =
 
       },
 
+      changePassword: async function()
+      {
+        const { value: formValues } = await Swal.fire({
+          title: '<i class="bi bi-lock"></i> Cambiar contraseña',
+          html: `
+            <div class="row pl-3 pr-3 pt-3">
+              <div class="col-12">
+                <div class="row">
+                  <div class="col-12 text-left">
+                      <label for="nuevopassword">Contraseña</label>
+                      <input id="nuevopassword" type="text" placeholder="Contraseña" class="form-control">
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-12 text-left">
+                    <label for="confirmpassword">Confirmar contraseña</label>
+                    <input id="confirmpassword" type="text" placeholder="Confirmación contraseña" class="form-control">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-12">
+                    <p class="errorValidation text-danger" style="display: none;">&nbsp;</p>
+                  </div>
+                </div>
+              </div>
+            </div>`,
+          focusConfirm: false,
+          preConfirm: () => {
+            var mensajeError = '';
+
+            if($('#nuevopassword').val() != $('#confirmpassword').val())
+                mensajeError = 'Las contraseñas no coinciden<br>';
+
+            if( $('#nuevopassword').val() == '' || $('#confirmpassword').val() == '')
+              mensajeError += 'Debe escribir la nueva contraseña y su confirmación<br>';
+          
+            if( $('#nuevopassword').val().length < 5 ||  $('#confirmpassword').val().length < 5 )
+              mensajeError += 'La longitud de la contraseña es inferior a 5 caracteres<br>';
+
+            if(mensajeError !== '')
+            {
+              $('.errorValidation').html(mensajeError);       
+              $('.errorValidation').show();
+              return false;
+            }else{
+
+              var encryptedPassword = core.Security.MD5($('#nuevopassword').val());
+              var data = {
+                password: encryptedPassword
+              };
+
+              apiFincatech.post('changepassword',data).then( (result) =>{
+                  var resultado = JSON.parse(result);
+                  if(resultado['data']['changepassword'] == 'ok')
+                  {
+                    CoreUI.Modal.Success('La contraseña se ha cambiado correctamente. Por su seguridad se va a cerrar sesión para que entre con la nueva contraseña.','Cambiar contraseña', function()
+                    {
+                      core.Security.logout();
+                    });          
+                  }else{
+                    CoreUI.Modal.Error('La contraseña no ha podido cambiarse','Cambiar contraseña');          
+                  }
+              });
+              return true;
+            }
+
+          }
+        })
+      },
+
+      resetPassword: async function()
+      {
+          if($('#email').val() == '')
+          {
+            CoreUI.Modal.Error('Escriba el correo electrónico con el que accede a la plataforma','Reestablecer contraseña');
+            return;
+          }
+
+              var _email = $('#email').val();
+              var data = {
+                email: _email
+              };
+
+              apiFincatech.post('resetpassword',data).then( (result) => {
+
+                  var resultado = JSON.parse(result);
+                  if(resultado['status']['response'] == 'error')
+                  {
+                    CoreUI.Modal.Error(resultado['status']['error'], 'E-mail no encontrado');
+                    $('#email').val('');
+                  }else{
+
+                    if(resultado['data']['resetpassword'] == 'ok')
+                    {
+                      CoreUI.Modal.Success('Le hemos enviado un e-mail con la nueva contraseña. Podrá cambiar la misma, en su perfil. Por favor, compruebe su bandeja de entrada o la carpeta de correo no deseado.','Contraseña reestablecida');
+                      $('#email').val('');
+                    }else{
+                      CoreUI.Modal.Error('La contraseña no ha podido reestablecerse','Reestablecer contraseña');          
+                    }
+
+                  }
+
+              });
+
+      },
+
       /**
        * Método que cambia el password para el usuario actual
        * @param {*} newPassword 
        */
-      changePassword: async function()
+      _changePassword: async function()
       {
+
         const { value: password } = await Swal.fire({
           title: 'Cambiar contraseña',
-          input: 'password',
+          input: 'text',
           inputLabel: 'Nueva contraseña',
           inputPlaceholder: 'Escriba la nueva contraseña',
           inputAttributes: {
@@ -1274,93 +1563,109 @@ let core =
   Validator: {
 
     /**
-     * Funcion para verificar si una cuenta IBAN es correcta
-     * @param string iban
-     * @return boolean
+     * Validación de formato del e-mail
+     * @param {*} emailToValidate 
+     * @returns 
      */
-    checkIBAN: function(iban)
-    {
-        if (iban == '')
-          return false;
+      Email: function(emailToValidate)
+      {
 
-        if(iban.length==24)
+        if(emailToValidate === '' || typeof(emailToValidate) === 'undefined')
         {
-            var digitoControl = core.Validator.getCodigoControl_IBAN(iban.substr(0,2).toUpperCase(), iban.substr(4));
-            if(digitoControl==iban.substr(2,2))
-                return true;
+          return false;
         }
-        return false;
-    },
+        var validRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return validRegex.test(emailToValidate.toLowerCase());
+      },
+
+      /**
+       * Funcion para verificar si una cuenta IBAN es correcta
+       * @param string iban
+       * @return boolean
+       */
+      checkIBAN: function(iban)
+      {
+          if (iban == '')
+            return false;
+
+          if(iban.length==24)
+          {
+              var digitoControl = core.Validator.getCodigoControl_IBAN(iban.substr(0,2).toUpperCase(), iban.substr(4));
+              if(digitoControl==iban.substr(2,2))
+                  return true;
+          }
+          return false;
+      },
+  
+      /**
+       * Funcion que devuelve el codigo de verificacion de una cuenta bancaria
+       * @param string codigoPais los dos primeros caracteres del IBAN
+       * @param string cc la cuenta corriente, que son los ultimos 20 caracteres del IBAN
+       * @return string devuelve el codigo de control
+       */
+      getCodigoControl_IBAN: function (codigoPais,cc)
+      {
+          // cada letra de pais tiene un valor
+          valoresPaises = {
+              'A':'10',
+              'B':'11',
+              'C':'12',
+              'D':'13',
+              'E':'14',
+              'F':'15',
+              'G':'16',
+              'H':'17',
+              'I':'18',
+              'J':'19',
+              'K':'20',
+              'L':'21',
+              'M':'22',
+              'N':'23',
+              'O':'24',
+              'P':'25',
+              'Q':'26',
+              'R':'27',
+              'S':'28',
+              'T':'29',
+              'U':'30',
+              'V':'31',
+              'W':'32',
+              'X':'33',
+              'Y':'34',
+              'Z':'35'
+          };
+      
+          // reemplazamos cada letra por su valor numerico y ponemos los valores mas dos ceros al final de la cuenta
+          var dividendo = cc + valoresPaises[codigoPais.substr(0,1)] + valoresPaises[codigoPais.substr(1,1)] + '00';
+      
+          // Calculamos el modulo 97 sobre el valor numerico y lo restamos al valor 98
+          var digitoControl = 98 - core.Validator.modulo(dividendo, 97);
+      
+          // Si el digito de control es un solo numero, añadimos un cero al delante
+          if(digitoControl.length==1)
+          {
+              digitoControl='0'+digitoControl;
+          }
+          return digitoControl;
+      },
+  
+      /**
+       * Funcion para calcular el modulo
+       * @param string valor
+       * @param integer divisor
+       * @return integer
+       */
+      modulo: function(valor, divisor) {
+          var resto=0;
+          var dividendo=0;
+          for (var i=0;i<valor.length;i+=10) {
+              dividendo = resto + "" + valor.substr(i, 10);
+              resto = dividendo % divisor;
+          }
+          return resto;
+      },
  
-    /**
-     * Funcion que devuelve el codigo de verificacion de una cuenta bancaria
-     * @param string codigoPais los dos primeros caracteres del IBAN
-     * @param string cc la cuenta corriente, que son los ultimos 20 caracteres del IBAN
-     * @return string devuelve el codigo de control
-     */
-    getCodigoControl_IBAN: function (codigoPais,cc)
-    {
-        // cada letra de pais tiene un valor
-        valoresPaises = {
-            'A':'10',
-            'B':'11',
-            'C':'12',
-            'D':'13',
-            'E':'14',
-            'F':'15',
-            'G':'16',
-            'H':'17',
-            'I':'18',
-            'J':'19',
-            'K':'20',
-            'L':'21',
-            'M':'22',
-            'N':'23',
-            'O':'24',
-            'P':'25',
-            'Q':'26',
-            'R':'27',
-            'S':'28',
-            'T':'29',
-            'U':'30',
-            'V':'31',
-            'W':'32',
-            'X':'33',
-            'Y':'34',
-            'Z':'35'
-        };
-    
-        // reemplazamos cada letra por su valor numerico y ponemos los valores mas dos ceros al final de la cuenta
-        var dividendo = cc + valoresPaises[codigoPais.substr(0,1)] + valoresPaises[codigoPais.substr(1,1)] + '00';
-    
-        // Calculamos el modulo 97 sobre el valor numerico y lo restamos al valor 98
-        var digitoControl = 98 - core.Validator.modulo(dividendo, 97);
-    
-        // Si el digito de control es un solo numero, añadimos un cero al delante
-        if(digitoControl.length==1)
-        {
-            digitoControl='0'+digitoControl;
-        }
-        return digitoControl;
-    },
- 
-    /**
-     * Funcion para calcular el modulo
-     * @param string valor
-     * @param integer divisor
-     * @return integer
-     */
-    modulo: function(valor, divisor) {
-        var resto=0;
-        var dividendo=0;
-        for (var i=0;i<valor.length;i+=10) {
-            dividendo = resto + "" + valor.substr(i, 10);
-            resto = dividendo % divisor;
-        }
-        return resto;
-    },
- 
-}
+  }
 
 
 };

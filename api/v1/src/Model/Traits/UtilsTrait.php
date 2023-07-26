@@ -23,7 +23,7 @@ trait UtilsTrait{
     }
 
     /** Filtra los resultados según el campo y valor deseado para una entidad */
-    protected function filterResults($datos, $entity, $key, $value, $relEntity = null)
+    public function filterResults($datos, $entity, $key, $value, $relEntity = null)
     {
 
         if(is_array($datos))
@@ -84,18 +84,56 @@ trait UtilsTrait{
 
         if(mysqli_num_rows($results) > 0)
         {
-            while($row = mysqli_fetch_assoc($results))
-            {
-                $arrayResults[] = $row;
-                // print_r($row);
-            }
+            $arrayResults = mysqli_fetch_all($results, MYSQLI_ASSOC);            
+            //  Liberamos el conjunto de resultados
+            mysqli_free_result($results);
         }
+
 
         //  FIX: Mirar a ver si es mejor devolver un array cuando solo tiene un registro
         //       o bien detectar si es un listado o un registro único
         //       o bien detectar si es la entidad principal para no asignarlo como array
 
         return $arrayResults;
+
+    }
+
+    /**
+     * @param Array $fields Array con el nombre de los campos
+     */
+    public function processSearch($fieldsToSearch, $valueToSearch)
+    {
+
+        $filterQuery = '';
+
+        if( is_array($fieldsToSearch) )
+        {
+
+            for($iField = 0; $iField < count($fieldsToSearch); $iField++)
+            {
+
+                $filterQuery .= $fieldsToSearch[$iField]['field'];
+
+                if($fieldsToSearch[$iField]['operator'] == "%")
+                {
+                    $filterQuery .= " like '" . '%' . $valueToSearch . '%' . "'";
+                }else{
+                    $filterQuery .= " = " . $valueToSearch;
+                }
+
+                //  Tipo de condición lógica
+                if(count($fieldsToSearch) > 1)
+                {
+                    $filterQuery .= isset($fieldsToSearch[$iField+1]['condition']) ? ' ' . $fieldsToSearch[$iField+1]['condition'] . ' ' : ' and ';
+                }else{
+                    $filterQuery .= ' and ';
+                }
+
+            }
+            $filterQuery = substr( $filterQuery, 0, strlen($filterQuery) - 4);
+        }
+
+        return $filterQuery;
 
     }
 

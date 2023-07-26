@@ -62,13 +62,13 @@ let apiFincatech =
     /** Lanza una petición GET al webservice y devuelve los datos en formato JSON
      * @param endpoint String Nombre del endpoint que se va a consultar
      */
-    get: function(entity)
+    get: async function(entity)
     {
 
         $('.loading').show();
 
         // https://es.stackoverflow.com/questions/3582/diferencias-entre-ajax-anidadas-y-promises
-        return $.ajax({
+        return await $.ajax({
             url: apiFincatech.baseUrlEndpoint + entity,
             async: true,
             success: function(respuesta)
@@ -125,12 +125,13 @@ let apiFincatech =
     },
 
     /** Llamada POST al restful api */
-    post: async function(entity, datosPost)
+    post: async function(entity, datosPost, showLoading = true)
     {
-        $('.loading').show();
+        if(showLoading)
+            $('.loading').show();
 
         //  Si tiene fichero adjuntado adjuntamos el objeto
-        if(core.Files.Fichero.base64 != '')
+        if(core.Files.Fichero.base64 != '' && core.Files.Fichero.base64 != null)
         {
             // console.log(core.Files.Fichero);
             // console.log(datosPost);

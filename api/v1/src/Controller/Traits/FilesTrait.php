@@ -10,35 +10,61 @@ use HappySoftware\Database\DatabaseCore;
 
 trait FilesTrait{
 
-    /** TODO: Recupera un fichero del histórico y lo asociad a la entidad deseada si existe */
-    public function moveFileFromHistoricoToStorage($id, $entidad, $iddestino)
+    public function WriteToFile($path, $fileName, $content)
     {
-        //  Se asigna el idfichero a la entidad sobre la que se desea reestablecer
-        //  el fichero original
 
+
+
+    } 
+
+    /**
+     * Elimina un fichero del sistema y de la bbdd
+     * @param int $fileId ID del fichero
+     */
+    public function DeleteFile($fileId)
+    {
+        //  Recuperamos la información del fichero
+        $fichero = $this->GetFileInfoById($fileId);
+        if(count($fichero) > 0)
+        {
+            global $appSettings;
+            $ruta = ROOT_DIR . $appSettings['storage']['path'];
+            //  Nombre fichero 
+            $nombreFichero = $fichero[''];
+            //  Eliminamos en bbdd el registro
+            $sql = "delete from ficheroscomunes where id = $fileId";
+            $this->getRepositorio()->queryRaw( $sql );
+            //  Eliminamos el fichero físicamente 
+            unlink($ruta . $nombreFichero);
+        }
     }
 
-    /** TODO: Mueve un fichero al histórico y que previamente exista */
-    public function moveFileFromStorageToHistorico($id, $entidad)
+    public function GetFileInfoById($fileId)
     {
-        //  Comprobamos primero que exista el fichero físico en la ruta del almacén
-
-        //  Comprobamos que no exista ese fichero en la tabla de histórico
-
-        //  Pasamos el fichero a la tabla de histórico indicando la entidad a la que pertenece
-        //  y la fecha en la que se ha generado el registro
-
+        $sqlFile = "select * from ficheroscomunes where id = $fileId";
+        $result = $this->getRepositorio()->queryRaw( $sqlFile );
+        $result = mysqli_fetch_assoc($result);
+        return $result;
     }
 
-    public function uploadFile($nombre, $base64string)
+    /**
+     * Sube un fichero al hosting y le asigna un ID
+     */
+    public function uploadFile($nombre, $base64string, $privateStorage = false)
     {
         global $appSettings;
 
         $result = [];
 
-        $ruta = ROOT_DIR . $appSettings['storage']['path'];
+        $ruta = ROOT_DIR;
 
-    //  TODO: Hay que pasar ficheros al histórico
+        if($privateStorage){
+            $ruta .= $appSettings['storage']['private'];
+        }else{
+            $ruta .= $appSettings['storage']['path'];
+        }
+
+        $ruta .=  '/';
 
         //  Generamos un nombre de fichero aleatorio basado en md5
             $fichero = md5(time());
@@ -98,5 +124,56 @@ trait FilesTrait{
 
     }
 
+    /**
+     * Guarda un fichero ZIP en la carpeta de certificados de Mensatek
+     */
+    public function saveZipFile($fileContent)
+    {
+
+        global $appSettings;
+
+        $ruta = ROOT_DIR . $appSettings['storage']['certificados'];
+        
+        if(!file_exists($ruta))
+            mkdir($ruta);
+
+        $fileName = time() . '.zip';
+        $fhFichero = fopen($ruta . '/'. $fileName ,"w");
+        fwrite($fhFichero, $fileContent);
+        fclose($fhFichero);
+
+        return $fileName;
+
+    }
+
+    /**
+     * Comprueba las carpetas de almacenamiento de ficheros
+     */
+    public function checkFolders()
+    {
+        global $appSettings;
+
+        $ruta = ROOT_DIR . $appSettings['storage']['certificados'];
+        
+        if(!file_exists($ruta))
+            mkdir($ruta);   
+
+        $ruta = ROOT_DIR . $appSettings['storage']['log'];
+        
+        if(!file_exists($ruta))
+            mkdir($ruta);   
+
+    }
+
+    /** Devuelve un fichero existente en formato base64 */
+    public function GetFileBase64Formated($path)
+    {
+
+        // Lee el contenido del archivo en una variable
+        $contenido = file_get_contents($path);
+
+        // Codifica el contenido en base64
+        return base64_encode($contenido);
+    }
 
 }

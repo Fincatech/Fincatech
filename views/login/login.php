@@ -1,3 +1,4 @@
+<?php if(!$App->isLogged()): ?>
 	<main class="d-flex space-between">
 
 		<div class="container d-flex flex-column flex-grow-1">
@@ -32,7 +33,7 @@
 											<label class="form-label">Password</label>
 											<input id="password" class="form-control form-control-lg form-required data" type="password" hs-entity="Login" hs-field="password" hs-error-msg="" name="password" placeholder="Contraseña" required />
 											<small>
-                                                <a href="pages-reset-password.html">Has olvidado la contraseña?</a>
+                                                <a href="javascript:void(0);" class="btnResetpassword">Has olvidado la contraseña?</a>
                                             </small>
 										</div>
 										<div>
@@ -43,7 +44,6 @@
 										</div>
 										<div class="text-center mt-3">
 											<button type="button" class="btn btn-lg btn-primary btnAuthenticate">Entrar</button>
-											<!-- <button type="submit" class="btn btn-lg btn-primary">Sign in</button> -->
 										</div>
 									</form>
 								</div>
@@ -55,3 +55,4 @@
 			</div>
 		</div>
 	</main>
+<?php endif; ?>

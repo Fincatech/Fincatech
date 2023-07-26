@@ -6,7 +6,7 @@ use Fincatech\Entity\InformeValoracionSeguimiento;
 
 class InformeValoracionSeguimientoModel extends \HappySoftware\Model\Model{
 
-    private $entidad = 'InformeValoracionSeguimiento';
+    private $entidad = 'Informevaloracionseguimiento';
 
     private $tablasSchema = array("InformeValoracionSeguimiento", "ficheroscomunes");
 

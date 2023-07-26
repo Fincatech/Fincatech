@@ -1,10 +1,3 @@
-/*!
- * AdminKit v2.1.0 (https://adminkit.io/)
- * Copyright 2020 Paul Laros
- * Copyright 2020 AdminKit
- * Licensed under MIT (https://github.com/adminkit/adminkit/blob/master/LICENSE)
- */
-
  @font-face {
 	font-family: Inter;
 	font-style: normal;
@@ -13344,16 +13337,16 @@ screen and (-ms-high-contrast:active) {
 }
 
 .sidebar {
-	min-width: 260px;
-	max-width: 260px;
+	min-width: 300px;
+	max-width: 300px;
 	direction: ltr
 }
 
 .sidebar,
 .sidebar-content {
 	transition: margin-left .35s ease-in-out, left .35s ease-in-out, margin-right .35s ease-in-out, right .35s ease-in-out;
-	/* background: #222e3c; */
-	background: #00913d;
+	background: #222e3c;
+	/* background: #00913d; */
 }
 
 .sidebar-content {
@@ -13363,11 +13356,10 @@ screen and (-ms-high-contrast:active) {
 }
 
 .sidebar-nav {
-	padding-left: 0;
+	padding-left:1em;
 	margin-bottom: 0;
 	list-style: none;
 	flex-grow: 1;
-	overflow-y: auto;
 }
 
 .sidebar-link,
@@ -21096,7 +21088,7 @@ span.flatpickr-weekday {
 	position: sticky;
 	top: 0;
 	left: 0;
-	width: 260px
+	width: 300px;
 }
 
 .flatpickr-calendar.inline {
@@ -21196,4 +21188,16 @@ span.flatpickr-weekday {
 .flatpickr-calendar.inline .flatpickr-prev-month:hover {
 	background: #e6e6e6;
 	color: #000
+}
+.select2-container {
+    display: block;
+    z-index: 9999;
+}
+.swal2-modal {
+    border-radius: 10px;
+    box-sizing: border-box;
+    box-shadow: 3px 4px 13px 0px #4a4a4a;
+}
+h2#swal2-title {
+ 	border-radius: 10px 10px 0px 0px;
 }

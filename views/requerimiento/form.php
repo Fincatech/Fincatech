@@ -31,13 +31,13 @@
                     </div>
 
                     <!-- Comunidad asociada -->
-                    <div class="form-group row">
+                    <!-- <div class="form-group row">
                         <div class="col-12">
                             <label for="idcomunidad"><i class="bi bi-building pr-2"></i>Comunidad asociada<small><i class="bi bi-info-circle ml-3 pl-1"></i> </span> Elija una opción solo si desea que el requerimiento sea asociado únicamente a una comunidad</label>              
                             <select id="idcomunidad" name="idcomunidad" class="select-data data custom-select form-control selectpicker" data-placeholder="Selecciona una opcion" data-allow-clear="true" data-live-search="true" hs-entity="Requerimiento" hs-field="idcomunidad" hs-list-entity="Comunidad" hs-list-field="nombre" hs-list-value="id">
                             </select>
                         </div>
-                    </div>
+                    </div> -->
 
                     <div class="form-group row mt-3">
                         <div class="col-12">

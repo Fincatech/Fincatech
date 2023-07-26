@@ -265,16 +265,37 @@ let dpdCore = {
             //  Comunidad
             // CoreUI.tableData.addColumn('listadoDpd', "comunidad[0].nombre","COMUNIDAD");
 
+            if(core.Security.getRole() == 'DPD')
+            {
+                //  Administrador
+                CoreUI.tableData.addColumn('listadoDpd', 
+                    function(row, type, val, meta)
+                    {
+                        var htmlSalida = '';
+                        htmlSalida = `<p class="mb-0">${row.usuario[0].nombre}</p>`;
+                        return htmlSalida; // row.requerimiento;
+
+                    }, 
+                    "Administrador", null, 'text-left');
+
+                //  E-mail
+                CoreUI.tableData.addColumn('listadoDpd', 
+                    function(row, type, val, meta)
+                    {
+                        var htmlSalida = '';
+                        htmlSalida = `<p class="mb-0 text-left"><small>${row.usuario[0].email}</small></p>`;
+
+                        return htmlSalida; // row.requerimiento;
+
+                    }, 
+                    "E-mail", null, 'text-center');                    
+            }
+
             //  Consulta
             CoreUI.tableData.addColumn('listadoDpd', "consulta", "Consulta");
 
             //  Respuesta
             CoreUI.tableData.addColumn('listadoDpd', "respuesta", "Respuesta");
-
-            //  Fichero asociado
-                var html = '<a href="' + config.baseURL + 'public/storage/data:ficheroscomunes.nombrestorage$" target="_blank"><i class="bi bi-cloud-arrow-down" style="font-size:24px;"></i></a>'
-                CoreUI.tableData.addColumn(null, "Fichero", html, 'text-center');
-            // CoreUI.tableData.addColumn("ficheroscomunes[0].storage",consulta, "Fichero");
 
             //  Fecha resolución 
             // CoreUI.tableData.addColumn("fecharesolucion", "Fecha esResolución");
@@ -282,6 +303,28 @@ let dpdCore = {
             //  Fecha de creación
                 var html = 'data:created$';
                 CoreUI.tableData.addColumn('listadoDpd', null, "Fecha", html, 'text-center', '80px');
+
+            //  Fichero asociado
+            CoreUI.tableData.addColumn('listadoDpd', 
+                function(row, type, val, meta)
+                {
+                    var ficheroAdjuntado = false;
+                    var htmlSalida = '';
+                    var estado = '';
+
+                    //  Enlace de descarga
+                    if(row.idfichero != null)
+                    {
+                        ficheroAdjuntado = true;
+                        //  Tiene fichero ya subido
+                        htmlSalida += `<a href="${config.baseURL}public/storage/${row.ficheroscomunes[0].nombrestorage}" target="_blank" download="${row.ficheroscomunes[0].nombre}" ><i class="bi bi-file-earmark-arrow-down" style="font-size:24px;"></i></a>`;
+                    }
+
+                    //  Validamos que solo el admin de fincas o el sudo pueda subir el fichero
+                    return htmlSalida; // row.requerimiento;
+
+                }, 
+                "Fichero", null, 'text-center');
 
             //  Estado
                 var html = 'data:solucionado$';
@@ -291,7 +334,7 @@ let dpdCore = {
                 {
                     //  Columna de acciones
                         var html = '<ul class="nav justify-content-center accionesTabla">';
-                            html += '<li class="nav-item"><a href="javascript:void(0);" class="btnResponderConsulta d-inline-block" data-id="data:id$"><i data-feather="send" class="text-info img-fluid"  style="height:42px; width: 42px;"></i></a></li>';
+                            html += '<li class="nav-item"><a href="javascript:void(0);" class="btnResponderConsulta d-inline-block" data-id="data:id$"><i data-feather="send" class="text-info img-fluid"  style="height:26px; width: 26px;"></i></a></li>';
                             CoreUI.tableData.addColumn('listadoDpd', null, "", html, 'text-center');
                 }
 

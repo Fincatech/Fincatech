@@ -17,24 +17,23 @@ let requerimientoCore = {
             core.Files.Fichero.entidadId = core.modelId;       
          }
 
-        // if( $('#listadoDocumentacionContratosCesion').length)
-        //    await requerimientoCore.renderTablaDocumentacionContratosCesion();
+    },
 
-        // if( $('#listadoContratosCesion'))
-            // await requerimientoCore.renderTablaContratosCesion(core.modelId);
+    events: function()
+    {   
 
-        // if( $('#listadoDocumentacionCamarasSeguridad'))
-        //     requerimientoCore.renderTablaDocumentacionCamarasSeguridad();
-
-        // if( $('#listadoCamarasSeguridad'))
-        //     requerimientoCore.renderTablaCamarasSeguridad(core.modelId);
+        $('body').on(core.helper.clickEventType, '.btnEliminarRequerimiento', (evt)=>{
+            evt.stopImmediatePropagation();
+            requerimientoCore.Model.Delete( $(evt.currentTarget).attr('data-id'), $(evt.currentTarget).attr('data-nombre') );
+        });        
 
     },
 
-    events: async function()
-    {   
-
-
+    Model: {
+        Delete: function(id, nombre)
+        {
+            core.Modelo.Delete('requerimiento', id, nombre, 'listadoRequerimiento', '¿Desea eliminar el requerimiento seleccionado?');
+        }
     },
 
     /**
@@ -58,8 +57,26 @@ let requerimientoCore = {
             //  Tipo
                 CoreUI.tableData.addColumn('listadoRequerimiento', "requerimientotipo[0].nombre", "TIPO", null,'text-left');
 
-            //  Comunidad asociada
-                CoreUI.tableData.addColumn('listadoRequerimiento', "comunidad[0].nombre","Comunidad asociada", null, 'text-left');
+            //  Sujeto a revisión
+                CoreUI.tableData.addColumn('listadoRequerimiento',function(row, type, val, meta)
+                {
+                    var sujetoRevision = (row.sujetorevision == '0' || row.sujetorevision == 'null' ? 'No' : 'Sí');
+                    return `<p class="text-center m-0">${sujetoRevision}</p>`;
+                }, "Sujeto revisión", null, 'text-center');
+
+            //  Requiere descarga previa
+                CoreUI.tableData.addColumn('listadoRequerimiento',function(row, type, val, meta)
+                {
+                    var descargaPrevia = (row.requieredescarga == '0' || row.requieredescarga == 'null' ? 'No' : 'Sí');
+                    return `<p class="text-center m-0">${descargaPrevia}</p>`;
+                }, "Requiere descarga previa", null, 'text-center');
+
+            //  Tiene caducidad
+                CoreUI.tableData.addColumn('listadoRequerimiento',function(row, type, val, meta)
+                {
+                    var caduca = (row.caduca == '0' || row.caduca == 'null' ? 'No' : 'Sí');
+                    return `<p class="text-center m-0">${caduca}</p>`;
+                }, "Caduca", null, 'text-center');
 
             //  Fichero asociado
                 var html = '<a href="' + config.baseURL + 'public/storage/data:ficheroscomunes.nombrestorage$" target="_blank"><i class="bi bi-cloud-arrow-down" style="font-size:24px;"></i></a>'
@@ -69,7 +86,26 @@ let requerimientoCore = {
                 var html = 'data:activado$';
                 CoreUI.tableData.addColumn('listadoRequerimiento', null, "Activo", html, 'text-center', '100px');
 
-                // $('#listadoRequerimiento').addClass('no-clicable');
+            //  Columna de acciones
+            CoreUI.tableData.addColumn('listadoRequerimiento',function(row, type, val, meta)
+            {
+                var html = `
+                    <ul class="nav justify-content-center">
+                        <li class="nav-item">
+                            <a href="${config.baseURL}requerimiento/${row.id}" class="d-inline-block">
+                                <i data-feather="edit-2" class="text-success img-fluid text-success mr-2" style="width:26px;height:26px;"></i>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="javascript:void(0);" class="btnEliminarRequerimiento d-inline-block" data-id="${row.id}" data-nombre="${row.nombre}"><i data-feather="trash-2" class="text-danger img-fluid" style="width:26px;height:26px;"></i></a>
+                        </li>
+                    </ul>`;
+                return html;
+            }, "&nbsp;", null, 'text-center', '40px');
+
+                // CoreUI.tableData.addColumn('listadoRequerimiento', null, "", html);
+
+                $('#listadoRequerimiento').addClass('no-clicable');
                 await CoreUI.tableData.render("listadoRequerimiento", "Requerimiento", "requerimiento/list");
         }
     },
@@ -89,7 +125,13 @@ let requerimientoCore = {
                 // CoreUI.tableData.addColumn('listadoDocumentacionContratosCesion', "nombre","NOMBRE", null, 'text-justify');
 
             //  Fichero asociado
-                var html = '<a href="' + config.baseURL + 'public/storage/data:ficheroscomunes.nombrestorage$" target="_blank"><i class="bi bi-cloud-arrow-down pr-2" style="font-size:24px;"></i> data:nombre$</a>'
+                var html = `
+                        <a href="${config.baseURL}public/storage/data:ficheroscomunes.nombrestorage$" target="_blank">
+                            <p class="m-0 d-inline-flex">
+                                <i class="bi bi-cloud-arrow-down pr-2" style="font-size:26px;"></i> 
+                                <span class="align-self-center">data:nombre$</span>
+                            </p>
+                        </a>`;
                 CoreUI.tableData.addColumn('listadoDocumentacionContratosCesion', null, "Fichero", html, 'text-left', '120px');
 
                 $('#listadoDocumentacionContratosCesion').addClass('no-clicable');
@@ -109,8 +151,6 @@ let requerimientoCore = {
                 CoreUI.tableData.init();
 
             // //  Nombre
-            //     CoreUI.tableData.addColumn('listadoDocumentacionCamarasSeguridad', "nombre","NOMBRE", null, 'text-justify');
-
             //  Fichero asociado
                 var html = '<a href="' + config.baseURL + 'public/storage/data:ficheroscomunes.nombrestorage$" target="_blank"><i class="bi bi-cloud-arrow-down mr-2" style="font-size:24px;"></i>data:nombre$</a>'
                 CoreUI.tableData.addColumn('listadoDocumentacionCamarasSeguridad', null, "Fichero", html, 'text-left', '120px');
@@ -142,11 +182,16 @@ let requerimientoCore = {
             //  Fichero
                 CoreUI.tableData.addColumn('listadoContratosCesion', 'ficheroscomunes[0]', "DOCUMENTO", null, 'text-center', null, function(data, type, row, meta)
                 {
-                    console.log(row);
+                    var descarga = '';;
 
-                    var salida = `<a href="${baseURL}public/storage/${row.ficheroscomunes[0].nombrestorage}" class="mr-2" data-toggle="tooltip" data-placement="bottom" title="Ver documento" data-original-title="Ver documento" target="_blank">
-                                    <i class="bi bi-cloud-arrow-down text-success" style="font-size: 30px;"></i>
-                                  </a>
+                    //  Descarga de fichero
+                    if(row.ficheroscomunes.length > 0)
+                    {
+                        descarga = `<a href="${baseURL}public/storage/${row.ficheroscomunes[0].nombrestorage}" class="mr-2" data-toggle="tooltip" data-placement="bottom" title="Ver documento" data-original-title="Ver documento" target="_blank">
+                                        <i class="bi bi-cloud-arrow-down text-success" style="font-size: 30px;"></i>
+                                    </a>`;
+                    }
+                    var salida = `${descarga}
                                   <a href="javascript:void(0);" class="btnAdjuntarDocumentoRGPD" data-tipo="contratoscesion" data-idrequerimiento="${row.id}">
                                     <i class="bi bi-cloud-arrow-up text-danger" style="font-size: 30px;"></i>
                                   </a>
@@ -187,17 +232,10 @@ let requerimientoCore = {
             //  Observaciones
                 CoreUI.tableData.addColumn('listadoCamarasSeguridad', "descripcion", "Comentarios", null, 'text-justify');
 
-            //  Fichero
-                CoreUI.tableData.addColumn('listadoCamarasSeguridad', 'ficheroscomunes[0]', "DOCUMENTO", null, 'text-center', null, function(data, type, row, meta)
+            //  SUBIDA DOCUMENTO DE CÁMARA DE SEGURIDAD
+                CoreUI.tableData.addColumn('listadoCamarasSeguridad', 'ficheroscomunes[0]', "SUBIR DOCUMENTO", null, 'text-center', null, function(data, type, row, meta)
                 {
                     var salida = '';
-                    if(row.ficheroscomunes.length > 0)
-                    {
-                        salida = `
-                        <a href="${baseURL}public/storage/${row.ficheroscomunes[0].nombrestorage}" class="mr-2" data-toggle="tooltip" data-placement="bottom" title="Ver documento" data-original-title="Ver documento" target="_blank">
-                            <i class="bi bi-cloud-arrow-down text-success" style="font-size: 30px;"></i>
-                        </a>`;
-                    }
 
                     salida += `<a href="javascript:void(0);" class="btnAdjuntarDocumentoRGPD" data-tipo="camarasseguridad" data-idrequerimiento="${row.id}">
                                     <i class="bi bi-cloud-arrow-up text-danger" style="font-size: 30px;"></i>
@@ -205,9 +243,41 @@ let requerimientoCore = {
                     return salida;
                 });
 
-            // Fecha de creación
-                var html = 'data:created$';
-                CoreUI.tableData.addColumn('listadoCamarasSeguridad', null, "Fecha de subida", html);
+            //  DESCARGA Y ESTADO DEL DOCUMENTO DE CÁMARA DE SEGURIDAD
+                CoreUI.tableData.addColumn('listadoCamarasSeguridad', 'ficheroscomunes[0]', "DOCUMENTO SUBIDO", null, 'text-center', null, function(data, type, row, meta)
+                {
+                    var salida = '';
+                    if(row.ficheroscomunes.length > 0)
+                    {
+                        salida = `
+                        <a href="${baseURL}public/storage/${row.ficheroscomunes[0].nombrestorage}" class="mr-2" data-toggle="tooltip" data-placement="bottom" title="Ver documento" data-original-title="Ver documento" target="_blank">
+                            <i class="bi bi-file-earmark-arrow-down text-success" style="font-size: 26px;"></i>
+                        </a>`;
+                    }else{
+                        salida += `<span class="badge bg-danger">Pendiente subir</span>`;
+                    }
+
+                    return salida;
+                });
+
+                // var html = 'data:updated$';
+                //CoreUI.tableData.addColumn('listadoCamarasSeguridad', null, "Fecha de subida", html);
+                CoreUI.tableData.addColumn('listadoCamarasSeguridad', 'ficheroscomunes[0]', "Fecha de subida", null, 'text-center', null, function(data, type, row, meta)
+                {
+
+                    var salida = '';
+                    if(!row.updated)
+                    {
+                        salida = `
+                        <span class="m-0">-</span>`;
+                    }else{
+                        salida += `<span>${moment(row.updated).locale('es').format('DD/MM/YYYY HH:mm')}</span>`;
+                    }
+
+                    return salida;
+
+                });
+
 
             //  Columna de acciones
                 var html = '<ul class="nav justify-content-center accionesTabla">';
@@ -220,6 +290,54 @@ let requerimientoCore = {
         }
         return true;
     },
+
+
+    renderEtiquetaEstado: function( value )
+    {
+        /** Estados posibles
+         * p: Pendiente de verificacion
+         * v: Verificado
+         * r: Rechazado
+         * c: Caducado
+         * n: Pendiente de subir
+         */
+        var clase;
+        var estado;
+
+        switch (value.toLowerCase()){
+            case 'pv':
+                estado = 'Pendiente de verificación';
+                clase = 'info';
+                break;
+            case 've':
+                estado = 'Verificado';
+                clase = 'success';
+                break;
+            case 're':
+                estado = 'Rechazado';
+                clase = 'danger';
+                break;
+            case 'ca':
+                estado = 'Caducado';
+                clase = 'danger';
+                break;
+            case 'ps':
+                estado = 'Pendiente de subir';
+                clase = 'warning';
+                break;
+            case 'na':
+                estado = 'No adjuntado';
+                clase = 'danger';
+                break;
+            default:
+                estado = 'Pendiente';
+                clase = 'danger';
+                break;
+        }
+
+        return `<span class="badge rounded-pill bg-${clase} pl-3 pr-3 pt-2 pb-2 d-block">${estado}</span>`
+
+    }
 
 }
 

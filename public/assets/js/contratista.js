@@ -2,6 +2,7 @@
 let contratista = {
 
     idContratista: null,
+    idEmpleadoSeleccionado: null,
 
     Constantes: {
 
@@ -49,6 +50,7 @@ let contratista = {
             CoreUI.Sidebar.Comunidades.cargarMenuComunidades();
             contratista.Events();
             core.Files.init();
+            contratista.checkRGPD();
     },
 
     Events: async function()
@@ -73,13 +75,12 @@ let contratista = {
         });
 
         //  Documentación CAE de la empresa
-        if( $('body #listadoDocumentacionEmpresa').length )
+        if( $('body #wrapperListadoDocumentacionCAEEmpresa').length )
         {
             await core.Security.getUserInfo().then(function()
             {
                 //  Renderizamos los documentos de la empresa
-                    empresaCore.renderTablaRequerimientosEmpresa(core.Security.user);
-
+                contratista.Model.ListarDocumentosEmpresa();
             });
         }
 
@@ -133,54 +134,6 @@ let contratista = {
 
         }
 
-        //  Documentación del empleado al hacer click sobre la tabla
-        if( $('body #listadoEmpleadosContratista').length )
-        {
-
-            $('body').on(core.helper.clickEventType, '#listadoEmpleadosContratista tr', function(evt)
-            {
-
-                evt.stopImmediatePropagation();
-                var idEmpleado = window['tablelistadoEmpleadosContratista'].row( $(this).attr('id')).data().idempleado;
-                core.Files.Fichero.entidadId = idEmpleado;
-                $('body .empleadoRequerimientosInfo').text('Requerimientos de ' + window['tablelistadoEmpleadosContratista'].row( $(this).attr('id')).data().nombre );
-                $('body .empleadoRequerimientosInfo').show();
-                $('body .wrapperDocumentacionEmpleado .mensajeInformacion').hide();
-                $('body #listadoDocumentacionEmpleado').removeClass('d-none');
-
-                empleadoCore.renderTablaDocumentacionEmpleado(idEmpleado, 'listadoDocumentacionEmpleado');
-
-                $('body .btnAdjuntarFicheroDocumento').off();
-                $('body').on(core.helper.clickEventType, '.btnAdjuntarFicheroDocumento', async function()
-                {
-        
-                    documentalCore.idcomunidad = $(this).attr('data-idcomunidad');
-                    documentalCore.idempresa = $(this).attr('data-idempresa');
-                    documentalCore.idempleado = $(this).attr('data-idempleado');
-                    documentalCore.idrequerimiento = $(this).attr('data-idrequerimiento');
-                    documentalCore.idrelacionrequerimiento = $(this).attr('data-idrelacionrequerimiento');
-                    documentalCore.entidad = $(this).attr('data-entidad');
-        
-                    const { value: file } = await Swal.fire({
-                    title: '',
-                    html: Constantes.CargaDocumento,
-                    showCancelButton: false,
-                    showConfirmButton: false,
-                    // grow: 'row',
-                    showCloseButton: true,
-                    didOpen: function()
-                    {
-        
-                        //  Inicializamos el componente de ficheros
-                            core.Files.init();
-                    }});
-        
-                });
-
-            });
-
-        }
-
         //  Carga de empleados de la comunidad
         $('body').on(core.helper.clickEventType, '.enlaceEmpleadosComunidadContratista', function(ev)
         {
@@ -203,6 +156,82 @@ let contratista = {
             empleadoCore.asignarEmpleadoComunidad(idComunidad, idEmpleado);
         });
 
+        //  Aceptación RGPD
+        $('body').on(core.helper.clickEventType, '.btnAceptarRGPD', function(ev)
+        {
+            contratista.aceptacionRGPD($(this).attr('data-id'), '1');
+        });
+        
+        //  Rechazo RGPD
+        $('body').on(core.helper.clickEventType, '.btnRechazarRGPD', function(ev)
+        {
+            contratista.aceptacionRGPD($(this).attr('data-id'), '0');
+        });
+
+        //  Adjuntar operatoria entre comunidad y empresa externa
+        $('body').on(core.helper.clickEventType, '.btnAdjuntarOperatoria', async function()
+        {
+
+            documentalCore.idcomunidad = $(this).attr('data-idcomunidad');
+            documentalCore.idempresa = $(this).attr('data-idempresa');
+            documentalCore.idempleado = $(this).attr('data-idempleado');
+            documentalCore.idrequerimiento = $(this).attr('data-idrequerimiento');
+            documentalCore.idrelacionrequerimiento = $(this).attr('data-idrelacionrequerimiento');
+            documentalCore.entidad = $(this).attr('data-entidad');
+
+            const { value: file } = await Swal.fire({
+            title: '',
+            html: Constantes.CargaDocumento,
+            showCancelButton: false,
+            showConfirmButton: false,
+            showCloseButton: true,
+            didOpen: function()
+            {
+
+                //  Inicializamos el componente de ficheros
+                    core.Files.init();
+            }});
+
+        });        
+
+    },
+
+    checkRGPD: function()
+    {
+
+        //  Comprobamos si tiene aceptada la RGPD
+        if( $('.mensajeRGPD').length > 0)
+        {
+            core.Security.getUserInfo().then( (result) =>
+            {
+                apiFincatech.get(`user/${core.Security.user}/rgpd`).then( result =>
+                {
+                    if((JSON.parse(result).data['rgpd']) == '1')
+                    {
+                        $('.mensajeRGPD').hide();
+                    }else{
+                        $('.mensajeRGPD').show();
+                    }
+                });
+            });       
+        }
+    },
+
+    //  Actualiza el status relativo a la aceptación de la RGPD de un contratista
+    aceptacionRGPD: function( idUsuario, valor )
+    {
+        var data = Object();
+        data.rgpd = valor;
+        apiFincatech.put(`usuario/${idUsuario}`, data).then( result =>
+        {
+            if(valor == '0')
+            {
+                CoreUI.Modal.Error('Ha rechazado el consentimiento de la aceptación de la RGPD', 'Aceptación RGPD');
+            }else{
+                CoreUI.Modal.Success('Ha aceptado el consentimiento relativo a la RGPD', 'Aceptación RGPD');
+            }
+            contratista.checkRGPD();
+        });
     },
 
     mostrarModalAsignarEmpleadoComunidad: function()
@@ -237,6 +266,14 @@ let contratista = {
             }
 
         });
+    },
+
+    Model: {
+        ListarDocumentosEmpresa: function()
+        {
+            documentalCore.Listado.Cargar('wrapperListadoDocumentacionCAEEmpresa', documentalCore.ENTIDAD_EMPRESA, documentalCore.CAE_EMPRESA, null, core.Security.user, null);
+            empresaCore.renderTablaRequerimientosEmpresa(core.Security.user);       
+        }
     },
 
 }

@@ -24,10 +24,6 @@
 
                         <div class="col-12 space-between">
 
-                            <!-- <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoDpd" id="listadoDpd" data-model="dpd">
-                                <thead class="thead"></thead>
-                                <tbody class="tbody"></tbody>
-                            </table> -->
                             <div class="row mb-3">
                                 <div class="col-12 pl-0 pr-0">
                                     <ul class="nav nav-tabs border-bottom-0" id="tablaRGPD" role="tablist">
@@ -78,7 +74,6 @@
                 </div>
 
             </div>
-
 
         </div>
 

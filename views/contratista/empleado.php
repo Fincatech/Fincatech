@@ -41,10 +41,10 @@
                         </div> 
 
                         <!-- Fecha de alta -->
-                        <div class="col-12 col-md-2">
+                        <!-- <div class="col-12 col-md-2">
                             <label for="fechaalta"><i class="bi bi-wrench pr-2"></i>Fecha de alta</label>                        
                             <input type="date" class="form-control data" id="fechaalta" name="fechaalta" hs-entity="Empleado" hs-field="fechaalta" placeholder="dd/mm/aaaa">
-                        </div> 
+                        </div>  -->
 
                     </div>
 
@@ -61,15 +61,15 @@
                     </div>
 
                     <!-- dirección -->
-                    <div class="form-group row mb-2">
+                    <!-- <div class="form-group row mb-2">
                         <div class="col-12">
                             <label for="direccion"><i class="bi bi-map pr-2"></i>Dirección</label>                        
                                 <input type="text" class="form-control data" id="direccion" name="direccion" placeholder="Dirección"  hs-entity="Empleado" hs-field="direccion" maxlength="255" required>
                         </div>
-                    </div> 
+                    </div>  -->
 
                     <!-- Código postal, Localidad y provincia -->                   
-                    <div class="form-group row mb-2">
+                    <!-- <div class="form-group row mb-2">
                         <div class="col-12 col-md-2">
                             <label for="codpostal"><i class="bi bi-mailbox pr-2"></i>Código postal</label>
                             <input type="text" class="form-control data text-center" id="codpostal" name="codpostal" placeholder="C.P." maxlength="5"  hs-entity="Empleado" hs-field="codpostal">
@@ -82,7 +82,7 @@
                             <label for="provincia"><i class="bi bi-geo-alt pr-2"></i>Provincia</label>
                             <select id="provincia" name="provincia" class="select-data data custom-select form-control selectpicker" data-live-search="true" hs-entity="Empleado" hs-field="provinciaid" hs-list-entity="Provincia" hs-list-field="Nombre" hs-list-value="Id"></select>
                         </div>                        
-                    </div> 
+                    </div>  -->
 
                     <!-- Teléfono y e-mail -->
                     <div class="form-group row mb-2">

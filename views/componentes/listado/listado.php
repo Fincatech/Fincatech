@@ -15,7 +15,7 @@
 
     if($App->getController() != 'dpd'): ?>
                     <div class="col-12 col-md-3 text-right">
-                        <a href="/<?php echo APPFOLDER . $App->getController() . "/add" ?>" class="btn btn-outline-secondary text-uppercase rounded-pill shadow pl-2 pr-4"><i class="bi bi-plus-circle pr-3"></i> AÑADIR <?php echo strtoupper($App->getController() ); ?></a>
+                        <a href="<?php echo HOME_URL . $App->getController() . "/add" ?>" class="btn btn-outline-secondary text-uppercase rounded-pill shadow pl-2 pr-4"><i class="bi bi-plus-circle pr-3"></i> AÑADIR <?php echo strtoupper($App->getController() ); ?></a>
                     </div>
     <?php endif; ?>
     

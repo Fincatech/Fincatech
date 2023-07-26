@@ -14,7 +14,7 @@ class Comunidad extends EntityHelper{
     public $tipoEliminacion = DELETE_FISICO;
     public $moveToHistorial = true;
 
-    public $orderBy = "nombre";
+    public $orderBy = "codigo";
     public $orderType = ORDER_BY_ASC;
 
     /**

@@ -113,7 +113,7 @@ class EmpleadoModel extends \HappySoftware\Model\Model{
         $sql .= 'select * from view_empleadoscomunidad where idcomunidad = ' . $idcomunidad;
 
         $data['Empleado'] = $this->query( $sql );
-
+        
         for($x = 0; $x < count($data['Empleado']); $x++)
         {
             //  Recuperamos los documentos asociados a PRL de empleado
@@ -148,11 +148,14 @@ class EmpleadoModel extends \HappySoftware\Model\Model{
     {
         $sql = "SELECT * FROM `view_empleadoscomunidadempresa` where idempresa = $idEmpresa and idcomunidad = $idComunidad";
         $data = $this->query($sql);
-        for($x = 0; $x < count($data); $x++)
+        if(count($data))
         {
-            //  Recuperamos los documentos asociados a PRL de empleado
-            $data[$x]['documentacionprl'] = $this->GetDocumentacionEmpleado($data[$x]['idempleado']);
-        }   
+            for($x = 0; $x < count($data); $x++)
+            {
+                //  Recuperamos los documentos asociados a PRL de empleado
+                $data[$x]['documentacionprl'] = $this->GetDocumentacionEmpleado($data[$x]['idempleado']);
+            }   
+        }
         return $data;
     }
 

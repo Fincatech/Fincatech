@@ -13,11 +13,13 @@ class MainController{
     use SecurityTrait, TableTrait, UtilsTrait, ViewTrait;
 
     private $userRol;
+    private $rgpdAceptado;
     private $pageTitle;
     private $controllerName;
     private $controllerAction;
     private $controllerRoute;
     private $_id;
+    private $_usuarioId;
 
     //  Esta variable se utiliza para comprobar si el segundo parámetro del controller
     //  es una acción propiamente dicha, si no, indica una subruta
@@ -42,10 +44,21 @@ class MainController{
         return ( $this->getUserRol() == 'ROLE_ADMINFINCAS' );
     }
 
+    public function isDPD()
+    {
+        return ( $this->getUserRol() == 'ROLE_DPD' );
+    }
+
     /** Comprueba si el usuario autenticado es un contratista */
     public function isContratista()
     {
         return ( $this->getUserRol() == 'ROLE_CONTRATISTA' ); 
+    }
+
+    /** Devuelve si el usuario tiene el RGPD aceptado */
+    public function tieneRGPDAceptado()
+    {
+        return $this->rgpdAceptado;
     }
 
     public function getFullControllerRoute()
@@ -61,6 +74,11 @@ class MainController{
     public function getUserRol()
     {
         return $this->userRol;
+    }
+
+    public function getUserId()
+    {
+        return $this->_usuarioId;
     }
 
     /** Obtiene la url a la que debe dirigir */
@@ -123,6 +141,7 @@ class MainController{
         return $this;
     }
 
+    /** Inicializa el Front Controller */
     public function Run()
     {
         //  Guardamos toda la url de la petición
@@ -130,7 +149,9 @@ class MainController{
 
             if(empty($_GET['route']))
             {
-                $this->setController( 'login' );
+                // $controller = ($this->isLogged() ? 'dashboard' : 'login');
+                $controller = ('login');
+                $this->setController( $controller );
             }else{
                 $this->setController( $_GET['route'] );
             }
@@ -143,14 +164,12 @@ class MainController{
             
             $resultValidation = $this->checkSecurity();
 
-            // print_r($resultValidation);die();
-
             if($resultValidation['status'] === true && !empty($resultValidation['data']))
             {
-                // die('a');
                 $userData = $resultValidation['data']->userData;
                 $this->userRol = $userData->role;
-                $this->getController();
+                $this->rgpdAceptado = $userData->rgpd;
+                $this->_usuarioId = $userData->id;
                 $this->InitView();
             }else{
 
@@ -165,10 +184,6 @@ class MainController{
                 }
 
             }
-
-        //  Obtenemos el nombre del controlador que se va a utilizar
-
-        //  Renderizamos la vista en función
 
     }
 

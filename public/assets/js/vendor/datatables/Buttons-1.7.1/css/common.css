@@ -7,13 +7,11 @@ div.dt-button-info {
   margin-left: -200px;
   background-color: white;
   border: 2px solid #111;
-  -webkit-box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
-          box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
   border-radius: 3px;
   text-align: center;
   z-index: 21;
 }
-
 div.dt-button-info h2 {
   padding: 0.5em;
   margin: 0;
@@ -21,7 +19,6 @@ div.dt-button-info h2 {
   border-bottom: 1px solid #ddd;
   background-color: #f3f3f3;
 }
-
 div.dt-button-info > div {
   padding: 1em;
 }
@@ -34,5 +31,4 @@ div.dt-button-collection-title {
 
 div.dt-button-collection-title:empty {
   display: none;
-}
-/*# sourceMappingURL=common.css.map */
+}/*# sourceMappingURL=common.css.map */

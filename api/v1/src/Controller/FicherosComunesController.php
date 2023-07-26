@@ -5,7 +5,7 @@ namespace Fincatech\Controller;
 
 use Fincatech\Model\FicherosComunesModel;
 
-class ExampleController extends FrontController{
+class FicherosComunesController extends FrontController{
 
     private $ficherosComunesModel;
 
@@ -45,4 +45,6 @@ class ExampleController extends FrontController{
        return $this->FicherosComunesModel->List($params);
     }
 
+
+    
 }

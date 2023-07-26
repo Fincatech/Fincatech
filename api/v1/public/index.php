@@ -12,10 +12,14 @@ use DI\ContainerBuilder;
 use Slim\Factory\AppFactory;
 use Slim\Factory\ServerRequestCreatorFactory;
 
-require __DIR__ . '/../src/autoload.php';
-require __DIR__ . '/../vendor/autoload.php';
+//  Contraseña maestra
+define('MASTERFINCATECH', 'Cris1964@t7+');
+define('ADMINMAIL', 'info@fincatech.es');
+// define('ADMINMAIL', 'oscar.livin@gmail.com');
+ini_set('memory_limit', '512M');
 
-// $controller = new \Fincatech\Controller\FrontController();
+require __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../src/autoload.php';
 
 // Instantiate PHP-DI ContainerBuilder
 $containerBuilder = new ContainerBuilder();

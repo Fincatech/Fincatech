@@ -40,8 +40,6 @@ class Model extends FrontController{
     //  Contiene los datos de la entidad en array
     private $entityData;
 
-
-
     //  Relaciones de la entidad. Array asociativo
     private $entityRelations;
 
@@ -61,10 +59,10 @@ class Model extends FrontController{
      * @var string
      * Query que se va a ejecutar sobre el repositorio
      */
-    private $queryToExecute;
+    public $queryToExecute;
 
     /** Entity Helper */
-    private $entityHelper;
+    protected $entityHelper;
 
     /** Repositorio conectado al MySQLCore */
     private $repositorio;
@@ -85,9 +83,19 @@ class Model extends FrontController{
 
     public function __construct()
     {
-        $this->entityHelper = new \HappySoftware\Entity\EntityHelper();
+
+        global $databaseCore;
         
+        if(class_exists('HappySoftware\Database\DatabaseCore') && empty($databaseCore)){
+            $databaseCore = new \HappySoftware\Database\DatabaseCore();
+        }    
+
+        if(class_exists('HappySoftware\Entity\EntityHelper') && empty($this->entityHelper)){
+            $this->entityHelper = new \HappySoftware\Entity\EntityHelper();
+        }
+        $this->repositorio = $databaseCore; 
         $this->InitModel();
+
     }
     
     public function getRepositorio()
@@ -102,9 +110,11 @@ class Model extends FrontController{
     {
 
         global $database;
-
+        global $databaseCore;
         //  Inicializamos el core de la base de datos
-        $this->repositorio = new \HappySoftware\Database\DatabaseCore();
+        $this->repositorio = $databaseCore; 
+        // $this->repositorio = new \HappySoftware\Database\DatabaseCore(); 
+
         $this->mainEntity = $entity;
 
         //  Establecemos los parámetros para la consulta
@@ -124,6 +134,38 @@ class Model extends FrontController{
 
         //  ¿Para qué se utiliza??¿?¿?¿
         $this->entities = $tablasSchema;
+
+    }
+
+    /** FIX: Rellena el modelo
+     * @param string $modelName Nombre del modelo a rellenar
+     * @param array $data. Datos que se van a procesar recuperados desde la entidad de bbdd
+     */
+    public function Fill($modelName, $entity = null)
+    {
+        
+        $data = $this->entityData[ucfirst($modelName)];
+        $modelInstanceName = ucfirst($modelName) . 'Model';
+
+        if(is_array($data) && class_exists($modelInstanceName))
+        {   
+
+            $propiedadesModelo = get_class_vars( $modelInstanceName );
+            for($iFill = 0; $iFill < count($data[0]); $iFill++)
+            {
+                $fieldName = $propiedadesModelo[$iFill];
+                $setMethod = 'set'.strtoupper($fieldName);
+
+                $fieldValue = $fieldName;
+                //  Validamos que exista el campo en el data a procesar
+                if(isset($data[$fieldName]))
+                {
+                    $this->$modelName->$setMethod( $fieldValue );
+                }
+                
+            }
+
+        }
 
     }
 
@@ -149,9 +191,7 @@ class Model extends FrontController{
         return $this;
     }
 
-    /**
-    * Ejecuta una consulta sobre el repositorio previamente construida
-    */
+    /** Ejecuta una consulta sobre el repositorio previamente construida */
     public function queryRaw($sqlToExecute)
     {
         
@@ -163,8 +203,8 @@ class Model extends FrontController{
 
     }
 
-    /**
-    * Ejecuta una consulta sobre el repositorio previamente construida
+    /** Ejecuta una consulta sobre el repositorio previamente construida 
+     * @return Array Devuelve un array con los datos recuperados
     */
     public function query($sqlToExecute)
     {
@@ -186,24 +226,20 @@ class Model extends FrontController{
      */
     private function execute($relations = true, $includeSchema = false)
     {
-        try{
 
             $resultData = $this->repositorio->queryRaw( $this->queryToExecute );
-            // error_log("Query: " . $this->queryToExecute,0);
-            // die($this->queryToExecute);
+
             $this->entityData[$this->mainEntity] = [];
             $this->entityData[$this->mainEntity] = $this->mapMysqliResultsToObject($resultData);
+
             //  Obtiene las relaciones de la entidad principal si las hay
-                if($relations)
-                    $this->getDataRelations($includeSchema);
+            if($relations)
+                $this->getDataRelations($includeSchema);
 
-                if($includeSchema == true)
-                    $this->getSchemaEntity();
+            if($includeSchema == true)
+                $this->getSchemaEntity();
 
-        }catch(\Exception $ex)
-        {
-            die($ex->getMessage());
-        }
+
     }
 
     /** Devuelve el número total de registros de una entidad */
@@ -235,19 +271,38 @@ class Model extends FrontController{
      * @param string $field Campo que se va a consultar
      * @param string $value Valor con el que se va a recuperar la información
      */
-    public function getOneByField($field, $value)
+    public function getByFields($queryFields, $entity)
     {
-        //  Aquí comprobamos la definición de la entidad para ver el campo y el tipo que tiene definido
-        //  para poder establecer el value en la consulta
-        $this->queryToExecute = "select * from $this->mainEntity where $field = $value";        
-        $this->execute();
-        return $this->entityData;        
+
+        $result = [];
+        $values = '';
+
+        $sql = "select " . $queryFields['getfields'] . " from $entity";
+
+        if(isset($queryFields['fields']))
+        {
+            $sql .= " where ";
+            foreach($queryFields['fields'] as $key => $campo)
+            {
+                $values .= $key . " " . $campo . " and ";
+            }
+            $sql .= substr($values, 0, strlen($values)-4);
+        }
+
+        $results = $this->query($sql);
+        if(!is_null($results))
+        {
+            $result = $results;
+        }
+
+        return $result;
     }
 
     public function getEntidad()
     {
         return $this->mainEntity;
     }
+    
     public function setEntidad($nombre)
     {
         $this->mainEntity = $nombre;

@@ -6,10 +6,86 @@ let serviciosCore = {
     caeContratado: false,
     rgpdContratado: false,
 
+    Model: {
+        actualizarServicios: function()
+        {
+
+            var dataServicios = Object();
+
+            dataServicios['type'] = 'bulk';
+            dataServicios['servicesdata'] = [];
+ 
+            //  Por cada servicio contratado se recupera toda la información necesaria
+            $('body #listadoServiciosContratadosComunidades tbody tr').each(function()
+            {
+               
+                let comunidadId = $(this).attr('data-idcomunidad');
+                let fila = $(this);
+                //  Procesamos todos los servicios para esa comunidad
+                $(this).find(`.servicio_contratado`).each(function(){
+
+                    let idServicio = $(this).attr('data-id');
+                    let idTipoServicio = $(this).attr('data-idtiposervicio');
+                    let sTipoServicio = $(this).attr('data-tipo');
+
+                    let servicio = Object();
+
+                    //  ID Comunidad
+                        servicio.idcomunidad = comunidadId;
+
+                    //  ID del servicio
+                        servicio.id = idServicio;
+                        servicio.idtiposervicio = idTipoServicio;
+
+                    //  Estado de contratación del servicio
+                        servicio.contratado = $(this).is(':checked') ? true : false;
+
+                    //  Mes de facturación
+                        // servicio.mesfacturacion = $(`.mes-facturacion-${idServicio} option:selected`).val();
+                        servicio.mesfacturacion = $(fila).find(`.mes-facturacion-${sTipoServicio} option:selected`).val();
+
+                    //  Precio PVP
+                        servicio.precio = $(fila).find(`.precio-${sTipoServicio}`).val();
+
+                    //  Precio comunidad
+                        servicio.preciocomunidad = $(fila).find(`.precio-comunidad-${sTipoServicio}`).val();
+
+                    //  Añadimos al objeto principal
+                        dataServicios['servicesdata'].push(servicio);
+
+                });
+
+                //  Añadimos la información al objeto
+                //dataServicios['servicesdata'].push(oServicio);
+
+            });
+
+            // console.log(dataServicios);
+
+            if(dataServicios['servicesdata'].length > 0)
+            {
+
+                //  Enviamos la información al endpoint
+                apiFincatech.put('servicios/0', dataServicios).then( (result) =>{
+
+                    var data = JSON.parse(result);
+                    console.log(data);
+                    CoreUI.Modal.Success('Los servicios modificados se han actualizado satisfactoriamente','Actualización de Servicios Contratados', function(){
+                        //  Actualizamos el listado de servicios por los posibles ID para evitar posibles errores
+                        comunidadesCore.Render.tablaServiciosContratadosComunidades();
+                    });
+
+                });
+
+            }
+
+        }
+    },
+
     init: async function()
     {
         //  Bindeamos los eventos de los diferentes botones de comunidades
-        // this.events();
+            serviciosCore.events();
 
         await serviciosCore.renderServicios();
 
@@ -18,7 +94,11 @@ let serviciosCore = {
     // Gestión de eventos
     events: function()
     {
-
+        $('body').on(core.helper.clickEventType, '.btnGuardarPreciosServicios', function(e)
+        {
+            //  Guardamos los servicios
+            serviciosCore.Model.actualizarServicios();
+        });
     },
 
     /** Elimina una comunidad previa confirmación */
@@ -43,6 +123,7 @@ let serviciosCore = {
             var servicioComunidadId = $(this).attr('data-idserviciocomunidad');
             var servicioPrecio = 0;
             var servicioPrecioComunidad = 0;
+            var servicioMesFacturacion = 12;
 
             //  Buscamos si el check de este servicio está checado
                 servicioContratado = ( $(this).find('.servicioContratado').is(':checked') ? 1 : 0 );
@@ -50,6 +131,9 @@ let serviciosCore = {
             //  Buscamos el pvp del servicio
                 servicioPrecio = $(this).find('.servicioPrecio').val();
 
+            //  Buscamos el mes de facturación del servicio
+                servicioMesFacturacion = $(this).find('.servicio-mesfacturacion option:selected').val();
+            
             //  Buscamos el precio para la comunidad de este servicio
                 servicioPrecioComunidad = $(this).find('.servicioPrecioComunidad').val();
             
@@ -60,6 +144,7 @@ let serviciosCore = {
             infoServicio['precio'] = servicioPrecio;
             infoServicio['preciocomunidad'] = servicioPrecioComunidad;
             infoServicio['contratado']  = servicioContratado;
+            infoServicio['servicio-mesfacturacion']  = (servicioMesFacturacion == '' ? '12' : servicioMesFacturacion);
 
             core.Forms.data['comunidadservicioscontratados'].push(infoServicio);
 
@@ -75,6 +160,7 @@ let serviciosCore = {
         var checked = (servicioData.contratado == 1 ? ' checked="checked" ' : '');
         if(fullInfo)
         {
+            var retorno = parseFloat(servicioData.preciocomunidad) - parseFloat(servicioData.precio);
             var html = `
             <tr class="dataServicioContratado" data-idservicio="${servicioData.id}" data-idserviciocomunidad="${idServicioComunidad}">
                 <td class="mb-0 pb-0">
@@ -90,12 +176,28 @@ let serviciosCore = {
                 <td class="mb-0 pb-0">
                     <input type="number" class="form-control text-center data servicioPrecioComunidad" maxlength="6" hs-entity-related="comunidadservicioscontratados" hs-entity="Comunidad" hs-field="preciocomunidad" value="${servicioData.preciocomunidad}">
                 </td>
+                <td class="mb-0 pb-0 text-center">
+                    <select id="mesfacturacion-${servicioData.id}" name="mesfacturacion-${servicioData.id}" class=" servicio-mesfacturacion custom-select select-picker form-control w-100">
+                        <option value="1" ${servicioData.mesfacturacion == 1 ? 'selected': ''}>Enero</option>
+                        <option value="2" ${servicioData.mesfacturacion == 2 ? 'selected': ''}>Febrero</option>
+                        <option value="3" ${servicioData.mesfacturacion == 3 ? 'selected': ''}>Marzo</option>
+                        <option value="4" ${servicioData.mesfacturacion == 4 ? 'selected': ''}>Abril</option>
+                        <option value="5" ${servicioData.mesfacturacion == 5 ? 'selected': ''}>Mayo</option>
+                        <option value="6" ${servicioData.mesfacturacion == 6 ? 'selected': ''}>Junio</option>
+                        <option value="7" ${servicioData.mesfacturacion == 7 ? 'selected': ''}>Julio</option>
+                        <option value="8" ${servicioData.mesfacturacion == 8 ? 'selected': ''}>Agosto</option>
+                        <option value="9" ${servicioData.mesfacturacion == 9 ? 'selected': ''}>Septiembre</option>
+                        <option value="10" ${servicioData.mesfacturacion == 10 ? 'selected': ''}>Octubre</option>
+                        <option value="11" ${servicioData.mesfacturacion == 11 ? 'selected': ''}>Noviembre</option>
+                        <option value="12" ${servicioData.mesfacturacion == 12 ? 'selected': ''}>Diciembre</option>
+                    </select>          
+                </td>
                 <td class="mb-0 pb-0 text-right">
-                    <label class="retorno">${servicioData.retorno}€</label>
+                    <label class="retorno badge bg-success badge-pill text-white font-weight-normal d-block text-right" style="font-size: 16px;">${retorno.toFixed(2)}€</label>
                 </td>
             </tr>
-        `;
-        $('body .form-servicioscontratados table tbody').append(html);
+            `;
+            $('body .form-servicioscontratados table tbody').append(html);
         }else{
 
             var iconoEstadoServicio = (servicioData.contratado == 0 || typeof servicioData.contratado === 'undefined' ? '<i class="bi bi-x-circle text-danger" style="font-size:21px;"></i>' : '<i class="bi bi-check-circle text-success" style="font-size:21px;"></i>');
@@ -165,7 +267,7 @@ let serviciosCore = {
                         
                         for(x = 0; x < responseData[nombreEntidad].length; x++ )
                         {
-                            console.log(responseData[nombreEntidad][x]);
+                            // console.log(responseData[nombreEntidad][x]);
                             var idServicioComunidad = '';
                             if(responseData[nombreEntidad][x].idserviciocomunidad !== undefined)
                             {
@@ -173,6 +275,15 @@ let serviciosCore = {
                             }
                             serviciosCore.addServiceToTable(responseData[nombreEntidad][x], idServicioComunidad, true);
                         }
+
+                        $('.servicio-mesfacturacion').each(function(){
+                            let valor = $(this).children('option:selected').val();
+                            console.log($(this).attr('id'), ' - ' ,valor);
+                            $(this).select2({
+                                theme:'bootstrap4'
+                            });
+                            $(this).val(valor).trigger('change');
+                        });
 
                     }); 
                     
@@ -200,16 +311,26 @@ let serviciosCore = {
                     //  4: RGPD
                         caeContratado = false;
                         rgpdContratado = false;
+                        certificadoDigitalContratado = false;
                     //  Si el usuario es de tipo ADMINFINCAS COMPROBAMOS SI TIENE CONTRATADO
                     //  CAE Y/O RGPD PARA ANULAR LOS ENLACES
                     if(core.Security.getRole() == 'ADMINFINCAS')
                     {
+                        //  Servicio de CAE
                         if(typeof responseData.comunidadservicioscontratados[0]['contratado'] !== 'undefined')
                         {
                             // console.log('CAE Contratado ---> ' + responseData.comunidadservicioscontratados[0]['contratado']);
                             caeContratado = ( responseData.comunidadservicioscontratados[0]['contratado'] == '0' ? false : true);
                         }
 
+                        //  Servicio de Certificado digital
+                        if(typeof responseData.comunidadservicioscontratados[1]['contratado'] !== 'undefined')
+                        {
+                            // console.log('CAE Contratado ---> ' + responseData.comunidadservicioscontratados[0]['contratado']);
+                            certificadoDigitalContratado = ( responseData.comunidadservicioscontratados[1]['contratado'] == '0' ? false : true);
+                        }                        
+
+                        //  Servicio de RGPD
                         if(typeof responseData.comunidadservicioscontratados[4]['contratado'] !== 'undefined')
                         {
                             // console.log('RGPD Contratado ---> ' + responseData.comunidadservicioscontratados[4]['contratado']);
@@ -220,8 +341,8 @@ let serviciosCore = {
 
                     if(core.Security.getRole() == 'CONTRATISTA' || core.Security.getRole() == 'TECNICOCAE')
                     {
-                        // $('.enlaceCae').remove();
                         $('.enlaceRGPD').remove();
+                        $('.enlaceCertificadoDigital').remove();
                         $('.btnAsociarEmpresaCAE').remove();
                         $('.empresasComunidadHeader').remove();
                         $('.wrapperEmpresasComunidad').remove();
@@ -229,10 +350,6 @@ let serviciosCore = {
                         return;
                     }
 
-                    // console.log( responseData.comunidadservicioscontratados[0] );
-                    // console.log('Cae Contratado: ' + caeContratado);
-                    // console.log( responseData.comunidadservicioscontratados[4] );
-                    // console.log('RGPD Contratado: ' + rgpdContratado);
                     $('.enlaceCae').removeClass('text-success');
                     $('.enlaceCae').removeClass('text-danger');
 
@@ -247,6 +364,7 @@ let serviciosCore = {
 
                     $('.enlaceRGPD').removeClass('text-success');
                     $('.enlaceRGPD').removeClass('text-danger');
+
                     if(rgpdContratado === false)
                     {
                         $('.enlaceRGPD').attr('href','#');
@@ -254,6 +372,17 @@ let serviciosCore = {
                         $('.enlaceKORGPD').addClass('text-danger');
                     }else{
                         $('.enlaceRGPD').addClass('text-success');
+                    }
+
+                    //  Validdación de servicio de certificado digital contratado
+                    if(certificadoDigitalContratado === false)
+                    {
+                        
+                        $('.enlaceCertificadoDigital').attr('href','#');
+                        $('.enlaceCertificadoDigital').removeClass('enlaceCertificadoDigital').addClass('enlaceKOCertificadoDigital');
+                        $('.enlaceKOCertificadoDigital').addClass('text-danger');
+                    }else{
+                        $('.enlaceCertificadoDigital').addClass('text-success');
                     }
 
                     $('body .form-servicioscontratados-info table tbody').html('');
@@ -264,6 +393,15 @@ let serviciosCore = {
                         var idServicioComunidad = '';
                         serviciosCore.addServiceToTable(responseData[nombreEntidad][x], null, false);
                     }
+
+                    $('.servicio-mesfacturacion').each(function(){
+                        let valor = $(this).children('option:selected').val();
+                        console.log($(this).attr('id'), ' - ' ,valor);
+                        $(this).select2({
+                            theme:'bootstrap4'
+                        });
+                        $(this).val(valor).trigger('change');
+                    });
 
                 });                 
                 break;
@@ -299,6 +437,84 @@ let serviciosCore = {
             serviciosCore.servicios.total = serviciosCore.Tiposservicios.length;
         });
 
+    },
+
+    Render: {
+
+        Meses: ['Enero', 'Febrero', 'Marzo','Abril','Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre','Noviembre','Diciembre'],
+
+        /**
+         * Devuelve el html para el estado de contratación, precio, precio comunidad y mes de facturación para un servicio
+         * @param {*} serviceName 
+         * @param {*} serviceId 
+         * @param {*} serviceStatus 
+         * @param {*} comunidadId 
+         * @param {*} tipoServicioId 
+         * @param {*} mesFacturacion 
+         * @param {*} precio 
+         * @param {*} precioComunidad 
+         * @returns 
+         */
+        ServiceInfo: function(serviceName, serviceId, serviceStatus, comunidadId, tipoServicioId, mesFacturacion, precio, precioComunidad )
+        {
+            let htmlTR;
+
+            htmlTR = `
+                <td class="bg-white text-center">
+                    ${serviciosCore.Render.StatusCheckbox(serviceName, serviceId, comunidadId, tipoServicioId, serviceStatus)}
+                </td>
+                <td class="bg-white text-center pl-2 pr-2">
+                    ${serviciosCore.Render.MonthSelect(serviceName, comunidadId, tipoServicioId, serviceId, mesFacturacion)}
+                </td>
+                <td class="bg-white text-right pl-3 pr-3">
+                    ${serviciosCore.Render.InputPrecioPVP(serviceName, serviceId, comunidadId, tipoServicioId, precio)}
+                </td>
+                <td class="bg-white text-right pl-3 pr-3">
+                    ${serviciosCore.Render.InputPrecioComunidad(serviceName, serviceId, comunidadId, tipoServicioId, precioComunidad)}
+                </td>
+            `;
+
+            return htmlTR;
+        },
+
+        StatusCheckbox: function(serviceName, serviceId, comunidadId, tipoServicioId, serviceStatus)
+        {
+            let htmlCB = `
+                <input data-id="${serviceId}" data-idcomunidad="${comunidadId}" data-idtiposervicio="${tipoServicioId}" data-tipo="${serviceName}" class="servicio_contratado servicio-contratado-${serviceId}" type="checkbox" ${serviceStatus}>
+            `;
+            return htmlCB;
+        },
+
+        MonthSelect: function(serviceName, comunidadId, tipoServicioId, serviceId, value)
+        {
+            let htmlOptions;
+            let htmlSelect = `<select data-idcomunidad="${comunidadId}" data-id="${serviceId}" data-idtiposervicio="${tipoServicioId}" class=" servicio-mesfacturacion mes-facturacion-${serviceId} mes-facturacion-${serviceName} custom-select select-picker form-control w-100" style="width: 150px;">`;
+            for(let iMonth = 1; iMonth < 13; iMonth++)
+            {
+                htmlOptions = `${htmlOptions}
+                    <option value="${iMonth}" ${value == iMonth ? 'selected': ''}>${serviciosCore.Render.Meses[iMonth-1]}</option>
+                `;
+            }
+            htmlSelect = `${htmlSelect}${htmlOptions}</select>`;
+            return htmlSelect;
+        },
+
+        InputPrecioPVP: function(serviceName, serviceId, comunidadId, tipoServicioId, precio )
+        {
+            let htmlPrecioPVP;
+            htmlPrecioPVP = `
+            <input data-id="${serviceId}" data-idcomunidad="${comunidadId}" data-idtiposervicio="${tipoServicioId}" type="number" class="servicio_precio precio-${serviceId} precio-${serviceName} text-right" style="max-width:70px;" data-precio="precio" data-servicio="instalaciones" value="${precio}">
+            `;
+            return htmlPrecioPVP
+        },
+
+        InputPrecioComunidad: function(serviceName, serviceId, comunidadId, tipoServicioId, precio){
+            let htmlPrecioComunidad;
+            htmlPrecioComunidad = `
+            <input data-id="${serviceId}" data-idcomunidad="${comunidadId}" data-idtiposervicio="${tipoServicioId}" type="number" class="servicio_precio precio-comunidad-${serviceId} precio-comunidad-${serviceName} text-right" style="max-width:70px;" data-precio="comunidad" data-servicio="rgpd" value="${precio}">            
+            `;
+            return htmlPrecioComunidad;
+        },
     }
 
 }

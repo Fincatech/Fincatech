@@ -59,7 +59,51 @@ let CoreUI = {
                 {
                     $('.titulo-modulo').text(core.Modelo.entity[entidad][0][campo]);
                 }
-        }
+        },
+
+        redirectTo(_url)
+        {
+            window.location = _url;
+        },
+
+        renderLabelByEstado: function(value)
+        {
+            if(value == '' || typeof value === 'undefined' || !value)
+                return;
+            
+            var out;
+// console.log('Valor value: ' + value);
+            switch (value.toLowerCase())
+            {
+                case 'no adjuntado':
+                    out = '<span class="badge rounded-pill bg-danger pl-3 pr-3 pt-2 pb-2 d-block">No adjuntado</span>';
+                    break;                 
+                case 'adjuntado':
+                    out = '<span class="badge rounded-pill bg-success pl-3 pr-3 pt-2 pb-2 d-block">Adjuntado</span>';
+                    break;
+                case 'no descargado':
+                    out = '<span class="badge rounded-pill bg-danger pl-3 pr-3 pt-2 pb-2 d-block">No descargado</span>';
+                    break;  
+                case 'no verificado':
+                    out = '<span class="badge rounded-pill bg-warning pl-3 pr-3 pt-2 pb-2 d-block">Pendiente revisión</span>';
+                    break; 
+                case 'descargado':
+                    out = '<span class="badge rounded-pill bg-primary pl-3 pr-3 pt-2 pb-2 d-block">Descargado</span>';
+                    break;    
+                case 'verificado':
+                    out = '<span class="badge rounded-pill bg-success pl-3 pr-3 pt-2 pb-2 d-block">Verificado</span>';
+                    break;      
+                case 'rechazado':
+                    out = '<span class="badge rounded-pill bg-danger pl-3 pr-3 pt-2 pb-2 d-block">Rechazado</span>';
+                    break;  
+                case 'pendiente verificación':
+                    out = '<span class="badge rounded-pill bg-warning pl-3 pr-3 pt-2 pb-2 d-block">Pendiente revisión</span>';
+                    break;
+            }
+
+            return out;
+
+        },
 
     },
 
@@ -109,7 +153,7 @@ let CoreUI = {
                         "csv": "fichero CSV",
                         "excel": "tabla Excel",
                         "pdf": "documento PDF",
-                        "print": "Imprimir",
+                        "print": '<i class="bi bi-printer"></i> Imprimir listado',
                         "colvis": "Visibilidad columnas",
                         "collection": "Colección",
                         "upload": "Seleccione fichero...."
@@ -259,7 +303,9 @@ let CoreUI = {
             }
 
             var columna = {};
-
+            // console.log(!!nombre);
+//             nombre = typeof nombre === 'function' ? '' : nombre;
+// console.log(typeof nombre);
             if(renderHTML !== undefined && renderHTML !== null)
             {
                 columna = {
@@ -267,6 +313,7 @@ let CoreUI = {
                     "data": null,
                     "width": widthColumn,
                     "className": clase,
+                    "name": (!!nombre ? nombre : null),
                     render: function(data, type, row, meta){
                         html = renderHTML;
                         field = "codigo";
@@ -276,7 +323,12 @@ let CoreUI = {
                     }
                 };
             }else{
-                columna = {"data": nombre, "className": clase, "width": widthColumn, "render": _render, "title":titulo};
+                if(typeof nombre !== 'function' && typeof nombre !== 'object')
+                {
+                    columna = {"data": nombre, "name": nombre,  "className": clase, "width": widthColumn, "render": _render, "title":titulo};
+                }else{
+                    columna = {"data": nombre, "className": clase, "width": widthColumn, "render": _render, "title":titulo};
+                }
             }
 
             CoreUI.tableData.columns[id].push(columna);
@@ -312,7 +364,7 @@ let CoreUI = {
                                     <td>${d.documentacioncomunidad[x].requerimiento}</td>`;
 
                     //  Estado del requerimiento
-                        salida += '<td class="text-center" >' + (!d.documentacioncomunidad[x].idficherorequerimiento ? '<span class="badge rounded-pill bg-danger pl-3 pr-3 pt-2 pb-2">No adjuntado</span>' : '<span class="badge rounded-pill bg-success pl-3 pr-3 pt-2 pb-2">Disponible para descargar</span>') + '</td>';
+                        salida += '<td class="text-center" >' + (!d.documentacioncomunidad[x].idficherorequerimiento ? '<span class="badge rounded-pill bg-danger pl-3 pr-3 pt-2 pb-2 d-block">No adjuntado</span>' : '<span class="badge rounded-pill bg-success pl-3 pr-3 pt-2 pb-2 d-block">Verificado</span>') + '</td>';
 
                     //  Enlace al fichero de descarga si está ya adjuntado o bien para subir si tiene permiso
                         ficheroAdjuntado = (!d.documentacioncomunidad[x].idficherorequerimiento ? false : true);
@@ -425,7 +477,7 @@ let CoreUI = {
                             break;
 
                     }
-                        salida += `<td class="text-center" ><span class="badge rounded-pill bg-${classRequerimiento} pl-3 pr-3 pt-2 pb-2">${estadoRequerimiento}</span></td>`;
+                        salida += `<td class="text-center" ><span class="badge rounded-pill bg-${classRequerimiento} pl-3 pr-3 pt-2 pb-2 d-block">${estadoRequerimiento}</span></td>`;
 
                     //  Enlace al fichero de descarga si está ya adjuntado o bien para subir si tiene permiso
                         ficheroAdjuntado = (!d.documentacionprl[x].idficherorequerimiento ? false : true);
@@ -471,6 +523,7 @@ let CoreUI = {
         /** Muestra la fila de información ampliada para CAE Empresa */
         formatEmpresa: function (d)
         {
+
             //  Debemos comprobar el rol para subir fichero
                 var canUploadFile = false;
                 var needFileUpload = false;
@@ -490,59 +543,22 @@ let CoreUI = {
                     <table border="0" class="table table-bordered table-light">
                         <thead class="">
                             <tr>
-                                <th style="background: #dee2e6 !important;">Requerimiento</th>
-                                <th class="text-center" style="background: #dee2e6 !important;width:150px;">Fecha última actuación</th>
-                                <th class="text-center" style="background: #dee2e6 !important;">Estado</th>
-                                <th style="background: #dee2e6 !important;">&nbsp;</th>`;
+                                <th style="background: #dee2e6 !important;">Administrador</th>
+                                <th class="text-left" style="background: #dee2e6 !important;width:150px;">Comunidad</th>`;
             salida += `        
                             </tr>
                         </thead>`;
 
-            for(x = 0; x < d.documentacioncae.length; x++)
+            for(x = 0; x < d.comunidades.length; x++)
             {
 
                 //  Nombre del requerimiento
                     salida += `
                         <tr>
-                            <td>${d.documentacioncae[x].requerimiento}</td>
-                            <td class="text-center" >`;
+                            <td width="50%" style="font-size:14px;">${d.comunidades[x].administrador}</td>
+                            <td width="50%" class="text-left" style="font-size:14px;">${d.comunidades[x].nombre}</td>
+                        </tr>`;
 
-                //  Fecha última actuación
-                    if(d.documentacioncae[x].fechaultimaactuacion != '' && d.documentacioncae[x].fechaultimaactuacion != null)
-                    {
-                        salida += moment( d.documentacioncae[x].fechaultimaactuacion ).locale('es').format('L');
-                    }else{
-                        salida += 'No se ha realizado ninguna actuación'; 
-                    }
-                    salida += '</td>';
-
-                //  Estado del requerimiento
-                    salida += '<td class="text-center" >' + (!d.documentacioncae[x].idficherorequerimiento ? '<span class="badge rounded-pill bg-danger pl-3 pr-3 pt-2 pb-2">No adjuntado</span>' : '<span class="badge rounded-pill bg-success pl-3 pr-3 pt-2 pb-2">Disponible para descargar</span>') + '</td>';
-
-                //  Enlace al fichero de descarga si está ya adjuntado o bien para subir si tiene permiso
-                    ficheroAdjuntado = (!d.documentacioncae[x].idficherorequerimiento ? false : true);
-                    if(ficheroAdjuntado)   //  DESCARGAR FICHERO YA SUBIDO
-                    {
-                        salida += ` <td class="text-center">
-                                        <a href="javascript:void(0)" data-toggle="tooltip" data-placement="bottom" title="Ver documento" id="home" data-original-title="Ver documento">
-                                            <i class="bi bi-cloud-arrow-down text-success" style="font-size: 30px;"></i>
-                                        </a>
-                                    </td>`;
-                    }
-
-                //  Construimos el enlace de salida para que pueda descargar el fichero adjuntado
-                    if(!ficheroAdjuntado && canUploadFile)
-                    {  //  SUBIR FICHERO SOLO PARA CONTRATISTA (EMPRESA)
-                        dataset = ` data-idcomunidad="${d.documentacioncae[x].idcomunidad}" data-idempresa="${d.id}" data-idempleado="" data-idrequerimiento="${d.documentacioncae[x].idrequerimiento}" data-idrelacionrequerimiento="${d.documentacioncae[x].idrelacion}" data-entidad="empresa" `;
-                        salida += `<td class="text-center" ><a href="javascript:void(0)" class="btnAdjuntarFicheroDocumento" data-toggle="tooltip" ${dataset} data-placement="bottom" title="" id="home" data-original-title="Adjuntar documento"><i class="bi bi-cloud-arrow-up text-success" style="font-size: 30px;"></i></a></td>`;
-                    }
-
-                    if(!ficheroAdjuntado && !canUploadFile)
-                    {
-                        salida += '<td>&nbsp;</td>';
-                    }
-
-                    salida += `</tr>`;
             }
             salida += '</table></div>';
             return salida;
@@ -576,13 +592,16 @@ let CoreUI = {
 
         tableEventsClick: function(id, detailRows, endpoint = null)
         {
+            if(typeof window['table' + id] !== 'undefined')
+            {
                // On each draw, loop over the `detailRows` array and show any child rows
-            window['table' + id].on( 'draw', function () {
+               window['table' + id].on( 'draw', function () {
                 $.each( detailRows, function ( i, id ) {
                     $('body #'+id+' td.details-control').off();
                     $('body #'+id+' td.details-control').trigger( 'click' );
                 } );
             } );
+            }
 
          // Add event listener for opening and closing details
             $('body #' + id +' tr td.details-control').off();
@@ -638,54 +657,75 @@ let CoreUI = {
         },
 
         /** Renderiza la tabla */
-        render: async function(id, entity, endpoint, allColumns, usePagination = true, _search = true, customRender = null)
+        render: async function(id, entity, endpoint, allColumns, 
+            usePagination = true, _search = true, customRender = null, 
+            showPrint = null, groupResults = false, groupCols = null, _serverSide = false, _ajaxType='GET',_responsive = true)
         {
-            // console.log(this.columns.length);
-            CoreUI.tableData.init();
-            if(allColumns === true)
-            {
-                //  Nos traemos la definición de la entidad para poder generar las columnas de la tabla
-            }
+            let promesaTabla = new Promise( (resolve, reject) => {
+                // console.log(this.columns.length);
+                CoreUI.tableData.init();
+                if(allColumns === true)
+                {
+                    //  Nos traemos la definición de la entidad para poder generar las columnas de la tabla
+                }
 
-            var detailRows = [];
+                var detailRows = [];
 
-            var opciones = {
-                "serverSide": false,
-                "autoWidth": false,
-                "select": true,
-                // "retrieve": true,
-                "paging": usePagination,
-                "searching": _search,
-                ajax: {
-                    "url": config.baseURLEndpoint + endpoint,
-                    "dataSrc": `data.${entity}`
-                },
-                "deferRender": true,
-                "columns": CoreUI.tableData.columns[id],  
-                "columnDefs": [{
-                    "targets": CoreUI.tableData.columns[id].length -1,
-                    "className": CoreUI.tableData.columns[id].className
-                }],
-                "drawCallback": function(settings){
-                    feather.replace();
-                },
-                "fnCreatedRow": function( nRow, aData, iDataIndex ) {
-                    $(nRow).attr('id', iDataIndex);
-                }                
-            };
+                var opciones = {
+                    "serverSide": _serverSide,
+                    "autoWidth": false,
+                    "select": true,
+                    "retrieve": true,
+                    "paging": usePagination,
+                    "searching": _search,
+                    "responsive": _responsive,
+                    ajax: {
+                        "url": config.baseURLEndpoint + endpoint,
+                        "dataSrc": `data.${entity}`,
+                        "type": _ajaxType
+                    },
+                    "deferRender": true,
+                    "columns": CoreUI.tableData.columns[id],  
+                    "columnDefs": [{
+                        "targets": CoreUI.tableData.columns[id].length -1,
+                        "className": CoreUI.tableData.columns[id].className
+                    }],
+                    "drawCallback": function(settings){
+                        feather.replace();
+                    },
+                    "fnCreatedRow": function( nRow, aData, iDataIndex ) {
+                        $(nRow).attr('id', iDataIndex);
+                    }                
+                };
 
-            if(customRender != null)
-                opciones['render'] = customRender;
+                if(showPrint === true)
+                {
+                    opciones['dom'] = 'Bfrtip';
+                    opciones['buttons'] = [
+                        'print'
+                    ];
+                }
 
-            //  Comprobamos si ya está inicializada la tabla
-            if ( $.fn.DataTable.isDataTable( `#${id}` ) ) {
-                window['table' + id].destroy();
-            }
+                //  Agrupado
+                if( groupResults === true)
+                {
+                    opciones['rowGroup'] = {'dataSrc': groupCols};
+                }
 
-            window['table' + id] = $(`#${id}`).DataTable(opciones);
 
-            CoreUI.tableData.tableEventsClick(id, detailRows, endpoint);
+                if(customRender != null)
+                    opciones['render'] = customRender;
 
+                //  Comprobamos si ya está inicializada la tabla
+                if ( $.fn.DataTable.isDataTable( `#${id}` ) ) {
+                    window['table' + id].destroy();
+                }
+
+                window['table' + id] = $(`#${id}`).DataTable(opciones);
+
+                CoreUI.tableData.tableEventsClick(id, detailRows, endpoint);
+                resolve(true);
+            });
         }        
 
     },
@@ -705,14 +745,29 @@ let CoreUI = {
             $('body .' + id).modal('show');
         },
 
-        CustomHTML: async function(texto, titulo, callback, modalWidth)
+        CustomHTML: async function(texto, titulo, callback = null, modalWidth = null, growType = null, callbackOnClose = null)
         {
             await Swal.fire({
                 html: `${texto}`,
                 title: titulo,
                 showCancelButton: false,
                 showConfirmButton: false,
-                width: (modalWidth == '' ? '32rem' : modalWidth)
+                grow: (growType == '' ? 'fullscreen' : growType),
+                width: (modalWidth == '' ? '32rem' : modalWidth),
+                didOpen: 
+                    function(){
+                        if(callback !== null){
+                            console.log('callback didopen');
+                            callback();
+                        } 
+                },
+                didClose:
+                    function(){
+                        if(callbackOnClose !== null){
+                            console.log('callback close');
+                            callbackOnClose();
+                        } 
+                }
             });  
         },
 
@@ -720,7 +775,7 @@ let CoreUI = {
         Success: function(texto, titulo, callback)
         {
             Swal.fire({
-                text: `${texto}`,
+                html: `${texto}`,
                 title: titulo,
                 icon: 'success',
                 showCancelButton: false
@@ -751,7 +806,7 @@ let CoreUI = {
         Error: function(texto, titulo, callback)
         {
             Swal.fire({
-                text: `${texto}`,
+                html: `${texto}`,
                 title: '',
                 icon: 'error',
                 showCancelButton: false
@@ -774,8 +829,6 @@ let CoreUI = {
 
                 var endpointComunidades = '';
 
-                console.log(core.Security.user);
-
                 core.Security.getUserInfo().then( (result) =>
                 {
 
@@ -794,12 +847,11 @@ let CoreUI = {
                     apiFincatech.get( endpointComunidades ).then ( (result) =>
                     {
                         var datos = JSON.parse(result);
-                        var comunidades = datos.data.Comunidades;
-                        console.log(comunidades);
-    
+                        var comunidades = datos.data.Comunidades['Comunidad'];
+                        // $('.navComunidades').html('');
                         var outHTML = ``;
                         $('.sidebar-nav').prepend(`
-                        <div class="row pl-3 pr-3">
+                        <div class="row pl-3 pr-3 sticky-top" style="background: #222e3c;">
                             <div class="col-12 pb-2 pt-2 mb-3 mt-2">
                                 <p class="text-white text-uppercase mt-0 mb-0"><small>Buscar comunidad</small></p>
                                 <div class="row">
@@ -820,22 +872,23 @@ let CoreUI = {
                             {
                                 outHTML = `<li class="sidebar-item pl-3 pr-3 pb-2 pt-2" data-codigo="${comunidades[x].codigo}" data-nombre="${comunidades[x].nombre}">
                                                 <div class="row">
-                                                    <div class="col-2 pr-0">
-                                                        <img src="/public/assets/img/icon_edificio.png" class="img-responsive feather">
+                                                    <div class="col-1 text-left pl-0 pr-0 align-self-center">
+                                                        <img src="${config.baseURL}public/assets/img/icon_edificio.png" class="img-responsive feather">
                                                     </div>   
                                                     
-                                                    <div class="col-8 pl-0">
-                                                        <a href="/comunidad/${comunidades[x].id}" class="text-white">   
-                                                            <span class="align-middle comunidad-${comunidades[x].id}">${comunidades[x].codigo} - ${comunidades[x].nombre}</span>
+                                                    <div class="col-11 pr-0">
+                                                        <a href="${config.baseURL}comunidad/${comunidades[x].id}" class="text-white d-block">   
+                                                            <span class="align-middle comunidad-${comunidades[x].id} d-block" style="font-size: 13px;">${comunidades[x].codigo} ${comunidades[x].nombre}</span>
                                                         </a>
                                                     </div>  
-
-                                                    <div class="col-2 pr-0 text-center pl-0">
+<!--
+                                                    <div class="col-2 pr-0 text-center pl-0 align-self-center">
                                                         <a href="javascript:void(0);" class="btnEliminarComunidad" data-id="${comunidades[x].codigo}" data-nombre="${comunidades[x].nombre}">
                                                             <i data-feather="trash-2" class="text-danger"></i>
                                                         </a>
                                                     </div>
-
+-->
+                                                </div>
                                             </li>`;
                                 $('.navComunidades').append(outHTML);
                             }
@@ -884,8 +937,6 @@ let CoreUI = {
             }
 
         }
-
-
 
     }
 

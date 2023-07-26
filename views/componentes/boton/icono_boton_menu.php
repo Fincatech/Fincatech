@@ -12,7 +12,9 @@
 
     $classBoton = "";
 
-    if( strpos($urlDestino, $App->getController() ) !== false ) 
+    // $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+    $actual_link = HOME_URL . substr( $_SERVER['REQUEST_URI'], 1, strlen($_SERVER['REQUEST_URI'])-1);
+    if(strpos($actual_link, $urlDestino) !== false)
     {
         $classBoton = "activo";
     }

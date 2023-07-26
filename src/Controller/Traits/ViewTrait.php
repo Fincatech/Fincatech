@@ -55,6 +55,8 @@ trait ViewTrait{
                 include(ABSPATH . 'views/' . security[$this->getUserRol()]['folder'] . '/menuacciones.php');
         }
 
+        $accion = $this->getAction();
+
         //  Comprobamos qué vista es la que hay que renderizar
         switch(strtolower($this->controllerName))
         {
@@ -65,7 +67,7 @@ trait ViewTrait{
                 $includeFile .= '/login/login';
                 break;
             default:
-                switch($this->getAction())
+                switch( $accion )
                 {
                     case "get":
                         $iconoAccion = "edit";
@@ -83,14 +85,12 @@ trait ViewTrait{
                     default:
                     
                         //  Es una vista aparte
-                        if( $this->checkIfViewExists($includeFile, $this->getController() . '/' . $this->getAction()))
+                        if( $this->checkIfViewExists($includeFile, $this->getController() . '/' . $accion ))
                         {
-                            $includeFile .=  $this->getController() . '/' . $this->getAction();
+                            $includeFile .=  $this->getController() . '/' . $accion;
                         }else{
-                            //  Lanzamos una excepción de vista
-                            die('0');
-                            throw new \Exception('Vista no encontrada');
-                            exit();
+                            //  Mostramos un 404
+                            $includeFile .= 'comunes/404';
                         }
                         break;
                 }
@@ -131,13 +131,13 @@ trait ViewTrait{
         global $App;
 
         try{
-
+            $viewName = strpos($viewName, '.php') === false ? $viewName . '.php' : $viewName;
             //  Validamos que exista la vista
             $viewRoute = ABSPATH.'views/'.$viewName;
             if(!file_exists($viewRoute))
             {
-                die('no existe');
-                throw new \Exception('Vista no encontrada');
+                echo("La vista $viewRoute no existe");
+                //throw new \Exception('Vista no encontrada');
             }else{
                 include($viewRoute);
             }
@@ -217,7 +217,7 @@ trait ViewTrait{
     /** Incluye un fichero JS */
     public function addJS($nombre, $version)
     {
-        echo '<script type="text/javascript" src="'. ASSETS_JS . $nombre . (APPENV=="dev" ? "" : "min") . '.js?v='.$version.'"></script>' . PHP_EOL;
+        echo '<script type="text/javascript" src="'. ASSETS_JS . $nombre . (APPENV=='dev' ? '' : '.min') . '.js?v='.$version.'"></script>' . PHP_EOL;
     }
 
     /** Incluye un fichero CSS */

@@ -6,10 +6,11 @@ if($App->isSudo()):?>
     <table class="table">
         <thead>
             <tr>
-                <th class="bg-light font-weight-normal text-uppercase">Nombre y estado del servicio</th>
-                <th class="text-center bg-light font-weight-normal text-uppercase">PVP (Sin IVA)</th>
-                <th class="text-center bg-light font-weight-normal text-uppercase">Precio Comunidad</th>
-                <th class="text-center bg-light font-weight-normal text-uppercase">Retorno</th>
+                <th class="bg-light font-weight-normal text-uppercase">Nombre y estado de contratación del servicio</th>
+                <th width="150px" class="text-center bg-light font-weight-normal text-uppercase">PVP (Sin IVA)</th>
+                <th width="150px" class="text-center bg-light font-weight-normal text-uppercase">Precio Comunidad</th>
+                <th width="200px" class="text-center bg-light font-weight-normal text-uppercase">Mes de facturación</th>
+                <th class="text-right bg-light font-weight-normal text-uppercase">Retorno</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -28,5 +29,4 @@ if($App->isSudo()):?>
         <tbody></tbody>
     </table>
 </div>
-
-<?php   endif; ?>
+<?php endif; ?>

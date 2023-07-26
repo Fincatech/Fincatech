@@ -23,10 +23,16 @@ trait SecurityTrait{
         return ( $this->getLoggedUserRole() == 'ROLE_CONTRATISTA' );
     }
 
+    /** Comprueba si es un técnico de certificados digitales el usuario que está en sesión */
+    public function isTecnicoRao()
+    {
+        return ( $this->getLoggedUserRole() == 'ROLE_REVCERT' );
+    }
+
     // TODO:
     public function isDPD()
     {
-
+        return ( $this->getLoggedUserRole() == 'ROLE_DPD' );
     }
 
     public function getJWTUserData()
@@ -46,9 +52,24 @@ trait SecurityTrait{
         }
     }
 
+    /** Devuelve el nombre del usuario autenticado en el sistema */
+    public function getLoggedUserName()
+    {
+        if($this->isLogged()){
+            $userName = get_object_vars( $this->getJWTUserData()['data']->userData )['nombre'];
+        }else{
+            $userName = "Master Fincatech"; // Se establece el SUDO como usuario
+        }
+        return $userName;
+    }
+
     public function getLoggedUserId()
     {
-        $usuarioId = get_object_vars( $this->getJWTUserData()['data']->userData )['id'];
+        if($this->isLogged()){
+            $usuarioId = get_object_vars( $this->getJWTUserData()['data']->userData )['id'];
+        }else{
+            $usuarioId = -1; // Se establece el SUDO como usuario
+        }
         return $usuarioId;
     }
 

@@ -17,8 +17,11 @@ let usuarioCore = {
         }
 
         //  Título del módulo
-            if($('.titulo-modulo').length && core.model == 'Usuario')
+            if($('.titulo-modulo').length && (core.model == 'Usuario' || core.model == 'Autorizado'))
                 CoreUI.setTitulo('nombre');    
+
+        //  Bindeamos los eventos de autorizado
+        usuarioCore.Autorizado.init();
 
     },
 
@@ -92,27 +95,47 @@ let usuarioCore = {
             CoreUI.tableData.addColumn('listadoUsuario', "cif", "CIF");
 
             //  Email
-                var html = '<a href="mailto:data:emailcontacto$" class="pl-1 pr-1">data:emailcontacto$</a>';
+                var html = '<a href="mailto:data:email$" class="pl-1 pr-1">data:email$</a>';
                 CoreUI.tableData.addColumn('listadoUsuario', null, "EMAIL", html);
 
             //  Teléfono
-            CoreUI.tableData.addColumn('listadoUsuario', "telefono", "TELEFONO");
+                CoreUI.tableData.addColumn('listadoUsuario', "telefono", "TELEFONO");
 
+            //  Fecha de último acceso
+                CoreUI.tableData.addColumn('listadoUsuario', 
+                function(row, type, val, meta)
+                {
+                    var timeStamp;
+                    var fechaCreacion;
+
+                    if(!row.lastlogin)
+                    {
+                        timeStamp = '';
+                        fechaCreacion = '<span class="badge badge-pill bg-danger text-white">Nunca</span>';
+                    }else{
+                        timeStamp = moment(row.lastlogin, 'YYYY-MM-DD hh:mm').unix();
+                        fechaCreacion = moment(row.lastlogin).locale('es').format('L');
+                    }
+
+                    return `<span style="display:none;">${timeStamp}</span>${fechaCreacion}`;
+                },
+                "Último acceso", null, 'text-center');
 
             // Estado
                 var html = 'data:estado$';
-                CoreUI.tableData.addColumn('listadoUsuario', null, "Estado", html);
+                CoreUI.tableData.addColumn('listadoUsuario', null, "Estado", html, 'text-center');
+
             //  Fecha de alta
                 var html = 'data:created$';
-                CoreUI.tableData.addColumn('listadoUsuario', null, "Fecha de alta", html);
+                CoreUI.tableData.addColumn('listadoUsuario', null, "Fecha de alta", html, 'text-center');
 
             //  Columna de acciones
                 var html = '<ul class="nav justify-content-center">';
-                    html += `<li class="nav-item"><a href="${baseURL}usuario/data:id$" class="btnEditarUsuario d-inline-block mr-2" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid"></i></a></li>`;
-                    html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarUsuario d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid"></i></li></ul>';
+                    html += `<li class="nav-item"><a href="${baseURL}usuario/data:id$" class="btnEditarUsuario d-inline-block mr-2" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid" style="height:26px; width:26px;"></i></a></li>`;
+                    html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarUsuario d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid" style="height:26px; width:26px;"></i></li></ul>';
                 CoreUI.tableData.addColumn('listadoUsuario', null, "", html);
 
-            // $('#listadoUsuario').addClass('no-clicable');
+            $('#listadoUsuario').addClass('no-clicable');
             CoreUI.tableData.render("listadoUsuario", "Usuario", "usuario/list");
         }
 
@@ -152,6 +175,277 @@ let usuarioCore = {
             usuarioCore.usuarios = responseData.Usuario;
             // usuarioCore.administradores.total = usuarioCore.administradores.length;
         });
+
+    },
+
+    /** Gestión de usuarios autorizados */
+    Autorizado: {
+
+        /**
+         * Inicializa el componente de Autorizado
+         */
+        init: function()
+        {
+            usuarioCore.Autorizado.events();
+
+            //  Comprobamos si se está cargando el listado
+            if(core.actionModel == "list" && core.model.toLowerCase() == "autorizado")
+            {
+                //  Recuperamos el listado de administradores
+                    usuarioCore.Autorizado.listadoAutorizados();
+            }   
+            
+        //  Comprobamos si se está cargando el listado
+            if( (core.actionModel == "add" || core.actionModel === 'get') && core.model.toLowerCase() == "autorizado")
+            {
+                //  Recuperamos el listado de comunidades del administrador principal
+                    usuarioCore.Autorizado.comunidadesAsignadas();
+            }            
+        },
+
+        events: function()
+        {
+
+                //  Cambio nombre de usuario
+                $('body .form-autorizado #nombre').on('keyup', function(e)
+                {
+                    CoreUI.Utils.setTituloPantalla(null, null, `${$(this).val()}`);
+                });
+
+                // @Override del botón de guardar
+                $("body .form-autorizado .btnSaveData").off(core.helper.clickEventType).on(core.helper.clickEventType, function(evt)
+                {
+                    evt.stopImmediatePropagation();
+                    evt.preventDefault();
+                    usuarioCore.Autorizado.Model.Save();
+                });
+
+                $('body').on(core.helper.clickEventType, '.btnEliminarUsuarioAutorizado', function(evt)
+                {
+                    //  Eliminamos el usuario autorizado
+                    evt.stopImmediatePropagation();
+                    usuarioCore.Autorizado.Model.delete( $(evt.currentTarget).attr('data-id'), $(evt.currentTarget).attr('data-nombre') );                    
+                });
+
+                switch(core.actionModel)
+                {
+                    case 'add':
+                    case 'get':
+                        $('body').on('change', '.form-autorizado .chkComunidadAutorizada', function(ev)
+                        {
+                            window['tablelistadoComunidadesAutorizado'].row($(this).attr('data-row')).data().asignada = ($(this).is(':checked'));
+                        });
+
+                        break;
+                    
+                }
+
+                if(core.actionModel === 'add')
+                {
+                    $('.form-autorizado #password').addClass('form-required');
+                }
+
+        },
+
+        /**
+         * Renderiza el listado de usuarios autorizados para un administrador
+         */
+        listadoAutorizados: function()
+        {
+
+            if( $('#listadoUsuariosAutorizados').length)
+            {
+                var listado = 'listadoUsuariosAutorizados';
+
+                //  Cargamos el listado de administradores
+                    CoreUI.tableData.init();
+
+                //  Nombre
+                    CoreUI.tableData.addColumn( listado, "nombre", "NOMBRE");
+
+                    CoreUI.tableData.addColumn(listado, "cif", "CIF");
+
+                //  Email
+                    var html = '<a href="mailto:data:email$" class="pl-1 pr-1">data:email$</a>';
+                    CoreUI.tableData.addColumn(listado, null, "EMAIL", html);
+
+                //  Teléfono
+                    CoreUI.tableData.addColumn(listado, "telefono", "TELEFONO");
+
+                //  Fecha de último acceso
+                    CoreUI.tableData.addColumn(listado, 
+                    function(row, type, val, meta)
+                    {
+                        var timeStamp;
+                        var fechaCreacion;
+
+                        if(!row.lastlogin)
+                        {
+                            timeStamp = '';
+                            fechaCreacion = '<span class="badge badge-pill bg-danger text-white">Nunca</span>';
+                        }else{
+                            timeStamp = moment(row.lastlogin, 'YYYY-MM-DD hh:mm').unix();
+                            fechaCreacion = moment(row.lastlogin).locale('es').format('L');
+                        }
+
+                        return `<span style="display:none;">${timeStamp}</span>${fechaCreacion}`;
+                    },
+                    "Último acceso", null, 'text-center');
+
+                //  Fecha de alta
+                    var html = 'data:created$';
+                    CoreUI.tableData.addColumn(listado, null, "Fecha de alta", html, 'text-center');
+
+                //  Columna de acciones
+                    var html = '<ul class="nav justify-content-center">';
+                        html += `<li class="nav-item"><a href="${baseURL}autorizado/data:id$" class="btnEditarUsuario d-inline-block mr-2" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid" style="height:26px; width:26px;"></i></a></li>`;
+                        html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarUsuarioAutorizado d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid" style="height:26px; width:26px;"></i></li></ul>';
+                    CoreUI.tableData.addColumn(listado, null, "", html);
+
+                $('#listadoUsuario').addClass('no-clicable');
+                CoreUI.tableData.render(listado, "Usuario", "autorizado/list");  
+
+            }
+
+        },
+
+        comunidadesAsignadas: function()
+        {
+            if( $('#listadoComunidadesAutorizado').length)
+            {
+                var listado = 'listadoComunidadesAutorizado';
+
+                //  Cargamos el listado de administradores
+                    CoreUI.tableData.init();
+
+                //  Asignada
+                    CoreUI.tableData.addColumn(listado, 
+                    function(row, type, val, meta)
+                    {
+                        var asignada = '';
+                        var rowId = meta.row;
+                        if(row.asignada === true)
+                        {
+                            asignada = 'checked';
+                        }
+
+                        var el = `
+                            <input id="asignada_${row.id}" name="asignada_${row.id}" type="checkbox" class="form-check-label chkComunidadAutorizada" ${asignada} data-row=${rowId}>
+                            <label class="form-check-label ml-2" for="asignada_${row.id}">
+                        `;
+
+                        return el;
+                    },
+                    "", null, 'text-center');
+
+                //  Código
+                    CoreUI.tableData.addColumn( listado, "codigo", "CÓDIGO");
+
+                //  Nombre
+                    CoreUI.tableData.addColumn( listado, "nombre", "NOMBRE");
+
+                //  Fecha de alta
+                    var html = 'data:created$';
+                    CoreUI.tableData.addColumn(listado, null, "Fecha de alta", html, 'text-center');
+
+                // //  Columna de acciones
+                //     var html = '<ul class="nav justify-content-center">';
+                //         html += `<li class="nav-item"><a href="${baseURL}comunidad/data:id$" class="btnEditarComunidad d-inline-block mr-2" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid" style="height:26px; width:26px;"></i></a></li>`;
+                //         html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid" style="height:26px; width:26px;"></i></li></ul>';
+                //     CoreUI.tableData.addColumn(listado, null, "", html);
+
+                $(`#${listado}`).addClass('no-clicable');
+
+                var ep = core.actionModel === 'get' ? `autorizado/${core.modelId}/comunidad/list` : 'autorizado/comunidad/list';
+                CoreUI.tableData.render(listado, "Comunidad", ep, null, false);  
+
+            }  
+        },
+
+        Model:{
+
+            /**
+             * Recupera la asignación de comunidades para un usuario autorizado desde el listado de comunidades
+             * @returns 
+             */
+            GetComunidadesAsignadas: function()
+            {
+                let oComunidades = Array();
+
+                //  Recorremos las filas del listado
+                $seleccionComunidades = window['tablelistadoComunidadesAutorizado'].rows().data();
+                for(let iSelCom = 0; iSelCom < $seleccionComunidades.length; iSelCom++)
+                {
+                    let oTMP = Object();
+                    oTMP.idcomunidad = window['tablelistadoComunidadesAutorizado'].row(iSelCom).data().id;
+                    oTMP.asignada = window['tablelistadoComunidadesAutorizado'].row(iSelCom).data().asignada;
+                    oComunidades.push(oTMP);
+                }
+                return oComunidades;
+            },
+
+            Validate: function(){
+
+                //  Validamos los campos obligatorios
+                let resultadoValidacion = false;
+                core.Forms.Validate();
+
+                if( $('.form-autorizado #email').val() !== '')
+                {
+                    if(!core.Validator.Email($('.form-autorizado #email').val()))
+                    {
+                        core.Forms.SetError('El formato del e-mail no es correcto');
+                    }
+                }
+
+                if($('.form-autorizado #password').val() !== '')
+                {
+
+                    if( $('.form-autorizado #password').val() !== $('.form-autorizado #passwordConfirme').val() )
+                    {
+                        core.Forms.SetError('Las contraseñas no coinciden');
+                    }
+
+                }
+
+
+                if(core.Forms.GetErrorMessage() === '')
+                    resultadoValidacion = true;
+
+                return resultadoValidacion;
+            },
+
+            /** Save model data */
+            Save: function()
+            {
+                //  Validamos que la información sea correcta
+                if(usuarioCore.Autorizado.Model.Validate()){
+                    //  Guardamos según la acción
+                    core.Forms.prepareFormDataBeforeSend('form-autorizado');
+                    //  Recuperamos la asignación de las comunidades
+                    core.Forms.data['comunidadesasignadas'] = usuarioCore.Autorizado.Model.GetComunidadesAsignadas();
+                    core.Forms.Save(true);
+                }else{
+                    core.Forms.ShowErrorMessage();
+                }
+            },
+
+            add: function()
+            {
+
+            },
+
+            update: function()
+            {
+
+            },
+
+            delete: function(id, nombre)
+            {
+                core.Modelo.Delete("autorizado", id, nombre, "listadoUsuariosAutorizados");
+            },
+
+        }
 
     }
 

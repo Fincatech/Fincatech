@@ -205,8 +205,30 @@ trait EntityTrait{
                        
                        if(!$deb)
                        {
-                          // echo $relationQuery . '<br>';
-                          $this->entityData[$this->mainEntity][$x][$relacion->table] = $this->mapMysqliResultsToObject( $resultado );
+                            //  Alias de tabla para el objeto resultante
+                            //  Se toma en cuenta si se ha configurado un alias para poder asignarlo en el objeto
+                            $nameObjectTable = $relacion->table;
+                            if(isset($relacion->alias))
+                            {
+                                $nameObjectTable = (trim($relacion->alias) !== '' ? $relacion->alias : $relacion->table);
+                            }
+
+                            //  Check results relation type
+                            $relationSingle = false; // Used to check if are one to one or one to many. By default: One to Many
+                            if(isset($relacion->resultsRelationType))
+                            {
+                                $relationSingle = ($relacion->resultsRelationType == ONE_TO_ONE);
+                            }
+
+                            //  Set relation type and return mapped results
+                            $mappedResults = $this->mapMysqliResultsToObject( $resultado );
+
+                            if($relationSingle)
+                            {
+                                $this->entityData[$this->mainEntity][$x][$nameObjectTable] = count($mappedResults) > 0 ? $mappedResults[0] : $mappedResults;
+                            }else{
+                                $this->entityData[$this->mainEntity][$x][$nameObjectTable] = $mappedResults;
+                            }
                        }else{
                            echo $relationQuery . '<br>';
                        }

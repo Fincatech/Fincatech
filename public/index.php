@@ -29,7 +29,8 @@
     require_once(ABSPATH . 'src/Controller/Traits/TableTrait.php');
     require_once(ABSPATH . 'src/Controller/Traits/ViewTrait.php');
     require_once(ABSPATH . 'src/Controller/Traits/UtilsTrait.php');
-
+    // require_once(ABSPATH . 'src/Controller/Traits/UanatacaTrait.php');
+    
     require_once(ABSPATH . 'src/Controller/FrontController.php');
     
     //  Instanciamos el front controller

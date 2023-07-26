@@ -61,4 +61,27 @@ class HelperController
         return json_encode($responseData);
     }
 
+    /** Genera un password aleatorio de n caracteres */
+    public static function GenerateRandomPassword($longitud = 8)
+    {
+
+        $comb = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        $shfl = str_shuffle($comb);
+        $pwd = substr($shfl, 0, $longitud);
+        return $pwd;
+    }
+
+    /** Devuelve la fecha actual basándonos en el timezone de españa */
+    public static function DateNow($mysqlFormat = false)
+    {
+        date_default_timezone_set('Europe/Madrid');
+        if($mysqlFormat)
+        {
+            return date('Y-m-d H:i:s');
+        }else{
+            return date('d-m-Y H:i:s');
+        }
+            
+    }
+
 }

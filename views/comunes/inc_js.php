@@ -5,6 +5,8 @@
 <script type="text/javascript" src="<?php echo ASSETS; ?>vendor/node_modules/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript" src="<?php echo ASSETS; ?>vendor/node_modules/izimodal/js/iziModal.min.js"></script>
 <script src="<?php echo ASSETS; ?>vendor/node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
 <!-- <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
 <link rel="stylesheet" href="<?php echo ASSETS; ?>vendor/node_modules/sweetalert2/dist/sweetalert2.min.css">
 
@@ -17,7 +19,9 @@
 
 <!-- DATATABLES -->
 <link rel="stylesheet" type="text/css" href="<?php echo ASSETS_JS; ?>vendor/datatables/datatables.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/rowgroup/1.1.4/css/rowGroup.dataTables.min.css">
 <script src="<?php echo ASSETS_JS; ?>vendor/datatables/datatables.js"></script>
+<script src="https://cdn.datatables.net/rowgroup/1.1.4/js/dataTables.rowGroup.min.js"></script>
 
 <!-- Moment -->
 <script src="<?php echo ASSETS_JS; ?>vendor/moment/moment.js"></script>
@@ -35,7 +39,7 @@
 
 <script type="text/javascript" src="<?php echo ASSETS_JS; ?>app.js"></script>
 
-<!-- <script type="text/javascript" src="<?php echo ASSETS_JS; ?>vendor/xlsx/dist/xlsx.js?v=<?php echo time(); ?>"></script> -->
+<!-- <script type="text/javascript" src="<?php //echo ASSETS_JS; ?>vendor/xlsx/dist/xlsx.js?v=<?php //echo time(); ?>"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.7.7/xlsx.core.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xls/0.7.4-a/xls.core.min.js"></script>
 <!-- Excel: https://github.com/SheetJS/sheetjs -->

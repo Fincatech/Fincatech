@@ -27,7 +27,7 @@
 
                         <div class="col-12">
 
-                            <table class="table table-hover my-0 hs-tabla w-100 no-clicable" data-order='[[ 2, "asc"]]' name="listadoDpd" id="listadoDpd" data-model="dpd">
+                            <table class="table table-hover my-0 hs-tabla w-100 no-clicable" data-order='[[ 4, "asc"]]' name="listadoDpd" id="listadoDpd" data-model="dpd">
                                 <thead class="thead"></thead>
                                 <tbody class="tbody"></tbody>
                             </table>
