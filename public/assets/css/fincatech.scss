@@ -146,9 +146,9 @@ a:hover{
     font-family: "Dosis";
 }
 
-.card{
-    // border-radius: 15px;
-}
+// .card{
+//     // border-radius: 15px;
+// }
 
 .shadow-neumorphic{
     // box-shadow: 20px 20px 60px #c9c9c9, -20px -20px 60px #ffffff;
@@ -514,6 +514,20 @@ body .btnAvisoEstado {
     border-radius: 0.25rem;
     width: fit-content;
 }
+
+.dt-buttons .buttons-html5 {
+    display: inline-block;
+    width: fit-content;
+    max-width: initial;
+    flex: none;
+    margin-right: 16px;
+    max-height: 31px;
+    background-color: orange;
+}
+button.btn.btn-secondary.buttons-copy, button.btn.btn-secondary.buttons-csv {
+    display: none;
+}
+
 // .custom-file-label::after {
 //     position: absolute;
 //     top: 0;

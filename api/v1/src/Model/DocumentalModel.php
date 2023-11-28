@@ -769,6 +769,45 @@ class DocumentalModel extends \HappySoftware\Model\Model{
         return $this->query($sql);
     }
 
+    public function GetRequerimientosPendientesCAEGeneral()
+    {
+        $sql = "SELECT 
+        comunidadescae.*,
+        u.nombre,
+        u.telefono,
+        u.email,
+        u.emailcontacto
+    FROM
+        (SELECT 
+        c.id AS comunidadid,
+        c.nombre AS comunidad,
+        c.codigo AS codigocomunidad,
+        c.cif as cifcomunidad,
+        c.direccion as direccioncomunidad,
+        c.codpostal as codpostalcomunidad,
+        c.localidad as localidadcomunidad,
+        c.provincia as provinciacomunidad,
+        GROUP_CONCAT(r.nombre ORDER BY r.nombre ASC SEPARATOR ', ') AS requerimientos
+    FROM
+        comunidadservicioscontratados csc
+    INNER JOIN comunidad c ON csc.idcomunidad = c.id
+    LEFT JOIN requerimiento r ON r.idrequerimientotipo = 6 AND r.activado = 1
+    LEFT JOIN comunidadrequerimiento cr ON cr.idcomunidad = c.id AND cr.idrequerimiento = r.id AND cr.idestado = 4
+    WHERE
+        csc.idservicio = 1
+        AND csc.contratado = 1
+        AND c.estado = 'A'
+        AND cr.idfichero IS NULL  
+    GROUP BY c.id, c.nombre, c.codigo, c.cif, c.direccion, c.codpostal, c.localidad, c.provincia
+    ORDER BY comunidadid ASC) comunidadescae,
+        usuario u,
+        comunidad c
+    WHERE
+        c.id = comunidadescae.comunidadid
+        AND u.id = c.usuarioid";
+            return $this->query($sql);
+    }
+
     /** Recupera todos los requerimientos pendientes de CAE para un administrador y que por cada comunidad tenga contratado el servicio */
     public function GetRequerimientosPendientesCAEEmpresa($idAdministrador)
     {

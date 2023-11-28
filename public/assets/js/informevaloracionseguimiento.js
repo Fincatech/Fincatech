@@ -55,8 +55,13 @@ let informeValoracionSeguimientoCore = {
                 CoreUI.tableData.addColumn('listadoInformevaloracionseguimiento', 
                     function(row, type, val, meta)
                     {
-                        var timeStamp = moment(row.fecha, 'YYYY-MM-DD hh:mm').unix();
-                        var fechaCreacion = moment(row.fecha).locale('es').format('L')
+                        var timeStamp = moment(row.fecha, 'YYYY-MM-DD').unix();
+                        var fechaCreacion = 'N/D';
+                        if(row.fecha !== null && row.fecha != undefined){
+                            console.log('Row Fecha: ' + row.fecha);
+                            fechaCreacion = moment(row.fecha).locale('es').format('L');
+                        }
+                        //console.log('row.Fecha: ' + fechaCreacion);
                         return `<span style="display:none;">${timeStamp}</span>${fechaCreacion}`;
                     },
                 "Fecha", null, 'text-center', '80px');

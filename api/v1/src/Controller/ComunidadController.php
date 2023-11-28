@@ -87,6 +87,7 @@ class ComunidadController extends FrontController{
         }
         
         //  Llamamos al método de crear
+        $datos['codigo'] = intval($datos['codigo']);
         $idComunidad = $this->ComunidadModel->Create($entidadPrincipal, $datos);
 
         if(isset($servicioCaeContratado))

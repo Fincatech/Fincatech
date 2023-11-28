@@ -530,4 +530,19 @@ body .btnAvisoEstado {
   border-radius: 0.25rem;
   width: -moz-fit-content;
   width: fit-content;
+}
+
+.dt-buttons .buttons-html5 {
+  display: inline-block;
+  width: -moz-fit-content;
+  width: fit-content;
+  max-width: initial;
+  flex: none;
+  margin-right: 16px;
+  max-height: 31px;
+  background-color: orange;
+}
+
+button.btn.btn-secondary.buttons-copy, button.btn.btn-secondary.buttons-csv {
+  display: none;
 }/*# sourceMappingURL=fincatech.css.map */

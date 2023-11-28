@@ -318,7 +318,7 @@ class UsuarioModel extends \HappySoftware\Model\Model{
 
     private $entidad = 'Usuario';
 
-    private $tablasSchema = array("usuario", "usuarioRol");
+    private $tablasSchema = array('usuario', 'usuarioRol');
 
     /**
      * @var \Fincatech\Entity\Usuario\Usuario
@@ -344,9 +344,14 @@ class UsuarioModel extends \HappySoftware\Model\Model{
         return $usuario;
     }
 
+    public function _Save()
+    {
+
+    }
+
     public function ListByRolId($rolId)
     {
-        $datos = parent::getEntityByField("usuario", "rolId", $rolId);
+        $datos = parent::getEntityByField('usuario', 'rolId', $rolId);
         $datos['total'] = count($datos["Usuario"]);
         return $datos;
     }

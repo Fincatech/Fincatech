@@ -29,6 +29,20 @@ let empresaCore = {
     events: function()
     {   
 
+        //  Validación existencia de CIF/NIF Modal de asignación de empresa a comunidad
+        $('body').on('blur', '.formEmpresaComunidad #cif', (evt) =>{
+
+            let cifEmpresa = $('body .formEmpresaComunidad #cif').val();
+            //  Si se ha introducido el cif se valida
+            if(cifEmpresa.trim() !== '')
+            {
+                empresaCore.existeCIF( cifEmpresa );
+            }else{
+                empresaCore.Controller.MostrarTablaEmpresasCIF(false);
+            }
+
+        });
+
         //  Descargar email certificado
         $('body').on(core.helper.clickEventType, '.btnDescargarEmailCertificado', (ev)=>{
             ev.stopImmediatePropagation();
@@ -141,8 +155,101 @@ let empresaCore = {
                 });
         });
 
+        //  Asignación de empresa desde el listado de empresas que comparten el mismo CIF
+        $('body').on(core.helper.clickEventType, '.btnAsignarEmpresaExistente', function(e){
+            //  Lanzamos la asignación de la empresa y guardamos directamente
+            comunidadesCore.asignarEmpresa( $(this).attr('data-id') );
+        });
+
     },
 
+    /**
+     * Comprueba si existe ya un cif de un proveedor en el sistema
+     * @param {*} cif 
+     */
+    existeCIF: async function(cif)
+    {
+        let datos = Object();
+        let resultados;
+        datos = {
+            fields: Array()
+        }
+
+        datos.fields.push({
+            field: 'cif',
+            search: cif,
+            type: 'string',
+            searchtype: 'eq'
+        });
+
+        await apiFincatech.post('empresa/search', datos).then( (response) =>
+        {
+            var responseData = JSON.parse(response);
+            resultados = responseData;
+            empresaCore.Model.empresas = resultados.data.Empresa;
+            //  Mostramos u ocultamos la tabla de empresas que comparten el mismo CIF
+            empresaCore.Controller.MostrarTablaEmpresasCIF(empresaCore.Model.empresas.length > 0);
+        });
+    },
+
+    Controller:{
+
+        /**
+         * Muestra el label de ya existe el cif + la tabla según los datos obtenidos en la consulta
+         * @param {*} show 
+         */
+        MostrarTablaEmpresasCIF: function(show = false)
+        {
+            //  Ocultamos la tabla
+            $('.tabla-empresas-cif').hide();  
+                        
+            if(!show)
+            {
+                $('#cifExiste').hide();
+              
+            }else{
+                $('#cifExiste').show();
+                //  Cargamos el listado y lo mostramos al usuario
+                empresaCore.Controller.CargarEmpresasMismoCIF();
+            }
+        },
+
+        /**
+         * Carga el listado de empresas que comparten el mismo CIF
+         */
+        CargarEmpresasMismoCIF: function()
+        {
+            if(empresaCore.Model.empresas.length > 0)
+            {
+                //  Cargamos los datos
+                $('.tabla-empresas-cif-datos').html('');
+                for($iEmpresa = 0; $iEmpresa < empresaCore.Model.empresas.length; $iEmpresa++)
+                {
+                    let empresa = empresaCore.Model.empresas[$iEmpresa];
+                    let htmlEmpresa = `
+                    <tr data-idempresa="${empresa['id']}" data-idusuario="${empresa['idusuario']}">
+                        <td>${empresa['razonsocial']}</td>
+                        <td>${empresa['direccion']}</td>
+                        <td>${empresa['localidad']}</td>
+                        <td>${empresa['telefono']}</td>
+                        <td>${empresa['email']}</td>
+                        <td><a href="javascript:void(0);" data-id="${empresa['id']}" data-idusuario="${empresa['idusuario']}" class="btn btn-success btnAsignarEmpresaExistente">Seleccionar y Asignar</a></td>
+                    </tr>`;
+                    $('.tabla-empresas-cif-datos').append(htmlEmpresa);
+                }
+
+                //  Mostramos la tabla
+                $('.tabla-empresas-cif').show();
+            }
+        },
+
+    },
+
+    Model:{
+        empresas: null,
+    },
+
+    /** Busca una empresa por su e-mail */
     buscarEmailEmpresa: async function(emailEmpresa)
     {
 

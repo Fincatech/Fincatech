@@ -12,7 +12,7 @@ Cambios:
 ====================
         js
 ====================
-[] certificadodigital
+[x] certificadodigital
 [] adminfincas
 
 ====================
@@ -70,3 +70,7 @@ API:
 FRONT:
 
         
+[] 04/09/2023 - TÉCNICO REVISIÓN DOCUMENTACIÓN CAE
+
++ Nuevo rol: TECNICO DOCUMENTACIÓN CAE: REVCAE
+INSERT INTO `rol` (`nombre`, `alias`, `created`, `usercreate`) VALUES ('Revisor Documentación CAE', 'revcae', '2023-01-09 00:00:00', '0');

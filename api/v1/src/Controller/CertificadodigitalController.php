@@ -159,7 +159,7 @@ class CertificadodigitalController extends FrontController{
     /**
      * Envío e-mail certificado
      */
-    public function SendEmailCertificadoAdministrador($subject, $destinatario, $administradorId, $mensaje, $nombreDestinatario = null)
+    public function SendEmailCertificadoAdministrador($subject, $destinatario, $administradorId, $mensaje, $nombreDestinatario = null, $attachment = null)
     {
 
         $destinatario = DatabaseCore::PrepareDBString($destinatario);
@@ -197,7 +197,7 @@ class CertificadodigitalController extends FrontController{
         $subject = DatabaseCore::PrepareDBString($subject);
 
         //  Realizamos el intento de envío
-        $resultadoEnvio = $this->SendEmailCertificado($subject, $destinatariosArray, $mensaje, $usuarioId, $nombreDestinatario);
+        $resultadoEnvio = $this->SendEmailCertificado($subject, $destinatariosArray, $mensaje, $usuarioId, $nombreDestinatario, $attachment);
 
         //  Evaluamos el resultado del envío
         if($resultadoEnvio == 'ok')
@@ -504,7 +504,7 @@ class CertificadodigitalController extends FrontController{
 
         //  Validamos que la emisión no haya sido ya generada y aprobada
         if($this->ValidateCertificateAlreadyRequested($idComunidad))
-            return 'La solicitud de certificado digital para esta comunidad ya ha sido creada y está siendo gestionada por un Operador de Registro Autorizado.<br>Si la solicitud resulta aprobada se le enviará un e-mail con las instrucciones para descargar su certificado digital.';
+            return 'La solicitud de certificado digital para esta comunidad ya ha sido creada y está siendo gestionada por un Operador de Autoridad de Registro.<br>Si la solicitud resulta aprobada se le enviará un e-mail con las instrucciones para descargar su certificado digital.';
 
         //  Comprobamos si tiene todos los documentos subidos a la plataforma
         $ficherosSubidos = $this->ValidateRequerimientosCertificadoByComunidadId($idComunidad);
@@ -590,6 +590,10 @@ class CertificadodigitalController extends FrontController{
     private function ValidateRequerimientosCertificadoByComunidadId($idComunidad)
     {
         $iFicherosSubidos = 0;
+        //TODO: Los requerimientos siguen la siguiente lógica:
+        //      Si no tiene copia del acta (junta general) el req 6 es obligatorio
+        //      Si no, los documentos del 1 al 5 son obligatorios
+        
         //  Tenemos que recuperar los requerimientos para la comunidad
         //  y usuario que solicita el certificado digital
         //  Instanciamos el controller de comunidad

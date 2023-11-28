@@ -33,17 +33,22 @@ class UsuarioController extends FrontController{
         // FIXME: Arreglar el e-mail de contacto ya que no se debe hacer aquí
         //  19012023: Se comprueba el email contacto para evitar error
         if(isset($datos['emailcontacto'])){
-            $datos['email'] = $datos['emailcontacto'];
+            $datos['email'] = trim($datos['emailcontacto']);
         }else{
-            $datos['emailcontacto'] = $datos['email'];
+            $datos['emailcontacto'] = trim($datos['email']);
         }
+
+        $datos['email'] = trim($datos['email']);
 
         if($this->ExisteEmailLogin( $datos['email'] ))
         {
             return HelperController::errorResponse('error','El e-mail ya existe', 200);
         }else{
+            //  Llenamos el modelo y lo guardamos
+            $this->UsuarioModel->Fill('usuario');
+            $this->UsuarioModel->_Save();
             //  Llamamos al método de crear
-            return $this->UsuarioModel->Create($entidadPrincipal, $datos);
+            //return $this->UsuarioModel->Create($entidadPrincipal, $datos);
         }
 
         

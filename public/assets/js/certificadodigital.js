@@ -162,7 +162,7 @@ let CertificadoDigital = {
                     var responseData = JSON.parse(response);
                     if(responseData.status['response'] == "ok"){
                         
-                        CoreUI.Modal.Success('La solicitud se ha realizado correctamente.<br><br>Una vez que el Operador de Registro Autorizado haya validado las solicitudes, recibirá en su e-mail las instrucciones para descargar el certificado digital.');
+                        CoreUI.Modal.Success('La solicitud se ha realizado correctamente.<br><br>Una vez que el Operador de la Autoridad de Registro haya validado las solicitudes, recibirá en su e-mail las instrucciones para descargar el certificado digital.');
                         CertificadoDigital.Render.CertificadosPendientes();
                     }else{
                         let mensajeError = `No se ha podido completar la solicitud por los siguientes motivos:<br><br>`;
@@ -193,7 +193,7 @@ let CertificadoDigital = {
                     CoreUI.Modal.Error(result.status.error,'Solicitud certificado digital');
                 }else{
                     //TODO: Cambiar mensaje por el que puso Cristóbal en el e-mail
-                    CoreUI.Modal.Success('Se ha solicitado correctamente el certificado digital para la comunidad y está a la espera de ser validado y aprobado por un Operador de Registro Autorizado.<br><br>Recibirá un e-mail con el resultado de la validación.','Solicitar certificado digital');
+                    CoreUI.Modal.Success('Se ha solicitado correctamente el certificado digital para la comunidad y está a la espera de ser validado y aprobado por un Operador de Autoridad de Registro.<br><br>Recibirá un e-mail con el resultado de la validación.','Solicitar certificado digital');
                 }
             });
         },

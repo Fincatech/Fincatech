@@ -72,7 +72,7 @@ let CoreUI = {
                 return;
             
             var out;
-// console.log('Valor value: ' + value);
+            // console.log('Valor value: ' + value);
             switch (value.toLowerCase())
             {
                 case 'no adjuntado':
@@ -659,7 +659,7 @@ let CoreUI = {
         /** Renderiza la tabla */
         render: async function(id, entity, endpoint, allColumns, 
             usePagination = true, _search = true, customRender = null, 
-            showPrint = null, groupResults = false, groupCols = null, _serverSide = false, _ajaxType='GET',_responsive = true)
+            showPrint = null, groupResults = false, groupCols = null, _serverSide = false, _ajaxType='GET',_responsive = true, _showExportToExcel = false)
         {
             let promesaTabla = new Promise( (resolve, reject) => {
                 // console.log(this.columns.length);
@@ -712,6 +712,26 @@ let CoreUI = {
                     opciones['rowGroup'] = {'dataSrc': groupCols};
                 }
 
+                //  Exportación a Excel
+                if(_showExportToExcel)
+                {
+                    opciones['buttons'] =[
+                        {
+                            extend: 'excel',
+                            className: 'btn-success',
+                            text: 'Exportar a fichero Excel',
+                        }
+                    ];
+
+                    if(showPrint)
+                    {
+                        opciones['buttons'].push({
+                            extend: 'print',
+                            text: 'Imprimir',
+                        });
+                    }
+
+                }
 
                 if(customRender != null)
                     opciones['render'] = customRender;

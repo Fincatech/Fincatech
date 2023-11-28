@@ -58,7 +58,7 @@ let adminFincas = {
 
         //  Envío email certificado
         $('body').on(core.helper.clickEventType, '.btnEnviarEmailCertificado',(()=>{
-            adminFincas.Email.EnviarEmailCertificado( $('#nombreDestinatario').val(), $('#emailDestinatario').val(), $('#emailAsunto').val(), $('#emailBody').val());
+            adminFincas.Email.EnviarEmailCertificado( $('#nombreDestinatario').val(), $('#emailDestinatario').val(), $('#emailAsunto').val(), $('#emailBody').val(), core.Files.Fichero);
         })); 
     },
 
@@ -139,7 +139,7 @@ let adminFincas = {
          * @param {*} subject 
          * @param {*} message 
          */
-        EnviarEmailCertificado: async function(recipient, emailto, subject, message)
+        EnviarEmailCertificado: async function(recipient, emailto, subject, message, file = null)
         {
             if(adminFincas.Email.validarEmailCertificado())
             {
@@ -150,7 +150,8 @@ let adminFincas = {
                     destinatario: emailto,
                     comunidad: recipient,
                     mensaje: message,
-                    subject: subject
+                    subject: subject,
+                    attachment: file
                 };            
 
                 await apiFincatech.post(`certificadodigital/administrador/envioemailcertificado`, data).then(async (response) =>{

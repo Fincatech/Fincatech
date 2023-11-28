@@ -2,12 +2,13 @@
 
 namespace Fincatech\Controller;
 
-
 use Fincatech\Model\InformeValoracionSeguimientoModel;
 
 class InformevaloracionseguimientoController extends FrontController{
 
-    private $informeValoracionSeguimientoModel;
+    public $InformeValoracionSeguimientoModel;
+    public $InformevaloracionseguimientoModel;
+    public $UsuarioController;
 
     public function __construct($params = null)
     {
@@ -39,7 +40,7 @@ class InformevaloracionseguimientoController extends FrontController{
             {
                 $enlaceInformeValoracion = $informeValoracion['informevaloracionseguimiento'][0]['ficheroscomunes'][0]['nombrestorage'];
             }
-            
+            // $emailAdministrador = 'oscar.livin@gmail.com';
             //  Enviamos el e-mail al administrador
             $this->EnviarEmailInformeValoracion($administradorNombre, $emailAdministrador, $enlaceInformeValoracion);
 

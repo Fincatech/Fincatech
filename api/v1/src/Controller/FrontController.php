@@ -148,8 +148,12 @@ class FrontController{
         }
     }
 
+    /**
+     * Elimina una entidad de la base de datos
+     */
     public function Delete($id)
     {
+        //  TODO: Evaluar si ha ocurrido algún error en la eliminación y devolverlo
         return HelperController::successResponse($this->context->Delete($id));
     }
 
@@ -160,7 +164,7 @@ class FrontController{
           //  Validar la respuesta por si tiene error        
           if(isset($data['error']))
           {
-              return HelperController::errorResponse($data, $data['error'], 200);
+            return HelperController::errorResponse($data, $data['error'], 200);
           }else{          
             return HelperController::successResponse( $data );
           }
@@ -182,6 +186,12 @@ class FrontController{
     /** Lista todos los registros para una entidad */
     public function List($params)
     {
+        //  Comprobamos si es un controller que no tiene seguridad externa
+        if(isset($this->context->securityDisabled))
+        {
+            return HelperController::successResponse( $this->context->List($params) );
+        }
+
         //  Validamos si hay usuario autenticado en el sistema
         if($this->getLoggedUserId() == '-1')
         {
@@ -263,7 +273,7 @@ class FrontController{
 
     public function ExecuteTest()
     {
-        $this->InitController('Certificadodigital');
+        //$this->InitController('Certificadodigital');
         //$this->CertificadodigitalController->Test();
         return true;
     }

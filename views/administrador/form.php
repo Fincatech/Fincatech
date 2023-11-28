@@ -17,6 +17,14 @@
                     <input type="hidden" hs-entity="Usuario" hs-field="rolid" class="data" name="rolid" value="5">
                     <!-- Estado del usuario -->
                     <div class="form-group row mb-4 justify-content-end">
+                        <!-- Pendiente de visita -->
+                        <div class="col-12 col-md-10 text-left justify-content-end d-flex flex-column align-items-start">
+                            <div class="form-check">
+                                <input class="form-check-input visitado data" type="checkbox" hs-entity="Usuario" hs-field="visitado" value="" id="visitado">
+                                <label class="form-check-label" for="visitado">Visitado</label>
+                            </div>
+                        </div>
+                        <!-- Estado del administrador -->
                         <div class="col-12 col-md-2 text-left">
                             <label for="estado"><i class="bi bi-geo-alt pr-2"></i>Estado</label>
                             <select id="estado" name="estado" class="select-data data custom-select form-control selectpicker" data-live-search="true" hs-entity="Usuario" hs-field="estado" hs-list-entity="Estado" hs-list-field="nombre" hs-list-value="sId"></select>

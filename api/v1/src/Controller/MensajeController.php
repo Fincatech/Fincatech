@@ -81,25 +81,41 @@ class MensajeController extends FrontController{
     }
 
     /** Reenvía un mensaje previamente enviado */
-    public function ResendMessage($idMensaje)
+    public function ResendMessage($idMensaje, $increment = false, $customSubject = '', $additionalBody = '')
     {
 
         //  Recuperamos el mensaje y reenviamos el mismo contenido
         $mensaje = $this->Get($idMensaje);
+
         if(!is_null($mensaje))
         {
             $body = html_entity_decode($mensaje['Mensaje'][0]['body'], ENT_QUOTES);
-            $subject = html_entity_decode($mensaje['Mensaje'][0]['subject'], ENT_QUOTES);
+            
+            //  Por alguna razón, cuando decodifica las urls suele meterle una barra de más por lo que lo saneamos con un replace
+            $body = str_replace('https:/app','https://app', $body);
+            $body = str_replace('http:/www', 'http://www', $body);
+            
             $to = $mensaje['Mensaje'][0]['email'];
+
+            //  Si tiene texto adicional, lo inyectamos justo antes del e-mail y 
+            if($additionalBody != '')
+                $body = $additionalBody . $body;
+
+            //  Si el asunto es diferente, lo establecemos
+            if($customSubject != '')
+            {
+                $subject = $customSubject;
+            }else{
+                $subject = html_entity_decode($mensaje['Mensaje'][0]['subject'], ENT_QUOTES);
+            }
+
             $this->SendEmail($to, '', $subject, $body, false);
+
+            //  Comprobamos si hay que incrementar el número de envío
+            if($increment)
+                $this->IncrementSendNumber( $idMensaje );
+
             return HelperController::successResponse('ok', 200);
-            //v=spf1 a mx include:spf.acumbamail.com ip4:212.227.126.130 ip4:212.227.126.134 ip4:217.160.0.103 ~all
-            /**
-             * Beta: v=spf1 mx a ptr ip4:217.160.0.103
-             * Principal: v=spf1 ptr include:mx00.1and1.es include:mx01.1and1.es include:mout.kundenserver.de ip4:217.160.0.103 ~all
-             * 212.227.126.134 	217.160.0.103
-             * v=spf1 ptr mx ip4:212.227.126.134 ~all
-             */
         }else{
             return HelperController::errorResponse('error', 'Error reenviando mensaje',200);
         }
@@ -160,6 +176,30 @@ class MensajeController extends FrontController{
     public function GetEmailsCertificadosAdministrador(){
         $data['Mensaje'] = $this->MensajeModel->EmailsCertificadosAdministrador();
         return $data;
+    }
+
+    /**
+     * Envío de e-mail avisando a administrador que la empresa X no ha accedido nunca desde su registro.
+     */
+    public function SendEmailRecordatorioAccesoAdministrador()
+    {
+
+    }
+
+    /**
+     * Envía un email recordatorio de acceso a la plataforma para empresas que no han entrado nunca desde su registro
+     */
+    public function SendEmailRecordatorioAccesoEmpresa()
+    {
+
+    }
+
+    /**
+     * Actualiza el número de envíos del mismo e-mail
+     */
+    public function IncrementSendNumber($idMensaje)
+    {
+        $this->MensajeModel->UpdateSendNumber($idMensaje);
     }
 
 }

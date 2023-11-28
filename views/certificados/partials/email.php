@@ -17,7 +17,13 @@
             <div class="form-group mb-3">
                     <label for="emailAsunto" class="form-label">Asunto*</label>
                     <input type="text" class="form-control" id="emailAsunto" maxlength="50" placeholder="Escriba el asunto del correo">
-            </div>                            
+            </div>    
+            <!-- Adjuntar fichero -->
+            <div class="form-group mb-3">
+                <label for="ficheroadjuntar" class="form-label">Adjuntar fichero</label>
+                <input type="file" accept=".pdf" id="ficheroadjuntar" name="ficheroadjuntar" class="form-control border-0 pl-0" />
+                <label class="form-label font-size-small text-primary"><i class="bi bi-info-circle-fill"></i> Solo se admite un fichero en formato PDF por envío</label>
+            </div>                        
             <!-- Cuerpo del mensaje -->
             <div class="form-group mb-3">
                     <label for="emailBody" class="form-label">Mensaje*</label>

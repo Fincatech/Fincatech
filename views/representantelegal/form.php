@@ -127,7 +127,7 @@
 
                     <?php if($App->getAction() == 'add'): ?>
 
-                        <input type="hidden" id="hadministradorid" name="hadministradorid" value="<?php echo $_GET['idadmin']; ?>" class="data" hs-entity="Representantelegal" hs-field="administradorid">>
+                        <input type="hidden" id="hadministradorid" name="hadministradorid" value="<?php echo $_GET['idadmin']; ?>" class="data" hs-entity="Representantelegal" hs-field="administradorid">
 
                     <?php endif; ?>
 

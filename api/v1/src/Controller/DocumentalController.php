@@ -718,4 +718,12 @@ class DocumentalController extends FrontController{
         $this->DocumentalModel-> moveRequerimientoToHistorial($idRequerimiento, $tablaDestino);
     }
 
+    /** Recupera todas las comunidades que tienen requerimientos pendientes en materia de CAE */
+    public function GetRequerimientosPendientesCAEGeneral()
+    {
+        $data = [];
+        $data['requerimiento'] = $this->DocumentalModel->GetRequerimientosPendientesCAEGeneral();
+        return $data;
+    }
+
 }

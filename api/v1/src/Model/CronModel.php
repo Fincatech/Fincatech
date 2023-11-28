@@ -158,4 +158,33 @@ class CronModel extends \HappySoftware\Model\Model{
         return $resultado;
     }
 
+    /**
+     * Devuelve aquellas empresas que han sido dadas de alta pero nunca han accedido al sistema
+     */
+    public function ListEmpresasPendientesAcceso()
+    {
+        $sql = "SELECT 
+                    e.id idempresa,
+                    e.razonsocial,
+                    e.idusuario,
+                    e.email emailempresa,
+                    u.created fecharegistro,
+                    u.email emailusuario,
+                    u.emailcontacto emailcontactousuario
+                FROM
+                    empresa e, usuario u
+                where 
+                    u.id = e.idusuario
+                    and u.lastlogin is null
+                    and u.estado = 'a'";
+        return $this->query($sql);
+    }
+
+    public function MensajeEnviadoRegistroEmpresa($emailEmpresa)
+    {
+        $sql = "select id, numeroenvio from mensaje where email = '$emailEmpresa' and subject = 'Fincatech - Alta en la plataforma'  order by id desc limit 1";
+        return $this->query($sql);
+    }
+
+
 }

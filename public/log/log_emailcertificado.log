@@ -130,3 +130,51 @@
 <result><Res>1</Res><Destinatarios><item0><NOMBRE>oscar.livin@gmail.co</NOMBRE><EMAIL>oscar.livin@gmail.com</EMAIL><IDMENSAJE>377534</IDMENSAJE></item0></Destinatarios><Cred>32</Cred><Enviados>1</Enviados><NoEnviados>0</NoEnviados><Duplicados>0</Duplicados><CreditosUsados>9</CreditosUsados></result>
 
 
+--- [28-11-2023 11:53] --- ( MailTrait -> SendEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>-3</Res><Error>You might include parameter ADJUNTOS[NOMBRE] (STRING type)</Error></result>
+
+
+--- [28-11-2023 11:53] --- ( Emails Certificados -> procesarRespuestaEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>-3</Res><Error>You might include parameter ADJUNTOS[NOMBRE] (STRING type)</Error></result>
+
+
+--- [28-11-2023 11:56] --- ( MailTrait -> SendEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>-3</Res><Error>You might include parameter ADJUNTOS[NOMBRE] (STRING type)</Error></result>
+
+
+--- [28-11-2023 11:56] --- ( Emails Certificados -> procesarRespuestaEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>-3</Res><Error>You might include parameter ADJUNTOS[NOMBRE] (STRING type)</Error></result>
+
+
+--- [28-11-2023 12:01] --- ( MailTrait -> SendEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>-3</Res><Error>ADJUNTOS[0][NOMBRE] should have a length lower than 20</Error></result>
+
+
+--- [28-11-2023 12:02] --- ( Emails Certificados -> procesarRespuestaEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>-3</Res><Error>ADJUNTOS[0][NOMBRE] should have a length lower than 20</Error></result>
+
+
+--- [28-11-2023 12:17] --- ( MailTrait -> SendEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>1</Res><Destinatarios><item0><NOMBRE>oscar.livin@gmail.co</NOMBRE><EMAIL>oscar.livin@gmail.com</EMAIL><IDMENSAJE>505689</IDMENSAJE></item0></Destinatarios><Cred>678</Cred><Enviados>1</Enviados><NoEnviados>0</NoEnviados><Duplicados>0</Duplicados><CreditosUsados>9</CreditosUsados></result>
+
+
+--- [28-11-2023 12:17] --- ( Emails Certificados -> procesarRespuestaEmailCertificado ) --- 
+
+<?xml version="1.0"?>
+<result><Res>1</Res><Destinatarios><item0><NOMBRE>oscar.livin@gmail.co</NOMBRE><EMAIL>oscar.livin@gmail.com</EMAIL><IDMENSAJE>505689</IDMENSAJE></item0></Destinatarios><Cred>678</Cred><Enviados>1</Enviados><NoEnviados>0</NoEnviados><Duplicados>0</Duplicados><CreditosUsados>9</CreditosUsados></result>
+
+

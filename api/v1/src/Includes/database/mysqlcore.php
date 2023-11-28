@@ -762,7 +762,7 @@ class DatabaseCore {
 		$saneado = str_replace("update","", $saneado);		
 		$saneado = str_replace("delete","", $saneado);		
 		$saneado = str_replace("truncate","", $saneado);	
-		$saneado = str_replace("drop","", $saneado);	
+		//$saneado = str_replace("drop","", $saneado);	
 		$saneado = str_replace(" or ","", $saneado);	
 				
 		return $saneado;

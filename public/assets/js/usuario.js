@@ -158,7 +158,7 @@ let usuarioCore = {
             responseStatus = result.status;
             responseData = result.data;
             usuarioCore.comunidad = responseData.Comunidad[0];
-            console.log(usuarioCore.comunidad);
+            //console.log(usuarioCore.comunidad);
             return usuarioCore.comunidad;
         });
     },

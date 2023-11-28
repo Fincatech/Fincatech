@@ -160,3 +160,25 @@ Inicio comunicación con Uanataca para crear una solicitud de certificado+ Resul
 [OK] Fichero: /Users/oscar/Proyectos/fincatech/public/storage//1aff7a8e5ef232711f43ebff48e6620b.pdf - Requerimiento: Copia del acta (Modelo acuerdo junta general)
 
 
+--- [02-08-2023 10:45] --- ( RequestCertificateToUanataca ) --- 
+
++ Inicio proceso solicitud certificado digital. Comunidad Id: 147
+Inicio comunicación con Uanataca para crear una solicitud de certificado+ Resultado solicitud Uanataca:
+{"http_code":201,"message":{"pk":55566,"given_name":"TEST","surname_1":"Sanchez","surname_2":null,"sex":null,"id_document_type":"TIN","id_document_country":"ES","serial_number":"08943955Z","country_name":"ES","citizenship":null,"residence":"ES","organization_email":"info@fincatech.es","email":"ororodeveloper+1@gmail.com","title":"Representante legal","organization_name":"Alrey","organizational_unit_1":null,"organizational_unit_2":null,"organization_identifier":"H29733987","responsible_name":"TEST","responsible_first_surname":"Sanchez","responsible_second_surname":null,"responsible_email":null,"responsible_serial":"08943955Z","responsible_position":null,"subscriber_responsible_serial":null,"administrative_unit":null,"empowerment":"Total","representation":"CIF\/NIF Representante legal,CIF Comunidad,Copia de la primera hoja del libro de actas,Acta nombramiento,Declaraci\u00f3n responsable,Copia del acta (Modelo acuerdo junta general)","circumstances":null,"limit":null,"registration":null,"process_application":null,"entity_owner":null,"entity_owner_serial_number":null,"description":"Certificado comunidad de propietarios","certificate_set":[],"profile":"REPESPJsoft","scratchcard":"1053604","status":"CREATED","registering_user":{"pk":79,"permission_profile":983,"registration_authority":59,"request":10599},"approving_user":null,"producing_user":null,"registration_authority":59,"secure_element":0,"validity_time":"1825","smartcard_sn":null,"citizen_tax_number":null,"birth_date":null,"birth_country":null,"birth_city":null,"birth_province":null,"birth_state":null,"birth_district":null,"birth_canton":null,"id_document_description":null,"id_document_issuer":null,"id_document_release":null,"id_document_expiry":null,"organization_rol":null,"professional_id_number":null,"mobile_phone_number":"684086020","fix_phone_number":null,"residence_address":null,"residence_city":null,"residence_province":null,"residence_postal_code":null,"residence_state":null,"residence_district":null,"residence_canton":null,"organization_tax_number":null,"organization_address":null,"organization_city":null,"organization_province":null,"organization_country":"ES","organization_postal_code":null,"organization_state":null,"organization_url":null,"responsible_legal_level":null,"subscriber":null,"responsible_legal_documents":null,"special_conditions":null,"responsible_registry_data":null,"approving_rao":null,"producing_rao":null,"id_document_number":null,"id_responsible_document_type":null,"id_responsible_document_country":null,"id_responsible_document_number":null,"organizational_unit_3":null,"paperless_mode":true,"videoid_mode":false,"ext_recognition_data":null,"complement_number":null,"id_responsible_document_issuer":null,"provider_registration_number":null,"communication_language":"","identification_rao":null,"videoid_data":null,"enrollment_success_url":null,"configuration_data":[],"external_profile":null,"responsible_citizenship":null,"responsible_city":null}}
+- PK Solicitud devuelta: 55566
++ Documento adjuntado a la solicitud con PK: 55566
+[OK] Fichero: /Users/oscar/Proyectos/fincatech/public/storage/private/c4ddcc924f1d47524918d915b8dfe49b.png - Requerimiento: DNI Frontal
++ Documento adjuntado a la solicitud con PK: 55566
+[OK] Fichero: /Users/oscar/Proyectos/fincatech/public/storage/private/c4ddcc924f1d47524918d915b8dfe49b.png - Requerimiento: DNI Anverso
++ Documento adjuntado a la solicitud con PK: 55566
+[OK] Fichero: /Users/oscar/Proyectos/fincatech/public/storage//21e2a0bb2b049a885e23265a66494c9e.pdf - Requerimiento: CIF de la comunidad
++ Documento adjuntado a la solicitud con PK: 55566
+[OK] Fichero: /Users/oscar/Proyectos/fincatech/public/storage//35b936936174b23f2ee7eb7b900fb833.pdf - Requerimiento: Copia de la primera hoja del libro de actas
++ Documento adjuntado a la solicitud con PK: 55566
+[OK] Fichero: /Users/oscar/Proyectos/fincatech/public/storage//bcf0c177346c5eb7e0051c719fbaab16.pdf - Requerimiento: Copia del acta donde se es elegido administrador
++ Documento adjuntado a la solicitud con PK: 55566
+[OK] Fichero: /Users/oscar/Proyectos/fincatech/public/storage//b9133ab90e1e6b7960a2572261e9e492.pdf - Requerimiento: Declaración responsable y solicitud del certificado digital
++ Documento adjuntado a la solicitud con PK: 55566
+[OK] Fichero: /Users/oscar/Proyectos/fincatech/public/storage//de1dddc3656555bc96ccc06d81d1cfea.pdf - Requerimiento: Copia del acta (Modelo acuerdo junta general)
+
+

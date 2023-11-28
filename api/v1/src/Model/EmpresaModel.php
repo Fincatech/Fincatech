@@ -3,14 +3,20 @@
 namespace Fincatech\Model;
 
 use Fincatech\Entity\Empresa;
+use HappySoftware\Controller\ComunidadController;
+use HappySoftware\Controller\UsuarioController;
+use HappySoftware\Controller\MensajeController;
 use HappySoftware\Controller\HelperController;
+use HappySoftware\Database\DatabaseCore;
 
 class EmpresaModel extends \HappySoftware\Model\Model{
 
     private $entidad = 'Empresa';
     private $tablasSchema = array("Empresa");
     private $passwordGenerated;
-
+    public $UsuarioController;
+    public $MensajeController;
+    public $ComunidadController;
     /**
      * @var \Fincatech\Entity\Empresa
      */
@@ -178,6 +184,29 @@ class EmpresaModel extends \HappySoftware\Model\Model{
         $sql = "delete from empresarequerimiento where idempresa = " . $idEmpresa;
         $this->queryRaw($sql);
         
+    }
+
+    public function GetByCIF($cif)
+    {
+        //  Saenamos el CIF que hayan podido escribir
+        $cif = DatabaseCore::PrepareDBString($cif);
+
+        // TODO: Reemplazamos los guiones, puntos y comas ¿?
+        $filter = [];
+        $filter['getfields'] = '*';
+        $filter['fields'] = [
+            'cif' =>  " = '$cif' "
+        ];
+
+        $resultado = $this->getByFields($filter, 'mensaje');
+
+        if(is_null($resultado) || @count($resultado) == 0)
+        {
+            return false;
+        }else{
+            return $resultado;
+        }
+
     }
 
 }

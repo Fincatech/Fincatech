@@ -16,9 +16,11 @@ class MensajeModel extends \HappySoftware\Model\Model{
     private $mensajeCertificadoId;
     private $destinatarionombre;
 
+    //  Número de envíos realizados
+    private $numeroEnvio;
+
     //  E-mails certificados
     private $idmensaje;
-
 
     /**
      * @var \Fincatech\Entity\Mensaje
@@ -57,6 +59,12 @@ class MensajeModel extends \HappySoftware\Model\Model{
             $this->setDestinatarioNombre($params['destinatarionombre']);
         }
 
+        if(isset($params['numeroenvio'])){
+            $this->setNumeroEnvio($params['numeroenvio']);
+        }else{
+            $this->setNumeroEnvio(1);
+        }
+
     }
 
     public function getMensajeCertificadoId(){
@@ -78,6 +86,10 @@ class MensajeModel extends \HappySoftware\Model\Model{
 
     public function getDestinatarioNombre(){
         return $this->destinatarionombre;
+    }
+
+    public function getNumeroEnvio(){
+        return $this->numeroEnvio;
     }
 
     public function setMensajeCertificadoId($value){
@@ -110,6 +122,10 @@ class MensajeModel extends \HappySoftware\Model\Model{
         $this->idmensaje = $value;
         return $this;
     }
+    public function setNumeroEnvio($value){
+        $this->numeroEnvio = $value;
+        return $this;
+    }
 
     public function _Save()
     {
@@ -117,6 +133,7 @@ class MensajeModel extends \HappySoftware\Model\Model{
         $datos['subject'] = htmlentities($this->getSubject(), ENT_QUOTES);
         $datos['body'] = htmlentities($this->getBody(), ENT_QUOTES);
         $datos['destinatarionombre'] = htmlentities($this->getDestinatarioNombre(), ENT_QUOTES);
+        $datos['numeroenvio'] = $this->numeroEnvio;
 
         //  TODO: id del mensaje certificado
         if(!is_null($this->getMensajeCertificadoId()))
@@ -162,6 +179,15 @@ class MensajeModel extends \HappySoftware\Model\Model{
     public function updateCertificado($idMensaje, $nombreFichero)
     {
         $sql = "update emailscertificados set filename='$nombreFichero', fechacertificacion = now() where idmensaje='$idMensaje'";
+        $this->queryRaw($sql);
+    }
+
+    /**
+     * Actualiza el número de reenvíos realizados sobre un e-mail
+     */
+    public function UpdateSendNumber($idMensaje)
+    {
+        $sql = "update mensaje set numeroenvio = (numeroenvio + 1), created = now() where id = " . $idMensaje;
         $this->queryRaw($sql);
     }
 

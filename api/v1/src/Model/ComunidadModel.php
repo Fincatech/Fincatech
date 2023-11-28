@@ -15,6 +15,8 @@ class ComunidadModel extends \HappySoftware\Model\Model{
 
     use SecurityTrait;
 
+    public $DocumentalController, $ServiciosController;
+
     private $entidad = 'Comunidad';
 
     //  Se utiliza para comprobar si es un usuario autorizado

@@ -122,6 +122,23 @@ let administradorCore = {
             //  Comunidades
                 CoreUI.tableData.addColumn('listadoAdministrador', "numerocomunidades", "Comunidades activas",null, 'text-center');
 
+            //  Visitado
+                CoreUI.tableData.addColumn('listadoAdministrador', 
+                function(row, type, val, meta)
+                {
+                    var visitado;
+                    if(row.visitado == true)
+                    {
+                        visitado = '<span class="badge badge-pill bg-success text-white">Visitado</span>';
+                    }else{
+                        visitado = '<span class="badge badge-pill bg-danger text-white">No visitado</span>';
+                    }
+
+                    return visitado;
+                },
+                "Visitado", null, 'text-center');
+
+
             //  Fecha de creación
                 CoreUI.tableData.addColumn('listadoAdministrador', 
                 function(row, type, val, meta)

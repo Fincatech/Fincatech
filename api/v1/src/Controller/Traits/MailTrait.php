@@ -199,7 +199,7 @@ trait MailTrait{
     /**
      * Envía un e-mail certificado simple desde el panel del administrador de fincas
      */
-    public function SendEmailCertificado($subject, $destinatarios, $body, $usuarioId = null, $singleNameDestinatario = null)
+    public function SendEmailCertificado($subject, $destinatarios, $body, $usuarioId = null, $singleNameDestinatario = null, $ficheroAdjunto = null)
     {
         //  Inicializamos el api de Mensatek
         $this->InitializeAPIEmailCertificado($usuarioId);
@@ -219,12 +219,27 @@ trait MailTrait{
         //  Componemos el cuerpo de la petición
             $cuerpoPeticion = array(
                 'Remitente' => $this->mensatek_remitente,
-                'Asunto' => $subject,
+                'Asunto' => is_null($ficheroAdjunto) ? $subject : $subject . ' [documento adjunto]',
                 'Mensaje' => $body,
                 'Destinatarios' => json_encode($destinatariosEmail),
                 'Resp' => 'XML',
                 'Report' => 1
             );
+
+        //  Si tiene fichero adjunto, lo incluimos en la petición
+            if(!is_null($ficheroAdjunto))
+            {
+                //  Comprobamos si el nombre del fichero excede de los 20 caracteres que es el permitido por Mensatek
+                $fichero['Nombre'] = 'documento.pdf';
+                //  Procesamos el fichero decodificándolo primero para obtener el binario
+                $contenidoDecodificado = base64_decode(explode(',', $ficheroAdjunto['base64'])[1]);
+                //  Sobre el contenido binario aplicamos la eliminación de espacios y lo codificamos de vuelta en base64
+                //  Esto se hace porque no se almacena en el servidor el contenido del fichero
+                $fichero['Contenido'] = chunk_split(base64_encode( $contenidoDecodificado ));
+                $cuerpoPeticion['Adjuntos'] = Array();
+                array_push($cuerpoPeticion['Adjuntos'], $fichero);
+                $cuerpoPeticion['Adjuntos'] = json_encode($cuerpoPeticion['Adjuntos']);
+            }
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
@@ -319,6 +334,8 @@ trait MailTrait{
                         }
                     }
             }
+        }else{
+            return false;
         }
         return true;
     }

@@ -133,6 +133,19 @@ define("security", [
             "folder"=>"empleado",
             "menulateral"=> false
         ],
+        "ROLE_REVCAE"=>[
+            "folder"=>"revcae",
+            "titulo" => "Revisión documental cae",
+            "menulateral"=> false,
+            "js" =>[
+                "tecnicocae",
+            ],
+            "permissions" => [
+                "create" => "all",
+                "delete" => "all",
+                "update" => "all"
+            ],            
+        ],        
         "ROLE_LOGIN"=>[
             "folder"=>"login",
             "menulateral"=> false,

@@ -21201,3 +21201,16 @@ span.flatpickr-weekday {
 h2#swal2-title {
  	border-radius: 10px 10px 0px 0px;
 }
+
+.dt-buttons .buttons-html5 {
+    display: inline-block;
+    width: fit-content;
+    max-width: initial;
+    flex: none;
+    margin-right: 16px;
+    max-height: 31px;
+}
+
+button.btn.btn-secondary.buttons-copy, button.btn.btn-secondary.buttons-csv {
+    display: none;
+}

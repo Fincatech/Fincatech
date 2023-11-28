@@ -82,7 +82,7 @@ trait FilesTrait{
             try{
 
                     file_put_contents($ruta . $fichero , base64_decode(explode(',',$base64string)[1]));
-
+                    $nombre = str_replace("'","`", $nombre);
                 //  Insertamos el registro en base de datos
                     $sqlFile = "insert into ficheroscomunes(nombre, nombrestorage, ubicacion, estado, created, usercreate) values (";
                     $sqlFile .= "'$nombre', '$fichero', '" . $ruta . "', null, now(), " . $this->getLoggedUserId() . ")";                     

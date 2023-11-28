@@ -1,9 +1,5 @@
 <?php
 
-/*
-    $this->Model hay que cambiarlo por $this->NombreModel
-*/
-
 namespace Fincatech\Controller;
 
 // Sustituir Model por el nombre del modelo real. Ej: UsuarioModel
@@ -26,12 +22,16 @@ class CronController extends FrontController{
     //  Se utiliza para almacenar la tabla en formato html con la información de los requerimientos de empleado de empresa caducado
     private $_htmlRequerimientoEmpleado;
 
+    //  Número de envíos máximo de e-mails de recordatorio de acceder a la plataforma para las empresas
+    private $_limiteEnviosRecordatorios = 10;
+
+    //  Texto recordatorio acceso para empresas
+    private $_textoRecordatorio = '<p>&nbsp;</p><p style="font-size: 14px; line-height: 140%; font-family: Raleway,sans-serif;"><span style="font-family: Raleway, sans-serif; font-size: 14px; line-height: 19.6px;">Hola @empresa, le recordamos que tiene pendiente de acceder a la plataforma según e-mail adjunto en el proceso del alta por parte del administrador.</span></p><p>&nbsp;</p>';
+
     public function __construct($params = null)
     {
         $this->InitModel('Cron', $params);
     }
-
-
 
     public function ControlCaducidadDocumentosAdministrador()
     {
@@ -332,5 +332,60 @@ class CronController extends FrontController{
 
         return $output;
     }
+
+    //============================================================================================
+    //                         RECORDATORIO DE REGISTRO DE EMPRESAS
+    //============================================================================================
+    /**
+     * Envío de e-mails de recordatorio de acceso a la plataforma para empresas
+     * @return string Mensaje de ejecución del cron con el resultado obtenido
+     */
+    public function EnvioRecordatorioAccesoEmpresas()
+    {
+
+        $numeroEnvios = 0;
+        //  Recuperamos aquellas empresas que no han accedido nunca al sistema
+        $empresasPendienteAcceso = $this->CronModel->ListEmpresasPendientesAcceso();
+
+        if(count($empresasPendienteAcceso) > 0)
+        {
+
+            //  Inicializamos el controller de mensaje
+            $this->Initcontroller('Mensaje');
+            //  Por cada una de las empresas recuperamos el mensaje enviado para comprobar si ha alcanzado el límite de envíos
+            //  En caso de haber alcanzado el límite de recordatorios, enviamos e-mail al administrador para avisarle de dicha circunstancia
+            for($iEmpresa = 0; $iEmpresa < count($empresasPendienteAcceso); $iEmpresa++)
+            {
+                //  Recuperamos la empresa del array
+                $empresa = $empresasPendienteAcceso[$iEmpresa];
+
+                //  Recuperamos el mensaje enviado durante el registro de la empresa
+                $emailRegistroId = $this->MensajeController->GetEmailRegistroIdByEmail( $empresa['emailempresa'] );
+
+                //  Comprobamos si hay mensaje enviado
+                if( $emailRegistroId > 0 )
+                {
+                    //  Comprobamos si el número de envío es inferior al máximo permitido
+                    if( $numeroEnvios < $this->_limiteEnviosRecordatorios) 
+                    {
+                        $mensajeRecordatorio = str_replace('@empresa', $empresa['razonsocial'], $this->_textoRecordatorio);
+                        //  Si aún no ha alcanzado el límite enviamos el recordatorio al usuario
+                        $this->MensajeController->ResendMessage($emailRegistroId, true, 'Recordatorio Acceso Fincatech', $mensajeRecordatorio);
+                        $numeroEnvios++;
+                    }else{
+                        //  Enviamos e-mail al administrador para avisar de dicha circunstancia
+                        $this->MensajeController->SendEmailRecordatorioAccesoAdministrador();
+                    }
+                }
+            }
+
+        }else{
+
+        }
+        //
+        $mensaje = $numeroEnvios;
+        return $mensaje;
+    }
+
 
 }

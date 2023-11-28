@@ -405,6 +405,20 @@ return function (App $app) {
 
     }); 
 
+    $app->get('/documental/requerimientos/cae/comunidades', function (Request $request, Response $response, array $params)
+    {
+    
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Documental');
+        
+        $response->getBody()->write( HelperController::successResponse($frontController->context->GetRequerimientosPendientesCAEGeneral()) );
+
+        return $response;  
+    });
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///                                                                         RGPD
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1243,9 +1257,10 @@ return function (App $app) {
         $mensaje = $data['mensaje'];
         $asunto = $data['subject'];
         $destinatarioNombre = $data['comunidad'];
+        $attachment = isset($data['fichero']) ? $data['fichero']: null;
 
         $response->getBody()->write( 
-            $frontController->context->SendEmailCertificadoAdministrador( $asunto, $destinatario, $administradorId, $mensaje, $destinatarioNombre )
+            $frontController->context->SendEmailCertificadoAdministrador( $asunto, $destinatario, $administradorId, $mensaje, $destinatarioNombre, $attachment )
         );        
         return $response;
 
@@ -1514,6 +1529,11 @@ return function (App $app) {
         return $response;   
     });
 
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////                                                                CRONS                     
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     /**
      * Cron de normalización de informes desde Mensatek
      */
@@ -1540,6 +1560,20 @@ return function (App $app) {
         $response->getBody()->write(HelperController::successResponse('ejecutado',200));
         return $response;
     });
+
+    /**
+     * Cron que reenvía e-mails de registro a las empresas que nunca han accedido
+    */
+    $app->get('/cron/empresa/pendienteacceso', function (Request $request, Response $response) {
+
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+        $frontController = new $frontControllerName();
+        $frontController->Init('Cron');
+        $result = $frontController->context->EnvioRecordatorioAccesoEmpresas();
+        $response->getBody()->write(HelperController::successResponse( $result, 200) );
+        return $response;
+    });
+
 
     //  Emails certificados
     $app->post('/emailcertificado', function(Request $request, Response $response, array $params ): Response

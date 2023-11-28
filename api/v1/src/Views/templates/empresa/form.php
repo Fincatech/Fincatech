@@ -19,6 +19,7 @@
                         <div class="col-12 col-md-2 text-left">
                             <label for="cif" class="pl-0"><i class="bi bi-credit-card-2-front pr-2"></i>CIF*</label>
                             <input type="text" maxlength="20" class="form-control data text-center form-required" id="cif" name="cif" placeholder="CIF" hs-entity="Empresa" hs-field="cif" required>
+                            <label for="cif" id="cifExiste" class="pl-0 text-danger" style="text-transform: initial;display:none;">Ya existe este CIF</label>
                         </div>
                         <div class="col-12 col-md-8 text-left">
                             <label for="razonsocial"><i class="bi bi-person pr-2"></i>Nombre / Razón social*</label>              
@@ -73,6 +74,36 @@
                         </div> 
 
                     </div>                    
+
+                    <!-- Listado de empresas disponibles con el mismo CIF -->
+                    <div class="form-group row mb-2 tabla-empresas-cif" style="display: none;">
+                        <div class="col-12 d-flex flex-column justify-content-between shadow-neumorphic pt-3 px-3 br-10" style="/*max-height: 250px;*//*overflow-y: auto;*/">
+                            <div class="row">
+                                <div class="col-12">
+                                    <h5 class="text-center mt-2 bg-success text-white py-2 rounded text-uppercase font-weight-bold">Empresas con el mismo CIF</h5>
+                                    <p class="text-center bg-light font-weight-bold p-2">Hemos detectado que este CIF ya está asignado a otra empresa, por favor seleccione la empresa que desea asociar clicando sobre el botón "Asignar", en caso contrario, si es una nueva delegación y desea darla de alta proporcione los datos en el formulario de arriba.<br><span class="text-danger font-weight-bold">NOTA: Revise el e-mail proporcionado con el fin de asegurarse que es válido.</span></p>
+                                </div>
+                            </div>
+                            <div class="row flex-grow-1">
+                                <div class="col-12 table-responsive">
+                                    <table class="table table-striped border">
+                                        <thead class="bg-dark text-white">
+                                            <tr>
+                                                <th scope="col">Empresa</th>
+                                                <th scope="col">Dirección</th>
+                                                <th scope="col">Localidad</th>
+                                                <th scope="col">Teléfono</th>
+                                                <th scope="col">E-mail</th>
+                                                <th scope="col">&nbsp;</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="tabla-empresas-cif-datos"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
 
                 </form>
 
