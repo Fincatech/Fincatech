@@ -2,7 +2,7 @@
 
     <div class="col-12 d-flex">
 
-        <div class="card flex-fill">
+        <div class="card flex-fill card-principal">
 
             <div class="card-header pl-0 headerListado">
 
@@ -24,7 +24,7 @@
 
                     <div class="row">
                         <div class="col-sm-12">
-                            <table class="table table-hover my-0 hs-tabla no-footer no-clicable" data-order='[[ 1, "asc"]]' name="listadoAdministrador" id="listadoAdministrador" data-model="Administrador">
+                            <table class="table table-bordered table-hover my-0 hs-tabla no-footer no-clicable" data-order='[[ 1, "asc"]]' name="listadoAdministrador" id="listadoAdministrador" data-model="Administrador">
                                 <thead class="thead"></thead>
                                 <tbody class="tbody"></tbody>
                             </table>

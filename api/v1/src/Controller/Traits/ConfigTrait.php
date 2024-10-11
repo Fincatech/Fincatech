@@ -29,4 +29,13 @@ trait ConfigTrait{
         return $this->settings[$setting];
     }
 
+    public function GetURL()
+    {
+        //  Comprobamos el dominio que es para poder asignar el logo correspondiente
+        $dominio = 'https://' . $_SERVER['SERVER_NAME'];
+        // $aDominio = explode('.', $dominio);
+        // $nombreFranquiciado = $aDominio[count($aDominio) - 2];
+        return strtolower($dominio);
+    }
+
 }

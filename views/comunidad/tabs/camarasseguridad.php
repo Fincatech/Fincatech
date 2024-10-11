@@ -47,7 +47,7 @@
 
     <div class="row mt-3 flex-grow-1">
         <div class="col-12">    
-            <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoCamarasSeguridad" id="listadoCamarasSeguridad" data-model="Comunidad">
+            <table class="table table-bordered table-hover my-0 hs-tabla w-100 no-clicable" name="listadoCamarasSeguridad" id="listadoCamarasSeguridad" data-model="Comunidad">
                 <thead class="thead"></thead>
                 <tbody class="tbody"></tbody>
             </table>

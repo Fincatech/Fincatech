@@ -29,12 +29,12 @@ class StatsModel extends \HappySoftware\Model\Model{
 
     public function TotalComunidades()
     {
-        return $this->getRepositorio()->selectCount('comunidad');
+        return $this->getRepositorio()->selectCount('comunidad', 'estado', '=', "'A'");
     }
 
     public function TotalAdministradores()
     {
-        return $this->getRepositorio()->selectCount('usuario', 'rolid','=',5);
+        return $this->getRepositorio()->selectCount('usuario', "idadministrador is null and estado = 'A' and rolid", '=', 5);
     }
 
     public function TotalServiciosFacturados()
@@ -55,6 +55,26 @@ class StatsModel extends \HappySoftware\Model\Model{
     public function TotalEmailsEnviados()
     {
         return $this->getRepositorio()->selectCount('mensaje');
+    }
+
+    /**
+     * Total servicios contratados por comunidades activas en el sistema
+     */
+    public function ServiciosContratadosComunidades()
+    {
+        $sql = "
+            SELECT 
+                sum(case when csc.idservicio = 1 then 1 else 0 end) as totalcae,
+                sum(case when csc.idservicio = 2 then 1 else 0 end) as totaldpd,
+                sum(case when csc.idservicio = 3 then 1 else 0 end) as totaldoccae,
+                sum(case when csc.idservicio = 4 then 1 else 0 end) as totalinstalaciones,
+                sum(case when csc.idservicio = 5 then 1 else 0 end) as totalcertificadosdigitales    
+            FROM
+                comunidadservicioscontratados csc, comunidad c 
+            where 
+            csc.contratado = 1
+            and c.id = csc.idcomunidad and c.estado = 'A' ";
+        return mysqli_fetch_assoc($this->getRepositorio()->queryRaw($sql));
     }
 
     // /** Recupera todos los registros */

@@ -6,7 +6,18 @@
 
             <div class="card-header">
 
-                <h5 class="card-title mb-0">Comunidades que tienen requerimientos de CAE pendientes</h5>
+                <div class="row">
+                    <div class="col-12 col-xl-6 text-center text-xl-left">
+                        <h5 class="card-title mb-2 mb-xl-0">Comunidades que tienen requerimientos de CAE pendientes - <span class="ml-2 mr-2 tipo-listado">Pendiente Comunidades</span></h5>
+                    </div>
+                    <div class="col-12 col-xl-3 mb-3 mb-xl-0">
+                        <button role="button" class="btn btn-outline-dark w-100 mr-0 mr-xl-2 active btnSeleccionPendiente" data-tipo="comunidades">Pendiente comunidades</button>
+                    </div>
+                    <div class="col-12 col-xl-3">                    
+                        <button role="button" class="btn btn-outline-dark w-100 btnSeleccionPendiente" data-tipo="administradores">Pendiente nuevos administradores</button>
+                    </div>
+                </div>
+                
 
             </div>
             

@@ -29,6 +29,12 @@ trait SecurityTrait{
         return ( $this->getLoggedUserRole() == 'ROLE_REVCERT' );
     }
 
+    /** Comprueba si es un técnico de certificados digitales el usuario que está en sesión */
+    public function isFacturacion()
+    {
+        return ( $this->getLoggedUserRole() == 'ROLE_FACTURACION' );
+    }
+
     // TODO:
     public function isDPD()
     {

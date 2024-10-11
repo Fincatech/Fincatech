@@ -108,13 +108,14 @@ let usuarioCore = {
                     var timeStamp;
                     var fechaCreacion;
 
-                    if(!row.lastlogin)
+                    if(!row.lastlogin || row.lastlogin == '0000-00-00 00:00:00')
                     {
                         timeStamp = '';
                         fechaCreacion = '<span class="badge badge-pill bg-danger text-white">Nunca</span>';
                     }else{
                         timeStamp = moment(row.lastlogin, 'YYYY-MM-DD hh:mm').unix();
-                        fechaCreacion = moment(row.lastlogin).locale('es').format('L');
+                        // fechaCreacion = moment(row.lastlogin).locale('es').format('L');
+                        fechaCreacion = moment(row.lastlogin).format('DD/MM/YYYY');
                     }
 
                     return `<span style="display:none;">${timeStamp}</span>${fechaCreacion}`;
@@ -131,8 +132,8 @@ let usuarioCore = {
 
             //  Columna de acciones
                 var html = '<ul class="nav justify-content-center">';
-                    html += `<li class="nav-item"><a href="${baseURL}usuario/data:id$" class="btnEditarUsuario d-inline-block mr-2" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid" style="height:26px; width:26px;"></i></a></li>`;
-                    html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarUsuario d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid" style="height:26px; width:26px;"></i></li></ul>';
+                    html += `<li class="nav-item"><a href="${baseURL}usuario/data:id$" class="btnEditarUsuario d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid icono-accion" style="height:26px; width:26px;"></i></a></li>`;
+                    html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarUsuario d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid icono-accion" style="height:26px; width:26px;"></i></li></ul>';
                 CoreUI.tableData.addColumn('listadoUsuario', null, "", html);
 
             $('#listadoUsuario').addClass('no-clicable');
@@ -298,8 +299,8 @@ let usuarioCore = {
 
                 //  Columna de acciones
                     var html = '<ul class="nav justify-content-center">';
-                        html += `<li class="nav-item"><a href="${baseURL}autorizado/data:id$" class="btnEditarUsuario d-inline-block mr-2" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid" style="height:26px; width:26px;"></i></a></li>`;
-                        html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarUsuarioAutorizado d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid" style="height:26px; width:26px;"></i></li></ul>';
+                        html += `<li class="nav-item"><a href="${baseURL}autorizado/data:id$" class="btnEditarUsuario d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid icono-accion" style="height:26px; width:26px;"></i></a></li>`;
+                        html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarUsuarioAutorizado d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid icono-accion" style="height:26px; width:26px;"></i></li></ul>';
                     CoreUI.tableData.addColumn(listado, null, "", html);
 
                 $('#listadoUsuario').addClass('no-clicable');

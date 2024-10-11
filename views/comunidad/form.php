@@ -12,16 +12,16 @@
 
                 <div class="card mb-1 shadow-neumorphic bg-white p-2">
 
-                    <div class="list-group list-group-horizontal list-group-flush" role="tablist">
-                        <a class="list-group-item list-group-item-action active d-none" data-toggle="list" href="#datos" role="tab" aria-selected="true"><i class="bi bi-archive mr-2"></i> Datos</a>
-                        <a class="list-group-item list-group-item-action enlaceCae" data-toggle="list" href="#empresa" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> CAE</a>
+                    <div class="list-group list-group-horizontal list-group-flush fincatech--enlaces-comunidd" role="tablist">
+                        <a class="list-group-item list-group-item-action active d-none fincatech--datos" data-toggle="list" href="#datos" role="tab" aria-selected="true"><i class="bi bi-archive mr-2"></i> Datos</a>
+                        <a class="list-group-item list-group-item-action enlaceCae fincatech--cae" data-toggle="list" href="#empresa" role="tab" aria-selected="false"><i class="bi bi-truck mr-2"></i> CAE</a>
                         <!-- <a class="list-group-item list-group-item-action enlaceDocumentacionComunidad" data-toggle="list" href="#documentos" role="tab" aria-selected="false"><i class="bi bi-folder-check"></i> DOC. COMUNIDAD CAE</a> -->
                         <?php if( $App->isContratista()): ?>
                             <a class="list-group-item list-group-item-action enlaceEmpleadosComunidadContratista" data-toggle="list" href="#empleadoscomunidadcontratista" role="tab" aria-selected="false"><i class="bi bi-people-fill mr-2"></i> Empleados Comunidad</a>
                         <?php endif; ?>
                         <?php if( !$App->isContratista() ): ?>
-                            <a class="list-group-item list-group-item-action enlaceRGPD" data-toggle="list" href="#rgpd" role="tab" aria-selected="false"><i class="bi bi-shield-lock mr-2"></i> RGPD</a>
-                            <a class="list-group-item list-group-item-action enlaceCertificadoDigital" data-toggle="list" href="#certificadodigital" role="tab" aria-selected="false"><i class="bi bi-patch-check mr-2"></i> Certificado Digital</a>
+                            <a class="list-group-item list-group-item-action enlaceRGPD fincatech--rgpd" data-toggle="list" href="#rgpd" role="tab" aria-selected="false"><i class="bi bi-shield-lock mr-2"></i> RGPD</a>
+                            <!-- <a class="list-group-item list-group-item-action enlaceCertificadoDigital" data-toggle="list" href="#certificadodigital" role="tab" aria-selected="false"><i class="bi bi-patch-check mr-2"></i> Certificado Digital</a> -->
                         <?php endif; ?>
                         <?php if( $App->isContratista() ): ?>
                             <a class="list-group-item list-group-item-action enlaceEmpresasExternas" data-toggle="list" href="#empresasexternascontratista" role="tab" aria-selected="false"><i class="bi bi-shop mr-2"></i> Empresas Concurrentes</a>
@@ -48,7 +48,7 @@
 
             <div class="col-12 d-flex">
 
-                <div class="card flex-fill shadow-neumorphic pl-3 pb-3 pt-2 pr-3">
+                <div class="card flex-fill shadow-neumorphic pl-3 pb-3 pt-2 pr-3 card-principal">
 
                     <div class="card-header pl-1 mb-2">
 
@@ -99,7 +99,7 @@
             <?php include('tabs/rgpd.php'); ?>
 
             <!-- CERTIFICADO DIGITAL -->
-            <?php include('tabs/certificadodigital.php'); ?>
+            <?php //include('tabs/certificadodigital.php'); ?>
 
 <?php endif; ?>
 

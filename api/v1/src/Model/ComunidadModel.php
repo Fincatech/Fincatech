@@ -10,6 +10,7 @@ use Fincatech\Model\Requerimiento;
 use Fincatech\Model\ServiciosModel;
 use HappySoftware\Controller\HelperController;
 use HappySoftware\Controller\Traits\SecurityTrait;
+use HappySoftware\Database\DatabaseCore;
 
 class ComunidadModel extends \HappySoftware\Model\Model{
 
@@ -29,12 +30,44 @@ class ComunidadModel extends \HappySoftware\Model\Model{
      */
     public $comunidad;
 
+    private $_usuarioId;
+    private $_idComunidad;
+    public function SetId($value)
+    {
+        $this->_idComunidad = $value;
+        return $this;
+    }
+
+    public function Id()
+    {
+        return $this->_idComunidad;
+    }
+
+    private $_estado;
+    public function Estado(){ return $this->_estado; }
+    public function SetEstado($value)
+    {
+        $this->_estado = $value;
+        return $this;
+    }
+
+    
+        
+
     public function setAdministradorIdUsuarioAutorizado($value){
         $this->administradorIdUsuarioAutorizado = $value;
     }
 
+    public function SetUsuarioId($value)
+    {
+        $this->_usuarioId = $value;
+        return $this;
+    }
+    public function UsuarioId(){ return $this->_usuarioId;}
+
     public function __construct($params = null)
     {
+        
         //  Inicializamos la entidad
         $this->InitEntity( $this->entidad );
 
@@ -141,7 +174,7 @@ class ComunidadModel extends \HappySoftware\Model\Model{
             and ce.idempresa = e.id
             and c.id = ce.idcomunidad        
         ";
-        $sql .= " order by cast(c.codigo as signed) asc";
+        $sql .= " order by c.codigo asc";
 
         $result = $this->query($sql);
         $data['Comunidad'] = $result;
@@ -184,7 +217,7 @@ class ComunidadModel extends \HappySoftware\Model\Model{
             $sql .= ' usuarioId = ' . $usuarioId . " ";
         }
 
-        $sql .= " order by cast(codigo as signed) asc";
+        $sql .= " order by codigo asc";
 
         $result = $this->query($sql);
         $data['Comunidad'] = $result;
@@ -245,9 +278,10 @@ class ComunidadModel extends \HappySoftware\Model\Model{
             }
         }
 
+        // ORR 28-03-2024. Se quita el cast al código ya que Cristóbal lo ha pedido ahora alfanumérico
         $sqlComunidades = "
             SELECT 
-                c.id, cast(c.codigo as signed) codigo, c.cif, c.direccion, c.codpostal, c.provincia, c.nombre as comunidad, u.nombre as administrador, c.localidad, c.cif, c.ibancomunidad, c.created as fechaalta, c.estado
+                c.id, c.codigo, c.cif, c.direccion, c.codpostal, c.provincia, c.nombre as comunidad, u.nombre as administrador, c.localidad, c.cif, c.ibancomunidad, c.created as fechaalta, c.estado
             FROM 
                 comunidad c
                 left join usuario u on u.id = c.usuarioid
@@ -255,16 +289,37 @@ class ComunidadModel extends \HappySoftware\Model\Model{
             order by u.nombre asc, c.codigo asc
             $limiteConsulta";
 
-        $sqlCount = "
+            $sqlCount = "
             SELECT COUNT(*) as total from (
                 SELECT 
-                c.id, cast(c.codigo as signed) codigo, c.nombre as comunidad, u.nombre as administrador, c.localidad, c.cif, c.ibancomunidad, c.created as fechaalta, c.estado
+                c.id, c.codigo, c.nombre as comunidad, u.nombre as administrador, c.localidad, c.cif, c.ibancomunidad, c.created as fechaalta, c.estado
             FROM 
                 comunidad c
                 left join usuario u on u.id = c.usuarioid
                 $searchText
             ) t1
         ";
+
+        // $sqlComunidades = "
+        //     SELECT 
+        //         c.id, cast(c.codigo as signed) codigo, c.cif, c.direccion, c.codpostal, c.provincia, c.nombre as comunidad, u.nombre as administrador, c.localidad, c.cif, c.ibancomunidad, c.created as fechaalta, c.estado
+        //     FROM 
+        //         comunidad c
+        //         left join usuario u on u.id = c.usuarioid
+        //         $searchText
+        //     order by u.nombre asc, c.codigo asc
+        //     $limiteConsulta";
+
+        // $sqlCount = "
+        //     SELECT COUNT(*) as total from (
+        //         SELECT 
+        //         c.id, cast(c.codigo as signed) codigo, c.nombre as comunidad, u.nombre as administrador, c.localidad, c.cif, c.ibancomunidad, c.created as fechaalta, c.estado
+        //     FROM 
+        //         comunidad c
+        //         left join usuario u on u.id = c.usuarioid
+        //         $searchText
+        //     ) t1
+        // ";
 
         $sqlResult = $this->query($sqlCount);
         $totalComunidades = $sqlResult[0]['total'];
@@ -337,7 +392,7 @@ class ComunidadModel extends \HappySoftware\Model\Model{
     /** Inserta un servicio contratado por una comunidad 
      *  TODO: Debería de hacerse directamente mediante el controller de servicios basándonos en objetos
     */
-    public function InsertServicioContratado($idComunidad, $idServicio, $precio, $precioComunidad, $contratado, $mesFacturacion = 1)
+    public function InsertServicioContratado($idComunidad, $idServicio, $precio, $precioComunidad, $contratado, $mesFacturacion = 1 )
     {
 
         $sql = "insert into comunidadservicioscontratados(idcomunidad, idservicio, precio, preciocomunidad, contratado, mesfacturacion, created) values (";
@@ -593,6 +648,110 @@ class ComunidadModel extends \HappySoftware\Model\Model{
         //  Select count
         $sql = "select * from emailscertificados where idcomunidad = $idComunidad and idempresa = $idEmpresa and filename is not null order by id desc limit 1";
         return $this->query($sql);
+    }
+
+    /**
+     * Recupera las comunidades asociadas a un administrador junto con los servicios contratados por cada una de ellas
+     */
+    public function GetComunidadesAndServicesByAdministradorId($idAdministrador, $mesFacturacion, $servicios)
+    {
+
+        $idAdministrador = DatabaseCore::PrepareDBString($idAdministrador);
+
+        $sql = "SELECT 
+                    csc.id, c.codigo, csc.idcomunidad, c.nombre as comunidad, csc.idservicio, 
+                    ts.nombre as servicio, csc.contratado as servicio_contratado, csc.precio, csc.preciocomunidad, 
+                    c.direccion, c.localidad, c.provincia, c.cif, c.ibancomunidad, csc.mesfacturacion comunidadmesfacturacion
+                FROM
+                    comunidadservicioscontratados csc left join comunidad c on c.id = csc.idcomunidad,
+                    tiposservicios ts 
+                where
+                    c.usuarioid = $idAdministrador
+                    and ts.id = csc.idservicio
+                    and c.estado in('A','P') ";
+
+        if(!is_null($servicios))
+        {
+            //  Puede venir de 1 a n servicios por lo que nos aseguramos de transformar el array en texto para la consulta */
+            if(is_array($servicios)){
+                $servicios = implode(',', $servicios);
+            }
+            $sql .= " and csc.idservicio in(" . $servicios . ")" ;
+        }
+
+        if(!is_null($mesFacturacion))
+            $sql .= " and csc.mesfacturacion = " . (int)$mesFacturacion . " ";
+
+        $sql .= " order by c.codigo, csc.idservicio";
+        return $this->query($sql);
+    }    
+    
+    /**
+     * Devuelve el número de empresas que tiene asignadas una comunidad
+     * @return int Número de empresas que tiene asignadas una comunidad
+     */
+    public function TotalEmpresasAsignadas()
+    {
+        return $this->getRepositorio()->selectCount('comunidadempresa', 'idcomunidad', '=', $this->Id());
+    }
+
+    /**
+     * Devuelve los datos de comunidad y usuario siempre que la comunidad esté asignada a un usuario autorizado
+     */
+    public function UsuarioAutorizado()
+    {
+        $sql = "select * from comunidadautorizado where idcomunidad = " . $this->Id() . " limit 1";
+        return $this->query($sql);
+    }
+
+    /** Listado de proveedores asignados a las comunidades */
+    public function ProveedoresAsignados()
+    {
+        $sql = "select 
+            ce.idcomunidad, c.codigo,  c.codigo as codigocomunidad, concat(c.codigo, ' - ', c.nombre) as comunidad, ce.idempresa, 
+            e.razonsocial as empresa, ce.created as fecha_asignacion
+        from 
+			comunidad c 
+            left join comunidadempresa ce on ce.idcomunidad = c.id
+            left join empresa e on e.id = ce.idempresa
+        where 
+            c.usuarioId =  " . $this->UsuarioId() . "
+            and c.estado = 'A'
+        group by 
+            ce.idcomunidad, ce.idempresa            
+        order by 
+           c.nombre asc, e.razonsocial asc";
+        return $this->query($sql);
+    }
+
+
+    /** Listado de proveedores asignados a las comunidades */
+    public function ProveedoresAsignadosAutorizado()
+    {
+        $sql = "select 
+            ce.idcomunidad, c.codigo, c.codigo as codigocomunidad, concat(c.codigo, ' - ', c.nombre) as comunidad, ce.idempresa, 
+            e.razonsocial as empresa, ce.created as fecha_asignacion
+        from 
+			comunidadautorizado ca,
+			comunidad c 
+            left join comunidadempresa ce on ce.idcomunidad = c.id
+            left join empresa e on e.id = ce.idempresa
+        where 
+            ca.idautorizado = " . $this->UsuarioId() . "
+            and c.id = ca.idcomunidad
+            and c.estado = 'A'
+        group by 
+            ce.idcomunidad, ce.idempresa            
+        order by 
+           c.nombre asc, e.razonsocial asc";
+        return $this->query($sql);
+    }
+
+    public function BulkUpdateStatus()
+    {
+       $sql = "update " . strtolower($this->entidad) . " set updated = now(), estado = '" . $this->Estado() . "' where usuarioId = " . $this->UsuarioId();
+       $sql .= " or usercreate = " . $this->UsuarioId() . " and estado = 'A'";
+       $this->queryRaw($sql);
     }
 
 }

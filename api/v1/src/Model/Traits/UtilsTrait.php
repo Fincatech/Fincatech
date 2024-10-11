@@ -2,6 +2,8 @@
 
 namespace HappySoftware\Model\Traits;
 
+use HappySoftware\Database\DatabaseCore;
+
 trait UtilsTrait{
 
 
@@ -31,7 +33,21 @@ trait UtilsTrait{
             //  Comprobamos si la entidad sobre la que se va a comprobar es un array
             if( is_null($relEntity))
             {
-
+                /* TOFIX: Hay veces que da error y hay que revisar por qué
+                if(!is_null($datos[$entity]))
+                {
+                    foreach ($datos[$entity] as $index => $object) 
+                    {
+                        if($object[$key] != $value)
+                        {
+                            unset($datos[$entity][$index]);
+                        }
+                    }
+                    $datos[$entity] = array_values($datos[$entity]);
+                }else{
+                    $datos[$entity] = null;
+                }
+                */
                 foreach ($datos[$entity] as $index => $object) 
                 {
                     if($object[$key] != $value)
@@ -98,11 +114,24 @@ trait UtilsTrait{
 
     }
 
-    /**
+    /** TOFIX: Revisar bien la parte de construcción de la búsqueda
      * @param Array $fields Array con el nombre de los campos
      */
     public function processSearch($fieldsToSearch, $valueToSearch)
     {
+
+
+        /////////////////////////////////////////////////////////////////////
+        ///
+        ///                          PROPIEDADES
+        ///
+        /////////////////////////////////////////////////////////////////////
+        ///
+        /// value
+        /// operator
+        /// condition
+        ///
+        /////////////////////////////////////////////////////////////////////
 
         $filterQuery = '';
 
@@ -112,13 +141,25 @@ trait UtilsTrait{
             for($iField = 0; $iField < count($fieldsToSearch); $iField++)
             {
 
+                //  Por cada campo de búsqueda hay que comprobar si tiene definido un valor
+                //  ya que si lo tiene definido cogemos ese, si no, cogemos el que viene por defecto
+                $_valueToSearch = $valueToSearch;
+                if(isset($fieldsToSearch[$iField]['value'])){
+                    $_valueToSearch = $fieldsToSearch[$iField]['value'];
+                }
+
+                //  Campo donde se va a buscar
                 $filterQuery .= $fieldsToSearch[$iField]['field'];
 
-                if($fieldsToSearch[$iField]['operator'] == "%")
+                //  Comprobamos si viene informado el tipo de operación
+                //  Por defecto es =
+                $_searchOperator = isset( $fieldsToSearch[$iField]['operator'] ) ? $fieldsToSearch[$iField]['operator'] : '=';
+
+                if($_searchOperator == "%")
                 {
-                    $filterQuery .= " like '" . '%' . $valueToSearch . '%' . "'";
+                    $filterQuery .= " like '" . '%' . $_valueToSearch . '%' . "'";
                 }else{
-                    $filterQuery .= " = " . $valueToSearch;
+                    $filterQuery .= " = " . $_valueToSearch;
                 }
 
                 //  Tipo de condición lógica
@@ -131,6 +172,129 @@ trait UtilsTrait{
 
             }
             $filterQuery = substr( $filterQuery, 0, strlen($filterQuery) - 4);
+        }
+
+        return $filterQuery;
+
+    }
+
+
+    /**
+     * 
+     */
+    public function processFilterFields($filters)
+    {
+        //  Query que se va a filtrar
+        $filterQuery = '';
+        //  Control de si tiene múltiples filtros para aplicar
+        $multipleFilter = false;
+
+        //  Comprobamos primero si son varios filtros los que hay que establecer
+        if(isset($filters['filters']))
+            $multipleFilter = true;
+
+        //  Filtros por array
+        if($multipleFilter)
+        {
+            //  Inicializamos la variable de la query que se va a montar
+            $filterSQL = '';
+
+            //  iteramos sobre todos los campos           
+            foreach($filters['filters'] as $filter)
+            {
+
+                //  Valor
+                $value =  DatabaseCore::PrepareDBString($filter['filtervalue']);
+                //  Si no tiene valor, continuamos 
+                if($value == ''){
+                    continue;
+                }
+
+                //  Campo de búsqueda
+                $field = $filter['filterfield'];
+
+                //  Tipo de filtro. Por defecto es =
+                $filterOperator = isset($filter['filteroperator']) ? $filter['filteroperator'] : 'eq';
+
+                //  Tipo de operador
+                switch($filterOperator)
+                {
+                    case 'like': // Like
+                        $filterCondition = ' like ';
+                        break;
+                    case 'eq': // Equals
+                        $filterCondition = ' = ';
+                        break;
+                    case 'gt': // Greater than
+                        $filterCondition = ' >= ';
+                        break;
+                    case 'lt': // Lower than
+                        $filterCondition = ' <= ';
+                        break;
+                    case 'g': // Greater
+                        $filterCondition = ' > ';
+                        break;
+                    case 'l': // Lower
+                        $filterCondition = ' < ';
+                        break;
+                }
+
+                //  Construimos la query temporal con el campo y el tipo
+                $filterSQL .= $field . $filterCondition . ' ';
+                //  Comprobamos el tipo de dato para terminar de construir la query
+                $filterType = isset($filter['filtertype']) ? $filter['filtertype'] : "string";
+                switch ($filterType)
+                {
+                    case 'string':
+                    case 'str':
+                    case 'date':
+                        $filterSQL .= "'" . $value . "' ";
+                        break;
+                    case 'int':
+                    case 'float':
+                    case 'double':
+                        $filterSQL .= $value . ' ';
+                        break;
+                }
+
+                $filterSQL .= ' and ';
+
+            }
+
+            //  Si tiene filtro detectado lo inyectamos en la query
+            if($filterSQL != '')
+            {
+                if(strpos($this->queryToExecute, "where") !== false)
+                {
+                    $filterQuery .= " AND ";
+                }else{
+                    $filterQuery .= " where ";
+                }
+
+                $filterSQL = substr($filterSQL, 0, -4);
+                //  Extraemos el último AND del string
+                $this->queryToExecute .= $filterQuery . $filterSQL;
+
+            }
+
+        }
+
+
+        //  Filtro simple
+        if(!$multipleFilter && isset($params['filterfield']) && isset($params['filtervalue']))
+        {
+
+            if(strpos($this->queryToExecute, "where") !== false)
+            {
+                $filterQuery .= " AND ";
+            }else{
+                $filterQuery .= " where ";
+            }
+
+            $params['filteroperator'] = (isset($params['filteroperator']) ? $params['filteroperator'] : ' = ');
+
+            $filterQuery.= ' ' . $params['filterfield'] . $params['filteroperator'] . $params['filtervalue'] . " ";
+            $this->queryToExecute .= $filterQuery;
         }
 
         return $filterQuery;

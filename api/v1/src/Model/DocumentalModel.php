@@ -301,6 +301,8 @@ class DocumentalModel extends \HappySoftware\Model\Model{
     public function updateRequerimiento($idRequerimiento, $idFicheroNuevo, $tabla, $fechaCaducidad = null)
     {
 
+            $tablasExcepcion = array('camarasseguridad', 'rgpdempleado');
+
             $estado = '';
             //  Si es un requerimiento de empleado, empresa o certificado digital se actualiza al estado pendiente
             //  ya que es un técnico el que debe validar el requerimiento
@@ -308,7 +310,8 @@ class DocumentalModel extends \HappySoftware\Model\Model{
                 $estado = ", idestado = 3 ";
 
             //  Si no es un requerimiento de cámara de seguridad se mueve al historial
-            if($tabla !== 'camarasseguridad')
+            // if($tabla !== 'camarasseguridad')
+            if(!in_array($tabla, $tablasExcepcion))
             {
                 //  Creamos una entrada en el histórico de requerimientos
                 $this->moveRequerimientoToHistorial($idRequerimiento, $tabla);
@@ -340,7 +343,7 @@ class DocumentalModel extends \HappySoftware\Model\Model{
             $requerimiento = $this->getByFields($queryFields, $tablaDestino);
 
         //  Si existe cogemos la información del requerimiento
-            if($requerimiento)
+            if(count($requerimiento) > 0)
             {
 
                     $requerimiento = $requerimiento[0];
@@ -354,36 +357,43 @@ class DocumentalModel extends \HappySoftware\Model\Model{
         
                     $resultFichero = $this->getByFields($queryFields, 'ficheroscomunes');
 
-                    $nombreFichero = $resultFichero[0]['nombre'];
-                    $nombreStorage = $resultFichero[0]['nombrestorage'];
-                    $ubicacion = $resultFichero[0]['ubicacion'];
+                    //  Validamos que exista el fichero en bbdd
+                    if(!is_null($resultFichero) && count($resultFichero) > 0){
 
-                //  Mapeamos los datos que vamos insertar en el histórico
-                    $datosHistorico = [];
-                    $datosHistorico['idrequerimiento'] = $requerimiento['idrequerimiento'];
-                    $datosHistorico['idrelacionrequerimiento'] = (isset($requerimiento['id']) ? $requerimiento['id'] : null);
-                    $datosHistorico['entidad'] = $tablaDestino;
-                    $datosHistorico['fechasubida'] = (isset($requerimiento['fechasubida']) ? $requerimiento['fechasubida'] : null);
-                    $datosHistorico['idfichero'] = $requerimiento['idfichero'];
-                    $datosHistorico['idcomunidad'] = (isset($requerimiento['idcomunidad']) ? $requerimiento['idcomunidad'] : null);
-                    $datosHistorico['idempleado'] = (isset($requerimiento['idempleado']) ? $requerimiento['idempleado'] : null);
-                    $datosHistorico['idempresa'] = (isset($requerimiento['idempresa']) ? $requerimiento['idempresa'] : null);
-                    $datosHistorico['fechacaducidad'] = (isset($requerimiento['fechacaducidad']) ? $requerimiento['fechacaducidad'] : null);
-                    $datosHistorico['fechadescarga'] = (isset($requerimiento['fechadescarga']) ? $requerimiento['fechadescarga'] : null);
+                        $nombreFichero = $resultFichero[0]['nombre'];
+                        $nombreStorage = $resultFichero[0]['nombrestorage'];
+                        $ubicacion = $resultFichero[0]['ubicacion'];
+    
+                    //  Mapeamos los datos que vamos insertar en el histórico
+                        $datosHistorico = [];
+                        $datosHistorico['idrequerimiento'] = $requerimiento['idrequerimiento'];
+                        $datosHistorico['idrelacionrequerimiento'] = (isset($requerimiento['id']) ? $requerimiento['id'] : null);
+                        $datosHistorico['entidad'] = $tablaDestino;
+                        $datosHistorico['fechasubida'] = (isset($requerimiento['fechasubida']) ? $requerimiento['fechasubida'] : null);
+                        $datosHistorico['idfichero'] = $requerimiento['idfichero'];
+                        $datosHistorico['idcomunidad'] = (isset($requerimiento['idcomunidad']) ? $requerimiento['idcomunidad'] : null);
+                        $datosHistorico['idempleado'] = (isset($requerimiento['idempleado']) ? $requerimiento['idempleado'] : null);
+                        $datosHistorico['idempresa'] = (isset($requerimiento['idempresa']) ? $requerimiento['idempresa'] : null);
+                        $datosHistorico['fechacaducidad'] = (isset($requerimiento['fechacaducidad']) ? $requerimiento['fechacaducidad'] : null);
+                        $datosHistorico['fechadescarga'] = (isset($requerimiento['fechadescarga']) ? $requerimiento['fechadescarga'] : null);
+    
+                    //  Datos del fichero
+                        $datosHistorico['nombre'] = $nombreFichero;
+                        $datosHistorico['nombrestorage'] = $nombreStorage;
+                        $datosHistorico['ubicacion'] = $ubicacion;
+                        $datosHistorico['created_at'] = (isset($requerimiento['created']) ? $requerimiento['created'] : null);
+                        $datosHistorico['observaciones'] = (isset($requerimiento['observaciones']) ? $requerimiento['observaciones'] : null);
+                        $datosHistorico['usercreate'] = $this->getLoggedUserId();
+    
+                    //  Inicializamos el controller de histórico
+                        $this->InitController('Historico');
+    
+                    //  Generamos el registro en el histórico de requerimientos
+                        $this->HistoricoController->Create('ficheroshistorico', $datosHistorico);
 
-                //  Datos del fichero
-                    $datosHistorico['nombre'] = $nombreFichero;
-                    $datosHistorico['nombrestorage'] = $nombreStorage;
-                    $datosHistorico['ubicacion'] = $ubicacion;
-                    $datosHistorico['created_at'] = (isset($requerimiento['created']) ? $requerimiento['created'] : null);
-                    $datosHistorico['observaciones'] = (isset($requerimiento['observaciones']) ? $requerimiento['observaciones'] : null);
-                    $datosHistorico['usercreate'] = $this->getLoggedUserId();
+                    }
 
-                //  Inicializamos el controller de histórico
-                    $this->InitController('Historico');
 
-                //  Generamos el registro en el histórico de requerimientos
-                    $this->HistoricoController->Create('ficheroshistorico', $datosHistorico);
 
             }
         
@@ -769,7 +779,7 @@ class DocumentalModel extends \HappySoftware\Model\Model{
         return $this->query($sql);
     }
 
-    public function GetRequerimientosPendientesCAEGeneral()
+    public function GetRequerimientosPendientesCAEGeneral($tipo = 'comunidades')
     {
         $sql = "SELECT 
         comunidadescae.*,
@@ -804,8 +814,20 @@ class DocumentalModel extends \HappySoftware\Model\Model{
         comunidad c
     WHERE
         c.id = comunidadescae.comunidadid
-        AND u.id = c.usuarioid";
-            return $this->query($sql);
+        AND u.id = c.usuarioid ";
+    switch($tipo)
+    {
+        case 'comunidades':
+            $sql .= 'and u.visitado = 1 and u.aportacae = 0';
+            // $sql .= 'and u.visitado = 1 ';
+            break;
+        case 'administradores': 
+            $sql .= 'and u.visitado = 0';
+            // $sql .= 'and u.visitado = 0 ';
+            break;
+    }
+
+    return $this->query($sql);
     }
 
     /** Recupera todos los requerimientos pendientes de CAE para un administrador y que por cada comunidad tenga contratado el servicio */
@@ -1153,6 +1175,47 @@ class DocumentalModel extends \HappySoftware\Model\Model{
     public function GetEmailCertificadoEmpresaComunidad($idEmpresa, $idComunidad)
     {
         $sql = "select filename from emailscertificados where idempresa = $idEmpresa and idcomunidad = $idComunidad order by id desc limit 1";
+        return $this->query($sql);
+    }
+
+    public function EmailsPendientesCAE()
+    {
+        $sql = "
+            SELECT 
+                comunidades.*,
+                c.nombre AS comunidad,
+                e.razonsocial AS empresa,
+                e.email AS emailempresa
+            FROM
+                (SELECT 
+                    ce.idempresa, ce.idcomunidad
+                FROM
+                    comunidadempresa ce
+                LEFT JOIN empresa e ON e.id = ce.idempresa, 
+                (SELECT 
+                    c.id, c.nombre, cr.idfichero
+                FROM
+                    requerimiento r
+                JOIN comunidadrequerimiento cr ON cr.idrequerimiento = r.id
+                LEFT JOIN comunidad c ON c.id = cr.idcomunidad AND c.estado = 'A'
+                WHERE
+                    r.idrequerimientotipo = 6
+                    AND r.id IN (2, 3, 4)
+                    AND cr.idfichero >= 0
+                GROUP BY c.id, cr.idrequerimiento
+                ) reqcae
+                WHERE
+                    reqcae.id = ce.idcomunidad) comunidades
+            LEFT JOIN emailscertificados ec ON ec.idempresa = comunidades.idempresa
+                AND ec.idcomunidad = comunidades.idcomunidad
+            JOIN comunidad c ON c.id = comunidades.idcomunidad
+            JOIN empresa e ON e.id = comunidades.idempresa
+            LEFT JOIN emailblacklist eb ON e.email = eb.email
+            WHERE
+                ec.id IS NULL
+                AND eb.email IS NULL
+            GROUP BY comunidades.idempresa, comunidades.idcomunidad;
+        ";
         return $this->query($sql);
     }
 

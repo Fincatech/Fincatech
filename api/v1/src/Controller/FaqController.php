@@ -67,7 +67,12 @@ class FaqController extends FrontController{
 
     public function List($params = null)
     {
-       return $this->FaqModel->List($params);
+        $search['searchfields'] =[];
+        $search['searchvalue'] = "'" . $params['type'] . "'";
+        $search['searchfields'][0]['field'] = "tipo";
+        $search['searchfields'][0]['operator'] = "=";
+
+       return $this->FaqModel->List($search);
     }
 
 }

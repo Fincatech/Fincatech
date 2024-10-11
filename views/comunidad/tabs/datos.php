@@ -19,7 +19,7 @@
     <!-- Código de comunidad -->
     <div class="col-12 col-md-2">
         <label for="codigo" class="pl-0"><i class="bi bi-key-fill pr-2"></i>Código*</label>
-            <input type="text" maxlength="10" class="form-control data text-center form-required" id="codigo" name="codigo" placeholder="Código interno" hs-entity="Comunidad" hs-field="codigo" required>
+            <input type="text" maxlength="70" class="form-control data text-center form-required" id="codigo" name="codigo" placeholder="Código interno" hs-entity="Comunidad" hs-field="codigo" required>
     </div>
 
     <!-- CIF -->
@@ -47,6 +47,12 @@
         <select id="usuarioId" name="usuarioId" class="select-data custom-select data form-control selectpicker" data-live-search="false" hs-seleccionar="false" hs-entity="Comunidad" hs-field="usuarioId" hs-list-entity="Administrador" hs-list-field="Usuario.nombre" hs-list-value="Usuario.id"></select>
     </div>                 
     
+    <!-- Límite de empresas por comunidad. Por defecto son 4 -->
+    <div class="col-12 col-md-3">
+        <label for="limiteEmpresas"><i class="bi bi-shop pr-2"></i>Límite de asignación de empresas</label>
+        <input type="number" step="1" min="1" max="10" class="form-control data text-center form-required" id="limiteempresas" name="limiteempresas" hs-entity="Comunidad" hs-field="limiteempresas" required>
+    </div>
+
 </div>
 
 <?php endif; ?>

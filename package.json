@@ -11,6 +11,7 @@
     "datatables.net-bs5": "^1.11.3",
     "datatables.net-buttons-bs5": "^1.7.1",
     "datatables.net-responsive-bs5": "^2.2.9",
+    "exceljs": "^4.4.0",
     "izimodal": "^1.5.1",
     "jquery": "^3.6.0",
     "jszip": "^3.7.1",

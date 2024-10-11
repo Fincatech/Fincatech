@@ -1,14 +1,15 @@
-environment = 'd';
+let server = window.location.hostname;
+var environment = 'd';
 
 config = Object();
-
+const serverHost = window.location.hostname;
 if(environment == 'd')
 {
-    config.baseURLEndpoint = 'http://localhost/fincatech/api/v1/public/';
+    config.baseURLEndpoint = 'https://naslivin.synology.me/fincatech/api/v1/public/';
     config.baseURL = '/fincatech/';
 }else{
-    config.baseURLEndpoint = 'https://app.fincatech.es/api/v1/public/';
-    config.baseURL = 'https://app.fincatech.es/';
+    config.baseURLEndpoint = `https://${server}/api/v1/public/`;
+    config.baseURL = `https://${server}/`;
 }
 
 //  Rutas endpoint

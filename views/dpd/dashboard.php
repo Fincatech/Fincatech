@@ -13,7 +13,7 @@
             
             <div class="row">
                 <div class="col-12">
-                    <table class="table table-hover my-0 hs-tabla w-100 no-clicable" data-order='[[ 5, "asc"]]' name="listadoDPD" id="listadoDPD" data-model="dpd">
+                    <table class="table table-bordered table-hover my-0 hs-tabla w-100 no-clicable" data-order='[[ 5, "asc"]]' name="listadoDPD" id="listadoDPD" data-model="dpd">
                         <thead class="thead"></thead>
                         <tbody class="tbody"></tbody>
                     </table>

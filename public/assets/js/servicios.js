@@ -6,6 +6,64 @@ let serviciosCore = {
     caeContratado: false,
     rgpdContratado: false,
 
+    Controller:{
+        
+        /**
+         * 
+         */
+        ProcesarUpdateFicheroServicios: async function(xlsxflag)
+        {
+
+            $('.wrapperProgresoCarga').show();
+
+            var file = $("#ficheroAdjuntarExcel")[0].files[0];
+            var workbook = new ExcelJS.Workbook();
+            let excelData = [];
+            let excelTitles = [];
+
+            await workbook.xlsx.load(file.arrayBuffer()).then(()=>{
+          
+                // excel to json converter (only the first sheet)
+                workbook.worksheets[0].eachRow((row, rowNumber) => {
+                    // rowNumber 0 is empty
+                    if (rowNumber > 0) {
+                        // get values from row
+                        let rowValues = row.values;
+                        // remove first element (extra without reason)
+                        rowValues.shift();
+                        // titles row
+                        if (rowNumber === 1) excelTitles = rowValues;
+                        // table data
+                        else {
+                            // create object with the titles and the row values (if any)
+                            let rowObject = {}
+                            for (let i = 0; i < excelTitles.length; i++) {
+                                let title = excelTitles[i];
+                                //let value = rowValues[i] ? rowValues[i] : '';
+                                let value = rowValues[i];
+                                rowObject[title] = value;
+                            }
+                            excelData.push(rowObject);
+                        }
+                    }
+                });
+
+            }).then(async ()=>{
+                $('.wrapperProgresoCarga .progress-bar').css('width','0%');
+                $('.wrapperProgresoCarga .progress-bar-striped').html('0%');
+                for(x = 0; x < excelData.length; x++)
+                {
+                    $('.wrapperProgresoCarga .progresoCarga').html(`(${x+1} de ` + (excelData.length) + ')');
+                    //  Llamamos al endpoint de actualización de servicio
+                    // console.log(excelData[x]);
+                    excelData[x]['type'] = 'single'; // Especificamos que es el update de tipo unitario
+                    await apiFincatech.put(`comunidad/${excelData[x]['Id Comunidad']}/servicios`, excelData[x]);
+                }
+                CoreUI.Modal.Success('Los servicios se han actualizado satisfactoriamente','Actualización masiva de servicios');
+            });
+        }  
+    },
+
     Model: {
         actualizarServicios: function()
         {
@@ -87,7 +145,9 @@ let serviciosCore = {
         //  Bindeamos los eventos de los diferentes botones de comunidades
             serviciosCore.events();
 
-        await serviciosCore.renderServicios();
+        await serviciosCore.renderServicios().catch((error) =>{
+            console.log(error);
+        });
 
     },
 
@@ -99,6 +159,7 @@ let serviciosCore = {
             //  Guardamos los servicios
             serviciosCore.Model.actualizarServicios();
         });
+
     },
 
     /** Elimina una comunidad previa confirmación */
@@ -293,7 +354,7 @@ let serviciosCore = {
             //  Si es admin de fincas recuperamos el listado de servicios contratados por una comunidad
             default:
                 //  Recuperamos los datos del modelo y pintamos los valores
-                if(typeof core.modelId === 'undefined' || core.modelId === '')
+                if(typeof core.modelId === 'undefined' || core.modelId === '' || core.model !== 'Comunidad')
                     return;
 
                 endpointServicios = `comunidad/${core.modelId}/servicioscontratados`;

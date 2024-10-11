@@ -17,11 +17,11 @@ let dpdCore = {
             dpdCore.renderTabla();
         }
 
-
     },
 
     events: async function()
     {
+        
         //  Si está la lista cargamos los datos
         if($('#listadoDpd').length)
         {
@@ -69,6 +69,82 @@ let dpdCore = {
         {
             Swal.close();
         });
+
+        //  DPD Exportar
+        $('body').on(core.helper.clickEventType, '.dpd-exportar', function(e){
+            dpdCore.Controller.ExportarAdministradoresDPD();
+        });
+
+    },
+
+    Controller:{
+
+        /**
+         * Exporta los administradores 
+         */
+        ExportarAdministradoresDPD: function()
+        {
+
+            Swal.fire({
+                title: 'Exportación de administradores',
+                html: `<p>Clique el botón <strong>descargar</strong> para generar y descargar un fichero Excel con la información de todos los administradores que tienen contratado el servicio DPD para al menos 1 comunidad.</p>`,
+                grow:'false',
+                width: '60rem',
+                showCancelButton: true,
+                showConfirmButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: '<i class="bi bi-save mr-2"></i> Descargar',
+                cancelButtonText: '<i class="bi bi-x-circle mr-2"></i> Cancelar',
+                reverseButtons: true,
+                buttonsStyling: false,
+                customClass: {
+                    actions: 'text-center p-3 shadow-inset rounded-pill border-light border-2 bg-white',
+                    confirmButton: 'btn btn-success rounded-pill shadow d-block pb-2 pt-2 cofirmButtonModal',
+                    cancelButton: ' btn btn-danger btnCancelSave rounded-pill shadow d-block pb-2 pt-2 mr-3 cacelButtonModal',
+                    popup: 'bdg-transparent'
+                }            
+              }).then((result) => {
+                if (result.isConfirmed) 
+                {
+                    //  Llamamos al endpoint de exportar
+                    apiFincatech.get(`administrador/exportar/dpd`).then( ( result ) =>
+                    {
+          
+                        let res = JSON.parse(result);
+                        if(res.data == 'Error')
+                        {
+                            CoreUI.Modal.Error(res.status.error,'Exportación de administradores');
+                        }else{
+                            // Decodificar el Base64
+                            let binaryData = atob(res.data);
+    
+                            // Crear un array de bytes
+                            let bytes = new Uint8Array(binaryData.length);
+                            for (let i = 0; i < binaryData.length; i++) {
+                                bytes[i] = binaryData.charCodeAt(i);
+                            }
+    
+                            // Crear un Blob
+                            let blob = new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    
+                            // Crear un enlace de descarga
+                            let a = document.createElement("a");
+                            a.href = window.URL.createObjectURL(blob);
+    
+                            // Establecer el nombre del archivo
+                            a.download = `exportacion_administradores_dpd_contratado_${moment().format('YYYY_MM_DD')}.xlsx`;
+    
+                            // Simular clic en el enlace para descargar el archivo
+                            a.click();
+                            //  Quitamos el enlace que hemos creado
+                            a.remove();
+                        }                       
+                    });
+                }
+            }); 
+        }
+
     },
 
     /**

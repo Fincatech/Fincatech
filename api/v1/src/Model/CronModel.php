@@ -153,9 +153,27 @@ class CronModel extends \HappySoftware\Model\Model{
 
     public function ListMensajesSinInforme()
     {
-        $sql = "select * from emailscertificados where filename is null";
-        $resultado = $this->query($sql);
-        return $resultado;
+        $sql = "select * from emailscertificados where filename is null and created > '2024-05-20'";
+        return $this->query($sql);
+    }
+
+    /**
+     * Recupera aquellas empresas que están registradas en el sistema pero no se les envió el e-mail de alta en la plataforma
+     */
+    public function ListEmpresasSinEnvioEmailAlta()
+    {
+        $sql = "
+            SELECT e.id, e.usercreate, e.idusuario, e.razonsocial, e.personacontacto, e.email, e.created
+            FROM empresa e
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM mensaje m
+                WHERE m.email = e.email
+                AND m.subject = 'Fincatech - Alta en la plataforma'
+            )
+            and e.created >= '2024-01-01'
+        ";
+        return $this->query($sql);
     }
 
     /**

@@ -1,0 +1,3 @@
+<!-- Administrador -->
+<label for="idadministrador" class="font-weight-bold"><i class="bi bi-people pr-2"></i>Administrador</label>                
+<select id="idadministrador" name="idadministrador" class="select-data custom-select form-data data form-control selectpicker" data-live-search="true" hs-seleccionar="false" hs-entity="IngresosCuenta" hs-field="idadministrador"  hs-list-entity="Administrador" hs-list-field="Usuario.nombre" hs-list-value="Usuario.id" aria-hidden="true"></select>

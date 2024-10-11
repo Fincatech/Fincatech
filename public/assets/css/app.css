@@ -2173,7 +2173,8 @@ progress {
 	color: #495057;
 	background-color: #fff;
 	background-clip: padding-box;
-	border: 1px solid #ced4da;
+	/* border: 1px solid #ced4da;  */
+	border: 1px solid #e2e2e2;
 	-webkit-appearance: none;
 	appearance: none;
 	border-radius: .2rem;
@@ -2379,8 +2380,8 @@ progress {
 }
 
 .form-check-input:checked {
-	background-color: #3b7ddd;
-	border-color: #3b7ddd
+	background-color: #17a2b8;
+	border-color: #17a2b8
 }
 
 .form-check-input:checked[type=checkbox] {
@@ -3787,7 +3788,6 @@ fieldset:disabled .btn {
 	z-index: 1000;
 	display: none;
 	min-width: 10rem;
-	padding: .5rem 0;
 	margin: .125rem 0 0;
 	font-size: .875rem;
 	color: #495057;
@@ -3795,8 +3795,10 @@ fieldset:disabled .btn {
 	list-style: none;
 	background-color: #fff;
 	background-clip: padding-box;
-	border: 1px solid rgba(0, 0, 0, .15);
-	border-radius: .2rem
+	border: 1px solid rgb(255 255 255 / 15%);
+	border-radius: 0px 0px 12px 12px;
+	overflow: hidden;
+	/* padding: .5rem 0; */
 }
 
 .dropdown-menu-left {
@@ -3957,7 +3959,7 @@ fieldset:disabled .btn {
 
 .dropdown-divider {
 	height: 0;
-	margin: .5rem 0;
+	/* margin: .5rem 0; */
 	overflow: hidden;
 	border-top: 1px solid rgba(0, 0, 0, .15)
 }
@@ -3979,7 +3981,8 @@ fieldset:disabled .btn {
 .dropdown-item:hover {
 	color: #16181b;
 	text-decoration: none;
-	background-color: #f8f9fa
+	/* background-color: #f8f9fa */
+	background-color: #ebebeb;
 }
 
 .dropdown-item.active,
@@ -3989,11 +3992,14 @@ fieldset:disabled .btn {
 	background-color: #3b7ddd
 }
 
-.dropdown-item.disabled,
-.dropdown-item:disabled {
-	color: #6c757d;
-	pointer-events: none;
-	background-color: initial
+.dropdown-item.disabled, .dropdown-item:disabled {
+    color: #000000;
+    pointer-events: none;
+    background-color: initial;
+    text-transform: uppercase;
+    padding-left: 14px;
+    font-family: "Dosis";
+    font-weight: 700;
 }
 
 .dropdown-menu.show {
@@ -6745,6 +6751,19 @@ fieldset:disabled .btn {
 	position: sticky!important
 }
 
+.start-0 {
+	left: 0!important
+}
+
+.start-50 {
+	left: 50%!important
+}
+
+.start-100 {
+	left: 100%!important
+}
+
+
 .top-0 {
 	top: 0!important
 }
@@ -7972,7 +7991,7 @@ fieldset:disabled .btn {
 }
 
 .bg-success {
-	background-color: #28a745!important
+	background-color: #58ce73 !important
 }
 
 .bg-info {
@@ -13223,7 +13242,7 @@ a.list-group-item {
 	font-size: 1.5rem;
 	color: #6c757d;
 	transition: background .1s ease-in-out, color .1s ease-in-out;
-	line-height: 1.4
+	line-height: 1
 }
 
 .nav-flag:after,
@@ -13496,7 +13515,7 @@ a.sidebar-link svg {
 }
 
 .sidebar.collapsed {
-	margin-left: -260px
+	margin-left: -300px
 }
 
 @media (min-width:1px) and (max-width:991.98px) {

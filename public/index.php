@@ -2,10 +2,16 @@
 
     $folder = 'fincatech/';
 
+    date_default_timezone_set('Europe/Madrid');
+
     define( 'ABSPATH', dirname(dirname( __FILE__ )) . '/' );
     define('PROTOCOL',(!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS'] == 'on')) ? 'https://' : 'http://');
     define('DOMAIN',$_SERVER['HTTP_HOST']);
     define('ROOT_URL', preg_replace("/\/$/",'',PROTOCOL.DOMAIN.str_replace(array('\\',"index.php","index.html"), '', dirname(htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES))),1).'/');// Remove backslashes for Windows compatibility
+
+    //  Obtenemos la carpeta del proyecto por si estuviese en una subcarpeta
+    
+    $folder = 'fincatech/';
 
     define('HOME_URL', (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/' . $folder);
 

@@ -74,3 +74,11 @@ FRONT:
 
 + Nuevo rol: TECNICO DOCUMENTACIÓN CAE: REVCAE
 INSERT INTO `rol` (`nombre`, `alias`, `created`, `usercreate`) VALUES ('Revisor Documentación CAE', 'revcae', '2023-01-09 00:00:00', '0');
+
+[] - Check de Qué datos se van a mostrar y check de admin principal
+
+
+FACTURACIÓN
+
+security.php
+SecurityTrait.php

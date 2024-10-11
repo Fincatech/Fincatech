@@ -17,6 +17,7 @@
 <?php
 
     $bodyModel = ucfirst($App->getController());
+    $bodyModel = ucfirst($App->getController());
     $bodyAction = $App->getAction();
     $bodyModelId = $App->getId();
 

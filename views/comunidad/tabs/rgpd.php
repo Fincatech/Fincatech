@@ -4,7 +4,7 @@
 
         <div class="col-12 d-flex">
 
-            <div class="card flex-fill shadow-neumorphic pl-3 pb-3 pt-2 pr-3">
+            <div class="card flex-fill shadow-neumorphic pl-3 pb-3 pt-2 pr-3 card-principal">
 
                 <div class="card-header pl-1 mb-2">
 

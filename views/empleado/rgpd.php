@@ -24,7 +24,7 @@
                 </div>
                 <div class="row h-100">
                     <div class="col-12">
-                        <table class="table table-hover my-0 hs-tabla h-100" name="listadoRGPDEmpleadosAdministracion" id="listadoRGPDEmpleadosAdministracion" data-model="rgpdempleadosadministracion">
+                        <table class="table table-bordered table-hover my-0 hs-tabla h-100" name="listadoRGPDEmpleadosAdministracion" id="listadoRGPDEmpleadosAdministracion" data-model="rgpdempleadosadministracion">
                             <thead class="thead"></thead>
                             <tbody class="tbody"></tbody>
                         </table>

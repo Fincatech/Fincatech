@@ -15,7 +15,7 @@
                         <div class="col-12">
                             <div class="card mb-0">
                                 <div class="card-body p-0">
-                                    <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoComunidadesPendientesCertificado" id="listadoComunidadesPendientesCertificado" data-model="Comunidad">
+                                    <table class="table table-bordered table-hover my-0 hs-tabla w-100 no-clicable" name="listadoComunidadesPendientesCertificado" id="listadoComunidadesPendientesCertificado" data-model="Comunidad">
                                         <thead class="thead"></thead>
                                         <tbody class="tbody"></tbody>
                                     </table>
@@ -40,7 +40,7 @@
                 </div>
                 <div class="card-body p-0 m-0">
                     <label class="infoComunidad"><i class="bi bi-info-circle"></i> Seleccione una comunidad del listado superior para poder ver la documentación aportada por el administrador</label>
-                    <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoComunidadesDocumentosCertificado" id="listadoComunidadesDocumentosCertificado" data-model="Comunidad">
+                    <table class="table table-bordered table-hover my-0 hs-tabla w-100 no-clicable" name="listadoComunidadesDocumentosCertificado" id="listadoComunidadesDocumentosCertificado" data-model="Comunidad">
                         <thead class="thead"></thead>
                         <tbody class="tbody"></tbody>
                     </table>

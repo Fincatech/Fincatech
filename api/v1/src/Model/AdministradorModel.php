@@ -56,7 +56,7 @@ class AdministradorModel extends \HappySoftware\Model\Model{
             $datosParseados[0]['col7'] = 'IBAN Comunidad';
         //  CAE
             $datosParseados[0]['col8'] = 'Cae Contratado';
-            $datosParseados[0]['col9'] = 'Cae PVP';
+            $datosParseados[0]['col9'] = 'Coste Cae';
             $datosParseados[0]['col10'] = 'Cae Precio Comunidad';
             $datosParseados[0]['col11'] = 'Cae Fecha contratación';
         //  RGPD
@@ -174,4 +174,25 @@ class AdministradorModel extends \HappySoftware\Model\Model{
         $sql .= "where usuarioid = $administradorId" ;
         $this->queryRaw($sql);
     }
+
+    /**
+     * Administradores que tienen contratado DPD para alguna comunidad
+     */
+    public function AdministradoresDPD()
+    {
+        $sql = "SELECT 
+                    u.nombre, u.cif, u.direccion, u.localidad, p.nombre as provincia, u.telefono, u.email
+                FROM
+                    comunidadservicioscontratados csc, comunidad c, usuario u, provincia p
+                WHERE
+                    c.id = csc.idcomunidad
+                    AND csc.idservicio = 2 AND csc.contratado = 1
+                    AND u.id = c.usuarioid AND c.estado IN ('A' , 'P')
+                    and p.id = u.provinciaid
+                    and u.estado = 'A'
+                GROUP BY u.id
+                ORDER BY u.nombre ASC";
+        return $this->query($sql);
+    }
+
 }

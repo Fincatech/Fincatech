@@ -2,10 +2,12 @@
 let sudo = {
 
     init: function(){
+
+        sudo.Mensajes.Init();
+
         if($('body #listadoMensajes').length)
         {
             sudo.Mensajes.CRUD.GetAll();
-            sudo.Mensajes.Init();
         }
 
         if($('body .stats-sistema').length)
@@ -13,6 +15,97 @@ let sudo = {
             sudo.Stats();
             //  Cargamos el listado de comunidades pendientes
             comunidadesCore.Render.tablaListadoComunidadesPendientes();
+        }
+
+        sudo.Events();
+
+    },
+
+    Events: function()
+    {
+        $('body').on(core.helper.clickEventType, '.btnActualizacionServicios', function(evt){
+            sudo.Controller.MostrarExportacionComunidades();
+        });
+
+        /**
+         * Proceso de actualización de servicios
+         */
+        $('body').on(core.helper.clickEventType, '.bntActualizarProcesos', function(evt){
+            sudo.Controller.ValidarFicheroActualizacionServicios();
+        });
+
+        //  IBAN para facturación
+        if($('#ibanliquidaciones').length)
+            {
+                $('#ibanliquidaciones').mask('SS00 0000 0000 00 0000000000');
+                //  Validación de cuando pierde el foco
+                $('#ibanliquidaciones').on('blur', function(evt)
+                {
+                    if($('#ibanliquidaciones').val().length > 0){
+                        if(!core.Validator.checkIBAN($('#ibanliquidaciones').val())){
+                            evt.stopImmediatePropagation();
+                            CoreUI.Modal.Error('El código IBAN no es correcto. Por favor, revíselo.');
+                            $('#ibanliquidaciones').val('');
+                        }    
+                    }
+                });
+            }        
+
+    },
+
+    Controller: {
+
+        ValidarColumnasFicheroServicios: function()
+        {
+            return false;
+        },
+
+        ValidarFicheroActualizacionServicios: function()
+        {
+
+            //  Comprobamos que el fichero sea un fichero de Excel
+            if(!core.Files.isExcelFile('ficheroAdjuntarExcel'))
+            {
+                $('.wrapperMensajeErrorCarga .mensaje').html('El fichero no es válido. Seleccione un fichero de formato Excel (xls o xlsx)');
+                $('.wrapperMensajeErrorCarga').show();
+                return;
+            }else{
+                $('.wrapperMensajeErrorCarga').hide();
+            }
+
+        //  Validamos que haya seleccionado un administrador
+            if( $('#administradorCargaId option:selected').val() == '-1' )
+            {
+                $('.wrapperMensajeErrorCarga .mensaje').html('Debe seleccionar el administrador al que asignar las comunidades a importar');
+                $('.wrapperMensajeErrorCarga').show();
+                return;
+            }
+
+            var xlsxflag = false; /*Flag for checking whether excel is .xls format or .xlsx format*/  
+            if ($("#ficheroAdjuntarExcel").val().toLowerCase().indexOf(".xlsx") > 0) {  
+                xlsxflag = true;  
+            } 
+
+        //  Si el fichero es correcto, ocultamos los wrappers de información y mostramos el de procesando
+            $('.wrapperInformacion').hide();
+            $('.wrapperSelectorAdministrador').hide();
+            $('.wrapperSelectorFichero').hide();
+            $('.wrapperMensajeErrorCarga').hide();
+
+        //  Intentamos hacer la importación
+            serviciosCore.Controller.ProcesarUpdateFicheroServicios(xlsxflag);
+        },
+
+        MostrarExportacionComunidades: function()
+        {
+            
+            apiFincatech.getView("sudo", "servicios").then((resultHTML)=>{
+
+                CoreUI.Modal.CustomHTML(resultHTML,'Actualización masiva de servicios de comunidades',function(){
+                });
+
+            });
+
         }
 
     },
@@ -61,8 +154,7 @@ let sudo = {
         
                     //  Razón social
                     CoreUI.tableData.addColumn('listadoMensajes', "subject","Asunto", null, 'text-left');
-    
-        
+            
                     //  Email
                     CoreUI.tableData.addColumn('listadoMensajes', "email", "EMAIL", null, 'text-left');
                 
@@ -120,6 +212,11 @@ let sudo = {
                 $('.stat-administradores').text(data.data['administradores']);
                 $('.stat-emails').text(data.data['emailscertificados']);
                 $('.stat-emails-enviados').text(data.data['emailsenviados']);
+                //  Totales servicios contratados
+                $('.stat-totalcae').text(data.data['servicioscomunidades']['totalcae']);
+                $('.stat-totaldpd').text(data.data['servicioscomunidades']['totaldpd']);
+                $('.stat-totaldoccae').text(data.data['servicioscomunidades']['totaldoccae']);
+                $('.stat-totalcertificados').text(data.data['servicioscomunidades']['totalcertificadosdigitales']);
         });
     }
 

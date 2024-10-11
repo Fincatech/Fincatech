@@ -3,60 +3,80 @@ let comunidadesCore = {
     comunidades: Object(),
     comunidad: Object(),
 
+    accessCae: true,
+    accessRgpd: true,
+
     iTotalDocumentos: 0,
     iTotalDocumentosPendientes: 0,
     iTotalDocumentosSubidos: 0, 
 
     init: async function()
     {
-        //  Bindeamos los eventos de los diferentes botones de comunidades
+    
+        //  Validamos los accesos del administrador
+        let p = new Promise(async(resolve, reject)=>{
+            await comunidadesCore.checkAccess();
+            resolve(true);
+        });
+        
+        p.then(async (result) =>{
+            //  Bindeamos los eventos de los diferentes botones de comunidades
             comunidadesCore.events();
-        // await comunidadesCore.renderMenuLateral();
+        
+            // await comunidadesCore.renderMenuLateral();
 
-        //  Comprobamos si se está cargando el listado
-        if(core.actionModel == "list" && core.model.toLowerCase() == "comunidad")
-        {
+            //  Comprobamos si se está cargando el listado
+                if(core.actionModel == "list" && core.model.toLowerCase() == "comunidad")
+                {
 
-            if(core.Security.getRole() === 'SUDO')
-            {
-                comunidadesCore.Render.tablaListadoComunidades();
-            }else{
-                await comunidadesCore.listadoDashboard();
-            }
+                    if(core.Security.getRole() === 'SUDO')
+                    {
+                        comunidadesCore.Render.tablaListadoComunidades();
+                    }else{
+                        await comunidadesCore.listadoDashboard();
+                    }
 
-        }else{
-            if(core.model.toLowerCase() == "comunidad"){
-                // TODO: Implementar posibilidad de añadir varios campos para el título
-                CoreUI.setTitulo(['codigo', 'nombre']);
-                comunidadesCore.comprobarServiciosContratados();
-            }
-        }
+                }
 
-        //  Listado de servicios contratados por las comunidades
-        if(core.actionModel == 'servicios-contratados')
-        {
-            comunidadesCore.Render.paginacion.init();
-            comunidadesCore.Render.tablaServiciosContratadosComunidades();
-        }
+                if(core.actionModel == 'get' && core.model.toLowerCase() == "comunidad"){
+                    // TODO: Implementar posibilidad de añadir varios campos para el título
+                    let titulo = `${core.Modelo.entity['Comunidad'][0]['codigo']} - ${core.Modelo.entity['Comunidad'][0]['nombre']}`;
+                    CoreUI.setTitulo(titulo);
+                    comunidadesCore.comprobarServiciosContratados();
+                }
+                
 
-        //  Inicialización del masked para la cuenta IBAN
-            $('#ibancomunidad').mask('SS00 0000 0000 00 0000000000');
+            //  Listado de servicios contratados por las comunidades
+                if(core.actionModel == 'servicios-contratados')
+                {
+                    comunidadesCore.Render.paginacion.init();
+                    comunidadesCore.Render.tablaServiciosContratadosComunidades();
+                }
 
-            if(core.Security.getRole() == 'CONTRATISTA')
-            {
-                $('.tabDatos').hide();
-            }
+            //  Inicialización del masked para la cuenta IBAN
+                $('#ibancomunidad').mask('SS00 0000 0000 00 0000000000');
 
-            if(core.Security.getRole() == 'SUDO')
-            {
-                $('.tabDatos').show();
-            }
+                if(core.Security.getRole() == 'CONTRATISTA'){
+                    $('.tabDatos').hide();
+                }
 
-            if(core.actionModel == 'add')
-            {
-                $('.tabDatos').show();
-            }
+                if(core.Security.getRole() == 'SUDO'){
+                    $('.tabDatos').show();
+                }
 
+                if(core.actionModel == 'add'){
+                    $('.tabDatos').show();
+                }
+
+            });
+
+    },
+
+    /** Check access to cae and rgpd for community */
+    checkAccess: async function()
+    {
+        comunidadesCore.accessCae = core.Security.userData.mostrarcae;
+        comunidadesCore.accessRgpd = core.Security.userData.mostrarrgpd;
     },
 
     // Gestión de eventos
@@ -107,9 +127,15 @@ let comunidadesCore = {
         });
 
     //  Mostrar modal de asignar empresa a comunidad
-        $('body').on(core.helper.clickEventType, '.btnAsociarEmpresaCAE', async function(e)
+        $('body').on(core.helper.clickEventType, '.btnAsociarEmpresaCAE', function(e)
         {
-            comunidadesCore.mostrarModalAsociarEmpresa();
+            //  Validamos el número de empresas que tiene asociadas actualmente
+            if(window['tablelistadoEmpresaComunidad'].data().length >= parseInt(core.Modelo.entity.Comunidad[0].limiteempresas))
+            {
+                CoreUI.Modal.Info(`Ha alcanzado el límite de asignación de empresas a una comunidad.<br>Si necesita asignar más de ${core.Modelo.entity.Comunidad[0].limiteempresas} empresas, por favor, póngase en contacto con nosotros.`);
+            }else{
+                comunidadesCore.mostrarModalAsociarEmpresa();
+            }
         });
 
     //  Cambio nombre de comunidad
@@ -142,19 +168,19 @@ let comunidadesCore = {
     //  Enlace CAE No contratado
         $('body').on(core.helper.clickEventType, '.enlaceKOCae', function(evt)
         {
-            CoreUI.Modal.Info('Actualmente no tiene contratado el servicio de CAE para esta comunidad.<br><br>Si desea contratarlo, por favor contacte con el departamento de administración de Fincatech o escriba a admin@fincatech.es','Servicio no contratado');
+            CoreUI.Modal.Info('Actualmente no tiene contratado el servicio de CAE para esta comunidad.<br><br>Si desea contratarlo, por favor contacte con el departamento de administración de Fincatech o escriba a info@fincatech.es','Servicio no contratado');
         });
 
     //  Enlace RGPD No contratado
         $('body').on(core.helper.clickEventType, '.enlaceKORGPD', function(evt)
         {
-            CoreUI.Modal.Info('Actualmente no tiene contratado el servicio de RGPD para esta comunidad.<br><br>Si desea contratarlo, por favor contacte con el departamento de administración de Fincatech o escriba a admin@fincatech.es','Servicio no contratado');
+            CoreUI.Modal.Info('Actualmente no tiene contratado el servicio de RGPD para esta comunidad.<br><br>Si desea contratarlo, por favor contacte con el departamento de administración de Fincatech o escriba a info@fincatech.es','Servicio no contratado');
         });    
 
     //  Certificado digital no contratado
         $('body').on(core.helper.clickEventType, '.enlaceKOCertificadoDigital', function(evt)
         {
-            CoreUI.Modal.Info('Actualmente no tiene contratado el servicio de Certificado Digital para esta comunidad.<br><br>Si desea contratarlo, por favor contacte con el departamento de administración de Fincatech o escriba a admin@fincatech.es','Servicio no contratado');
+            CoreUI.Modal.Info('Actualmente no tiene contratado el servicio de Certificado Digital para esta comunidad.<br><br>Si desea contratarlo, por favor contacte con el departamento de administración de Fincatech o escriba a info@fincatech.es','Servicio no contratado');
         });        
 
     //  Cámaras de seguridad
@@ -222,6 +248,11 @@ let comunidadesCore = {
         $('body').on(core.helper.clickEventType, '#tablaEmpresasConcurrentes tr', function(){
             comunidadesCore.Render.tablaDocumentosEmpresaConcurrente($(this).attr('id'));
         });
+
+    //  Listado de proveedores asignados a las comunidades
+        if($('#listadoComunidadesProveedores').length){
+            comunidadesCore.Render.tablaProveedores();
+        }
 
     },
 
@@ -433,10 +464,10 @@ let comunidadesCore = {
                 $('.sidebar-nav').prepend(`
                 <div class="row pl-3 pr-3 sticky-top" style="background: #222e3c;">
                     <div class="col-12 pb-2 pt-2 mb-3 mt-2">
-                        <p class="text-uppercase mt-0 mb-0 text-white"><small>Buscar comunidad</small></p>
+                        <p class="text-uppercase mt-0 mb-1 text-white"><small><i class="bi bi-search pr-1"></i> Buscar comunidad</small></p>
                         <div class="row">
-                            <div class="col-10">
-                                <input type="text" class="form-control busquedaComunidad" placeholder="Escriba cód o nombre">
+                            <div class="col-10 pr-0">
+                                <input type="text" class="form-control busquedaComunidad" placeholder="Escriba código o nombre" style="border-radius:12px;">
                             </div>
                             <div class="col-2 align-self-center">
                                 <a href="javascript:void(0);" class="btnLimpiarBusqueda"><i class="bi bi-x-circle text-white"></i></a>
@@ -455,10 +486,11 @@ let comunidadesCore = {
                 var html = `<li class="sidebar-item pl-3 pr-3 pb-2 pt-2" data-codigo="${valor['codigo']}" data-nombre="${valor['nombre']}">
                                     <div class="row">
                                         <div class="col-1 text-left pl-0 pr-0 align-self-center">
-                                            <img src="${config.baseURL}public/assets/img/icon_edificio.png" class="img-responsive feather">
+                                           <!-- <img src="${config.baseURL}public/assets/img/icon_edificio.png" class="img-responsive feather"> -->
+                                           <i class="bi bi-building text-white"></i>
                                         </div>
 
-                                        <div class="col-11 pr-0">
+                                        <div class="col-11 pr-2 pl-1">
                                             <a href="${enlaceEstado}" class=" text-white d-block ${claseSegunEstado}">   
                                                 <span class="align-middle comunidad-${valor['id']} d-block">${valor['codigo']} ${valor['nombre']}</span>
                                             </a>
@@ -485,85 +517,98 @@ let comunidadesCore = {
      */
     renderTabla: async function()
     {
+
+        // await comunidadesCore.checkAccess();
+
         if($('#listadoComunidad').length)
         {
-
-            //  Cargamos el listado de comunidades
-                CoreUI.tableData.init();
-
-            //  Código
-                CoreUI.tableData.addColumn('listadoComunidad', "codigo","COD", null, null, '40px');
-
-            //  Nombre
-                CoreUI.tableData.addColumn('listadoComunidad', "nombre", "NOMBRE", null, null, '40%');
-
-            //  Cumplimiento CAE
-                CoreUI.tableData.addColumn('listadoComunidad',function(row, type, val, meta)
-                {
-                    var htmlSalida = '';
-                    if(row.cumplimientocae == null)
+                //  Cargamos el listado de comunidades
+                    CoreUI.tableData.init();
+    
+                //  Código
+                    CoreUI.tableData.addColumn('listadoComunidad', "codigo","COD", null, null, '120px');
+    
+                //  Nombre
+                    CoreUI.tableData.addColumn('listadoComunidad', "nombre", "NOMBRE", null, null);
+    
+                //  Si el usuario tiene acceso a CAE mostramos la información correspondiente
+                if(core.Security.userData.mostrarcae == true){
+    
+                //  Cumplimiento CAE
+                    CoreUI.tableData.addColumn('listadoComunidad',function(row, type, val, meta)
                     {
-                        htmlSalida = '<p class="mb-0">No contratado</p>';
-                    }else{
-                        if(parseFloat(row.cumplimientocae) >= 75)
+                        var htmlSalida = '';
+                        if(row.cumplimientocae == null)
                         {
-                            bgcolor = 'success';
+                            htmlSalida = '<p class="mb-0">No contratado</p>';
                         }else{
-                            bgcolor = 'warning';
+                            if(parseFloat(row.cumplimientocae) >= 75)
+                            {
+                                bgcolor = 'success';
+                                border = 'success';
+                            }else{
+                                bgcolor = 'warning';
+                                border = 'warning';
+                            }
+                            htmlSalida = `
+                            <div class="mr-3 ml-3 border progress shadow-inset" style="background-color: white !important; border-radius: 8px;">
+                                <div class="progress-bar bg-${bgcolor}" role="progressbar" style="border:0 !important; width: ${row.cumplimientocae}%;" aria-valuenow="${row.cumplimientocae}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div> 
+                            <p class="m-0 text-center"><small>${row.cumplimientocae}%</small></p>                   
+                            `;
                         }
-                        htmlSalida = `
-                        <div class="mr-3 ml-3 progress shadow-inset" style="background-color: white !important;">
-                            <div class="progress-bar bg-${bgcolor}" role="progressbar" style="border:0 !important; width: ${row.cumplimientocae}%;" aria-valuenow="${row.cumplimientocae}" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div> 
-                        <p class="m-0 text-center"><small>${row.cumplimientocae}%</small></p>                   
-                        `;
-                    }
-
-                    return htmlSalida;
-
-                }, "CUMP. CAE", null, 'text-center');
-
-            //  Cumplimiento RGPD
-                CoreUI.tableData.addColumn('listadoComunidad',function(row, type, val, meta)
+    
+                        return htmlSalida;
+    
+                    }, "CUMP. CAE", null, 'text-center', '180px');
+                }
+    
+                if(core.Security.userData.mostrarrgpd == true)
                 {
-                    var htmlSalida = '';
-                    if(row.cumplimientorgpd == null)
+                //  Cumplimiento RGPD
+                    CoreUI.tableData.addColumn('listadoComunidad',function(row, type, val, meta)
                     {
-                        htmlSalida = '<p class="mb-0">No contratado</p>';
-                    }else{
-                        if(parseFloat(row.cumplimientorgpd) >= 75)
+                        var htmlSalida = '';
+                        if(row.cumplimientorgpd == null)
                         {
-                            bgcolor = 'success';
+                            htmlSalida = '<p class="mb-0">No contratado</p>';
                         }else{
-                            bgcolor = 'warning';
+                            if(parseFloat(row.cumplimientorgpd) >= 75)
+                            {
+                                bgcolor = 'success';
+                                border = 'success';
+                            }else{
+                                bgcolor = 'warning';
+                                border = 'warning';
+                            }
+                            htmlSalida = `
+                            <div class="mr-3 ml-3 border progress shadow-inset" style="background-color: white !important;">
+                                <div class="progress-bar bg-${bgcolor}" role="progressbar" style="border:0 !important; width: ${row.cumplimientorgpd}%;" aria-valuenow="${row.cumplimientorgpd}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div> 
+                            <p class="m-0 text-center"><small>${row.cumplimientorgpd}%</small></p>                   
+                            `;
                         }
-                        htmlSalida = `
-                        <div class="mr-3 ml-3 progress shadow-inset" style="background-color: white !important;">
-                            <div class="progress-bar bg-${bgcolor}" role="progressbar" style="border:0 !important; width: ${row.cumplimientorgpd}%;" aria-valuenow="${row.cumplimientorgpd}" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div> 
-                        <p class="m-0 text-center"><small>${row.cumplimientorgpd}%</small></p>                   
-                        `;
-                    }
-
-                    return htmlSalida;
-
-                }, "CUMP. RGPD", null, 'text-center');
-
-
-            // Estado
-                var html = 'data:estado$';
-                CoreUI.tableData.addColumn('listadoComunidad', null, "Estado", html, null, '80px');
-
-            //  Columna de acciones
-                var html = '<ul class="nav justify-content-center accionesTabla">';
-                    // html += '<li class="nav-item"><a href="javascript:void(0);" class="btnVerComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="eye" class="text-info img-fluid"></i></a></li>';
-                    html += `<li class="nav-item"><a href="${baseURL}comunidad/data:id$?view=1" class="btnEditarComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid pr-2" style="width:32px;height:32px;"></i></a></li>`;
-                    html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid" style="width:26px;height:26px;"></i></li></ul>';
-                CoreUI.tableData.addColumn('listadoComunidad', null, "", html);
-
-            // $('#listadoComunidad').addClass('no-clicable');
-            CoreUI.tableData.render("listadoComunidad", "Comunidad", "comunidad/list", false, true, true, null, false, false, null, true);
+    
+                        return htmlSalida;
+    
+                    }, "CUMP. RGPD", null, 'text-center', '180px');
+                }
+    
+                // Estado
+                    var html = 'data:estado$';
+                    CoreUI.tableData.addColumn('listadoComunidad', null, "Estado", html, 'text-center', '100px');
+    
+                //  Columna de acciones
+                    var html = '<ul class="nav justify-content-center accionesTabla">';
+                        // html += '<li class="nav-item"><a href="javascript:void(0);" class="btnVerComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="eye" class="text-info img-fluid"></i></a></li>';
+                        html += `<li class="nav-item"><a href="${baseURL}comunidad/data:id$?view=1" class="btnEditarComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid icono-accion" style="width:32px;height:32px;"></i></a></li>`;
+                        html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid icono-accion" style="width:26px;height:26px;"></i></li></ul>';
+                    CoreUI.tableData.addColumn('listadoComunidad', null, "", html, null, '60px');
+    
+                // $('#listadoComunidad').addClass('no-clicable');
+                CoreUI.tableData.render("listadoComunidad", "Comunidad", "comunidad/list", false, true, true, null, false, false, null, true);
         }
+
     },
 
     /**
@@ -630,6 +675,7 @@ let comunidadesCore = {
     /** Recupera el listado de comunidades en el dashboard */
     listadoDashboard: async function()
     {
+        // await comunidadesCore.checkAccess();
         this.renderTabla();  
     },
 
@@ -731,7 +777,6 @@ let comunidadesCore = {
             return true;
         },
 
-
         guardarComunidadDesdePlantilla: async function(jsonExcel)
         {
 
@@ -758,6 +803,7 @@ let comunidadesCore = {
                 Comunidad.ibancomunidad = jsonExcel[x].ibancomunidad;
                 Comunidad.usercreate = idAdministrador;
                 Comunidad.usuarioId = idAdministrador;
+                Comunidad.importacion = 1;
                 Comunidad.estado = 'A';
 
                 //  Servicios contratados
@@ -775,6 +821,7 @@ let comunidadesCore = {
                 infoServicio.contratado = (jsonExcel[x]['cae.contratado'] === undefined ? 0 : jsonExcel[x]['cae.contratado'] );
                 infoServicio.precio = (jsonExcel[x]['cae.pvp'] === undefined ? 0 : jsonExcel[x]['cae.pvp']);
                 infoServicio.preciocomunidad = (jsonExcel[x]['cae.preciocomunidad'] === undefined ? 0 : jsonExcel[x]['cae.preciocomunidad']);
+                infoServicio.mesfacturacion = (jsonExcel[x]['cae.mesfacturacion'] === undefined ? 0 : jsonExcel[x]['cae.mesfacturacion']);
 
                 Comunidad.comunidadservicioscontratados.push(infoServicio);
 
@@ -783,6 +830,7 @@ let comunidadesCore = {
                 infoServicio.contratado = (jsonExcel[x]['Rgpd.contratado'] === undefined ? 0 :jsonExcel[x]['Rgpd.contratado'] );
                 infoServicio.precio = ( jsonExcel[x]['Rgpd.pvp'] === undefined ? 0 : jsonExcel[x]['Rgpd.pvp'] );
                 infoServicio.preciocomunidad = ( jsonExcel[x]['Rgpd.preciocomunidad'] === undefined ? 0 : jsonExcel[x]['Rgpd.preciocomunidad'] );
+                infoServicio.mesfacturacion = (jsonExcel[x]['Rgpd.mesfacturacion'] === undefined ? 0 : jsonExcel[x]['Rgpd.mesfacturacion']);                
                 Comunidad.comunidadservicioscontratados.push(infoServicio);
 
                 var infoServicio = new Object();
@@ -790,6 +838,7 @@ let comunidadesCore = {
                 infoServicio.contratado = (jsonExcel[x]['prl.contratado'] === undefined ? 0 : jsonExcel[x]['prl.contratado']);
                 infoServicio.precio = (jsonExcel[x]['prl.pvp'] === undefined ? 0 : jsonExcel[x]['prl.pvp']);
                 infoServicio.preciocomunidad = (jsonExcel[x]['prl.preciocomunidad'] === undefined ? 0 : jsonExcel[x]['prl.preciocomunidad']);
+                infoServicio.mesfacturacion = (jsonExcel[x]['prl.mesfacturacion'] === undefined ? 0 : jsonExcel[x]['prl.mesfacturacion']);                
                 Comunidad.comunidadservicioscontratados.push(infoServicio);
 
                 var infoServicio = new Object();
@@ -797,6 +846,7 @@ let comunidadesCore = {
                 infoServicio.contratado = (jsonExcel[x]['instalaciones.contratado'] === undefined ? 0 : jsonExcel[x]['instalaciones.contratado']);
                 infoServicio.precio = (jsonExcel[x]['instalaciones.pvp'] === undefined ? 0 : jsonExcel[x]['instalaciones.pvp']);
                 infoServicio.preciocomunidad = (jsonExcel[x]['instalaciones.preciocomunidad'] === undefined ? 0 : jsonExcel[x]['instalaciones.preciocomunidad']);
+                infoServicio.mesfacturacion = (jsonExcel[x]['instalaciones.mesfacturacion'] === undefined ? 0 : jsonExcel[x]['instalaciones.mesfacturacion']);                
                 Comunidad.comunidadservicioscontratados.push(infoServicio);
 
                 var infoServicio = new Object();
@@ -804,25 +854,33 @@ let comunidadesCore = {
                 infoServicio.contratado = ( jsonExcel[x]['certificadosdigitales.contratado'] === undefined ? 0 : jsonExcel[x]['certificadosdigitales.contratado'] );
                 infoServicio.precio = ( jsonExcel[x]['certificadosdigitales.pvp'] === undefined ? 0 : jsonExcel[x]['certificadosdigitales.pvp'] );
                 infoServicio.preciocomunidad = ( jsonExcel[x]['certificadosdigitales.preciocomunidad'] === undefined ? 0 : jsonExcel[x]['certificadosdigitales.preciocomunidad'] ); 
+                infoServicio.mesfacturacion = (jsonExcel[x]['certificadosdigitales.mesfacturacion'] === undefined ? 0 : jsonExcel[x]['certificadosdigitales.mesfacturacion']);                
                 Comunidad.comunidadservicioscontratados.push(infoServicio);
 
                 console.log(Comunidad);
 
+                //  Pintamos el nombre de la comunidad para que el usuario pueda ir siguiendo el progreso
+                $('.importacionComunidad').html(`${Comunidad.codigo} - ${Comunidad.nombre}`);
+
                 //  Generamos la comunidad en base de datos
-                core.Modelo.Insert('comunidad', Comunidad, false, '', false, false);
+                await core.Modelo.Insert('comunidad', Comunidad, false, '', false, false);
+
                 porcentaje = (( x * 100 ) / jsonExcel.length).toFixed(2);
+
                 $('.wrapperProgresoCarga .progress-bar-striped').attr('aria-valuenow',`${porcentaje}%`);
                 $('.wrapperProgresoCarga .progress-bar-striped').css('width',`${porcentaje}%`);
                 $('.wrapperProgresoCarga .progress-bar-striped').html(`${porcentaje}%`);  
 
                 $('.wrapperProgresoCarga .progresoCarga').html(`(${x} de ` + (jsonExcel.length) + ')');
-                await sleep(500);
+                // await sleep(500);
             }
 
-            //  Obtenemos el ID del administrador seleccionado
+            
             // FIXME: Arreglar el texto para plural y singular
                 $('.wrapperProgresoCarga .progresoCarga').html(jsonExcel.length + ' comunidad(es) importada(s)');
+                $('.importacionComunidad').hide();
                 $('.btnCerrarProceso').show();
+
                 $('.wrapperProgresoCarga .progress-bar-striped').attr('aria-valuenow',`100%`);
                 $('.wrapperProgresoCarga .progress-bar-striped').css('width',`100%`);
                 $('.wrapperProgresoCarga .progress-bar-striped').html(`100%`);                  
@@ -928,6 +986,9 @@ let comunidadesCore = {
                 $('.wrapperSelectorFichero').hide();
                 $('.wrapperMensajeErrorCarga').hide();
     
+            //  Cargamos el nombre del administrador en el modal
+                $('.importacionAdministrador').html( $('#administradorCargaId option:selected').text() );
+
             //  Intentamos hacer la importación
                 comunidadesCore.Import.leerPlantillaComunidades( xlsxflag );
     
@@ -1149,8 +1210,8 @@ let comunidadesCore = {
                 //  Columna de acciones
                     var html = '<ul class="nav justify-content-center accionesTabla">';
                         // html += '<li class="nav-item"><a href="javascript:void(0);" class="btnVerComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="eye" class="text-info img-fluid"></i></a></li>';
-                        html += `<li class="nav-item"><a href="${baseURL}comunidad/data:id$?view=1" class="btnEditarComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid pr-2" style="width:32px;height:32px;"></i></a></li>`;
-                        html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid" style="width:26px;height:26px;"></i></li></ul>';
+                        html += `<li class="nav-item"><a href="${baseURL}comunidad/data:id$?view=1" class="btnEditarComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid icono-accion" style="width:32px;height:32px;"></i></a></li>`;
+                        html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid icono-accion" style="width:26px;height:26px;"></i></li></ul>';
                     CoreUI.tableData.addColumn('listadoComunidad', null, "", html);
     
                 // $('#listadoComunidad').addClass('no-clicable');
@@ -1203,9 +1264,16 @@ let comunidadesCore = {
                     CoreUI.tableData.init();
 
                 //  Código
-                    CoreUI.tableData.addColumn('listadoComunidad', "codigo","COD", null, null, '40px');
+                    CoreUI.tableData.addColumn('listadoComunidad', "codigo","COD", null, null, '40px', null);
                 //  Nombre
                     CoreUI.tableData.addColumn('listadoComunidad', "nombre", "NOMBRE", null, null, '40%');
+
+                //  CIF Solo para sudo
+                    if(core.Security.getRole() == 'SUDO'){
+                        CoreUI.tableData.addColumn('listadoComunidad', "cif", "CIF/NIF", null, null, '10%');
+                    }
+
+                    console.log('Role: ', core.Security.getRole());
 
                 //  Administrador
                     var html = 'data:usuario.nombre$';
@@ -1221,8 +1289,8 @@ let comunidadesCore = {
 
                 //  Columna de acciones
                     var html = '<ul class="nav justify-content-center accionesTabla">';
-                        html += `<li class="nav-item"><a href="${baseURL}comunidad/data:id$?view=1" class="btnEditarComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid pr-2" style="width:32px;height:32px;"></i></a></li>`;
-                        html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid" style="width:26px;height:26px;"></i></li></ul>';
+                        html += `<li class="nav-item"><a href="${baseURL}comunidad/data:id$?view=1" class="btnEditarComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid icono-accion" style="width:32px;height:32px;"></i></a></li>`;
+                        html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid icono-accion" style="width:26px;height:26px;"></i></li></ul>';
                     CoreUI.tableData.addColumn('listadoComunidad', null, "", html);
 
                 CoreUI.tableData.render("listadoComunidad", "Comunidad", endpointListado, false, true, true, null, false, false, null, true);
@@ -1484,7 +1552,60 @@ let comunidadesCore = {
                         });                    
                     });
             }  
+        },
+
+        tablaProveedores: function()
+        {
+            if($('#listadoComunidadesProveedores').length)
+            {
+    
+                    //  Cargamos el listado de comunidades
+                        CoreUI.tableData.init();
+                        CoreUI.tableData.columns = [];
+    
+                    //  Código Comunidad
+                        CoreUI.tableData.addColumn('listadoComunidadesProveedores', "codigocomunidad", 'CÓD', null, 'text-left', '30px');
+    
+                    //  Comunidad
+                        CoreUI.tableData.addColumn('listadoComunidadesProveedores', "comunidad", 'Comunidad', null, 'text-left');
+    
+                    //  Nombre del proveedor
+                        CoreUI.tableData.addColumn('listadoComunidadesProveedores', "empresa", 'Proveedor Asignado', null, 'text-left');
+    
+                    // //  Estado del requerimiento
+                    //     CoreUI.tableData.addColumn('listadoDocumentacionComunidadCae', 
+                    //         function(row, type, val, meta)
+                    //         {
+                    //             if(row.idficherorequerimiento == null)
+                    //             {
+                    //                 return '<span class="badge rounded-pill bg-danger pl-3 pr-3 pt-2 pb-2 d-block">No adjuntado</span>';
+                    //             }else{
+                    //                 //  Comprobamos el estado del requerimiento
+                    //                 if(core.Security.getRole() == 'CONTRATISTA')
+                    //                 {
+                                        
+                    //                     //  Comprobamos si el contratista ha descargado el documento previamente
+                    //                     if(documentalCore.Helper.ComprobarDescargaRequerimientoPorEmpresa(core.Security.user, row.idficherorequerimiento, row.descargas))
+                    //                     {
+                    //                         return '<span class="badge rounded-pill bg-success pl-3 pr-3 pt-2 pb-2 d-block">Descargado</span>';
+                    //                     }else{
+                    //                         return '<span class="badge rounded-pill bg-warning pl-3 pr-3 pt-2 pb-2 d-block">Pendiente descarga</span>';
+                    //                     }
+                    //                 }else{
+                    //                     return '<span class="badge rounded-pill bg-success pl-3 pr-3 pt-2 pb-2 d-block">Subido</span>';
+                    //                 }
+                    //             }
+                    //         },
+                    //     "Estado", null, 'text-center', '10%');
+  
+                    CoreUI.tableData.render("listadoComunidadesProveedores", "proveedores", 'comunidad/proveedoresasignados/list', false, true, true, null, true, true, 'comunidad', false, 'GET', true, true ).then ( () =>{
+                        window['tablelistadoComunidadesProveedores'].table(0).columns(0).visible(false);
+                        window['tablelistadoComunidadesProveedores'].table(0).columns(1).visible(false);
+                    });
+                    $('#listadoComunidadesProveedores').show();
+                    // CoreUI.tableData.render("listadoComunidadesProveedores", "proveedores", 'comunidad/proveedoresasignados/list', false, false, false, null, false, false, null, false);
         }
+    }
 
     },
 }
@@ -1493,6 +1614,13 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-$(()=>{
-    comunidadesCore.init();
+document.addEventListener('coreInitialized', function(event) {
+    comunidadesCore.init();     
+});
+   
+document.addEventListener('modelLoaded', function(event) {
+    if(core.actionModel == 'get' && core.model.toLowerCase() == "comunidad"){
+        let titulo = `${core.Modelo.entity['Comunidad'][0]['codigo']} - ${core.Modelo.entity['Comunidad'][0]['nombre']}`;
+        CoreUI.Utils.setTituloPantalla(null, null, titulo);
+    }    
 });

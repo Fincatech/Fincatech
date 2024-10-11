@@ -6,23 +6,32 @@
 
 namespace Fincatech\Controller;
 
-// Sustituir Model por el nombre del modelo real. Ej: UsuarioModel
-use Fincatech\Model\SmsModel;
+// use Fincatech\Model\SmsModel;
+use HappySoftware\Model\Model;
+use \Fincatech\Model\SmsModel;
+use HappySoftware\Controller;
 
 class SmsController extends FrontController{
 
-    private $smsModel;
-    public $SmsModel;
-
+    protected SmsModel $SmsModel;
+    
     public function __construct($params = null)
     {
-        $this->InitModel('sms', $params);
+       $this->InitModel('sms', $params);
     }
 
-    public function Create($entidadPrincipal, $datos)
+    public function Create($entidadPrincipal, $data)
     {
         //  Llamamos al método de crear
-        return $this->SmsModel->Create($entidadPrincipal, $datos);
+        $this->SmsModel->setIdUsuario($data['idusuario'])
+            ->setPhone($data['phone'])
+            ->setMessage($data['message'])
+            ->setContractFileId(null)
+            ->setMensajeCertificadoId($data['mensajecertificadoid'])
+            ->setContrato(intval($data['contrato']));
+
+        $this->SmsModel->_Save();
+        return $this->SmsModel->Id();
     }
 
     public function Update($entidadPrincipal, $datos, $usuarioId)
@@ -47,7 +56,8 @@ class SmsController extends FrontController{
 
     public function List($params = null, $useLoggedUserId = false)
     {
-        return $this->SmsModel->List($params, true);
+        $data['Sms'] = $this->SmsModel->List($params, true);
+        return $data;
     }
 
 }

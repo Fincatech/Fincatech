@@ -1,0 +1,170 @@
+
+    <!-- <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">     -->
+    <style media="print">
+        p{
+            font-family: "Arial", sans-serif;
+            font-optical-sizing: auto;
+            font-size: 14px;
+            margin-bottom: 0;
+            margin-top: 0;
+        }
+
+        a{ text-decoration: none;}
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            border: 0;
+        }
+
+        .row{ display: block; }
+
+        .clearfix{
+            margin-top: 16px;
+            margin-bottom: 16px;
+            clear: both;
+            height: 32px;
+        }
+
+        .font-weight-bold{ font-weight: 700; }
+        .text-light-gray{ color: slategray; }
+        .text-blue{ color: #17a2b8;}
+        .text-start{text-align: left;}
+        .text-center{text-align: center;}
+        .text-right{text-align: right;}
+        .text-footer{ font-size: 12px; }
+
+        .bg-fincatech{ background-color: #def2d4;}
+        .bg-grey{ background-color: #ebebeb;}
+        .table-detalle-factura{
+            border: 1px solid #bababa;
+        }
+
+        .table-detalle-factura tr{
+            border-bottom: 1px solid #bababa;
+        }
+        .table-detalle-factura td,
+        .table-detalle-factura th{
+            border-right: 1px solid #bababa;
+        }
+
+    </style>
+
+<table border="0">
+    <tr>
+        <td>
+            <!-- CABECERA -->
+            <table>
+                <tr>
+                    <td style="width: 50%;">
+                        <img src="[logo]" style="width:200px;height:65px;">
+                    </td>
+                    <td style="width: 50%;">                    
+                        <p><strong>FACTURA RECTIFICATIVA Nº</strong>: [factura_numero]</p>
+                        <p><strong>FECHA</strong>: [factura_fecha]</p>
+                    </td>
+                </tr>
+            </table> 
+            <!-- Tabla datos cabecera -->
+            <table border="0">
+                <tbody>
+                    <tr>
+                        <!-- Datos de Fincatech-->
+                        <td style="width: 50%;">
+                            <p class="font-weight-bold text-blue">FINCATECH SOFTWARE SL</p>
+                            <p class="text-blue"><span class="font-weight-bold">CIF</span>: B93594992</p>
+                            <p class="text-blue">Av.del Carmen 9. 29680 Estepona (Málaga)</p>
+                            <p class="text-blue"><strong>Email</strong>: <a class="text-blue" href="mailto:info@fincatech.es" target="_blank" title="Email">info@fincatech.es</a></p>
+                            <p class="text-blue"><strong>Web</strong>: <a class="text-blue" href="https://www.fincatech.es" target="_blank">www.fincatech.es</a></p>
+                            <p class="text-blue"><strong>Teléfono</strong>: +34 952 792 038</p>
+                        </td>
+                        <!-- Datos del cliente -->
+                        <td>
+                            <p><strong>FACTURAR A</strong></p>
+                            <p>[comunidad_codigo] - [comunidad_nombre]</p>
+                            <p>[comunidad_cif]</p>                    
+                            <p>[comunidad_localidad]</p>
+                            <p><strong>REF. CONTRATO</strong>: [referencia_contrato]</p>
+                            <p><strong>CLIENTE</strong>: [administrador_id]</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>                       
+        </td>
+    </tr>
+    <tr valign="top">
+        <td>
+            <div class="clearfix">&nbsp;</div>
+            <!-- DATOS FACTURA -->
+            <table class="table-detalle-factura">
+                <thead>
+                    <tr class="bg-grey" style="height: 36px;">
+                        <th scope="row" width="80%">
+                            <p class="text-start font-weight-bold">&nbsp;CONCEPTO</p>
+                        </th>
+                        <th scope="row" width="20%">
+                            <p class="font-weight-bold text-right">IMPORTE&nbsp;</p>
+                        </th>
+                    </tr>
+                </thead>
+                <!-- Detalle de la factura -->
+                <tbody>
+                    <tr>
+                        <td class="text-start">
+                            [detalle_conceptos]
+                        </td>
+                        <td class="text-right">
+                            [detalle_importes]
+                        </td>
+                    </tr>
+                    <!-- Subtotal -->
+                    <tr>
+                        <td class="text-right">
+                            <p><span class="font-weight-bold">CUOTA I.V.A.</span> [impuesto_porcentaje]% S/[factura_total_taxes_excl]</p>
+                        </td>
+                        <td class="text-right">
+                            <p>[impuesto_importe_total]&euro;</p>
+                        </td>
+                    </tr>
+                    <!-- TOTAL -->
+                    <tr>
+                        <td class="text-right">
+                            <p><span class="font-weight-bold">TOTAL FRA.</span></p>
+                        </td>
+                        <td class="text-right">
+                            <p>[factura_total_taxes_inc]&euro;</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- Datos domiciliación -->
+            <div class="clearfix">&nbsp;</div>
+            <!-- Tabla cuenta y fecha de vencimiento -->
+            <table border="0">
+                <tr>
+                    <td style="width: 50%;" class="text-center">
+                        <p><strong>FACTURA DOMICILIADA EN CC</strong> ******* [comunidad_iban]</p>
+                    </td>
+                    <td style="width: 50%;" class="text-center">
+                        <p><strong>Fecha vencimiento</strong>: [fecha_vencimiento]</p>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="clearfix">&nbsp;</div>
+
+            <p class="text-light-gray text-footer">FINCATECH: Plataforma para la Coordinación de Actividades Empresariales, elaboración de Documentos CAE y cumplimiento del reglamento general de protección de datos a través del nombramiento de delegado de protección de datos : Salvador Zotano Sánchez email: <a href="mailto:dpd@fincatech.es" target="_blank" title="E-mail DPD Fincatech">dpd@fincatech.es</a></p>
+
+            <div class="clearfix">&nbsp;</div>
+
+            <p class="text-light-gray text-footer">DPD certificado por la Agencia Española de Protección de Datos. La mejor forma de estar protegido ante el RGPD.</p>
+
+            <div class="clearfix">&nbsp;</div>             
+        </td>
+    </tr>
+
+</table>
+
+

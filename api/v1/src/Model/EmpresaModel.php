@@ -13,6 +13,7 @@ class EmpresaModel extends \HappySoftware\Model\Model{
 
     private $entidad = 'Empresa';
     private $tablasSchema = array("Empresa");
+    private $tablaSeguimiento = 'empresaseguimiento';
     private $passwordGenerated;
     public $UsuarioController;
     public $MensajeController;
@@ -21,6 +22,71 @@ class EmpresaModel extends \HappySoftware\Model\Model{
      * @var \Fincatech\Entity\Empresa
      */
     public $empresa;
+
+    private $id;
+    public function Id()
+    {
+        return $this->id;
+    }
+    public function SetId($value){
+        $this->id = $value;
+        return $this;
+    }
+
+    private $idEmpresa;
+    public function IdEmpresa()
+    {
+        return $this->idEmpresa;
+    }
+    public function SetIdEmpresa($value){
+        $this->idEmpresa = $value;
+        return $this;
+    }
+
+    private $email;
+    public function SetEmail($value){
+        $this->email = $value;
+        return $this;
+    }
+    public function Email(){
+        return $this->email;
+    }
+
+    private $fecha;
+    public function SetFecha($value){
+        $this->fecha = $value;
+        return $this;
+    }
+    public function Fecha(){
+        return $this->fecha;
+    }
+    private $tipo;
+    public function SetTipo($value){
+        $this->tipo = $value;
+        return $this;
+    }
+    public function Tipo(){
+        return $this->tipo;
+    }
+
+    private $observaciones;
+    public function SetObservaciones($value){
+        $this->observaciones = $value;
+        return $this;
+    }
+    public function Observaciones(){
+        return $this->observaciones;
+    }
+
+
+    private $usercreate;
+    public function SetUserCreate($value){
+        $this->usercreate = $value;
+        return $this;
+    }
+    public function UserCreate(){
+        return $this->usercreate;
+    }
 
     public function setPasswordGenerated($value)
     {
@@ -90,6 +156,13 @@ class EmpresaModel extends \HappySoftware\Model\Model{
     {
         $data = [];
         $data = parent::List($params, $useUserLogged);
+
+        if(isset($params['target']))
+        {
+            if(@$params['target'] == 'cbo'){
+                return $data;
+            }
+        }
 
         //  Recuperamos las comunidades asociadas a esta empresa
             for($x = 0; $x < count($data['Empresa']); $x++)
@@ -207,6 +280,112 @@ class EmpresaModel extends \HappySoftware\Model\Model{
             return $resultado;
         }
 
+    }
+
+    /**
+     * Comunidades que tiene asignadas una empresa
+     */
+    public function ComunidadesAsignadas($idEmpresa)
+    {
+        $idEmpresa = DatabaseCore::PrepareDBString($idEmpresa);
+        $sql = "
+        select 
+            c.codigo, c.nombre, c.direccion, c.localidad, c.provincia, 
+            u.nombre as administrador, c.id as idcomunidad
+        from 
+            comunidadempresa ce, comunidad c, usuario u
+        where 
+            ce.idempresa = $idEmpresa
+            and c.id = ce.idcomunidad
+            and u.id = c.usuarioId
+        order by administrador asc, c.nombre asc";
+        return $this->query($sql);
+    }
+
+    /**
+     * Reasigna las comunidades de una empresa a otra
+     */
+    public function ReasignarComunidades($idEmpresa, $idEmpresaDestino)
+    {
+
+        $idEmpresa = DatabaseCore::PrepareDBString($idEmpresa);
+        $idEmpresaDestino = DatabaseCore::PrepareDBString($idEmpresaDestino);
+
+        $sql ="update comunidadempresa set idempresa = $idEmpresaDestino where idempresa = $idEmpresa";
+        $this->queryRaw($sql);
+
+    }
+
+    public function EmpresasRegistradasSinAcceso()
+    {
+        $sql = "SELECT 
+            e.*, count(es.id) as totalactuaciones
+        FROM
+            usuario u,
+            empresa e
+            left join empresaseguimiento es on es.idempresa = e.id
+        where u.id = e.idusuario
+        group by e.id
+        order by e.razonsocial asc";
+        return $this->query($sql);
+    }
+
+    /**
+     * Recupera las actuaciones de seguimiento para una empresa
+     */
+    public function Actuaciones()
+    {
+        $sql  ="select * from empresaseguimiento where idempresa = " . $this->IdEmpresa() . ' order by created desc';
+        return $this->query($sql);
+    }
+
+    /**
+     * Crea una nueva actuación en bbdd para la empresa 
+     */
+    public function CreateActuacion()
+    {
+        $sql = "insert into " . $this->tablaSeguimiento . "(idempresa, tipo, observaciones, created, usercreate) values(";
+        $sql .= $this->IdEmpresa() . ", '" . $this->Tipo() . "', '" . $this->Observaciones() . "', now(), " . $this->UserCreate() .")";
+        $this->queryRaw($sql);
+    }
+
+    /**
+     * Elimina una actuación
+     */
+    public function DeleteActuacion()
+    {
+        $sql = "delete from " . $this->tablaSeguimiento . " where idempresa = " . $this->IdEmpresa() . " and id = " . $this->Id();
+        $this->queryRaw($sql);
+    }
+
+    /**
+     * Da por finalizado el seguimiento de una empresa
+     */
+    public function FinishFollow()
+    {
+        $sql = "update empresa set estadoprotocolo = 1, updated = now() where id = " . $this->IdEmpresa();
+        $this->queryRaw($sql);
+    }
+    
+    /**
+     * Devuelve todos los e-mails enviados para el alta en la plataforma
+     */
+    public function EmailAlta()
+    {
+        $sql = "SELECT m.subject, m.numeroenvio, m.created
+                from mensaje m, empresa e 
+                where 
+                    e.id = " . $this->IdEmpresa() . " 
+                    and m.email = e.email 
+                    and m.subject = 'Fincatech - Alta en la plataforma'
+                order by m.created asc";
+        return $this->query($sql);
+    }
+
+    /** Devuelve si el e-mail está incluido en la blacklist */
+    public function EmailBlackList()
+    {
+        return $this->getRepositorio()->selectCount('emailblacklist', 'email', '=', "'". $this->Email() . "'");
     }
 
 }

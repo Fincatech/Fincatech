@@ -6,7 +6,7 @@ let dashboard = {
         //  Recuperamos el listado de comunidades
         if(core.model == 'Dashboard')
         {
-            await comunidadesCore.listadoDashboard();
+           await comunidadesCore.listadoDashboard();
         }
 
     }
@@ -14,5 +14,9 @@ let dashboard = {
 }
 
 $(()=>{
+    // dashboard.init();
+});
+
+document.addEventListener('coreInitialized', function(event){
     dashboard.init();
 });

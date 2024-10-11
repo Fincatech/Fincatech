@@ -7,7 +7,9 @@
             <div class="card-header pl-1 mb-2">
 
                 <h5 class="card-title mb-0"> <span class="titulo titulo-modulo"><i class="bi bi-shop pr-2"></i> Alta de nueva Empresa</span></h5>
-
+                <div class="alert text-danger p-2 mt-4 rounded mb-0">
+                    <p class="mb-0"><span class="font-weight-bold">NOTA IMPORTANTE</span>: Solo dar de alta aquellas empresas que acceden de manera periódica a la comunidad como por ejemplo empresas de limpieza, de ascensores o empresas de mantenimiento que van periódicamente a la comunidad.</p>
+                </div>
             </div>
     
             <div class="card-body shadow-inset rounded-lg border mb-1 border-white text-left">

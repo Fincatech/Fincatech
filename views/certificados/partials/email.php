@@ -20,9 +20,16 @@
             </div>    
             <!-- Adjuntar fichero -->
             <div class="form-group mb-3">
-                <label for="ficheroadjuntar" class="form-label">Adjuntar fichero</label>
-                <input type="file" accept=".pdf" id="ficheroadjuntar" name="ficheroadjuntar" class="form-control border-0 pl-0" />
-                <label class="form-label font-size-small text-primary"><i class="bi bi-info-circle-fill"></i> Solo se admite un fichero en formato PDF por envío</label>
+                <p class="mb-0"><i class="bi bi-file-pdf-fill"></i>  Fichero adjunto</p>
+                <p class="font-size-small text-primary">
+                    <small><i class="bi bi-info-circle-fill"></i> Solo se admite un fichero en formato PDF por envío
+                    </small>
+                </p>
+                <div class="custom-file w-100">
+                    <!-- <label for="ficheroadjuntar" class="form-label"><i class="bi bi-file-pdf-fill"></i> Seleccionar archivo</label> -->
+                    <input type="file" accept=".pdf" id="ficheroadjuntar" name="ficheroadjuntar" class="form-control form-control-sm border-0 shadow-inset p-2" lang="es" />
+                </div>
+                
             </div>                        
             <!-- Cuerpo del mensaje -->
             <div class="form-group mb-3">

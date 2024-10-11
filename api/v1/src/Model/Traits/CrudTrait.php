@@ -6,6 +6,8 @@ use HappySoftware\Database\DatabaseCore;
 
 trait CrudTrait{
 
+    protected $test = null;
+
     /** Método de guardar entidad en bbdd */
     public function Save()
     {
@@ -13,7 +15,7 @@ trait CrudTrait{
         {
             $this->constructInsertSQL();
             //  Ejecutamos sobre la propiedad SQL
-
+                $d = $this->getSQL();
                 $this->repositorio->queryRaw( $this->getSQL() );
                 $data['id'] = $this->repositorio->getLastID(strtolower($this->getEntidad())) - 1;
                 return $data;
@@ -43,7 +45,7 @@ trait CrudTrait{
         //  Recuperamos el esquema de la entidad y sus entidades relacionadas
             $this->getSchemaEntity();
 
-        //  Preparamos el builder de SQL
+        //  Preparamos el builder de la sentencia SQL
             $this->createInsert($entidadPrincipal);
 
         //  Si hay fichero, guardamos el mismo en el almacén y quitamos la info del $data
@@ -64,7 +66,7 @@ trait CrudTrait{
             date_default_timezone_set('Europe/Madrid');
             $this->addField("created", "'" . date('Y-m-d H:i:s') . "'");
 
-        //  Ejecutamos sobre la propiedad SQL
+        //  Ejecutamos el proceso de guardar
             return $this->Save();
 
     }
@@ -138,6 +140,10 @@ trait CrudTrait{
     {
 
         $this->fields = [];
+
+        //  Se hace un lcase del nombre de la entidad ya que el motor de BBDD es case sensitive
+        //  Si no, cuando se pasa con alguna mayúscula no actualiza
+        // $entidadPrincipal = strtolower($entidadPrincipal);
 
         $this->setEntidad($entidadPrincipal);
 
@@ -255,21 +261,31 @@ trait CrudTrait{
 
         //  FIXME: Arreglar esta búsqueda ya que puede dar error
         //  NOTE: Habría que montar vistas para los listados
-        if(isset($params['filterfield']) && isset($params['filtervalue']))
-        {
-            if(strpos($this->queryToExecute, "where") !== false)
-            {
-                $this->queryToExecute .= " AND ";
-            }else{
-                $this->queryToExecute .= " where ";
-            }
 
-            $params['filteroperator'] = (isset($params['filteroperator']) ? $params['filteroperator'] : ' = ');
+        /////////////////////////////////////////////////////////////////////
+        ///                       FILTROS DE BÚSQUEDA
+        /////////////////////////////////////////////////////////////////////        
+        $this->processFilterFields($params);
+        // if(isset($params['filterfield']) && isset($params['filtervalue']))
+        // {
+        //     if(strpos($this->queryToExecute, "where") !== false)
+        //     {
+        //         $this->queryToExecute .= " AND ";
+        //     }else{
+        //         $this->queryToExecute .= " where ";
+        //     }
 
-            $this->queryToExecute .= ' ' . $params['filterfield'] . $params['filteroperator'] . $params['filtervalue'] . " ";
+        //     $params['filteroperator'] = (isset($params['filteroperator']) ? $params['filteroperator'] : ' = ');
+
+        //     $this->queryToExecute .= ' ' . $params['filterfield'] . $params['filteroperator'] . $params['filtervalue'] . " ";
             
-        }
+        // }
 
+        $this->queryToExecute .= $this->ProcessFieldsToSearch($params);
+
+        /////////////////////////////////////////////////////////////////////
+        ///                         CAMPOS DE BÚSQUEDA
+        /////////////////////////////////////////////////////////////////////
         //  Procesamiento de la búsqueda desde los datatables
         if(isset($params['searchfields']) && @count($params['searchfields']) > 0)
         {
@@ -284,6 +300,10 @@ trait CrudTrait{
         }
 
         $queryWithoutFilter = $this->queryToExecute;
+
+        /////////////////////////////////////////////////////////////////////
+        ///                         ORDER BY
+        /////////////////////////////////////////////////////////////////////
 
         //  Comprobamos si hay establecido orden
             $orderBy = (isset($params['orderby']) ? $params['orderby'] : null);
@@ -311,14 +331,20 @@ trait CrudTrait{
                 }
             }
 
-        //  Parámetros de paginación
-            $limitStart = (isset($params['start']) ? $params['start'] : null);
-            $limitLength = (isset($params['length']) ? $params['length'] : null);
+        /////////////////////////////////////////////////////////////////////
+        ///                         PAGINACIÓN
+        /////////////////////////////////////////////////////////////////////
+        $limitStart = (isset($params['start']) ? $params['start'] : null);
+        $limitLength = (isset($params['length']) ? $params['length'] : null);
 
-            if(!is_null($limitStart) && !is_null($limitLength))
-                $this->queryToExecute .= " limit " . $params['start'] . "," . $params['length'];
+        if(!is_null($limitStart) && !is_null($limitLength))
+            $this->queryToExecute .= " limit " . $params['start'] . "," . $params['length'];
 
         // die($this->queryToExecute);
+
+        /////////////////////////////////////////////////////////////////////
+        ///                         EJECUCIÓN
+        /////////////////////////////////////////////////////////////////////
 
         $this->execute(true,false);
         
@@ -340,7 +366,7 @@ trait CrudTrait{
     }
 
     /** Recupera los registros de una entidad mediante campos de búsqueda $key => $value */
-    public function Search($dataToSearch)
+    public function Search($dataToSearch = null)
     {
         if(!is_array($dataToSearch))
         {
@@ -389,10 +415,17 @@ trait CrudTrait{
         */
         $searchSQL = '';
 
+        //  Validamos que exista la definición en el array
+        if(!isset($searchFields['fields'])){
+            return $searchSQL;
+        }
+
         for($xField = 0; $xField < count($searchFields['fields']); $xField++)
         {
             //  Campo
-            $searchSQL .= DatabaseCore::PrepareDBString($searchFields['fields'][$xField]['field']);
+            //TODO: Ver la forma de sanear esta parte para evitar posibles ataques
+            // $searchSQL .= DatabaseCore::PrepareDBString($searchFields['fields'][$xField]['field']);
+            $searchSQL .= $searchFields['fields'][$xField]['field'];
 
             //  Valor
             $valor = DatabaseCore::PrepareDBString($searchFields['fields'][$xField]['search']);

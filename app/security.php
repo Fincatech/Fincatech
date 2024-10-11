@@ -20,6 +20,7 @@ define("security", [
                 "facturacion",
                 'informevaloracionseguimiento',
                 'notasinformativas',
+                'proveedor',
                 "requerimiento",
                 "rgpd",
                 "servicios",
@@ -145,11 +146,40 @@ define("security", [
                 "delete" => "all",
                 "update" => "all"
             ],            
-        ],        
+        ],    
+        "ROLE_SEGPROV"=>[
+            "folder"=>"segprov",
+            "titulo" => "Seguimiento Proveedores",
+            "menulateral"=> false,
+            "js" =>[
+                "seguimientoproveedores",
+            ],
+            "permissions" => [
+                "create" => "all",
+                "delete" => "all",
+                "update" => "all"
+            ],            
+        ],              
         "ROLE_LOGIN"=>[
             "folder"=>"login",
             "menulateral"=> false,
             "titulo" => "Login Fincatech"
+        ],
+        "ROLE_FACTURACION" => [
+            "folder" => "facturacion",
+            "titulo" => "Facturación",
+            "menulateral" => false,
+            "js" => [
+                "administrador",
+                "comunidades",
+                "facturacion",
+                "sudo",
+            ],
+            "permissions" => [
+                "create" => "all",
+                "delete" => "all",
+                "update" => "all"
+            ],                        
         ]
     ]
 );

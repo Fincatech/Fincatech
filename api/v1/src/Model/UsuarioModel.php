@@ -351,7 +351,7 @@ class UsuarioModel extends \HappySoftware\Model\Model{
 
     public function ListByRolId($rolId)
     {
-        $datos = parent::getEntityByField('usuario', 'rolId', $rolId);
+        $datos = parent::getEntityByField('usuario', 'rolid', $rolId);
         $datos['total'] = count($datos["Usuario"]);
         return $datos;
     }

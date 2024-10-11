@@ -91,10 +91,21 @@ class CertificadodigitalController extends FrontController{
        return $this->CertificadodigitalModel->List($params);
     }
 
-    //  Envío de SMS
+    /**
+     * Envía un sms certificado con acuse de recibo
+     * @param string $phoneNumber
+     * @param string $sender
+     * @param string $message
+     * @param string $fileName
+     * @param string $fileBase64
+     * @param string $storageFileId
+     * @return httpResponse 
+     */  
     public function SendSMS($phoneNumber, $sender, $message, $fileName = null, $fileBase64 = null, $storageFileId = null)
     {
+
         $smsContract = false;
+        $resultadoEnvio = false;
 
         $this->InitController('Administrador');
         $administrador = $this->AdministradorController->Get($sender);
@@ -106,41 +117,52 @@ class CertificadodigitalController extends FrontController{
         $nombreAdministrador = $administrador['Usuario'][0]['nombre'];
 
         //  Enviamos el mensaje
-        if(is_null($fileName) && is_null($fileBase64) && is_null($storageFileId))
+        if( is_null($fileName) && is_null($fileBase64) )
         {
-            $result = $this->SendSMSCertificated($phoneNumber, $message, $nombreAdministrador, $cifAdministrador, $telefonoAdministrador);
+            $resultadoEnvio = $this->SendSMSCertificated($phoneNumber, $message, $nombreAdministrador, $cifAdministrador, $telefonoAdministrador);
         }else{
             //  Es un sms con contrato adjunto por lo que debemos almacenar
             //  primero el fichero en el almacén
-            $smsContract = true;
-            $this->InitController('Ficheroscomunes');
-            $fichero = $this->FicheroscomunesController->Get($storageFileId);
-            $ficheroNombreStorage = $fichero['FicherosComunes'][0]['nombrestorage'];
-            $result = $this->SendSMSContractCertified($telefonoAdministrador, $message, $ficheroNombreStorage, $nombreAdministrador, $cifAdministrador, $telefonoAdministrador);
+            // $smsContract = true;
+            // $this->InitController('Ficheroscomunes');
+            // $fichero = $this->FicheroscomunesController->Get($storageFileId);
+            // $ficheroNombreStorage = $fichero['FicherosComunes'][0]['nombrestorage'];
+            $resultadoEnvio = $this->SendSMSContractCertified($telefonoAdministrador, $message, $fileName, $fileBase64, $nombreAdministrador, $cifAdministrador, $telefonoAdministrador);
         }
 
         //  Esperamos a la respuesta
-        if($result !== true)
+        if($resultadoEnvio !== false)
         {
-            return $result;
-        }else{
             //  Creamos el registro en base de datos
             $this->InitController('Sms');
             $data = [];
+            //  Id del usuario que ha enviado el sms certificado
             $data['idusuario'] = $sender;
+            //  Número de teléfono
             $data['phone'] = $phoneNumber;
+            //  Cuerpo del mensaje
             $data['message'] = DatabaseCore::PrepareDBString($message);
             $data['message'] = str_replace('&',' ', $data['message']);
+            // Id que devuelve Mensatek            
+            $data['mensajecertificadoid'] = $resultadoEnvio; 
+            //  ¿Es un contrato firmado?
+            $data['contrato'] = $smsContract;
+
             //  Si es un sms con contrato adjunto, se almacena el fichero en el almacén
             if($smsContract){
+                
                 $data['storagefileid'] = $storageFileId;
             }
-
             $this->SmsController->Create('sms', $data);
         }
 
         //  Devolvemos la respuesta al front controller
-        return 'ok';
+        if($resultadoEnvio !== false)
+        {
+            return HelperController::successResponse('ok');
+        }else{
+            return HelperController::errorResponse('error','El sms no se ha podido enviar. Inténtelo pasado unos minutos, si el problema persiste, contacte con el departamento de soporte.',200);
+        }
 
     }
 
@@ -150,10 +172,9 @@ class CertificadodigitalController extends FrontController{
     public function SendSMSContrato( $phoneNumber, $sender, $message, $ficheroBase64, $ficheroNombre)
     {
         //  Subimos el fichero al almacén y recuperamos el ID
-            $storageFileId = $this->uploadFile($ficheroNombre, $ficheroBase64);
-  
+        //$storageFileId = $this->uploadFile($ficheroNombre, $ficheroBase64);
         //  Enviamos el sms para firmar
-        return $this->SendSMS($phoneNumber, $sender, $message, $ficheroNombre, $ficheroBase64, $storageFileId );
+        return $this->SendSMS($phoneNumber, $sender, $message, $ficheroNombre, $ficheroBase64 );        
     }
 
     /**

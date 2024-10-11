@@ -175,7 +175,7 @@ let rgpdCore = {
                     CoreUI.tableData.addColumn('listadoRGPDEmpleadosAdministracion', "titulo","Nombre del empleado", null, 'text-left');
     
                 //  Fichero
-                    CoreUI.tableData.addColumn('listadoRGPDEmpleadosAdministracion', 'ficheroscomunes[0]', "DOCUMENTO", null, 'text-center', null, function(data, type, row, meta)
+                    CoreUI.tableData.addColumn('listadoRGPDEmpleadosAdministracion', 'ficheroscomunes[0]', "DOCUMENTO", null, 'text-center', '150px', function(data, type, row, meta)
                     {
                         var salida = `
                                       <a href="javascript:void(0);" class="btnAdjuntarDocumentoEmpleadoRGPD" data-idrow="${meta.row}" data-tipo="rgpdempleado" data-idrequerimiento="${row.id}">
@@ -219,12 +219,12 @@ let rgpdCore = {
                                 return `<p class="mb-0 text-center">${descarga} ${fechaSubida}</p>`;
                         }
 
-                    },"DOCUMENTO ADJUNTADO", null, 'text-center');      
+                    },"DOCUMENTO ADJUNTADO", null, 'text-center', '150px');      
 
                 //  Columna de acciones
                     var html = '<ul class="nav justify-content-center accionesTabla">';
                         html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarDocumentoRGPD d-inline-block" data-id="data:id$" data-tipo="rgpdempleado" data-nombre="data:titulo$"><i data-feather="trash-2" class="text-danger img-fluid"></i></li></ul>';
-                    CoreUI.tableData.addColumn('listadoRGPDEmpleadosAdministracion', null, "", html);
+                    CoreUI.tableData.addColumn('listadoRGPDEmpleadosAdministracion', null, '', html, '', '50px');
     
                     $('#listadoRGPDEmpleadosAdministracion').addClass('no-clicable');
                     CoreUI.tableData.render("listadoRGPDEmpleadosAdministracion", "Rgpdempleado", `rgpd/documentacion/rgpdempleado/1/list`, false, false, false);

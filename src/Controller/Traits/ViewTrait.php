@@ -79,8 +79,14 @@ trait ViewTrait{
                         break;
                     case 'list':
                         $iconoAccion = "list";
-                        $App->renderTable("listado" . ucfirst($this->getController()), ucfirst($this->getController()), []); 
-                        $includeFile .= $this->getListadoRoute();
+                        //  Comprobamos si existe el tipo de listado personalizado, si existe, cargamos la info, si no, cargamos el componente principal
+                        if( $this->checkIfViewExists($includeFile, $this->getController() . '/' . $accion ))
+                        {
+                            $includeFile .=  $this->getController() . '/' . $accion;
+                        }else{
+                            $App->renderTable("listado" . ucfirst($this->getController()), ucfirst($this->getController()), []); 
+                            $includeFile .= $this->getListadoRoute();
+                        }
                         break;
                     default:
                     
@@ -116,7 +122,12 @@ trait ViewTrait{
         require_once( $includeFile . '.php');
     }
 
-    /** Renderiza el icono de menú
+    /**
+     * Renderiza el icono de menú
+     * @param string $titulo
+     * @param string $urlDestino
+     * @param string $imagen
+     * @param string $icono
      */
     public function renderBotonMenu($titulo, $urlDestino, $destino = null, $imagen = null, $icono = null)
     {

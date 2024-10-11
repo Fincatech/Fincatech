@@ -2,7 +2,7 @@
 
     <div class="col-12 d-flex">
 
-        <div class="card flex-fill shadow-neumorphic pl-3 pb-3 pt-2 pr-3">
+        <div class="card flex-fill shadow-neumorphic pl-3 pb-3 pt-2 pr-3 card-principal">
 
             <div class="card-header pl-1 mb-2">
 
@@ -109,7 +109,17 @@
                     </div>
 
                     <?php endif; ?>
-                    <?php $App->renderActionButtons(); ?>
+                    <!-- Si pertenece al grupo de usuarios de seguimiento no se deja modificar la información de la empresa -->
+                    <?php if($App->getAction() == 'get' && $App->getUserRol() != 'ROLE_SEGPROV'): ?>
+                        <?php $App->renderActionButtons(); ?>
+                    <?php endif; ?>
+
+                    <?php
+                        //  Si es un usuario de tipo sudo o un usuario de tipo seguimiento de proveedores se le muestra la información de actuaciones
+                        if($App->getUserRol() == 'ROLE_SEGPROV' || $App->getUserRol() == 'SUDO'): 
+                    ?>
+                        <?php $App->renderView('empresa/partials/actuaciones'); ?>
+                    <?php endif; ?>
 
                 </form>
 

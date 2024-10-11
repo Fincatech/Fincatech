@@ -2,7 +2,6 @@
 namespace Fincatech\Controller;
 
 use Fincatech\Model\ComunidadModel;
-
 use HappySoftware\Controller\HelperController;
 use HappySoftware\Controller\AutorizadoController;
 use HappySoftware\Controller\DocumentalController;
@@ -26,7 +25,7 @@ class ComunidadController extends FrontController{
     {
 
         $this->InitModel('Comunidad', $params);
-
+        $this->ComunidadModel = new ComunidadModel($params);
         //  Instanciamos el controller de tipos de servicio
         $this->InitController('Servicios');
         $this->InitController('Usuario');
@@ -35,6 +34,9 @@ class ComunidadController extends FrontController{
 
     public function Create($entidadPrincipal, $datos)
     {
+
+        //  Comprobamos si es una creación desde el proceso de importación automático para el master
+        $procesoImportacion = isset($datos['importacion']);
 
         //  Servicios contratados en el alta
         if(isset($datos['servicioCAE']))
@@ -86,8 +88,12 @@ class ComunidadController extends FrontController{
             
         }
         
+        //  Comprobamos si existe el IBAN para poder parsearlo
+        if(isset($datos['ibancomunidad']))
+            $datos['ibancomunidad'] = HelperController::NormalizeIBAN($datos['ibancomunidad']);
+
         //  Llamamos al método de crear
-        $datos['codigo'] = intval($datos['codigo']);
+        // $datos['codigo'] = intval($datos['codigo']);
         $idComunidad = $this->ComunidadModel->Create($entidadPrincipal, $datos);
 
         if(isset($servicioCaeContratado))
@@ -123,9 +129,10 @@ class ComunidadController extends FrontController{
                 $precio = $datosServiciosContratados[$x]['precio'];
                 $precioComunidad = $datosServiciosContratados[$x]['preciocomunidad'];
                 $contratado = $datosServiciosContratados[$x]['contratado'];
+                $mesfacturacion = $datosServiciosContratados[$x]['mesfacturacion'];
                 if(!$this->ComunidadModel->ExisteServicioComunidad($idComunidad['id'], $idServicio))
                 {   
-                    $this->ComunidadModel->InsertServicioContratado($idComunidad['id'], $idServicio, $precio, $precioComunidad, $contratado);
+                    $this->ComunidadModel->InsertServicioContratado($idComunidad['id'], $idServicio, $precio, $precioComunidad, $contratado, $mesfacturacion);
                 }
             }
         }
@@ -137,17 +144,30 @@ class ComunidadController extends FrontController{
             $this->AutorizadoController->GuardarComunidadAsignada($this->getLoggedUserId(), $idComunidad['id']);
         }
 
-
-        //  Si no ha sido el sudo el que ha dado de alta la comunidad, envíamos e-mail al administrador de la plataforma
+        //  Solo enviamos el e-mail de alta cuando no proviene de un proceso de importación
+        if(!$procesoImportacion)
+        {
+            //  Si no ha sido el sudo el que ha dado de alta la comunidad, envíamos e-mail al administrador de la plataforma
             $this->EnviarEmailAltaComunidad($datos['codigo'], $datos['nombre']);
+        }
+
 
         return $idComunidad;
 
     }
 
+    /**
+     * Actualiza la entidad de la comunidad con los datos proporcionados
+     */
     public function Update($entidadPrincipal, $datos, $usuarioId)
     {
-       //  Creamos la comunidad y obtenemos el id del registro para procesar los posibles servicios contratados
+
+        //  Comprobamos si existe el IBAN para poder parsearlo
+        if(isset($datos['ibancomunidad']))
+            $datos['ibancomunidad'] = HelperController::NormalizeIBAN($datos['ibancomunidad']);
+        
+
+        //  Creamos la comunidad y obtenemos el id del registro para procesar los posibles servicios contratados
         //  así como los precios 
         if(isset($datos['comunidadservicioscontratados']))
         {
@@ -208,8 +228,7 @@ class ComunidadController extends FrontController{
         }
 
         //  Si el usuario es un autorizado o pertenece a los roles: Sudo, Contratista ó Técnico RAO, se le concede el acceso
-        if($idUsuarioAcceso == $comunidad['Comunidad'][0]['usuarioId'] || $this->isSudo() || $this->isContratista() 
-        || $this->isTecnicoRao())
+        if($idUsuarioAcceso == $comunidad['Comunidad'][0]['usuarioId'] || $this->isSudo() || $this->isContratista() || $this->isTecnicoRao())
         {
             $tieneAcceso = true;
         }
@@ -238,22 +257,56 @@ class ComunidadController extends FrontController{
         $_documentacionAsociada = false;
         $_gradoCumplimiento = true;
 
+        //  Parámetros de paginación
+        $limitStart = (isset($params['start']) ? $params['start'] : null);
+        $limitLength = (isset($params['length']) ? $params['length'] : null);        
+        $orderType = 'asc';
+
         //  Parámetros de búsqueda
-        
-        
         if(isset( $params['search']['value'] ))
         {
             $params['searchfields'] =[];
             $params['searchvalue'] = $params['search']['value'];
             $params['searchfields'][0]['field'] = "nombre";
             $params['searchfields'][0]['operator'] = "%";
-            $params['searchfields'][1]['field'] = "codigo";
-            $params['searchfields'][1]['condition'] = "or";
-            $params['searchfields'][1]['operator'] = "%";                                  
+            
+            if(!$this->isSudo())
+            {
+                $params['searchfields'][1]['field'] = "codigo";
+                $params['searchfields'][1]['condition'] = "or";
+                $params['searchfields'][1]['operator'] = "%";     
+            }
+
+            //  23/07/2024 - ORR
+            //  Se acota por cif sólo para el usuario sudo, hablado con Cristóbal por WhatsApp
+            if($this->isSudo()) 
+            {
+                $params['searchfields'][1]['field'] = "cif";
+                $params['searchfields'][1]['condition'] = "or";
+                $params['searchfields'][1]['operator'] = "%";                                                  
+            }
         }
 
+        //  Parámetros de orden por columna
+        //  Establecemos orden si es que lo hay
+        // if(isset($params['order']))
+        // {
+        //     $iColumna = $params['order'][0]['column'];
+        //     if(trim($params['columns'][$iColumna]['name']) !== '')
+        //     {
+        //         $params['orderby'] = $params['columns'][$iColumna]['name'];
+        //         $params['order'] = $params['order'][0]['dir'];   
+        //         $orderType = $params['order'][0]['dir'];
+        //     }
+        // }        
+
+        //  Usuarios con rol Administrador de fincas
         if($this->isAdminFincas())
         {
+
+            unset($params['start']);
+            unset($params['length']);
+
             $_serviciosContratados = true;
             $_documentacionAsociada = true;
             $_gradoCumplimiento = true;
@@ -292,11 +345,12 @@ class ComunidadController extends FrontController{
                     //$data['Comunidad'] = $listadoComunidades;
 
                 }else{
-                    $data = $this->ComunidadModel->List($params, false);
+                    $data = $this->ComunidadModel->List($params, true);
+                //   $daa['Comunidad'] = [];
                 }
 
                 //  Recuperamos el listado de comunidades
-                $data = $this->ComunidadModel->List($params, false);
+                // $data = $this->ComunidadModel->List($params, false);
 
             }else{
                 $data = $this->ComunidadModel->List($params, true);
@@ -306,7 +360,7 @@ class ComunidadController extends FrontController{
         }
 
         //  Usuarios SUDO
-        if($this->isSudo())
+        if($this->isSudo() || $this->isFacturacion())
         {
 
             $useLoggedUserId = false;
@@ -326,12 +380,18 @@ class ComunidadController extends FrontController{
             }
 
             //  Establecemos orden si es que lo hay
-            if(isset($params['order']))
-            {
-                $iColumna = $params['order'][0]['column'];
-                $params['orderby'] = $params['columns'][$iColumna]['name'];
-                $params['order'] = $params['order'][0]['dir'];
-            }
+            // if(isset($params['order']))
+            // {
+            //     $iColumna = $params['order'][0]['column'];
+            //     $params['orderby'] = $params['columns'][$iColumna]['name'];
+            //     $params['order'] = $params['order'][0]['dir'];
+            // }
+
+            // if(!is_null($limitStart) && !is_null($limitLength) )
+            // {
+            //     $params['start'] = $limitStart;
+            //     $params['length'] = $limitLength;
+            // }
 
             if(isset($params['administradorId']))
             {
@@ -341,6 +401,8 @@ class ComunidadController extends FrontController{
                 //  TODO: Hay que meterlo en una vista y definirlo en el $params['view']
                 //          Para poder acotar por nombre de administrador
                 $data = $this->ComunidadModel->List($params, $useLoggedUserId);
+                $limitStart = null;
+                $limitLength = null;
             }
 
         }
@@ -349,6 +411,7 @@ class ComunidadController extends FrontController{
         // if(@count($data['Comunidad']) > 0 && !$this->isSudo())
         if(@count($data['Comunidad']) > 0)
         {
+                $data = $this->ordenarComunidades($data, $limitStart, $limitLength, $orderType);
 
             //  Recuperamos todos los servicios del sistema
                 if($_serviciosContratados)
@@ -404,6 +467,7 @@ class ComunidadController extends FrontController{
                         }
                     }
                 }
+                
 
         }
     
@@ -411,13 +475,21 @@ class ComunidadController extends FrontController{
 
     }
 
+    /**
+     * Comprueba si una comunidad tiene el servicio especificado contratado
+     * @param int $idComunidad ID de la comunidad a consultar
+     * @param int $idServicio ID del servicio que se va a consultar
+     * @return bool Estado de contratación del servicio
+     */
     private function TieneServicioContratado($idComunidad, $idServicio)
     {
         $servicio = $this->ComunidadModel->ServicioContratado($idComunidad, $idServicio);
         return ($servicio == -1 ? false : $servicio);
     }
 
-    /** Recupera el listado de servicios contratados por una comunidad */
+    /** Recupera el listado de servicios contratados por una comunidad
+     * @param int $id ID de la comunidad que se va a consultar
+     */
     public function ListadoServiciosContratados($id)
     {
         if(is_null($id))
@@ -441,7 +513,13 @@ class ComunidadController extends FrontController{
 
         if($this->isContratista())
         {
-            return $this->ComunidadModel->ListComunidadesMenuContratista($params);   
+            $comunidades = $this->ComunidadModel->ListComunidadesMenuContratista($params);
+            //  Ordenación del array para alfanumérico teniendo en cuenta los códigos
+            if(count($comunidades) > 0)
+            {
+                $comunidades = $this->ordenarComunidades($comunidades);                
+            }
+            return $comunidades; //$this->ComunidadModel->ListComunidadesMenuContratista($params);   
         }else{
 
             // $administradorId = $this->UsuarioAutorizado($this->getLoggedUserId());
@@ -465,6 +543,7 @@ class ComunidadController extends FrontController{
                             $listadoComunidades[] = $filtro['Comunidad'][0];
                         }
                     }
+
                     //  Ordenamos el listado por código
                     if(count($listadoComunidades) > 0)
                     {
@@ -476,7 +555,10 @@ class ComunidadController extends FrontController{
                 $comunidades =  $this->ComunidadModel->ListComunidadesMenu($params, true);
             }
 
-
+            //  Ordenación del array para alfanumérico teniendo en cuenta los códigos
+            if(count($comunidades) > 0)
+                $comunidades = $this->ordenarComunidades($comunidades);
+ 
             return $comunidades;
 
         }
@@ -499,6 +581,18 @@ class ComunidadController extends FrontController{
         return helperController::successResponse( $data );
     }
 
+    /**
+     * Listado de comunidades con los servicios que tiene contratados por administrador
+     * @param int $idAdministrador ID del administrador que se va a consultar
+     * @param int $mesFacturacion Mes de facturación según su ordinal: 1,2,3,...
+     * @param array $servicios Servicios que se van a consultar
+     * @return object Listado
+     */
+    public function ListComunidadesWithServicesByAdministradorId($idAdministrador, $mesFacturacion = null, $servicios = null)
+    {
+        return $this->ComunidadModel->GetComunidadesAndServicesByAdministradorId($idAdministrador, $mesFacturacion, $servicios);
+    }
+
     /** Listado de comunidades por id de administrador */
     public function ListComunidadesByAdministradorId($id)
     {
@@ -513,49 +607,77 @@ class ComunidadController extends FrontController{
     {
         $data = [];
         $data['empresascomunidad'] = $this->ComunidadModel->GetEmpresasByComunidadId($id);
-        //  Por cada una de las empresas comprobamos si accedió alguna vez al sistema
-        $this->InitController('Usuario');
-        $this->InitController('Mensaje');
-        $this->InitController('Documental');
         
-        for($x = 0; $x < count($data['empresascomunidad']); $x++)
+        if(!is_null($data['empresascomunidad']))
         {
-            $idUsuario = $data['empresascomunidad'][$x]['idusuario'];
-            $idEmpresa = $data['empresascomunidad'][$x]['id'];
 
-            $usuarioData = $this->UsuarioController->Get($idUsuario);
+            //  Por cada una de las empresas comprobamos si accedió alguna vez al sistema
+            $this->InitController('Usuario');
+            $this->InitController('Mensaje');
+            $this->InitController('Documental');
+            $this->InitController('Empresa');
 
-            $lastLogin = null;
-            $idmensajeregistro = -1;
-
-            if(!is_null($usuarioData['Usuario']) && @count($usuarioData['Usuario']) > 0)
+            for($x = 0; $x < count($data['empresascomunidad']); $x++)
             {
-                $lastLogin =  $usuarioData['Usuario'][0]['lastlogin'];
-                $idmensajeregistro =  $this->MensajeController->GetEmailRegistroIdByEmail($usuarioData['Usuario'][0]['email']);
-            }
-
-            $data['empresascomunidad'][$x]['lastlogin'] = $lastLogin;
-            $data['empresascomunidad'][$x]['idmensajeregistro'] = $idmensajeregistro;
-
-            //  Recuperamos el mail certificado si lo tuviese
+                $idUsuario = $data['empresascomunidad'][$x]['idusuario'];
+                $idEmpresa = $data['empresascomunidad'][$x]['id'];
+                $emailEmpresa = $data['empresascomunidad'][$x]['email'];
+                $usuarioData = $this->UsuarioController->Get($idUsuario);
+    
+                $lastLogin = null;
+                $idmensajeregistro = -1;
+    
+                if(!is_null($usuarioData['Usuario']) && @count($usuarioData['Usuario']) > 0)
+                {
+                    $lastLogin =  $usuarioData['Usuario'][0]['lastlogin'];
+                    $idmensajeregistro =  $this->MensajeController->GetEmailRegistroIdByEmail($usuarioData['Usuario'][0]['email']);
+                }
+    
+                $data['empresascomunidad'][$x]['lastlogin'] = $lastLogin;
+                $data['empresascomunidad'][$x]['idmensajeregistro'] = $idmensajeregistro;
+                $data['empresascomunidad'][$x]['actuaciones'] = $this->EmpresaController->ListadoActuaciones($idEmpresa)['actuaciones'];
+                //  Recuperamos el mail certificado si lo tuviese
                 $data['empresascomunidad'][$x]['emailcertificado'] = $this->DocumentalController->GetEmailCertificadoEmpresaComunidad($idEmpresa, $id);
-
+                //  Comprobamos si el e-mail del proveedor está en nuestra blacklist
+                $data['empresascomunidad'][$x]['blacklist'] = $this->EmpresaController->EmailInBlacklist($emailEmpresa);
+    
+            }    
+        }else{
+            $data['empresascomunidad'] = [];
         }
+
 
         $data['total'] = count($data);
         return HelperController::successResponse( $data );
     
     }
 
+    /** Devuelve el número de empresas que tiene asignadas una comunidad
+     * @param int $idComunidad. ID de la comunidad a comprobar
+     * @return int Número de empresas asignadas
+     */
+    public function TotalEmpresasAsignadas($idComunidad)
+    {
+        $this->ComunidadModel->SetId($idComunidad);
+        return $this->ComunidadModel->TotalEmpresasAsignadas();
+    }
+
     /** Asigna una empresa a una comunidad */
     public function asignarEmpresa($idcomunidad, $idempresa)
     {
+
+        //  FIXME: Validamos el límite del número de empresas que tiene asignadas a una comunidad
+            // $empresasAsignadas = $this->TotalEmpresasAsignadas($idcomunidad);
+            // if(intval($empresasAsignadas) >= 4)
+            //     return HelperController::errorResponse('error','Ha alcanzado el límite de asignación de empresas a una comunidad. Si necesita asignar más de 4 empresas, por favor, póngase en contacto con nosotros.', 200);
+
+            $resultAsignacion = $this->ComunidadModel->asignarEmpresa($idcomunidad, $idempresa);
 
         //  Al asignar una nueva empresa hay que enviar el e-mail certificado con la información de la documentación básica
             $this->InitController('Documental');
             $this->DocumentalController->comprobarDocumentacionComunidad($idcomunidad, $idempresa);
 
-        return HelperController::successResponse( $this->ComunidadModel->asignarEmpresa($idcomunidad, $idempresa) );
+        return HelperController::successResponse( $resultAsignacion );
     }
 
     public function GetDocumentacionComunidad($id)
@@ -721,7 +843,13 @@ class ComunidadController extends FrontController{
             $this->InitController('Documental');
 
             $infoComunidad = $this->Get($idComunidad, false);
-            $tieneCamaraSeguridad = $infoComunidad['Comunidad'][0]['camarasseguridad'];
+            // echo 'GradoCumplimientoRGPD. ID Comunidad: ' . $idComunidad;
+            // var_dump($infoComunidad);
+            if(is_null($infoComunidad) || @isset($infoComunidad['error'])){
+                return 0;
+            }
+
+            $tieneCamaraSeguridad = is_null($infoComunidad['Comunidad'][0]['camarasseguridad']) ? false : $infoComunidad['Comunidad'][0]['camarasseguridad'];
 
         //  Recuperamos el total de requerimientos de RGPD para una comunidad
             $totalRequerimientos            = $this->DocumentalController->GetTotalRequerimientosRGPDComunidad( $this->getLoggedUserId(), $idComunidad, $tieneCamaraSeguridad );  
@@ -755,7 +883,12 @@ class ComunidadController extends FrontController{
         $porcentajeDocumentosSubidosEmpresas = 15;
 
         $empresas = $this->EmpresasComunidad($idComunidad);
-        $numeroEmpresas = count($empresas);
+        if(!is_null($empresas))
+        {
+            $numeroEmpresas = count($empresas);
+        }else{
+            $numeroEmpresas = 0;
+        }
 
         //  Si no tiene empresas, directamente tiene 0%
         if($numeroEmpresas === 0)
@@ -814,6 +947,98 @@ class ComunidadController extends FrontController{
         }
         return ($grado >= 100 ? 100 : number_format($grado, 2, '.',','));
 
+    }
+
+    /**
+     * Ordena las comunidades por código alfanumérico
+     */
+    private function ordenarComunidades($data, $limitStart = null, $limitLength = null,  $orderBy = 'asc')
+    {
+
+        $arrayComunidades = $data['Comunidad'];
+        usort($arrayComunidades, ['HappySoftware\Controller\HelperController', 'customAlphanumericSort']);
+        
+        $inicio = $limitStart * $limitLength;
+
+        //  Si tiene paginación hay eliminar del array los que no nos sirven
+        if(!is_null($limitStart) && !is_null($limitLength))
+        {
+            $arrayComunidades = array_slice($arrayComunidades, $limitStart, $limitLength);
+        }
+        $data['Comunidad'] = $arrayComunidades; 
+        return $data;        
+    }
+
+    public function GetUsuarioAutorizado($idComunidad)
+    {
+        $usuarioAutorizado = false;
+        //  Establecemos el ID de la comunidad
+        $this->ComunidadModel->SetId($idComunidad);
+        //  Recuperamos si es una comunidad asignada a un usuario autorizado
+        $result = $this->ComunidadModel->UsuarioAutorizado();
+
+        if(count($result) > 0)
+        {
+            $usuarioAutorizado = $this->UsuarioController->Get($result[0]['idautorizado'], false);
+        }
+
+        if($usuarioAutorizado !== false && @count($usuarioAutorizado) > 1)
+        {
+            $usuarioAutorizado = $usuarioAutorizado['Usuario'][0];
+        }
+
+        return $usuarioAutorizado;
+
+    }
+
+    /** Listado de proveedores asignados a las comunidades */
+    public function ProveedoresAsignados()
+    {
+        $proveedoresAsignados = [];
+        $comunidades = [];
+        $this->ComunidadModel->SetUsuarioId($this->getLoggedUserId());
+
+        //  Comprobamos si es un usuario autorizado o el principal
+        $administradorAutorizado = $this->UsuarioController->IsAuthorizedUserByAdmin($this->getLoggedUserId());
+
+        if($administradorAutorizado !== false)
+        {
+            $comunidades['Comunidad'] = $this->ComunidadModel->ProveedoresAsignadosAutorizado();
+        }else{
+            $comunidades['Comunidad'] = $this->ComunidadModel->ProveedoresAsignados();
+        }
+
+        $comunidades = $this->ordenarComunidades($comunidades);
+
+        $proveedoresAsignados['proveedores'] = $comunidades['Comunidad'];
+        return $proveedoresAsignados;
+    }
+
+    /**
+     * Bulk update for community status
+     * @param string $newStatus New Status to apply
+     * @param int $idComunidad (optional) ID de la comunidad. If null, update all comunities for administrador
+     * @param int $idAdministrador (optional) ID del administrador.
+     * @return string result
+     */
+    public function BulkChangeStatus($newStatus, $idComunidad = null, $idAdministrador = null)
+    {
+
+        $result = '';
+        
+        if(is_null($idComunidad) && is_null($idAdministrador))
+            return 'No se ha podido cambiar el estado de las comunidades debido a que no viene informada ni la comunidad ni el administrador';
+
+        if(!is_null($idAdministrador))
+            $this->ComunidadModel->SetUsuarioId($idAdministrador);
+
+        //  Update communities status on repository
+        $this->ComunidadModel->SetEstado($newStatus);
+
+        //  Launch update to repository
+        $this->ComunidadModel->BulkUpdateStatus();
+
+        return true;
     }
 
 }

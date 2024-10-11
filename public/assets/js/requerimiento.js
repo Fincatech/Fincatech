@@ -93,11 +93,13 @@ let requerimientoCore = {
                     <ul class="nav justify-content-center">
                         <li class="nav-item">
                             <a href="${config.baseURL}requerimiento/${row.id}" class="d-inline-block">
-                                <i data-feather="edit-2" class="text-success img-fluid text-success mr-2" style="width:26px;height:26px;"></i>
+                                <i data-feather="edit-2" class="text-success img-fluid text-success icono-accion" style="width:26px;height:26px;"></i>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="btnEliminarRequerimiento d-inline-block" data-id="${row.id}" data-nombre="${row.nombre}"><i data-feather="trash-2" class="text-danger img-fluid" style="width:26px;height:26px;"></i></a>
+                            <a href="javascript:void(0);" class="btnEliminarRequerimiento d-inline-block" data-id="${row.id}" data-nombre="${row.nombre}">
+                                <i data-feather="trash-2" class="text-danger img-fluid icono-accion" style="width:26px;height:26px;"></i>
+                            </a>
                         </li>
                     </ul>`;
                 return html;

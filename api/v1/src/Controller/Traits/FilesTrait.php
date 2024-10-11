@@ -7,8 +7,51 @@
 **/
 namespace HappySoftware\Controller\Traits;
 use HappySoftware\Database\DatabaseCore;
+use ZipArchive;
 
 trait FilesTrait{
+
+    /**
+     * Crea un fichero comprimido para los ficheros indicados
+     * @param array $files Ficheros que van a ser incluidos en el paquete
+     * @param string $filePath. Ubicación 
+     * @param string $fileName. Nombre del fichero que se va a generar con extensión ZIP
+     * @param bool $deleteFilesOnEnds. Defaults: False. Indica si se deben eliminar físicamente los ficheros del servidor tras la creación del ZIP
+     * @return bool. Estado de la generación
+     */
+    public function GenerateZipFile($files, $filePath, $fileName, $deleteFilesOnEnds = false)
+    {
+        
+        //  Comprobamos si tiene la extensión zip para si no, añadirla
+        if(pathinfo($fileName, PATHINFO_EXTENSION) !== 'zip'){
+            $fileName .= '.zip';
+        }
+
+        if (!is_dir(ROOT_DIR . $filePath)){
+            mkdir(ROOT_DIR . $filePath, 0777, true);
+        }        
+
+        $zipFile = ROOT_DIR . $filePath . $fileName;
+
+        //  Inicializamos el componente de ZIP
+        $zipHandler = new ZipArchive();
+
+        if($zipHandler->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true)
+        {
+            //  Recorremos todos los archivos a incluir en el zip
+            foreach($files as $file)
+            {
+                if(file_exists($file)){
+                    $zipHandler->addFile($file, basename($file));
+                }
+            }
+            $zipHandler->close();
+            return true;
+        }else{
+            return false;
+        }
+
+    }
 
     public function WriteToFile($path, $fileName, $content)
     {
@@ -131,17 +174,20 @@ trait FilesTrait{
     {
 
         global $appSettings;
+        try{
+            $ruta = ROOT_DIR . $appSettings['storage']['certificados'];
+            
+            if(!file_exists($ruta))
+                mkdir($ruta);
 
-        $ruta = ROOT_DIR . $appSettings['storage']['certificados'];
-        
-        if(!file_exists($ruta))
-            mkdir($ruta);
-
-        $fileName = time() . '.zip';
-        $fhFichero = fopen($ruta . '/'. $fileName ,"w");
-        fwrite($fhFichero, $fileContent);
-        fclose($fhFichero);
-
+            $fileName = time() . '.zip';
+            $fhFichero = fopen($ruta . '/'. $fileName ,"w");
+            fwrite($fhFichero, $fileContent);
+            fclose($fhFichero);
+        }catch(\Exception $ex)
+        {
+            die('Error FilesTrait (saveZipFile): ' . $ex->getMessage());
+        }
         return $fileName;
 
     }
@@ -153,15 +199,27 @@ trait FilesTrait{
     {
         global $appSettings;
 
-        $ruta = ROOT_DIR . $appSettings['storage']['certificados'];
-        
-        if(!file_exists($ruta))
-            mkdir($ruta);   
+        $rutas = $appSettings['storage'];
 
-        $ruta = ROOT_DIR . $appSettings['storage']['log'];
+        foreach($rutas as $key => $value){
+
+            $ruta = ROOT_DIR . $value;
         
-        if(!file_exists($ruta))
-            mkdir($ruta);   
+            if(!is_dir($ruta) || !file_exists($ruta)){
+                mkdir($ruta, 0777, true);
+            }
+
+        }
+
+        // $ruta = ROOT_DIR . $appSettings['storage']['certificados'];
+        
+        // if(!file_exists($ruta))
+        //     mkdir($ruta);   
+
+        // $ruta = ROOT_DIR . $appSettings['storage']['log'];
+        
+        // if(!file_exists($ruta))
+        //     mkdir($ruta);   
 
     }
 

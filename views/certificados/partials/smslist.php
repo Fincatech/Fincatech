@@ -8,7 +8,7 @@
 
 <div class="row">
     <div class="col-sm-12">
-        <table class="table table-hover my-0 hs-tabla no-footer no-clicable" data-order='[[ 2, "desc"]]' name="listadoSMSAdministrador" id="listadoSMSAdministrador" data-model="sms">
+        <table class="table table-hover my-0 no-footer no-clicable" data-order='[[ 2, "desc"]]' name="listadoSMSAdministrador" id="listadoSMSAdministrador">
             <thead class="thead"></thead>
             <tbody class="tbody"></tbody>
         </table>

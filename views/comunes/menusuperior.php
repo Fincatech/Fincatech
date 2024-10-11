@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand navbar-light navbar-bg">
-<?php if (!$App->isSudo()): ?>
+<?php if ($App->isAdminFincas() || $App->isContratista()): ?>
     <a class="sidebar-toggle d-flex">
         <i class="hamburger align-self-center"></i>
     </a>
@@ -7,14 +7,14 @@
    
     <div class="navbar-collapse collapse">
 
-        <img src="<?php echo HOME_URL ;?>public/assets/img/logo-fincatech.png" style="max-width: 130px;">    
+        <img src="<?php echo HOME_URL ;?>public/assets/img/logo-<?php echo $App->GetLogo(); ?>.png" style="max-width: 130px;">    
 
         <ul class="navbar-nav navbar-align">
 
             <?php if( !$App->isContratista() ): ?>
 
                 <li class="nav-item align-self-center">
-                    <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Dashboard" href="<?php echo HOME_URL . "dashboard"; ?>" id="home">
+                    <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Ir al Dashboard" href="<?php echo HOME_URL . "dashboard"; ?>" id="home">
                         <div class="position-relative text-center text-info">
                             <i class="bi bi-house-door mr-2"></i><span class="text-uppercase" style="font-size: 12px;">Dashboard</span>
                         </div>
@@ -54,17 +54,17 @@
             <?php if($App->isAdminFincas()): ?>
                 <!-- Home -->
                 <li class="nav-item align-self-center">
-                    <a href="<?php echo HOME_URL;?>videotutoriales" class="nav-icon" role="button">
+                    <a href="<?php echo HOME_URL;?>videotutoriales" data-toggle="tooltip" data-placement="bottom" title="Videotutoriales de uso de la plataforma"  class="nav-icon" role="button">
                         <div class="position-relative text-center text-info">
                             <i class="bi bi-camera-video mr-2"></i><span class="text-uppercase" style="font-size: 12px;">Videotutoriales</span>
                         </div>
                     </a>
                 </li>     
                 <!-- Requerimientos pendientes -->              
-                <li class="nav-item">
+                <li class="nav-item align-self-center">
                     <a class="nav-icon" data-toggle="tooltip" data-placement="bottom" title="Listado requerimientos pendientes" href="<?php echo HOME_URL . "requerimiento/pendientes"; ?>">
-                        <div class="position-relative pt-1">
-                            <i class="bi bi-shield-exclamation mr-2"></i><span class="text-uppercase" style="font-size: 12px;">Requerimientos pendientes</span>
+                        <div class="pposition-relative text-center text-info">
+                            <i class="bi bi-shield-exclamation mr-2" style="font-size: 18px;"></i><span class="text-uppercase" style="font-size: 12px;">Requerimientos pendientes</span>
                         </div>
                     </a>                    
                 </li>        
@@ -158,42 +158,52 @@
                         <i class="align-middle" data-feather="settings"></i>
                     </a>
                 <?php //endif; ?>
-                <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-toggle="dropdown">
-                    <!-- <img src="<?php //echo ASSETS_IMG; ?>avatars/avatar.jpg" class="avatar img-fluid rounded mr-1" alt="Oscar Rodríguez" />--><i class="bi bi-person-circle" style="font-size:20px;"></i> <span class="text-dark usuarioFincatech">&nbsp;</span>
+                <a class="nav-link dropdown-toggle d-none d-sm-flex align-items-center" href="#" data-toggle="dropdown">
+                    <!-- <img src="<?php //echo ASSETS_IMG; ?>avatars/avatar.jpg" class="avatar img-fluid rounded mr-1" alt="Oscar Rodríguez" />--><i class="bi bi-person-circle pr-2" style="font-size:20px;"></i> <span class="text-dark usuarioFincatech">&nbsp;</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right">
                     <!-- Cambiar contraseña -->
+                    <a class="dropdown-item disabled" href="javascript:void(0);">Mi cuenta</a>
                     <a class="dropdown-item btnChangePassword" href="javascript:void(0);"><i class="align-middle mr-1" data-feather="unlock"></i> Cambiar contraseña</a>
                     <?php if(!$App->isSudo()): ?>
                         <a class="dropdown-item disabled d-none" href="javascript:void(0);"><i class="align-middle mr-1" data-feather="user"></i> Perfil</a>
                     <?php endif; ?>
 
-                    <div class="dropdown-divider"></div>
                     <?php if($App->isSudo()): ?>
+                        <!-- <div class="dropdown-divider"></div> -->
+                        <a class="dropdown-item disabled" href="javascript:void(0);">Herramientas de comunidades</a>
                         <a class="dropdown-item btnCargarComunidadesExcel" href="javascript:void(0);"><i class="align-middle mr-1" data-feather="folder-plus"></i> Cargar comunidades desde plantilla</a>
+                        <a class="dropdown-item btnActualizacionServicios" href="javascript:void(0);"><i class="align-middle mr-1" data-feather="folder-plus"></i> Actualización masiva servicios comunidades</a>
+                        <a class="dropdown-item btnReasignacionProveedores" href="<?php echo HOME_URL . "proveedor/reasignacion"; ?>"><i class="bi bi-people-fill"></i> Reasignación de proveedor</a>
                     <?php endif; ?>
                     <?php if(!$App->isSudo()): ?>
-                        <a class="dropdown-item disabled" href="pages-settings.html"><i class="align-middle mr-1" data-feather="settings"></i> Editar perfil</a>
+                        <!-- <a class="dropdown-item disabled" href="javascript:void(0);"><i class="align-middle mr-1" data-feather="settings"></i> Editar perfil</a> -->
                     <?php endif; ?>
 
                     <!-- Sólo para usuarios de tipo administrador de fincas -->
                     <?php if($App->isAdminFincas() ) : ?>
                         <?php if(!$App->isAuhorizedUser()): ?>
 
+                            <a class="dropdown-item disabled" href="javascript:void(0);">Gestión empleados y usuarios</a>
                             <a class="dropdown-item" href="<?php echo HOME_URL ;?>autorizado/list"><i class="align-middle mr-1" data-feather="users"></i> Usuarios autorizados</a>
                             <a class="dropdown-item" href="<?php echo HOME_URL ;?>empleado/rgpd"><i class="align-middle mr-1" data-feather="eye"></i> RGPD empleados administración</a>
 
-                            <div class="dropdown-divider"></div>
-
-                            <a class="dropdown-item" href="<?php echo HOME_URL ;?>certificadodigital/solicitudes"><i class="align-middle mr-1" data-feather="lock"></i> Certificados digitales</a>
+                            <!-- <div class="dropdown-divider"></div> -->
+                            <a class="dropdown-item disabled" href="javascript:void(0);">Certificados digitales</a>
+                            <a class="dropdown-item d-none" href="<?php echo HOME_URL ;?>certificadodigital/solicitudes"><i class="align-middle mr-1" data-feather="lock"></i> Certificados digitales</a>
                             <a class="dropdown-item" href="<?php echo HOME_URL ;?>certificados/dashboard"><i class="align-middle mr-1" data-feather="mail"></i> Envíos certificados</a>
 
                         <?php endif; ?>
+
+                        <!-- <div class="dropdown-divider"></div> -->
+                            <a class="dropdown-item disabled" href="javascript:void(0);">Listados</a>
+                            <a class="dropdown-item" href="<?php echo HOME_URL ;?>comunidad/proveedores"><i class="align-middle mr-1" data-feather="list"></i> Proveedores asignados a comunidades</a>
+
                     <?php endif; ?>
 
                     <!-- <a class="dropdown-item" href="#"><i class="align-middle mr-1" data-feather="help-circle"></i> Ayuda</a> -->
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item btnLogout" href="javascript:void(0);">Cerrar sesión</a>
+                    <a class="dropdown-item btnLogout" href="javascript:void(0);"><i class="bi bi-box-arrow-left" style="font-size:18px;"></i> Cerrar sesión</a>
                 </div>
 
             </li>

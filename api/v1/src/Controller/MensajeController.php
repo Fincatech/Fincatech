@@ -72,6 +72,25 @@ class MensajeController extends FrontController{
             $params['searchfields'][1]['operator'] = "%";                                  
         }
 
+        //  Comprobamos si viene orden
+        if(isset($params['order']))
+        {
+            $orderType = $params['order'][0]['dir'];
+            switch($params['order'][0]['column'])
+            {
+                case 0: // Asunto
+                    $params['orderby'] = 'subject';
+                    break;
+                case 1: // Email
+                    $params['orderby'] = 'email';
+                    break;
+                case 2: //  Fecha envío
+                    $params['orderby'] = 'created';
+                    break;
+            }
+            $params['order'] = $orderType;
+        }
+
         $resultado = $this->MensajeModel->List($params, $useLoggedUserId);
         for($x = 0; $x < count($resultado['Mensaje']); $x++)
         {
@@ -109,7 +128,7 @@ class MensajeController extends FrontController{
                 $subject = html_entity_decode($mensaje['Mensaje'][0]['subject'], ENT_QUOTES);
             }
 
-            $this->SendEmail($to, '', $subject, $body, false);
+            $this->SendEmail($to, '', $subject, $body, true);
 
             //  Comprobamos si hay que incrementar el número de envío
             if($increment)
@@ -152,6 +171,8 @@ class MensajeController extends FrontController{
     {
         global $appSettings;
 
+        try{
+
         //  Generamos un nombre de fichero basado en timestamp
             $fileGenerated = $this->saveZipFile($fileContent);
             
@@ -166,11 +187,15 @@ class MensajeController extends FrontController{
             {
                 //  Guardamos el registro en la base de datos
                 $this->MensajeModel->updateCertificado($idMensaje, $fileGenerated);
+                return $fileGenerated;
             }else{
                 //  Eliminamos el fichero del sistema
                 unlink($pathFileGenerated);
             }
-
+        }catch(\Exception $ex)
+        {
+            die('Error (saveFileEmailCertificado): ' . $ex->getMessage() );
+        }
     }
 
     public function GetEmailsCertificadosAdministrador(){

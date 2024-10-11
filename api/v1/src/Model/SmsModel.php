@@ -18,12 +18,14 @@ class SmsModel extends \HappySoftware\Model\Model{
     private $_updated;
     private $_usercreate;
     private $_contractFileId;
-
+    private $_mensajeCertificadoId;
+    private $_contrato;
+    
     public function Id(){
         return $this->_id;
     }
     private function setId($value){
-        $this->_id = $value;
+        $this->_id = $value['id'];
         return $this;
     }
 
@@ -83,6 +85,23 @@ class SmsModel extends \HappySoftware\Model\Model{
         return $this->_contractFileId;
     }
 
+    public function setMensajeCertificadoId($value){
+        $this->_mensajeCertificadoId = $value;
+        return $this;
+    }
+    public function MensajeCertificadoId(){
+        return $this->_mensajeCertificadoId;
+    }
+
+    public function setContrato($value){
+        $this->_contrato = $value;
+        return $this;
+    }
+
+    public function Contrato(){
+        return $this->_contrato;
+    }
+
     /**
      * @var \Fincatech\Entity\Sms
      */
@@ -102,14 +121,33 @@ class SmsModel extends \HappySoftware\Model\Model{
         $datos['idusuario'] = $this->IdUsuario();
         $datos['phone'] = $this->Phone();
         $datos['message'] = $this->Message();
-        $datos['contractfileid'] = $this->ContractFileId();
+        // $datos['contractfileid'] = $this->ContractFileId();
+        $datos['mensajecertificadoid'] = $this->MensajeCertificadoId();
+        $datos['contrato'] = $this->Contrato();
         $this->setId($this->Create('sms', $datos));
     }
 
-    /** Recupera todos los registros */
+    /** Recupera todos los sms enviados junto con los certificados de estado */
     public function List($params = null, $useLoggedUserId = true)
     {
-       return parent::List($params, true);
+
+        $sql = "
+            SELECT 
+                a.id, a.idusuario, a.message, a.phone, a.mensajecertificadoid, a.storagefileid, a.created, a.usercreate,
+                b.idmensaje, b.fechacertificacion, b.filename
+            FROM
+                sms a LEFT JOIN emailscertificados b ON b.idmensaje = a.mensajecertificadoid
+            WHERE
+                a.usercreate = " . $this->getLoggedUserId();
+
+        //  SMS Contrato
+        if(isset($params['contrato']))
+        {
+            $sql .= " and a.contrato = 1";
+        }
+
+        $result = $this->query($sql);
+        return $result;
     }
 
 }

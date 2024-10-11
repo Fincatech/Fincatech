@@ -1,116 +1,164 @@
---- [29-12-2022 11:10] --- ( SendSMSCertificated ) --- 
+--- [29-12-2022 11:50] --- ( SendSMSCertificated ) --- 
 
-Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=hola oscar, esto es una prueba&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
 
---- [29-12-2022 11:12] --- ( SendSMSCertificated ) --- 
 
-Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=hola oscar, esto es una prueba&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+--- [29-12-2022 11:52] --- ( SendSMSCertificated ) --- 
 
---- [29-12-2022 11:12] --- ( SendSMSCertificated ) --- 
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=oscar hola&Contacto=Fincatech&TelContacto=&CIFContacto=B93594992&Resp=JSON
 
-Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=hola oscar, esto es una prueba&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+--- [29-12-2022 11:53] --- ( SendSMSCertificated ) --- 
 
---- [29-12-2022 11:15] --- ( SendSMSCertificated ) --- 
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=oscar hola&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
 
-Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=hola oscar, esto es una prueba&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+--- [29-12-2022 11:55] --- ( SendSMSCertificated ) --- 
 
---- [29-12-2022 01:31] --- ( SendSMSCertificated ) --- 
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34659041131&Mensaje=¿Que qué tal voy? Pues probando los sms en producción y a seguir con uanataca. Avísame si te llega bien, por fa. Un abrazo!!!&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
 
-Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=holiii&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+--- [29-12-2022 11:56] --- ( SendSMSCertificated ) --- 
 
---- [29-12-2022 01:33] --- ( SendSMSCertificated ) --- 
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=¿Que qué tal voy? Pues probando los sms en producción y a seguir con uanataca. Avísame si te llega bien, por fa. Un abrazo!!!&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
 
-Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=probnado&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+--- [29-12-2022 11:57] --- ( SendSMSCertificated ) --- 
 
---- [03-01-2023 01:04] --- ( SendSMSCertificated ) --- 
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=¿Que qué tal voy? Pues probando los sms en producción y a seguir con uanataca. Avísame si te llega bien, por fa. Un abrazo!!!&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
 
-Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=Aquí tiene su contrato para firmar.&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+--- [29-12-2022 11:57] --- ( SendSMSCertificated ) --- 
 
---- [03-01-2023 01:20] --- ( SendSMSContractCertified ) --- 
 
-Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=684086020&Mensaje=Aquí tiene su contrato para firmar. (FILE:2:https://app.fincatech.es//public/storage/cv oscar rodriguez rodrigo.pdf)&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Report=1&Referencia=&TipoContrato=18&Links=1&Resp=JSON
 
---- [03-01-2023 01:22] --- ( SendSMSContractCertified ) --- 
+--- [29-12-2022 12:13] --- ( SendSMSCertificated ) --- 
 
-Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=684086020&Mensaje=Aquí tiene su contrato para firmar. (FILE:2:https://app.fincatech.es//public/storage/dd685500aebfa6c88694218d8a8da3ee.pdf)&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Report=1&Referencia=&TipoContrato=18&Links=1&Resp=JSON
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=¿Que qué tal voy? Pues probando los sms en producción y a seguir con uanataca. Avísame si te llega bien, por fa. Un abrazo!!!&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
 
---- [03-01-2023 01:28] --- ( SendSMSContractCertified ) --- 
+--- [29-12-2022 12:13] --- ( SendSMSCertificated ) --- 
 
-Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=684086020&Mensaje=Aquí tiene su contrato para firmar. (FILE:2:app.fincatech.es//public/storage/51b1f12037b521771abb707121cfea41.pdf)&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Report=1&Referencia=51b1f12037b521771abb707121cfea41.pdf&TipoContrato=18&Links=1&Resp=JSON
 
---- [03-01-2023 01:29] --- ( SendSMSContractCertified ) --- 
 
-Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=684086020&Mensaje=Aquí tiene su contrato para firmar. (FILE:2:app.fincatech.es//public/storage/2dba3472a07d88745a939534aa8fd0c6.pdf)&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Report=1&Referencia=2dba3472a07d88745a939534aa8fd0c6.pdf&TipoContrato=18&Links=1&Resp=JSON
+--- [03-01-2023 02:45] --- ( SendSMSContractCertified ) --- 
 
---- [03-01-2023 01:39] --- ( SendSMSContractCertified ) --- 
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=684086020&Mensaje=Firma esto (FILE:2:app.fincatech.es//public/storage/0cd2d71e09c634495b25778b64cfeb28.pdf)&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Report=1&Referencia=0cd2d71e09c634495b25778b64cfeb28.pdf&TipoContrato=18&Links=1&Resp=JSON
 
-Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=684086020&Mensaje=Aquí tiene su contrato para firmar. (FILE:2:app.fincatech.es//public/storage/c9a13479977a2d42dadd69ebea50abf2.pdf)&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Report=1&Referencia=c9a13479977a2d42dadd69ebea50abf2.pdf&TipoContrato=18&Links=1&Resp=JSON
+--- [03-01-2023 02:46] --- ( SendSMSContractCertified ) --- 
 
---- [03-01-2023 01:40] --- ( SendSMSContractCertified ) --- 
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=684086020&Mensaje=Firma esto (FILE:2:app.fincatech.es//public/storage/9869d22becad92a2509d083e2dd66f34.pdf)&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Report=1&Referencia=9869d22becad92a2509d083e2dd66f34.pdf&TipoContrato=18&Links=1&Resp=JSON
 
-Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=684086020&Mensaje=Aquí tiene su contrato para firmar. (FILE:2:app.fincatech.es//public/storage/6e1d1b80b2e57a643f18a4e40494270d.pdf)&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Report=1&Referencia=6e1d1b80b2e57a643f18a4e40494270d.pdf&TipoContrato=18&Links=1&Resp=JSON
+--- [03-01-2023 02:46] --- ( SendSMSContractCertified - JSON Recibido ) --- 
 
---- [03-01-2023 02:03] --- ( SendSMSContractCertified ) --- 
+{"Res":"-16","Msgid":"0","Cred":"0","File":"2:app.fincatech.es\/\/public\/storage\/9869d22becad92a2509d083e2dd66f34.pdf"}
+
+--- [08-03-2023 12:47] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=prueba sms&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [08-03-2023 12:47] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=prueba sms&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [08-03-2023 12:54] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=probando 2&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [10-03-2023 06:52] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34659041131&Mensaje=PRUEBA DE SMS CERTIFICADO&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [17-04-2023 06:51] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34659041131&Mensaje=prueba sms certfificado&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [07-07-2023 07:06] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34659041131&Mensaje=esto es una prueba&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [29-09-2023 11:09] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34659041131&Mensaje=PRUEBA DE SMS CERTIFICADO&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [03-10-2023 06:16] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34644257575&Mensaje=Buenas. esto es para que sepas que tenemos una reunión y no puedas negarlo&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [10-10-2023 10:43] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34600605888&Mensaje=esto es un recordatorio para que me envíes el logo de tu empresa&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [05-12-2023 12:15] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=Probando certificación desde producción&Unicode=1&Report=1&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [05-12-2023 12:22] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=sms desde producción con acuse de recibo&Unicode=1&Report=1&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [05-12-2023 12:31] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=otra prueba más, no está devolviendo el reporte&Unicode=1&Report=1&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [05-12-2023 12:35] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=ultima prueba&Unicode=1&Report=1&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [05-12-2023 12:42] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=asdñfl jasñdlkf &Unicode=1&Report=1&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [05-12-2023 12:49] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=probando ultima vez&Unicode=1&Report=1&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [05-12-2023 01:22] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=otra vez, a ver&Unicode=1&Report=1&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [05-12-2023 01:36] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=envío nuevo&Unicode=1&Report=1&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [05-12-2023 01:39] --- ( SendSMSCertificated ) --- 
+
+Correo=info@fincatech.es&Passwd=1758264&Remitente=Fincatech&Destinatarios=34684086020&Mensaje=asdf&Unicode=1&Report=1&Contacto=Fincatech&TelContacto=952792038&CIFContacto=B93594992&Resp=JSON
+
+--- [05-12-2023 01:48] --- ( SendSMSCertificated ) --- 
 
 Array
 
---- [03-01-2023 02:03] --- ( SendSMSContractCertified - JSON Recibido ) --- 
-
-{"Res":"-16","Msgid":"0","Cred":"0","File":"2:8977e5b417cb468fd5d0067fa0454970.pdf"}
-
---- [03-01-2023 02:04] --- ( SendSMSContractCertified ) --- 
+--- [05-12-2023 01:49] --- ( SendSMSCertificated ) --- 
 
 Array
 
---- [03-01-2023 02:04] --- ( SendSMSContractCertified - JSON Recibido ) --- 
+--- [05-12-2023 01:50] --- ( SendSMSCertificated ) --- 
 
-{"Res":"-16","Msgid":"0","Cred":"0","File":"2:03063cc77f33384e65e9971d3081f2f4.pdf"}
+{"Remitente":"Fincatech","Destinatarios=":"{\"Movil\":\"34684086020\",\"Variable_1\":\"Fincatech\"}","Mensaje":"prueba1","Unicode":1,"Report":1,"Contacto":"Fincatech","TelContacto":"952792038","Cifcontacto":"B93594992","Resp":"JSON"}
 
---- [03-01-2023 02:05] --- ( SendSMSContractCertified ) --- 
+--- [05-12-2023 01:54] --- ( SendSMSCertificated ) --- 
 
-{"Correo":"info@fincatech.es","Passwd":"1758264","Remitente":"Fincatech","Destinatarios":"684086020","Mensaje":"Aqu\u00ed tiene su contrato para firmar. (FILE:2:fdebba44095e4129754182cd4ac07a4f.pdf)","Contacto":"Fincatech","TelContacto":"952792038","CIFContacto":"B93594992","Report":1,"Referencia":"fdebba44095e4129754182cd4ac07a4f.pdf","File=":{"name":"\/Users\/oscar\/Proyectos\/fincatech\/public\/storage\/fdebba44095e4129754182cd4ac07a4f.pdf","mime":"","postname":""},"TipoContrato":"18","Links":"1","Resp":"JSON"}
+{"Remitente":"Fincatech","Destinatarios=":"[{\"Movil\":\"34684086020\",\"Variable_1\":\"Fincatech\"}]","Mensaje":"prueba3","Unicode":1,"Report":1,"Contacto":"Fincatech","TelContacto":"952792038","Cifcontacto":"B93594992","Resp":"JSON"}
 
---- [03-01-2023 02:05] --- ( SendSMSContractCertified - JSON Recibido ) --- 
+--- [05-12-2023 01:58] --- ( SendSMSCertificated ) --- 
 
-{"Res":"-16","Msgid":"0","Cred":"0","File":"2:fdebba44095e4129754182cd4ac07a4f.pdf"}
+{"Remitente":"Fincatech","Destinatarios":"[{\"Movil\":\"34684086020\",\"Variable_1\":\"Fincatech\"}]","Mensaje":"Test1","Unicode":1,"Report":1,"Contacto":"Fincatech","TelContacto":"952792038","Cifcontacto":"B93594992","Resp":"JSON"}
 
---- [03-01-2023 02:07] --- ( SendSMSContractCertified ) --- 
+--- [05-12-2023 02:30] --- ( SendSMSCertificated ) --- 
 
-{"Correo":"info@fincatech.es","Passwd":"1758264","Remitente":"Fincatech","Destinatarios":"684086020","Mensaje":"Aqu\u00ed tiene su contrato para firmar. (FILE:2:946c863d37b9b20d53ae619736fa71d6.pdf)","Contacto":"Fincatech","TelContacto":"952792038","CIFContacto":"B93594992","Report":1,"Referencia":"946c863d37b9b20d53ae619736fa71d6.pdf","File=":{"name":"\/Users\/oscar\/Proyectos\/fincatech\/public\/storage\/946c863d37b9b20d53ae619736fa71d6.pdf","mime":"application\/pdf","postname":"\/Users\/oscar\/Proyectos\/fincatech\/public\/storage\/946c863d37b9b20d53ae619736fa71d6.pdf"},"TipoContrato":"18","Links":"1","Resp":"JSON"}
+{"Remitente":"Fincatech","Destinatarios":"[{\"Movil\":\"34684086020\",\"Variable_1\":\"Fincatech\"}]","Mensaje":"test2","Unicode":1,"Report":1,"Contacto":"Fincatech","TelContacto":"952792038","Cifcontacto":"B93594992","Resp":"JSON"}
 
---- [03-01-2023 02:07] --- ( SendSMSContractCertified - JSON Recibido ) --- 
+--- [05-12-2023 02:34] --- ( SendSMSCertificated ) --- 
 
-{"Res":"-16","Msgid":"0","Cred":"0","File":"2:946c863d37b9b20d53ae619736fa71d6.pdf"}
+{"Remitente":"Fincatech","Destinatarios":"[{\"Movil\":\"34684086020\",\"Variable_1\":\"Fincatech\"}]","Mensaje":"test3","Unicode":1,"Report":1,"Contacto":"Fincatech","TelContacto":"952792038","Cifcontacto":"B93594992","Resp":"JSON"}
 
---- [03-01-2023 02:07] --- ( SendSMSContractCertified ) --- 
+--- [07-12-2023 08:15] --- ( SendSMSCertificated ) --- 
 
-{"Correo":"info@fincatech.es","Passwd":"1758264","Remitente":"Fincatech","Destinatarios":"684086020","Mensaje":"Aqu\u00ed tiene su contrato para firmar. (FILE:2:e62409365572d5fa8f75ac3f9ac05b27.pdf)","Contacto":"Fincatech","TelContacto":"952792038","CIFContacto":"B93594992","Report":1,"Referencia":"e62409365572d5fa8f75ac3f9ac05b27.pdf","File=":{"name":"\/Users\/oscar\/Proyectos\/fincatech\/public\/storage\/e62409365572d5fa8f75ac3f9ac05b27.pdf","mime":"application\/pdf","postname":"e62409365572d5fa8f75ac3f9ac05b27.pdf"},"TipoContrato":"18","Links":"1","Resp":"JSON"}
+{"Remitente":"Fincatech","Destinatarios":"[{\"Movil\":\"34659041131\",\"Variable_1\":\"Fincatech\"}]","Mensaje":"prueba de sms certificado","Unicode":1,"Report":1,"Contacto":"Fincatech","TelContacto":"952792038","Cifcontacto":"B93594992","Resp":"JSON"}
 
---- [03-01-2023 02:07] --- ( SendSMSContractCertified - JSON Recibido ) --- 
+--- [06-03-2024 01:34] --- ( SendSMSCertificated ) --- 
 
-{"Res":"-16","Msgid":"0","Cred":"0","File":"2:e62409365572d5fa8f75ac3f9ac05b27.pdf"}
+{"Remitente":"Fincatech","Destinatarios":"[{\"Movil\":\"34629844804\",\"Variable_1\":\"Fincatech\"}]","Mensaje":"Rufino te comunico que nos tenemos que comer un cochinillo en tu zona","Unicode":1,"Report":1,"Contacto":"Fincatech","TelContacto":"952792038","Cifcontacto":"B93594992","Resp":"JSON"}
 
---- [03-01-2023 02:09] --- ( SendSMSContractCertified ) --- 
+--- [10-04-2024 02:05] --- ( SendSMSCertificated ) --- 
 
-{"Correo":"info@fincatech.es","Passwd":"1758264","Remitente":"Fincatech","Destinatarios":"684086020","Mensaje":"Aqu\u00ed tiene su contrato para firmar. (FILE:2:41f3582856cb2d51c7c14ce0128cccc3.pdf)","Contacto":"Fincatech","TelContacto":"952792038","CIFContacto":"B93594992","Report":1,"Referencia":"41f3582856cb2d51c7c14ce0128cccc3.pdf","file":{"name":"\/Users\/oscar\/Proyectos\/fincatech\/public\/storage\/41f3582856cb2d51c7c14ce0128cccc3.pdf","mime":"application\/pdf","postname":"41f3582856cb2d51c7c14ce0128cccc3.pdf"},"TipoContrato":"18","Links":"1","Resp":"JSON"}
+{"Remitente":"Fincatech","Destinatarios":"[{\"Movil\":\"34644951864\",\"Variable_1\":\"Fincatech\"}]","Mensaje":"PREVIO A INICIAR RECLAMACION JUDICIAL le requiero el pago de la cantidad pendiente de honorarios de la letrada Adela Ferrer del divorcio n\u00ba 95\/23 de Moncada 2. ","Unicode":1,"Report":1,"Contacto":"Fincatech","TelContacto":"952792038","Cifcontacto":"B93594992","Resp":"JSON"}
 
---- [03-01-2023 02:09] --- ( SendSMSContractCertified - JSON Recibido ) --- 
+--- [10-05-2024 09:18] --- ( SendSMSCertificated ) --- 
 
-{"Res":"-16","Msgid":"0","Cred":"0","File":"2:41f3582856cb2d51c7c14ce0128cccc3.pdf"}
-
---- [03-01-2023 02:10] --- ( SendSMSContractCertified ) --- 
-
-{"Correo":"info@fincatech.es","Passwd":"1758264","Remitente":"Fincatech","Destinatarios":"684086020","Mensaje":"Aqu\u00ed tiene su contrato para firmar. (FILE:2:32f2628eb03d043b5c144498fc288ef7.pdf)","Contacto":"Fincatech","TelContacto":"952792038","CIFContacto":"B93594992","Report":1,"Referencia":"32f2628eb03d043b5c144498fc288ef7.pdf","file":{"name":"\/Users\/oscar\/Proyectos\/fincatech\/public\/storage\/32f2628eb03d043b5c144498fc288ef7.pdf","mime":"application\/pdf","postname":"32f2628eb03d043b5c144498fc288ef7.pdf"},"TipoContrato":"18","Links":"1","Resp":"JSON"}
-
---- [03-01-2023 02:10] --- ( SendSMSContractCertified - JSON Recibido ) --- 
-
-{"Res":"-16","Msgid":"0","Cred":"0","File":"2:32f2628eb03d043b5c144498fc288ef7.pdf"}
-
---- [04-01-2023 07:23] --- ( SendSMSContractCertified ) --- 
-
-{"Correo":"info@fincatech.es","Passwd":"1758264","Remitente":"Fincatech","Destinatarios":"684086020","Mensaje":"Aqu\u00ed tiene su contrato para firmar. (FILE:2:06446bad438fc00a7edf22df048dae7d.pdf)","Contacto":"Fincatech","TelContacto":"952792038","CIFContacto":"B93594992","Report":1,"Referencia":"06446bad438fc00a7edf22df048dae7d.pdf","file":{"name":"\/Users\/oscar\/Proyectos\/fincatech\/public\/storage\/06446bad438fc00a7edf22df048dae7d.pdf","mime":"application\/pdf","postname":"06446bad438fc00a7edf22df048dae7d.pdf"},"TipoContrato":"18","Links":"1","Resp":"JSON"}
-
---- [04-01-2023 07:23] --- ( SendSMSContractCertified - JSON Recibido ) --- 
-
-{"Res":"-16","Msgid":"0","Cred":"0","File":"2:06446bad438fc00a7edf22df048dae7d.pdf"}
+{"Remitente":"Fincatech","Destinatarios":"[{\"Movil\":\"34670969632\",\"Variable_1\":\"Fincatech\"}]","Mensaje":"LE CITO PARA EL PROXIMO MARTES 14 DE MAYO A LAS 9H A FIN DE QUE PUEDA RETIRAR LO QUE DESEE DEL LOCAL C\/GORGOS, 18. CUALQUIER ACLARACION: ADELA FERRER 670969632","Unicode":1,"Report":1,"Contacto":"Fincatech","TelContacto":"952792038","Cifcontacto":"B93594992","Resp":"JSON"}
 

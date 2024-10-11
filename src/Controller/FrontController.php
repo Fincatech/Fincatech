@@ -197,11 +197,39 @@ class MainController{
 
     public static function redirectToLogin()
     {
-        header('Location: ' . 'login');
+        header('Location: ' . HOME_URL . 'login');
         // header('Location: ' . HOME_URL . 'login');
         exit;
     }
 
+    public function GetLogo()
+    {
+        //  Comprobamos el dominio que es para poder asignar el logo correspondiente
+        $dominio = $_SERVER['SERVER_NAME'];
+        $aDominio = explode('.', $dominio);
+        $nombreFranquiciado = $aDominio[count($aDominio) - 2];
+        return strtolower($nombreFranquiciado);
 
+    }
+
+    public function CurrentMonth()
+    {
+        $month = date('m');
+        $months = [
+            1 => 'enero',
+            2 => 'febrero',
+            3 => 'marzo',
+            4 => 'abril',
+            5 => 'mayo',
+            6 => 'junio',
+            7 => 'julio',
+            8 => 'agosto',
+            9 => 'septiembre',
+            10 => 'octubre',
+            11 => 'noviembre',
+            12 => 'diciembre',
+            ];        
+        return ucfirst($months[intval($month)]);
+    }
 
 }

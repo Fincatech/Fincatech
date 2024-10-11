@@ -13,6 +13,7 @@ use HappySoftware\Controller\HelperController;
 class EmpleadoController extends FrontController{
 
     private $empleadoModel;
+    public $EmpleadoModel;
 
     public function __construct($params = null)
     {
@@ -156,6 +157,17 @@ class EmpleadoController extends FrontController{
             return HelperController::errorResponse( 'error', 'El empleado ya está asignado a la comunidad', '200' );
         }
         
+    }
+
+    /**
+     * Elimina un empleado de una comunidad
+     * @param int idComunidad
+     * @param int idEmpleado
+     */
+    public function DeleteRelacionEmpleadoComunidad($idComunidad, $idEmpleado)
+    {
+        $resultado = $this->EmpleadoModel->BajaComunidad($idComunidad,  $idEmpleado);
+        return HelperController::successResponse( 'ok' );
     }
 
 }

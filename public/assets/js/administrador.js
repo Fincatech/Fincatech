@@ -65,6 +65,11 @@ let administradorCore = {
             administradorCore.Helper.readURL(this, 'imgfileRearDocument');
         }); 
 
+        //  Exportación de comunidades con servicios contratados por administrador
+        $('body').on(core.helper.clickEventType, '.btnExportarComunidades', function(evt){
+            administradorCore.ExportComunidadesToExcel($(this).attr('data-id'), $(this).attr('data-nombre'));
+        });
+
     },
 
     /** Elimina una comunidad previa confirmación */
@@ -97,33 +102,34 @@ let administradorCore = {
     /**
      * Carga los datos del listado de administradores en la tabla listadoAdministradores
      */
-    renderTabla: async function()
+    renderTabla: async function(reducida = false, nombreTabla = 'listadoAdministrador')
     {
-        if($('#listadoAdministrador').length)
+
+        if( $(`#${nombreTabla}`).length)
         {
             //  Cargamos el listado de administradores
                 CoreUI.tableData.init();
 
             //  ID
-                CoreUI.tableData.addColumn('listadoAdministrador', "codigo", "CÓD");
+                CoreUI.tableData.addColumn(nombreTabla, "codigo", "CÓD");
 
             //  Nombre
-                CoreUI.tableData.addColumn('listadoAdministrador', "nombre", "NOMBRE");
+                CoreUI.tableData.addColumn(nombreTabla, "nombre", "NOMBRE");
 
-                CoreUI.tableData.addColumn('listadoAdministrador', "cif", "CIF");
+                CoreUI.tableData.addColumn(nombreTabla, "cif", "CIF");
 
             //  Email
                 var html = '<a href="mailto:data:email$" class="pl-1 pr-1">data:email$</a>';
-                CoreUI.tableData.addColumn('listadoAdministrador', null, "EMAIL", html);
+                CoreUI.tableData.addColumn(nombreTabla, null, "EMAIL", html);
 
             //  Teléfono
-                CoreUI.tableData.addColumn('listadoAdministrador', "telefono", "TELEFONO");
+                CoreUI.tableData.addColumn(nombreTabla, "telefono", "TELEFONO");
 
             //  Comunidades
-                CoreUI.tableData.addColumn('listadoAdministrador', "numerocomunidades", "Comunidades activas",null, 'text-center');
+                CoreUI.tableData.addColumn(nombreTabla, "numerocomunidades", "Comunidades activas",null, 'text-center');
 
             //  Visitado
-                CoreUI.tableData.addColumn('listadoAdministrador', 
+                CoreUI.tableData.addColumn(nombreTabla, 
                 function(row, type, val, meta)
                 {
                     var visitado;
@@ -139,43 +145,50 @@ let administradorCore = {
                 "Visitado", null, 'text-center');
 
 
-            //  Fecha de creación
-                CoreUI.tableData.addColumn('listadoAdministrador', 
-                function(row, type, val, meta)
-                {
-                    var timeStamp;
-                    var fechaCreacion;
-
-                    if(!row.lastlogin)
+                //  Fecha de creación
+                    CoreUI.tableData.addColumn(nombreTabla, 
+                    function(row, type, val, meta)
                     {
-                        timeStamp = '';
-                        fechaCreacion = '<span class="badge badge-pill bg-danger text-white">Nunca</span>';
-                    }else{
-                        timeStamp = moment(row.lastlogin, 'YYYY-MM-DD hh:mm').unix();
-                        fechaCreacion = moment(row.lastlogin).locale('es').format('L');
-                    }
+                        var timeStamp;
+                        var fechaCreacion;
 
-                    return `<span style="display:none;">${timeStamp}</span>${fechaCreacion}`;
-                },
-                "Último acceso", null, 'text-center');
+                        if(!row.lastlogin || row.lastlogin == '0000-00-00 00:00:00')
+                        {
+                            timeStamp = '';
+                            fechaCreacion = '<span class="badge badge-pill bg-danger text-white">Nunca</span>';
+                        }else{
+                            timeStamp = moment(row.lastlogin, 'YYYY-MM-DD hh:mm').unix();
+                            // fechaCreacion = moment(row.lastlogin).locale('es').format('L');
+                            fechaCreacion = moment(row.lastlogin).format('DD/MM/YYYY');
+                        }
 
-            // Estado
-                var html = 'data:estado$';
-                CoreUI.tableData.addColumn('listadoAdministrador', null, "Estado", html, 'text-center');
+                        return `<span style="display:none;">${timeStamp}</span>${fechaCreacion}`;
+                    },
+                    "Último acceso", null, 'text-center');
 
-            //  Fecha de alta
-                var html = 'data:created$';
-                CoreUI.tableData.addColumn('listadoAdministrador', null, "Fecha de alta", html, 'text-center');
-
-            //  Columna de acciones
-                var html = '<ul class="nav justify-content-center">';
-                    html += `<li class="nav-item"><a href="${baseURL}administrador/data:id$" class="btnEditarAdministrador d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid mr-2" style="height:26px; width:26px;"></i></a></li>`;
+                // Estado
+                    var html = 'data:estado$';
+                    CoreUI.tableData.addColumn(nombreTabla, null, "Estado", html, 'text-center');
+                                    
+                //  Fecha de alta
+                    var html = 'data:created$';
+                    CoreUI.tableData.addColumn(nombreTabla, null, "Fecha de alta", html, 'text-center');
+                //  Columna de acciones
+                    var html = '<ul class="nav justify-content-center">';
+                    html += `<li class="nav-item"><a href="${baseURL}administrador/data:id$" class="btnEditarAdministrador d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid icono-accion" style="height:26px; width:26px;"></i></a></li>`;
                     if(core.Security.getRole() == 'SUDO'){
-                        html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarAdministrador d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid" style="height:26px; width:26px;"></i></li></ul>';
+                        html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarAdministrador d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid icono-accion" style="height:26px; width:26px;"></i></a></li>';
                     }
-                CoreUI.tableData.addColumn('listadoAdministrador', null, "", html, 'text-center');
+                    html += '</ul>';
+                    CoreUI.tableData.addColumn(nombreTabla, null, "", html, 'text-center');
 
-            CoreUI.tableData.render("listadoAdministrador", "Usuario", "administrador/list");
+                //  Columna de exportar comunidades solo para el sudo
+                    if(core.Security.getRole() == 'SUDO')
+                    {
+                        html = '<a href="javascript:void(0);" class="btnExportarComunidades btn btn-primary d-inline-block" data-id="data:id$" data-nombre="data:nombre$">Exportar comunidades</a>';
+                        CoreUI.tableData.addColumn(nombreTabla, null, "", html, 'text-center');                
+                    }
+                CoreUI.tableData.render(nombreTabla, "Usuario", "administrador/list");
         }
     },
 
@@ -215,6 +228,73 @@ let administradorCore = {
             // administradorCore.administradores.total = administradorCore.administradores.length;
         });
 
+    },
+
+    /**
+     * Exporta las comunidades a un fichero excel que se mostrará para descargar
+     * @param {*} administradorId 
+     */
+    ExportComunidadesToExcel: function(administradorId, nombreAdministrador)
+    {
+        Swal.fire({
+            title: 'Exportación de comunidades',
+            html: `<p>Clique el botón <strong>descargar</strong> para poder descargar un fichero Excel con la información de todas las comunidades asociadas a este administrador así como los servicios contratados.</p>
+            <h6 class="p-2 bg-primary shadow-neumorphic mb-3 mt-3 br-10 text-white font-weight-bold text-uppercase"></i> Instrucciones tras la descarga</h6>
+            <p class="text-left">Las columnas con el nombre <strong>ID interno (No cambiar)</strong> no puede cambiarse su valor o el proceso de importación no se ejecutará correctamente.</p>
+            <p class="text-left">Las columnas que hacen referencia al <strong>estado de contratación</strong> solo admiten 2 valores: 0 ó 1 de donde 0 indica que no está contratado y 1 que está contratado el servicio especificado.</p>
+            <p class="text-left">Las columnas que hacen referencia al <strong>precio</strong> tanto de comunidad como de Fincatech no deben contener símbolos de Euro, sólo valores numéricos.</p>`,
+            grow:'false',
+            width: '60rem',
+            showCancelButton: true,
+            showConfirmButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '<i class="bi bi-save mr-2"></i> Descargar',
+            cancelButtonText: '<i class="bi bi-x-circle mr-2"></i> Cancelar',
+            reverseButtons: true,
+            buttonsStyling: false,
+            customClass: {
+                actions: 'text-center p-3 shadow-inset rounded-pill border-light border-2 bg-white',
+                confirmButton: 'btn btnSaveData btn-success rounded-pill shadow d-block pb-2 pt-2 cofirmButtonModal',
+                cancelButton: ' btn btn-danger btnCancelSave rounded-pill shadow d-block pb-2 pt-2 mr-3 cacelButtonModal',
+                popup: 'bdg-transparent'
+            }            
+          }).then((result) => {
+            if (result.isConfirmed) 
+            {
+                //  Llamamos al endpoint de exportar
+                apiFincatech.get(`administrador/${administradorId}/comunidades/excelexport`).then(( result )=>{
+                    let res = JSON.parse(result);
+                    if(res.data == 'Error')
+                    {
+                        CoreUI.Modal.Error(res.status.error,'Exportación de comunidades');
+                    }else{
+                        // Decodificar el Base64
+                        let binaryData = atob(res.data);
+
+                        // Crear un array de bytes
+                        let bytes = new Uint8Array(binaryData.length);
+                        for (let i = 0; i < binaryData.length; i++) {
+                            bytes[i] = binaryData.charCodeAt(i);
+                        }
+
+                        // Crear un Blob
+                        let blob = new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+
+                        // Crear un enlace de descarga
+                        let a = document.createElement("a");
+                        a.href = window.URL.createObjectURL(blob);
+
+                        // Establecer el nombre del archivo
+                        nombreAdministrador = nombreAdministrador.replace(/ /g, "_");
+                        a.download = `exportacion_comunidades_${nombreAdministrador}.xlsx`;
+
+                        // Simular clic en el enlace para descargar el archivo
+                        a.click();
+                    }
+                });
+            }
+        }); 
     },
 
     // Componente Representante Legal
@@ -324,6 +404,7 @@ let administradorCore = {
             {
                 if($('#listadoAdministradorRepresentantesLegales').length)
                 {
+                        
                     //  Cargamos el listado de administradores
                         CoreUI.tableData.init();
         
@@ -506,5 +587,9 @@ let administradorCore = {
 }
 
 $(()=>{
-    administradorCore.init();
+
+    document.addEventListener('coreInitialized', function(event) {
+        administradorCore.init();
+    });
+
 });

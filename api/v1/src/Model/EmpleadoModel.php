@@ -4,6 +4,7 @@ namespace Fincatech\Model;
 
 use Fincatech\Entity\Empleado;
 use \HappySoftware\Controller\HelperController;
+use HappySoftware\Database\DatabaseCore;
 
 class EmpleadoModel extends \HappySoftware\Model\Model{
 
@@ -219,6 +220,18 @@ class EmpleadoModel extends \HappySoftware\Model\Model{
             return 'ok';
         }
 
+    }
+
+    /** Da de baja un empleado en una comunidad
+     * @param int idComunidad
+     * @param int idEmpleado
+     */
+    public function BajaComunidad($idComunidad,  $idEmpleado)
+    {
+        $idEmpleado = DatabaseCore::PrepareDBString($idEmpleado);
+        $idComunidad = DatabaseCore::PrepareDBString($idComunidad);
+        $sql = "delete from empleadocomunidad where idempleado = $idEmpleado and idcomunidad = $idComunidad";
+        $this->getRepositorio()->queryRaw($sql);
     }
 
 }

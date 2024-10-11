@@ -13,14 +13,22 @@
     $classBoton = "";
 
     // $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-    $actual_link = HOME_URL . substr( $_SERVER['REQUEST_URI'], 1, strlen($_SERVER['REQUEST_URI'])-1);
-    if(strpos($actual_link, $urlDestino) !== false)
+    $actual_link = (string)HOME_URL . substr( $_SERVER['REQUEST_URI'], 1, strlen($_SERVER['REQUEST_URI'])-1);
+    
+    if((@strpos($actual_link, $urlDestino) !== false) && !is_null($urlDestino) )
     {
         $classBoton = "activo";
     }
 
+    if(!is_null($urlDestino) )
+    {
+        $urlDestino = HOME_URL . $urlDestino;
+    }else{
+        $urlDestino = 'javascript:void(0);';
+    }
+
 ?>  
-<a href="<?php echo HOME_URL . $urlDestino; ?>" class="">
+<a href="<?php echo $urlDestino; ?>" class="">
 <div class="card card-dashboard <?php echo $destino; ?> icono-menu <?php echo $classBoton; ?>">
     <div class="card-body d-flex align-self-center w-100">
         <div class="row w-100 d-flex">

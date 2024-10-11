@@ -1,5 +1,3 @@
-// const { ajaxPrefilter } = require("jquery");
-
 let CoreUI = {
 
     tituloModulo: null,
@@ -13,7 +11,209 @@ let CoreUI = {
         CoreUI.tituloModulo = value;
     },
 
+    Controller:{
+
+        /**
+         * Carga automáticamente los combos de la pantalla según el modelo y columnas a mostrar
+         */
+        InitializeSelectData: async function()
+        {
+            var promesaSelect;
+            var numeroCombos = $("body .form-data .select-data").length;
+            var iCombo = 0;
+      
+            promesaSelect = new Promise(async function(resolve, reject){
+      
+            //  Validamos que hay algún select dentro del form
+              if($("body .form-data .select-data").length)
+              {
+                //  Iteramos sobre todos los select del formulario
+                $("body .form-data .select-data").each(function()
+                {
+                    var insertarOpcionSeleccionar = false;
+      
+                    var entidadCombo = $(this).attr("hs-list-entity");
+                    var keyField = $(this).attr("hs-list-field");
+                    var keyValue = $(this).attr("hs-list-value");
+                    var elDOM = $(this).prop("id");
+      
+                    var keyOriginField = $(this).attr("hs-field");
+                    var keyOriginValue = $(this).attr("hs-value");
+      
+                    if($(this).attr('hs-seleccionar') !== undefined)
+                    {
+                      insertarOpcionSeleccionar = ($(this).attr('hs-seleccionar') == 'false' ? false : true);              
+                    }
+      
+                    var promesaSelectActual = new Promise(async function(resolve2, reject2){
+                      // console.log('Llamada a getselectdata');
+                      CoreUI.Controller.GetSelectData( entidadCombo, keyField, keyValue, null, null, elDOM, insertarOpcionSeleccionar ).then((result)=>{
+                        // console.log('--- Ha resuelto GetSelectData ---');
+                        iCombo++;
+                        // console.log('numeroCombos: ' + numeroCombos);
+                        // console.log('iCombo: ' + iCombo);
+                        if(iCombo >= numeroCombos)
+                        {
+                          // console.log('icombo>=n')
+                          resolve(true);
+                        }
+                      });
+      
+                    });
+      
+                });
+      
+              }else{
+                // console.log('resolve2')
+                resolve(true);
+              }
+              
+            });
+      
+            promesaSelect.then(function(){
+            // console.log('------------ promSelect2');
+            core.Forms.getModelo();
+            return promesaSelect;
+            }); 
+        },
+
+        /**
+         * Obtiene los datos del WS
+         */
+        GetSelectData: async function(entidad, keyField, keyValue, keyOriginField, keyOriginValue, elementoDOM, insertarOpcionSeleccionar)
+        {
+            //  Vaciamos el combo
+            $("body #" + elementoDOM).html("");
+            //  Recuperamos los registros que correspondan según la entidad
+            var promSelect = new Promise( function(resolve, reject)
+            {
+                apiFincatech.get(`${entidad}/list?target=cbo`).then( (data) =>
+                // await apiFincatech.get(`${entidad}/list?target=cbo`).then( async (data) =>
+                {
+
+                    var htmlOutput = "";
+                    var result = JSON.parse(data);
+                    responseData = result.data;
+
+                    //  Validamos que exista el dato
+                    if(!responseData[entidad])
+                    {
+                        alert('Error. La entidad no es correcta para el select');
+                        console.log('Error en el select ', elementoDOM, ' entidad: ', entidad);
+                        return;
+                    }
+
+                    if(insertarOpcionSeleccionar)
+                    {
+                        htmlOutput = '<option value="-1" disabled selected="selected">Seleccione una opción</option>';
+                        $("body #" + elementoDOM).append(htmlOutput);
+                    }
+
+                    //  Primero sacamos todos los valores que queremos pintar en el combo
+                    var values = keyField.split(',');
+                    var valueId;
+                    var valueToShow;
+
+                    // Obtenemos el nombre del campo que vamos a utilizar para el value del select
+                    // y que viene definido en hs-list-value del propio select
+                    keyValue = keyValue.split('.')
+
+                    //  Recorremos todos los registros que hemos recuperado del WS
+                    for(var i = 0; i < responseData[entidad].length; i++)
+                    {
+                        valueToShow = Array();
+                        valueId = responseData[entidad][i][keyValue[1]];
+
+                        for(var x = 0; x < values.length; x++)
+                        {
+                            //  Descomponemos para obtener la entidad y el campo que se va a mostrar
+                            fieldValue = values[x].split('.');
+                            //  Insertamos en el array el valor que se va a pintar
+                            valueToShow.push( responseData[entidad][i][fieldValue[1]] );
+                        }
+                        //  Unimos el array para la visualización dentro del propio select
+                        valueToShow = valueToShow.join(' - ');
+                        //  Construimos el elemento html para el select
+                        htmlOutput = `<option value="${valueId}">${valueToShow}</option>`;
+                        //  Agregamos el elemento al dom
+                        $("body #" + elementoDOM).append(htmlOutput);
+                    }
+
+                    //  Inicializamos el componente select2 para el select que se acaba de poblar
+                    $('body #' + elementoDOM).select2({
+                        theme: 'bootstrap4',
+                        placeholder: "Seleccione una opción",
+                    });
+                    resolve(true);
+                });
+            });
+
+            return promSelect.then(function(){
+                return true;
+            });
+        },
+
+    },
+
+    Forms:{
+
+        Errors: {
+
+            hasErrors: false,
+
+            /**
+             * Establece el mensaje de error para un campo
+             * @param {*} idDOM ID del campo que contiene el error
+             * @param {*} msg   Mensaje que se va a mostrar
+             */
+            SetMessage: function(idDOM, msg)
+            {
+                //  Establecemos el mensaje de error
+                $(`#${idDOM}-msg-error`).html(msg);
+                CoreUI.Forms.Errors.hasErrors = true;
+                CoreUI.Forms.Errors.ShowErrors();
+            },
+
+            /**
+             * Muestra los posibles errores que tenga el formulario
+             */
+            ShowErrors: function()
+            {
+                //  Ocultamos todos los posibles errores que haya en el formulario
+                $('.msg-form-error').removeClass('d-none').addClass('d-none');
+                //  Recorremos todos los posibles errores que haya en el formulario
+                $('.msg-form-error').each(function(ev){
+                    let field = $(this).attr('data-input-field-id');
+                    if($(this).html() !== '')
+                    {
+                        //  Quitamos la clase que oculta el label
+                        $(this).removeClass('d-none');
+                        //  Añadimos la clase de error al formulario
+                        $(`#${field}`).removeClass('form-error').addClass('form-error');
+                    }else{
+                        //  Quitamos la marca de error sobre el input                        
+                        $(`#${field}`).removeClass('form-error');
+                    }
+                });
+            }
+        }
+
+
+    },
+
     Utils: {
+
+        /**
+         * Formatea un número a moneda
+         * @param {*} numero 
+         * @returns 
+         */
+        formatNumberToCurrency: function(numero)
+        {
+            let total = parseFloat(numero);
+            total = total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&.').replace(',', '.');
+            return total;
+        },
 
         parse: function(valor, data)
         {
@@ -105,6 +305,35 @@ let CoreUI = {
 
         },
 
+        /**
+         * 
+         * @param {*} domInputName 
+         */
+        getSelectedFileInBase64Format: async function(domInputName)
+        {
+            var fileInput = document.getElementById(domInputName);
+            if (fileInput.files.length === 0) {
+                return false;
+            }else{
+                // Obtener el primer archivo seleccionado (puedes ajustar esto según tus necesidades)
+                var selectedFile = fileInput.files[0];
+
+                return new Promise((resolve, reject) =>{
+                    const reader = new FileReader();
+
+                    reader.onload = (event) => {
+                        resolve(event.target.result);
+                    };
+    
+                    reader.onerror = (error) => {
+                        reject(error);
+                    };
+    
+                    reader.readAsDataURL(selectedFile);
+                });
+            }
+        }
+
     },
 
     tableData: {
@@ -135,9 +364,9 @@ let CoreUI = {
                         "previous": "Anterior"
                     },
                     "processing": "Procesando...",
-                    "search": "Buscar:",
+                    "search": '<i class="bi bi-search"></i>',
                     "searching": true,
-                    "searchPlaceholder": "",
+                    "searchPlaceholder": "Buscar",
                     "zeroRecords": "No se encontraron resultados",
                     "emptyTable": "Ningún dato disponible en esta tabla",
                     "aria": {
@@ -166,7 +395,8 @@ let CoreUI = {
                         }
                     }
                 }           
-            } );        
+            } );    
+            
         },  
         
         /** Extrae el campo que se va a mapear */
@@ -295,7 +525,7 @@ let CoreUI = {
         },
 
         /** Añade la definición de una columna */
-        addColumn: function(id, nombre, titulo, renderHTML, clase, widthColumn, _render = null )
+        addColumn: function(id, nombre, titulo, renderHTML, clase, widthColumn, _render = null, _type = null )
         {
             if(typeof CoreUI.tableData.columns[id] === 'undefined')
             {
@@ -304,8 +534,8 @@ let CoreUI = {
 
             var columna = {};
             // console.log(!!nombre);
-//             nombre = typeof nombre === 'function' ? '' : nombre;
-// console.log(typeof nombre);
+            //             nombre = typeof nombre === 'function' ? '' : nombre;
+            // console.log(typeof nombre);
             if(renderHTML !== undefined && renderHTML !== null)
             {
                 columna = {
@@ -656,7 +886,23 @@ let CoreUI = {
                 }     
         },
 
-        /** Renderiza la tabla */
+        /**
+         * Renderiza la tabla
+         * @param {*} id 
+         * @param {*} entity 
+         * @param {*} endpoint 
+         * @param {*} allColumns 
+         * @param {*} usePagination 
+         * @param {*} _search 
+         * @param {*} customRender 
+         * @param {*} showPrint 
+         * @param {*} groupResults 
+         * @param {*} groupCols 
+         * @param {*} _serverSide 
+         * @param {*} _ajaxType 
+         * @param {*} _responsive 
+         * @param {*} _showExportToExcel 
+         */
         render: async function(id, entity, endpoint, allColumns, 
             usePagination = true, _search = true, customRender = null, 
             showPrint = null, groupResults = false, groupCols = null, _serverSide = false, _ajaxType='GET',_responsive = true, _showExportToExcel = false)
@@ -688,7 +934,7 @@ let CoreUI = {
                     "columns": CoreUI.tableData.columns[id],  
                     "columnDefs": [{
                         "targets": CoreUI.tableData.columns[id].length -1,
-                        "className": CoreUI.tableData.columns[id].className
+                        "className": CoreUI.tableData.columns[id].className,
                     }],
                     "drawCallback": function(settings){
                         feather.replace();
@@ -837,6 +1083,92 @@ let CoreUI = {
                 }
             });  
         },
+
+        Question: function(texto, titulo, tituloBotonConfirmar, callback)
+        {
+            Swal.fire({
+                title: titulo,
+                html: texto,
+                grow:'true',
+                width: '60rem',
+                showCancelButton: true,
+                showConfirmButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: '<i class="bi bi-check-circle mr-2"></i> ' + tituloBotonConfirmar,
+                cancelButtonText: '<i class="bi bi-x-circle mr-2"></i> Cancelar',
+                reverseButtons: true,
+                buttonsStyling: false,
+                customClass: {
+                    actions: 'text-center p-3 shadow-inset rounded-pill border-light border-2 bg-white',
+                    confirmButton: 'btn btnConfirmModalAction btn-success rounded-pill shadow d-block pb-2 pt-2 confirmButtonModal',
+                    cancelButton: ' btn btn-danger btnCancelSave rounded-pill shadow d-block pb-2 pt-2 mr-3 cancelButtonModal',
+                    popup: 'bdg-transparent'
+                }            
+              }).then((result) => {
+                if (result.isConfirmed) 
+                {
+                    callback();
+                }
+            }); 
+        }
+
+    },
+
+    /**
+     * Módulo de información de progreso
+     */
+    Progress: {
+
+        Total: 100,
+        Actual: 0,
+
+        SetProgress: function(value){
+            CoreUI.Progress.Actual = value;
+            //  Porcentaje
+            $('.fincatech--progreso .progress-bar').css('width',`${CoreUI.Progress.Actual}%`);
+            $('.fincatech--progreso .progress-bar').html(`${CoreUI.Progress.Actual}%`);
+        },
+
+        /**
+         * Establece los valores iniciales de la barra de progreso y el texto inicial
+         */
+        Init: function(){
+            CoreUI.Progress.SetMessage('Iniciando proceso');
+            $('.fincatech--progreso .progress-bar').html('0%');
+            $('.fincatech--progreso .progress-bar').css('width','0');
+        },
+
+        /**
+         * Muestra el cuadro de progreso
+         */
+        Show: function(){
+            CoreUI.Progress.Init();
+            $('body').addClass('progress');
+            $('.fincatech--progreso').removeClass('d-none');
+        },
+
+        /**
+         * Oculta el cuadro de pgoreso
+         */
+        Hide: function(){
+            $('body').removeClass('progress');
+            $('.fincatech--progreso .btnProcesoTerminado').hide();
+            $('.fincatech--progreso').removeClass('d-none').addClass('d-none');
+        },
+
+        /**
+         * Pinta el mensaje en el cuadro de progreso
+         * @param {string} value Texto a mostrar
+         */
+        SetMessage: function(value){
+            //  Texto
+            $('body .fincatech--progreso .mensaje').html(value);
+        },
+
+        Completed: function(){
+            $('body .fincatech--progreso .btnProcesoTerminado').show();
+        }
 
     },
 

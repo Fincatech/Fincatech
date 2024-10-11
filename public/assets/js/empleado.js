@@ -69,11 +69,13 @@ let empleadoCore = {
     events: async function()
     {   
 
+        //  Eliminar empleado
         $('body').on(core.helper.clickEventType, '.btnEliminarEmpleado', (evt)=>{
             evt.stopImmediatePropagation();
             empleadoCore.eliminar( $(evt.currentTarget).attr('data-id'), $(evt.currentTarget).attr('data-nombre') );
         });
 
+        //  Nuevo empleado en comunidad
         $('body').on(core.helper.clickEventType, '.btnNuevoEmpleadoComunidad', function(evt)
         {
             //  Comprobamos si tiene spa asignado y si está editando o añadiendo
@@ -222,6 +224,46 @@ let empleadoCore = {
         });
     },
 
+    /**
+     * Elimina la relación entre un empleado y una comunidad
+     * @param {*} idComunidad 
+     * @param {*} idEmpleado 
+     * @param {*} nombreComunidad 
+     * @param {*} nombreEmpleado 
+     */
+    desasignarEmpleadoComunidad: function(idComunidad, idEmpleado, nombreComunidad, nombreEmpleado)
+    {
+        //  Lanzamos el mensaje de confirmación al usuario pero previamente comprobamos el rol
+        if(core.Security.getRole() == 'CONTRATISTA')
+        {
+            //core.Modelo.Delete("empleado", id, nombre, "listadoEmpleado");
+            Swal.fire({
+                title: 'Baja de empleado en comunidad',
+                html: `<p class="text-left"><strong>Empleado</strong>: ${nombreEmpleado}<br><strong>Comunidad</strong>: ${nombreComunidad}<br><br>Esta acción no eliminará el posible resto de relaciones entre este empleado y aquellas comunidades en las que esté asignado.</p>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Eliminar',
+                cancelButtonText: 'Cancelar'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                    //  Llamamos al endpoint de eliminar
+                    apiFincatech.delete(`comunidad/${idComunidad}/empleado`, idEmpleado).then((result) =>{
+                        Swal.fire(
+                            'Asociación eliminada correctamente',
+                            '',
+                            'success'
+                          );
+                          $('#listadoEmpleadosComunidad').DataTable().ajax.reload();
+                    });
+                }
+            });
+        }else{
+            CoreUI.Modal.Error('Ud. no tiene permiso para realizar esta acción', 'Baja empleado en comunidad');
+        }
+    },
+
     /** Carga los datos del listado */
     renderTabla: async function()
     {
@@ -259,8 +301,8 @@ let empleadoCore = {
 
             //  Columna de acciones
                 var html = '<ul class="nav justify-content-center accionesTabla">';
-                    html += `<li class="nav-item"><a href="${baseURL}empleado/data:id$" class="btnEditarEmpleado d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid"></i></a></li>`;
-                    html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarEmpleado d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid"></i></li></ul>';
+                    html += `<li class="nav-item"><a href="${baseURL}empleado/data:id$" class="btnEditarEmpleado d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid icono-accion"></i></a></li>`;
+                    html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarEmpleado d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid icono-accion"></i></li></ul>';
                 CoreUI.tableData.addColumn('listadoEmpleado', null, "", html);
 
                 // $('#listadoEmpleado').addClass('no-clicable');
@@ -294,6 +336,10 @@ let empleadoCore = {
         }
     },
 
+    /**
+     * Lista los empleados que tiene asignados una comunidad
+     * @param {*} idcomunidad 
+     */
     renderTablaEmpleadosComunidad: function(idcomunidad)
     {
         if($('#listadoEmpleadosComunidad').length &&
@@ -371,18 +417,20 @@ let empleadoCore = {
                 CoreUI.tableData.addColumn('listadoEmpleadosComunidad', function(row, type, val, meta)
                 {
                     var salida =  '';
+                    salida = `<ul class="nav justify-content-center accionesTabla">`;
 
                     if(row.tipoempleado == 'Comunidad')
                     {
-                        salida = `<ul class="nav justify-content-center accionesTabla">
-                                        <li class="nav-item">
-                                            <a href="${baseURL}empleado/${row.idempleado}" class="btnEditarEmpleado d-inline-block" data-id="${row.idempleado}" data-nombre="${row.nombre}"><i data-feather="edit" class="text-success img-fluid mr-2"></i></a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="javascript:void(0);" class="btnEliminarEmpleado d-inline-block" data-id="${row.idempleado}" data-nombre="${row.nombre}"><i data-feather="trash-2" class="text-danger img-fluid"></i></a>
-                                        </li>
-                                </ul>`;
+                        salida += `<li class="nav-item">
+                                        <a href="${baseURL}empleado/${row.idempleado}" class="btnEditarEmpleado d-inline-block icono-accion" data-id="${row.idempleado}" data-nombre="${row.nombre}"><i data-feather="edit" class="text-success img-fluid mr-2"></i></a>
+                                   </li>
+                                   <li class="nav-item">
+                                        <a href="javascript:void(0);" class="btnEliminarEmpleado d-inline-block icono-accion" data-id="${row.idempleado}" data-nombre="${row.nombre}"><i data-feather="trash-2" class="text-danger img-fluid"></i></a>
+                                   </li>`;
                     }
+
+                    salida += '</ul>';
+
 
                     return salida;
 
@@ -481,20 +529,26 @@ let empleadoCore = {
         {
             CoreUI.tableData.addColumn('listadoEmpleadosComunidad', function(row, type, val, meta)
             {
-                var salida =  '';
+                var salida =  '<ul class="nav justify-content-center accionesTabla">';
 
                 if(row.tipoempleado == 'Comunidad')
                 {
-                    salida = `<ul class="nav justify-content-center accionesTabla">
-                                    <li class="nav-item">
-                                        <a href="${baseURL}empleado/${row.idempleado}" class="btnEditarEmpleado d-inline-block" data-id="${row.idempleado}" data-nombre="${row.nombre}"><i data-feather="edit" class="text-success img-fluid mr-2"></i></a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="javascript:void(0);" class="btnEliminarEmpleado d-inline-block" data-id="${row.idempleado}" data-nombre="${row.nombre}"><i data-feather="trash-2" class="text-danger img-fluid"></i></a>
-                                    </li>
-                            </ul>`;
+                    salida += `<li class="nav-item">
+                                        <a href="${baseURL}empleado/${row.idempleado}" class="btnEditarEmpleado d-inline-block icono-accion" data-id="${row.idempleado}" data-nombre="${row.nombre}"><i data-feather="edit" class="text-success img-fluid mr-2"></i></a>
+                               </li>
+                               <li class="nav-item">
+                                        <a href="javascript:void(0);" class="btnEliminarEmpleado d-inline-block icono-accion" data-id="${row.idempleado}" data-nombre="${row.nombre}"><i data-feather="trash-2" class="text-danger img-fluid"></i></a>
+                               </li>`;
                 }
 
+                //  Desasignación de empleado para contratistas
+                if(core.Security.getRole() == 'CONTRATISTA')
+                {
+                    salida += `<li class="nav-item">
+                        <a href="javascript:void(0);" class="btnDesasignarEmpleado d-inline-block icono-accion" data-id="${row.idempleado}" data-idcomunidad="${row.idcomunidad}" data-nombre="${row.nombre}"><i data-feather="trash-2" class="text-danger img-fluid"></i></a>
+                    </li>`;
+                }
+                salida += '</ul>';
                 return salida;
 
             } , "&nbsp;", null, 'text-center', '70px');

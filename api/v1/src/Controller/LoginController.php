@@ -26,6 +26,7 @@ class LoginController extends FrontController{
     {
         $data = [];
         setcookie('FINCATECHTOKEN', '', time() - 3600, "/");
+        setcookie('FINCATECHACCESS', '', time() - 3600, "/");
         $data['logout'] = 'ok';
         return HelperController::successResponse($data);
     }
@@ -104,7 +105,7 @@ class LoginController extends FrontController{
         $sql = "
             SELECT 
                 u.id, u.nombre, u.idadministrador, u.email, u.rolid, concat('ROLE_',r.alias) as rol,
-                u.rgpd
+                u.rgpd, u.mostrarcae, u.mostrarrgpd
             FROM
                 usuario u,
                 rol r
@@ -140,6 +141,8 @@ class LoginController extends FrontController{
                 $data['rolid'] = $result[0]['rolid'];
                 $data['authorized'] = (is_null($result[0]['idadministrador']) || empty($result[0]['idadministrador']) ? -1 : $result[0]['idadministrador']);
                 $data['rol'] = strtoupper($result[0]['rol']);
+                $data['accesscae'] = $result[0]['mostrarcae'];
+                $data['accessrgpd'] = $result[0]['mostrarrgpd'];
 
                 //  Generamos el token de autenticación
                     $issuedAt = new \DateTimeImmutable();
@@ -153,7 +156,7 @@ class LoginController extends FrontController{
                     }
 
                 //  Creamos el token JWT
-                    $JWTToken = $this->createToken($data['id'], $data['email'], $data['email'], $data['nombre'], $data['authorized'], $data['rgpd'], $data['rol'], $issuedAt->getTimeStamp(), $expire );
+                    $JWTToken = $this->createToken($data['id'], $data['email'], $data['email'], $data['nombre'], $data['authorized'], $data['rgpd'], $data['rol'], $data['accesscae'], $data['accessrgpd'], $issuedAt->getTimeStamp(), $expire );
 
                 //  Grabamos la fecha de acceso para controlar los accesos por usuario
                     $this->setLastAccess( $result[0]['id'] );
@@ -175,11 +178,11 @@ class LoginController extends FrontController{
         
     }
 
-    private function createToken($id, $login, $email, $nombre, $authorized, $rgpd, $role, $issuedAt, $expire)
+    private function createToken($id, $login, $email, $nombre, $authorized, $rgpd, $role, $accessCae, $accessRgpd, $issuedAt, $expire)
     {
 
         //  Referencia: https://www.sitepoint.com/php-authorization-jwt-json-web-tokens/
-            $serverName = "fincatech";
+            $serverName = $_SERVER['SERVER_NAME'];//"fincatech";
 
         //  Retrieved from filtered POST data
             $username   = $login;                                           
@@ -196,7 +199,9 @@ class LoginController extends FrontController{
                     'nombre' => $nombre,
                     'email' => $email,
                     'rgpd' => $rgpd,
-                    'role' => $role
+                    'role' => $role,
+                    'accesscae' => $accessCae,
+                    'accessrgpd' => $accessRgpd
                 ]
             );        
 

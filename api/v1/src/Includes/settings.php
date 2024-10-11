@@ -1,7 +1,7 @@
 <?php
 
 /** Fichero de settings generales de la aplicación */
-
+//TODO: Montar an fichero YAML con un trait para recuperar elementos de esta configuración
 // Configuración general
 global $appSettings;
 
@@ -21,10 +21,27 @@ $appSettings = [
     ],
     //  Configuración de la ruta de almacén de ficheros
     'storage' => [
-        'path' => '/public/storage/',
-        'certificados' => '/public/storage/emailcertificados', 
-        'private' => '/public/storage/private', 
-        'log' => '/public/log/', 
+        'templates'     => '/src/Views/templates/',
+        'emailtemplates'=> '/src/Views/templates/mails/',
+        'path'          => '/public/storage/',
+        'facturas'      => '/public/storage/factura',
+        'facturaszip'   => '/public/storage/facturazip',
+        'remesas'       => '/public/storage/remesas',
+        'certificados'  => '/public/storage/emailcertificados', 
+        'private'       => '/public/storage/private', 
+        'log'           => '/public/log/', 
+    ],
+    //  Servidores FTP
+    'ftp_servers' =>[
+        'facturacion'   => [
+            'server_id' => '001',
+            'server_url' => 'https://factura.fincatech.es/',
+            'url'       => 'home400351608.1and1-data.host',
+            'port'      => 22,
+            'user'      => 'acc652662948',
+            'password'  => 'e)EJ;2O!p94S',
+            'use_ssl'   => true
+        ]
     ],
     'uanataca' => [
         'validity_time' => '1825',

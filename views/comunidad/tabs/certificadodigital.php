@@ -1,7 +1,7 @@
 <div class="tab-pane fade h-100 tabCertificadoDigital" id="certificadodigital" role="tabpanel">
     <div class="row h-100">
         <div class="col-12 d-flex">
-            <div class="card flex-fill shadow-neumorphic pl-3 pb-3 pt-2 pr-3">
+            <div class="card flex-fill shadow-neumorphic pl-3 pb-3 pt-2 pr-3 card-principal">
                 <div class="card-header pl-1">
                     <div class="row mb-3">
                         <!-- DOCUMENTACIÓN NECESARIA PARA GENERAR CERTIFICADO DIGITAL -->

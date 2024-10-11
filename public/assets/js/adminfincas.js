@@ -8,17 +8,17 @@ let adminFincas = {
 
     },
 
-    Events: async function()
+    Events: function()
     {
 
         if($('body #listadoSMSAdministrador').length > 0)
         {
-            await adminFincas.SMS.RenderTableSMSCertified();
+           adminFincas.SMS.RenderTableSMSCertified();
         }
 
         if($('body #listadoEmailCertificadoAdministrador').length > 0)
         {
-            await adminFincas.Email.RenderTableEmailCertified();
+            adminFincas.Email.RenderTableEmailCertified();
         }
 
         // Envío sms certificado
@@ -33,12 +33,17 @@ let adminFincas = {
         }));
 
         //  Envío SMS Certificado con contrato
-        $('body').on(core.helper.clickEventType,'.btnEnviarSMSCertificadoContrato', ((evt)=>{
+        $('body').on(core.helper.clickEventType,'.btnEnviarSMSCertificadoContrato', (async (evt)=>{
             if(adminFincas.SMS.ValidateSMSContrato())
             {
+                let _fileContract = document.getElementById('ficheroadjuntarcontrato');
                 let phoneNumber = $('#telefonoDestinatarioContrato').val();
                 let messageText = $('#mensajeSMSContrato').val();
-                adminFincas.SMS.SendContractSMSCertified(phoneNumber, messageText);
+                let fileContractBase64 = await CoreUI.Utils.getSelectedFileInBase64Format('ficheroadjuntarcontrato');
+                let fileContractName = _fileContract.files[0].name;
+
+                //  Enviamos el fichero al endpoint para procesarlo y enviarlo
+                adminFincas.SMS.SendContractSMSCertified(phoneNumber, messageText, fileContractBase64, fileContractName);
             };
         }));        
 
@@ -156,7 +161,7 @@ let adminFincas = {
 
                 await apiFincatech.post(`certificadodigital/administrador/envioemailcertificado`, data).then(async (response) =>{
                     var responseData = JSON.parse(response);
-console.log(responseData);
+
                     if(responseData.status['response'] == "ok")
                     {
                         CoreUI.Modal.Success("El E-mail se ha enviado correctamente.");
@@ -257,7 +262,7 @@ console.log(responseData);
             $(`body .${smsOrigin} .smsCaracteresRestantes`).text(totalRemaining);
         },
 
-        RenderTableSMSCertified: async function()
+        RenderTableSMSCertified: function()
         {
             if($('#listadoSMSAdministrador').length)
             {
@@ -276,12 +281,29 @@ console.log(responseData);
                         fecha = row.created;
                         //  Renderizamos el icono de descarga junto con la fecha
                         fechaSubida = `<span>${moment(fecha).locale('es').format('LLL')}</span>`;
-                        return `<p class="mb-0 text-center">${fechaSubida}</p>`;
+                        return `<p class="mb-0 text-left">${fechaSubida}</p>`;
 
-                    },"Fecha envío", null, 'text-center');      
+                    },"Fecha envío", null, 'text-center', '20%');      
+
+                //  Estado
+                    CoreUI.tableData.addColumn('listadoSMSAdministrador', function(row, type, val, meta){
+
+                        let salida = '';
+                        // console.log(row);
+                        if(!row.filename)
+                        {
+                            salida = '<span class="badge rounded-pill bg-success pl-2 pr-2 pt-1 pb-1">Entregado</span>';
+                        }else{
+                            salida = `<a class="btnDescargarEmailCertificado" href="${baseURL}public/storage/emailcertificados/${row.filename}" target="_blank" title="Email certificado"><i data-feather="mail" class="text-success img-fluid"></i></a>`;
+                        }
+                        // salida = row.filename;
+                        //  Renderizamos el icono de descarga 
+                        return `<p class="mb-0 text-center">${salida}</p>`;
+
+                    },"Estado", null, 'text-center', '10%');                     
 
                     $('#listadoSMSAdministrador').addClass('no-clicable');
-                    CoreUI.tableData.render("listadoSMSAdministrador", "Sms", "sms/list", false, false, true);
+                    CoreUI.tableData.render("listadoSMSAdministrador", "Sms", "sms/list", false, true, true);
             }
         },
 
@@ -298,6 +320,7 @@ console.log(responseData);
                 sender: core.Security.user,
                 phonenumber: targetPhone,
                 message: messageText,
+                contrato: 0
             };            
 
             await apiFincatech.post(`certificadodigital/administrador/enviosms`, data).then(async (response) =>{
@@ -320,14 +343,15 @@ console.log(responseData);
         /**
          * Envía un contrato para ser firmado por SMS
          */
-        SendContractSMSCertified: async function(targetPhone, messageText){
+        SendContractSMSCertified: async function(targetPhone, messageText, fileContractBase64, fileContractName){
+
             var data = Object();
             data = {
                 sender: core.Security.user,
                 phonenumber: targetPhone,
                 message: messageText,
-                filebase64: core.Files.Fichero.base64,
-                filename: core.Files.Fichero.nombre,
+                filebase64: fileContractBase64,
+                filename: fileContractName,
             };            
 
             await apiFincatech.post(`certificadodigital/administrador/enviosmscontrato`, data).then(async (response) =>{
@@ -397,7 +421,7 @@ console.log(responseData);
          * Validación de envío de SMS con contrato
          * @returns Boolean. Resultado de la validación
          */
-        ValidateSMSContrato: function()
+        ValidateSMSContrato: async function()
         {
             let validationError = '';
 
@@ -414,8 +438,16 @@ console.log(responseData);
                 validationError += '- El texto del mensaje no puede estar vacío<br>';
 
             //  Validación de fichero seleccionado
-            if(core.Files.Fichero.base64 == null){
+            var ficheroContrato = await CoreUI.Utils.getSelectedFileInBase64Format('ficheroadjuntarcontrato');
+            if(ficheroContrato === false)
+            {
                 validationError += '- Debe adjuntar un fichero en formato PDF<br>';
+            }else{
+                //  Validamos que el fichero sea PDF
+                if(ficheroContrato.indexOf('data:application/pdf;base64') < 0)
+                {
+                    validationError += '- Debe adjuntar un fichero en formato PDF<br>';
+                }
             }
 
             if(validationError != '')

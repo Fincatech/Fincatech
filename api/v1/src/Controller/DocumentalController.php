@@ -7,6 +7,8 @@
 namespace Fincatech\Controller;
 
 // Sustituir Model por el nombre del modelo real. Ej: UsuarioModel
+
+use Exception;
 use Fincatech\Model\DocumentalModel;
 use Fincatech\Model\ComunidadModel;
 use Fincatech\Controller\FrontController;
@@ -163,114 +165,132 @@ class DocumentalController extends FrontController{
         
     }
 
+    /**
+     * Comprueba si la documentación CAE para una comunidad está subida, y, de ser así, la envía por 
+     * correo electrónico certificado a través de Mensatek
+     * @param int $idComunidad ID de la comunidad a comprobar
+     * @param int $idEmpresa (optional). ID De la empresa a validar. Defaults: Null
+     * @param bool $_enviarEmail (optional). Boolean que indica si se debe enviar el e-mail certificado. Defaults: True
+     * @return int Número de envíos realizados
+     */
     public function comprobarDocumentacionComunidad($idComunidad, $idEmpresa = null, $_enviarEmail = true)
     {
-
-        $bodyEmail = 'Estimado Contratista,<br><br>
-
-        En virtud de lo establecido en el <strong>Real decreto 171/2004</strong> de 30 de enero por el que se desarrolla el artículo 24 de la ley 31/1995 del 8 de Noviembre de prevención de riesgos laborales y su reforma, la ley 54/2003 en materia de coordinación de actividades empresariales, cuando en un mismo centro de trabajo se desarrollen actividades trabajadores/as de 2 o más empresas, éstas deberán cooperar en la aplicación de la normativa de prevención de riesgos laborales.<br><br>
-
-        Es por ello que ponemos a su disposición como documentos adjuntos a esta notificación la evaluación de riesgos, la planificación de las actividad preventiva y medidas de emergencia de la comunidad de propietarios del asunto, con objeto de que pueda llevar a cabo la coordinación de actividades empresariales con la/las empresas que acceden a dicha comunidad de propietarios, las cuales puede conocer y acceder a su respectiva información en materia de prevención de riesgos laborales accediendo a la plataforma <a href="https://www.fincatech.es" target="_blank">www.fincatech.es</a>  , en la pestaña de EMPRESAS CONCURRENTES . En el supuesto que dicha información no esté disponible, deberá contactar con dichas empresas para que le aporte la documentación necesaria en esta materia.  Deberá tener en cuenta la información proporcionada por las empresas concurrentes con objeto poder incorporar la misma a su plan de prevención y establecer las medidas adecuadas para prevenir dichos riesgos, así como informar a sus trabajadores de los riesgos del centro de trabajo proporcionados por el titular y de los riesgos derivados de la concurrencia.<br><br>
-
-        Por otro lado, le recordamos que deberá informar sobre los riesgos específicos que puede generar su actividad en el centro de trabajo y que pueden afectar a las empresas concurrentes.<br><br> 
-
-        En el caso de que su actividad genere algún peligro para otras empresas concurrentes, deberá comunicar dicho peligro a las mismas, así como, en el supuesto de producirse algún accidente de trabajo o situación de peligro deberá comunicarlo de manera fehaciente tanto a la propia Comunidad como a las empresas concurrentes y trasladar dicha situación a los empleados que accedan a la comunidad de propietarios.<br><br>
-
-        En todo caso, se compromete, bajo su responsabilidad, a cumplir con lo determinado por la Ley 31/1995, de 8 de noviembre, de Prevención de Riesgos Laborales quedando terminantemente prohibido que acceda a la Comunidad trabajador alguno que no reúna los requisitos establecidos en dicha normativa, así como, cualquier otra normativa aplicable y que rige la contratación de trabajadores por cuenta ajena.<br><br>
+        try{
         
-        Por otro lado, una vez accedido a la plataforma, dispone en la parte superior de un videotutorial que le guiará sobre los pasos a realizar.<br><br>
-        
-        El acceso a la plataforma se realiza con el mismo email donde ha recibido este correo y su clave de acceso ha sido remitida previamente a ese mismo email. En el supuesto de no disponer o haber olvidado la clave, en la misma zona de iniciar sesión, tiene la opción de recuperar la contraseña.';
+            $bodyEmail = 'Estimado Contratista,<br><br>
 
-        $enviarEmail = true;
-        $this->InitController('comunidad');
-        $ComunidadController = new \Fincatech\Controller\ComunidadController();
+            En virtud de lo establecido en el <strong>Real decreto 171/2004</strong> de 30 de enero por el que se desarrolla el artículo 24 de la ley 31/1995 del 8 de Noviembre de prevención de riesgos laborales y su reforma, la ley 54/2003 en materia de coordinación de actividades empresariales, cuando en un mismo centro de trabajo se desarrollen actividades trabajadores/as de 2 o más empresas, éstas deberán cooperar en la aplicación de la normativa de prevención de riesgos laborales.<br><br>
 
-        $documentosComunidad = $ComunidadController->GetDocumentacionComunidad($idComunidad);
-        //  Recorremos el array que devuelve para ver si alguno de ellos está vacío lo que indica que aún no están todos
-        for($iDoc = 0; $iDoc < count($documentosComunidad); $iDoc++)
-        {
-            if($documentosComunidad[$iDoc]['idrelacion'] == '' || $documentosComunidad[$iDoc]['idrelacion'] == 'null' || is_null($documentosComunidad[$iDoc]['idrelacion'])){
-                $enviarEmail = false;
-                break;
-            }
-        }
+            Es por ello que ponemos a su disposición como documentos adjuntos a esta notificación la evaluación de riesgos, la planificación de las actividad preventiva y medidas de emergencia de la comunidad de propietarios del asunto, con objeto de que pueda llevar a cabo la coordinación de actividades empresariales con la/las empresas que acceden a dicha comunidad de propietarios, las cuales puede conocer y acceder a su respectiva información en materia de prevención de riesgos laborales accediendo a la plataforma <a href="https://app.fincatech.es" target="_blank">app.fincatech.es</a>  , en la pestaña de EMPRESAS CONCURRENTES . En el supuesto que dicha información no esté disponible, deberá contactar con dichas empresas para que le aporte la documentación necesaria en esta materia.  Deberá tener en cuenta la información proporcionada por las empresas concurrentes con objeto poder incorporar la misma a su plan de prevención y establecer las medidas adecuadas para prevenir dichos riesgos, así como informar a sus trabajadores de los riesgos del centro de trabajo proporcionados por el titular y de los riesgos derivados de la concurrencia.<br><br>
 
-        //  Si no tiene todos los documentos nos salimos
-            if(!$enviarEmail)
-                return;
+            Por otro lado, le recordamos que deberá informar sobre los riesgos específicos que puede generar su actividad en el centro de trabajo y que pueden afectar a las empresas concurrentes.<br><br> 
 
-        //  Si se ha de enviar el e-mail preparamos la información para enviarla a los e-mails correspondientes
-            $ficherosAdjuntos = [];
+            En el caso de que su actividad genere algún peligro para otras empresas concurrentes, deberá comunicar dicho peligro a las mismas, así como, en el supuesto de producirse algún accidente de trabajo o situación de peligro deberá comunicarlo de manera fehaciente tanto a la propia Comunidad como a las empresas concurrentes y trasladar dicha situación a los empleados que accedan a la comunidad de propietarios.<br><br>
+
+            En todo caso, se compromete, bajo su responsabilidad, a cumplir con lo determinado por la Ley 31/1995, de 8 de noviembre, de Prevención de Riesgos Laborales quedando terminantemente prohibido que acceda a la Comunidad trabajador alguno que no reúna los requisitos establecidos en dicha normativa, así como, cualquier otra normativa aplicable y que rige la contratación de trabajadores por cuenta ajena.<br><br>
+            
+            Por otro lado, una vez accedido a la plataforma, dispone en la parte superior de un videotutorial que le guiará sobre los pasos a realizar.<br><br>
+            
+            El acceso a la plataforma se realiza con el mismo email donde ha recibido este correo y su clave de acceso ha sido remitida previamente a ese mismo email. En el supuesto de no disponer o haber olvidado la clave, en la misma zona de iniciar sesión, tiene la opción de recuperar la contraseña.';
+
+            $enviarEmail = true;
+            $this->InitController('comunidad');
+            $ComunidadController = new \Fincatech\Controller\ComunidadController();
+
+            $documentosComunidad = $ComunidadController->GetDocumentacionComunidad($idComunidad);
+
+            //  Recorremos el array que devuelve para ver si alguno de ellos está vacío lo que indica que aún no están todos
             for($iDoc = 0; $iDoc < count($documentosComunidad); $iDoc++)
             {
-                $fichero = [];
-                $fichero['nombre'] = $documentosComunidad[$iDoc]['storageficherorequerimiento'];
-                $fichero['ubicacion'] = $documentosComunidad[$iDoc]['ubicacionficherorequerimiento'] . $documentosComunidad[$iDoc]['storageficherorequerimiento'];
-                $ficherosAdjuntos[] = $fichero;
-            }
-
-        //  Recuperamos todos los proveedores que tenga asignados la comunidad y recuperamos los e-mail de cada uno de ellos
-            $destinatarios = [];
-
-            if(!is_null($idEmpresa))
-            {
-                //  Recuperamos la información de la empresa 
-                $this->InitController('Empresa');
-                $empresas = $this->EmpresaController->Get($idEmpresa)['Empresa'];
-                $destinatario = [];
-
-                //ORR: Se cambia el nombre de la personad e contacto por el nombre de la empresa
-                //Fecha: 20/02/2023
-                
-                // $destinatario['nombre'] = substr($empresas[0]['personacontacto'], 0, 20);
-                $destinatario['nombre'] = substr($empresas[0]['razonsocial'], 0, 20);
-                if(strlen($destinatario['nombre']) < 4)
-                {
-                    $destinatario['nombre'] = str_pad($destinatario['nombre'],5, '_',STR_PAD_RIGHT);
+                if($documentosComunidad[$iDoc]['idrelacion'] == '' || $documentosComunidad[$iDoc]['idrelacion'] == 'null' || is_null($documentosComunidad[$iDoc]['idrelacion'])){
+                    $enviarEmail = false;
+                    break;
                 }
-                $destinatario['email'] = $empresas[0]['email'];
-                $destinatarios[] = $destinatario;
-            }else{
-                $empresas = $ComunidadController->ComunidadModel->GetEmpresasByComunidadId($idComunidad);
             }
 
-            if(count($empresas) === 0)
-            {
-                $enviarEmail = false;
-            }else{
+            //  Si no tiene todos los documentos nos salimos
+                if(!$enviarEmail)
+                    return;
 
-                for($iEmpresa = 0; $iEmpresa < count($empresas); $iEmpresa++)
+            //  Si se ha de enviar el e-mail preparamos la información para enviarla a los e-mails correspondientes
+                $ficherosAdjuntos = [];
+                for($iDoc = 0; $iDoc < count($documentosComunidad); $iDoc++)
                 {
+                    $fichero = [];
+                    $fichero['nombre'] = $documentosComunidad[$iDoc]['storageficherorequerimiento'];
+                    $fichero['ubicacion'] = $documentosComunidad[$iDoc]['ubicacionficherorequerimiento'] . $documentosComunidad[$iDoc]['storageficherorequerimiento'];
+                    $ficherosAdjuntos[] = $fichero;
+                }
+
+            //  Recuperamos todos los proveedores que tenga asignados la comunidad y recuperamos los e-mail de cada uno de ellos
+                $destinatarios = [];
+
+                if(!is_null($idEmpresa))
+                {
+                    //  Recuperamos la información de la empresa 
+                    $this->InitController('Empresa');
+                    $empresas = $this->EmpresaController->Get($idEmpresa)['Empresa'];
                     $destinatario = [];
-                    $destinatario['nombre'] = substr($empresas[$iEmpresa]['razonsocial'], 0, 20);
+
+                    //ORR: Se cambia el nombre de la persona de contacto por el nombre de la empresa
+                    //Fecha: 20/02/2023
+                    
+                    // $destinatario['nombre'] = substr($empresas[0]['personacontacto'], 0, 20);
+                    $destinatario['nombre'] = substr($empresas[0]['razonsocial'], 0, 20);
                     if(strlen($destinatario['nombre']) < 4)
                     {
-                        $destinatario['nombre'] = str_pad($empresas[$iEmpresa]['razonsocial'], 5, '_',STR_PAD_RIGHT);
-                    }                    
-                    $destinatario['email'] = $empresas[$iEmpresa]['email'];
+                        $destinatario['nombre'] = str_pad($destinatario['nombre'],5, '_',STR_PAD_RIGHT);
+                    }
+                    $destinatario['email'] = $empresas[0]['email'];
                     $destinatarios[] = $destinatario;
-                }
-
-            }
-
-        //  Recuperamos el nombre de la comunidad
-            $comunidad = $ComunidadController->Get($idComunidad);
-            $nombreComunidad = $comunidad['Comunidad'][0]['nombre'];
-
-            if($enviarEmail)
-            {
-                //  Componemos el cuerpo del mensaje
-                $body = 'Estimado Contratista,  ' .$nombreComunidad.' dispone de todos los documentos obligatorios en materia de CAE disponibles y que son enviados en este e-mail certificado.';
-                if($_enviarEmail)
-                {
-                    $this->procesarEmailCertificado($idComunidad,$empresas, $this->SendEmailCertificadoAdjuntos('Documentos CAE C.P. ' .$nombreComunidad, $destinatarios, $bodyEmail, $ficherosAdjuntos));
-                    return count($destinatarios);
                 }else{
-                    return count($destinatarios);
+                    $empresas = $ComunidadController->ComunidadModel->GetEmpresasByComunidadId($idComunidad);
                 }
-            }
 
+                if(count($empresas) === 0)
+                {
+                    $enviarEmail = false;
+                }else{
+
+                    for($iEmpresa = 0; $iEmpresa < count($empresas); $iEmpresa++)
+                    {
+                        $destinatario = [];
+                        $destinatario['nombre'] = substr($empresas[$iEmpresa]['razonsocial'], 0, 20);
+                        if(strlen($destinatario['nombre']) < 4)
+                        {
+                            $destinatario['nombre'] = str_pad($empresas[$iEmpresa]['razonsocial'], 5, '_',STR_PAD_RIGHT);
+                        }                    
+                        $destinatario['email'] = $empresas[$iEmpresa]['email'];
+                        $destinatarios[] = $destinatario;
+                    }
+
+                }
+
+            //  Recuperamos el nombre de la comunidad
+                $comunidad = $ComunidadController->Get($idComunidad, false);
+
+            //  Comprobamos que tenga acceso a la comunidad
+                if(isset($comunidad['error']))
+                    return 0;
+
+                $nombreComunidad = $comunidad['Comunidad'][0]['nombre'];
+
+                if($enviarEmail)
+                {
+                    //  Componemos el cuerpo del mensaje
+                    $body = 'Estimado Contratista,  ' .$nombreComunidad.' dispone de todos los documentos obligatorios en materia de CAE disponibles y que son enviados en este e-mail certificado.';
+                    if($_enviarEmail)
+                    {
+                        $this->procesarEmailCertificado($idComunidad,$empresas, $this->SendEmailCertificadoAdjuntos('Documentos CAE C.P. ' .$nombreComunidad, $destinatarios, $bodyEmail, $ficherosAdjuntos));
+                        return count($destinatarios);
+                    }else{
+                        return count($destinatarios);
+                    }
+                }
+            }catch(\Exception $ex)
+            {
+                die('Excepción: ' . $ex->getMessage());
+            }
     }
 
     private function procesarEmailCertificado($idComunidad, $empresas, $respuestaXML)
@@ -296,9 +316,20 @@ class DocumentalController extends FrontController{
                 <CreditosUsados>18</CreditosUsados>
             </result>
          */
+        // if(strpos($respuestaXML, 'Res:') >= 0)
+        // {
+        //     // print_r($empresas);
+        //     $this->WriteToLog('emailcertificado', 'DocumentalController -> procesarEmailCertificado', $respuestaXML . ' - Error');            
+        //     // echo 'idcomunidad: ' . $idComunidad;
+        //     return;
+
+        // }
+
+
         //  Ha ocurrido algún tipo de error así que salimos por seguridad pero habrá que determinar
         if($respuestaXML == '-1' || strpos($respuestaXML, 'xml') < 0)
         {
+            $dEmpresas = implode(',', $empresas);
             $this->WriteToLog('emailcertificado', 'DocumentalController -> procesarEmailCertificado', $respuestaXML . ' - Error de autenticación');            
             //            echo 'respuesta: ' . $respuestaXML;
             return;
@@ -715,15 +746,23 @@ class DocumentalController extends FrontController{
      */
     public function moveRequerimientoToHistorial($idRequerimiento, $tablaDestino)
     {
-        $this->DocumentalModel-> moveRequerimientoToHistorial($idRequerimiento, $tablaDestino);
+        $this->DocumentalModel->moveRequerimientoToHistorial($idRequerimiento, $tablaDestino);
     }
 
     /** Recupera todas las comunidades que tienen requerimientos pendientes en materia de CAE */
-    public function GetRequerimientosPendientesCAEGeneral()
+    public function GetRequerimientosPendientesCAEGeneral($tipo = 'comunidades')
     {
         $data = [];
-        $data['requerimiento'] = $this->DocumentalModel->GetRequerimientosPendientesCAEGeneral();
+        $data['requerimiento'] = $this->DocumentalModel->GetRequerimientosPendientesCAEGeneral($tipo);
         return $data;
+    }
+
+    /**
+     * Devuelve la asociación entre comunidad y empresa que tenga la cae sin enviar
+     */
+    public function PendienteEnviarDocumentacionCAE()
+    {
+        return $this->DocumentalModel->EmailsPendientesCAE(); 
     }
 
 }

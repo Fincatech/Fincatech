@@ -158,7 +158,7 @@ trait DatabaseTrait{
     public function createUpdate($table)
     {
         $this->setAction(false, true, false);
-        $this->builder("UPDATE $table SET ");
+        $this->builder("UPDATE " . strtolower($table) . " SET ");
     }
 
     /** 
@@ -176,7 +176,7 @@ trait DatabaseTrait{
         $tipo = trim(strtolower($tipo));
 
         if($tipo == "string" || $tipo == "varchar" || $tipo == "char" || $tipo == "text" ||
-            $tipo == "datetime" || $tipo == "date")
+            $tipo == "datetime" || $tipo == "date" || $tipo == 'enum' )
         {
             //  Para los campos de fecha hay que comprobar que si viene vacío o null hay que establecer la fecha de hoy
             if(($valor == '' || $valor == null) && ($tipo == "datetime" || $tipo == "date") )

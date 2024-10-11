@@ -7,6 +7,8 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\App;
+
+use Slim\Psr7\Response as BaseResponse;
 use Slim\Interfaces\RouteCollectorProxyInterface as Group;
 
 use \PHPMailer\PHPMailer\PHPMailer;
@@ -15,6 +17,28 @@ use Fincatech\Controller;
 use Fincatech\Controller\FrontController;
 use HappySoftware\Controller\HelperController;
 use HappySoftware\Controller\Traits\ConfigTrait;
+use PHPUnit\TextUI\Help;
+
+$accessMiddleware = function(Request $request, RequestHandler $handler) use($app)
+{
+
+    //  Control de accesos de aplicación para CAE Y RGPD
+    $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+    $frontController = new $frontControllerName();
+    $frontController->Init('usuario');
+    $newCookieValue = $frontController->context->CheckAccess();
+
+    $response = $handler->handle($request);
+    $existingContent = (string) $response->getBody();
+    $newResponse = $app->getResponseFactory()->createResponse();
+    // $bodyPeticion = json_decode($existingContent);
+    // $bodyPeticion->access = $accesos;
+    
+    $newResponse->getBody()->write($existingContent);
+    return $newResponse;
+};
+
+$app->add($accessMiddleware);
 
 return function (App $app) {
 
@@ -149,12 +173,12 @@ return function (App $app) {
     $app->get('/userinfo', function(Request $request, Response $response, array $params )
     {
         // Instanciamos el controller principal
-        //$frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
-        //$frontController = new $frontControllerName();
-        //$frontController->Init('Login');
-
-        $response->getBody()->write( HelperController::successResponse( null ) );
+        $frontController = new $frontControllerName();
+        $frontController->Init('Usuario');
+        
+        $response->getBody()->write( HelperController::successResponse( $frontController->context->GetResumedInfo()) );
 
         return $response;  
 
@@ -221,22 +245,6 @@ return function (App $app) {
 
     });
 
-    /** Punto de entrada para delete. Se utiliza para eliminar una entidad y sus relaciones */
-    $app->delete('/{controller}/{id}', function (Request $request, Response $response, array $params)
-    {
-
-        // Instanciamos el controller principal
-        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
-        
-        $frontController = new $frontControllerName();
-        $frontController->Init($params['controller']);
-
-        $response->getBody()->write( $frontController->Delete($params['id']) );
-
-        return $response->withHeader('Content-Type', 'application/json');  
-
-    });
-
     /** Recupera el schema para una entidad y sus posibles entidades relacionadas */
     $app->get('/{controller}/schema', function (Request $request, Response $response, array $params)
     {
@@ -263,7 +271,7 @@ return function (App $app) {
         $frontController = new $frontControllerName();
         $frontController->Init($params['controller']);
         $queryString = $request->getQueryParams();
-        
+
         $response->getBody()->write( $frontController->List($queryString) );
 
         return $response;  
@@ -365,6 +373,120 @@ return function (App $app) {
     ///                                                                         FACTURACION
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
+    /**
+     * Recupera la configuración de la facturación
+     */
+    $app->post('/facturacion/generar', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Invoice');
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        $result = $frontController->context->GenerarFacturacion($data);
+
+        $response->getBody()->write( HelperController::successResponse( $result ));
+        return $response;
+        // $newResponse = $response->withStatus(400,  $result );
+        // return $newResponse;
+
+    });
+
+    //  Fichero de prefacturación en formato Excel
+    $app->post('/factura/{id:[0-9]+}/rectificativa/create', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Invoice');
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        $idInvoice = $params['id'];
+
+        $response->getBody()->write( $frontController->context->CreateInvoiceRectificativa($idInvoice, $data) );
+        return $response;
+
+    });
+
+    //  Envío de factura a un administrador
+    $app->post('/factura/{id:[0-9]+}/send', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Invoice');
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        //  Evaluamos la factura que se va a enviar: (F)actura | (R)ectificativa
+        // switch($data['tipo'])
+        // {
+        //     case 'F':
+        //         break;
+        //     case 'R':
+        //         $frontController->Init('InvoiceRectificativa');
+        //         break;
+        // }
+
+        $idInvoice = $params['id'];
+
+        $response->getBody()->write( $frontController->context->Send($idInvoice, $data) );
+        return $response;
+
+    });
+
+    /**
+     * Recupera la configuración de la facturación
+     */
+    $app->get('/facturacion/configuracion', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Configuracion');
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        $response->getBody()->write( HelperController::successResponse($frontController->context->List(null) ));
+        return $response;
+
+    });
+
+    /**
+     * Actualización de configuración para la facturación
+     */
+    $app->post('/facturacion/configuracion', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Configuracion');
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        $response->getBody()->write( HelperController::successResponse($frontController->context->Update(null, $data, null) ));
+        return $response;
+
+    });
+
     //  Fichero de prefacturación en formato Excel
     $app->post('/facturacion/prefacturacion/{id:[0-9]+}', function(Request $request, Response $response, array $params ): Response
     {
@@ -381,6 +503,197 @@ return function (App $app) {
         $idAdministrador = $params['id'];
 
         $response->getBody()->write( $frontController->context->GetExcelPrefacturacion($idAdministrador, $data) );
+        return $response;
+
+    });
+
+    /**
+     * Cálculo de totales de facturación
+     */
+    $app->post('/facturacion/totalfacturacion', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Invoice');
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        $anyo = null;
+        $mes = null;
+        $anual = true;
+
+        if(isset($data['year'])){
+            $anyo = $data['year'];
+            $anual = false;
+        }
+
+        if(isset($data['month'])){
+            $mes = $data['month'];
+        }
+
+        $response->getBody()->write( HelperController::successResponse($frontController->context->TotalFacturacion($anual, $mes, $anyo) ));
+        return $response;
+
+    });
+
+    /**
+     * Cálculo de totales de facturación
+     */
+    $app->post('/facturacion/info', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Invoice');
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+
+        $servicios = $data['servicios'];
+        $idAdministrador = $data['idadministrador'];
+        $mesFacturacion = $data['mesfacturacion'];
+
+        $resultado = $frontController->context->Info($servicios, $mesFacturacion, $idAdministrador);
+
+        if(isset($resultado['error'])){
+            $response->getBody()->write( HelperController::errorResponse('error',$resultado['error'], 200) );
+        }else{
+            $response->getBody()->write( HelperController::successResponse( $resultado ) );
+        }
+
+        return $response;
+
+    });
+
+    /**
+     * Cálculo de totales de facturación
+     */
+    $app->post('/liquidaciones/info', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Liquidaciones');
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        $idAdministrador = (int)$data['idadministrador'];
+        $dateFrom = $data['datefrom'];
+        $dateTo = $data['dateto'];
+
+        $resultado = $frontController->context->Info($idAdministrador, $dateFrom, $dateTo);
+
+        if(isset($resultado['error'])){
+            $response->getBody()->write( HelperController::errorResponse('error',$resultado['error'], 200) );
+        }else{
+            $response->getBody()->write( HelperController::successResponse( $resultado ) );
+        }
+
+        return $response;
+
+    });
+
+    /**
+     * Generación de liquidación
+     */
+    $app->post('/liquidaciones/generate', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Liquidaciones');
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        $idAdministrador = (int)$data['idadministrador'];
+        $dateFrom = $data['datefrom'];
+        $dateTo = $data['dateto'];
+
+        $resultado = $frontController->context->Process($data);
+
+        if(isset($resultado['error'])){
+            $response->getBody()->write( HelperController::errorResponse('error',$resultado['error'], 200) );
+        }else{
+            $response->getBody()->write( HelperController::successResponse( $resultado ) );
+        }
+
+        return $response;
+
+    });
+
+    /**
+     * Listado de facturas emitidas
+     */
+    $app->get('/facturacion/listado/{estado}', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Invoice');
+
+        $estado = $params['estado'];
+
+        if(trim($estado) == '' || strlen($estado) > 1){
+            $response->getBody()->write( HelperController::successResponse(['Facturas' => [], 'total' => 0], 200) );
+        }else{
+            $response->getBody()->write( HelperController::successResponse($frontController->context->Listado($estado) ));
+        }
+
+        return $response;
+
+    });
+
+    /**
+     * Listado de facturas rectificativas
+     */
+    // $app->get('/facturacion/rectificativa/list', function(Request $request, Response $response, array $params ): Response
+    // {
+
+    //     // Instanciamos el controller principal
+    //     $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+    //     $frontController = new $frontControllerName();
+    //     $frontController->Init('Invoice');
+
+    //     $result = $frontController->context->ListRectificativas();
+
+    //     $response->getBody()->write( HelperController::successResponse($result, 200) );
+
+    //     return $response;
+
+    // });
+
+    /**
+     * Listado de recibos asociados a remesas
+     */
+    $app->get('/remesa/{remesaId:[0-9]+}/recibos', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Remesa');
+
+        $remesaId = $params['remesaId'];
+
+        $response->getBody()->write( HelperController::successResponse($frontController->context->RecibosByRemesaId($remesaId) ));
+
         return $response;
 
     });
@@ -405,7 +718,10 @@ return function (App $app) {
 
     }); 
 
-    $app->get('/documental/requerimientos/cae/comunidades', function (Request $request, Response $response, array $params)
+    /**
+     * Recupera los documentos pendientes de cae para el técnico de revisión CAE
+     */
+    $app->get('/documental/requerimientos/cae/comunidades/{destino}', function (Request $request, Response $response, array $params)
     {
     
         // Instanciamos el controller principal
@@ -414,7 +730,14 @@ return function (App $app) {
         $frontController = new $frontControllerName();
         $frontController->Init('Documental');
         
-        $response->getBody()->write( HelperController::successResponse($frontController->context->GetRequerimientosPendientesCAEGeneral()) );
+        $destino = $params['destino'];
+        if($destino != 'administradores' && $destino != 'comunidades')
+        {
+            die('No tiene acceso a este servicio');
+        }else{
+            $response->getBody()->write( HelperController::successResponse($frontController->context->GetRequerimientosPendientesCAEGeneral( $destino )) );
+        }
+
 
         return $response;  
     });
@@ -659,6 +982,21 @@ return function (App $app) {
 
     });
 
+    $app->get('/comunidad/proveedoresasignados/list', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Comunidad');
+        
+        $response->getBody()->write( HelperController::successResponse($frontController->context->ProveedoresAsignados()) );
+
+        return $response;  
+
+    });
+
     //  Documentación de comunidad
     $app->get('/comunidad/{id}/documentacioncomunidad', function (Request $request, Response $response, array $params)
     {
@@ -781,6 +1119,24 @@ return function (App $app) {
 
     }); 
 
+    //  Elimina la realación entre un empleado y la comunidad
+    $app->delete('/comunidad/{idcomunidad}/empleado/{idempleado}', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Empleado');
+
+        $idComunidad = $params['idcomunidad'];
+        $idEmpleado = $params['idempleado'];
+
+        $response->getBody()->write( $frontController->context->DeleteRelacionEmpleadoComunidad($idComunidad, $idEmpleado) );
+        return $response;
+
+    }); 
+
     //  Documentación requerida para certificados digitales
     $app->get('/comunidad/{id}/documentacioncertificadodigital', function (Request $request, Response $response, array $params)
     {
@@ -798,8 +1154,9 @@ return function (App $app) {
         return $response;  
 
     });
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///                                                                 EMPLEADO
+    ///                                                                 ADMINISTRADOR
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     $app->get('/administrador/{id}/comunidades', function (Request $request, Response $response, array $params)
@@ -818,7 +1175,27 @@ return function (App $app) {
         return $response;  
 
     });
-    
+  
+    /**
+     * Exportación de comunidades de administrador
+     */
+    $app->get('/administrador/{id}/comunidades/excelexport', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Servicios');
+
+        $id = $params['id'];
+
+        $response->getBody()->write( $frontController->context->ExportServiciosByAdministradorId($id) );
+
+        return $response;  
+
+    });    
+
     $app->get('/empleado/{id}/empresas', function (Request $request, Response $response, array $params)
     {
 
@@ -852,7 +1229,21 @@ return function (App $app) {
         return $response;  
 
     });
+   
+    $app->get('/administrador/exportar/dpd', function (Request $request, Response $response, array $params)
+    {
 
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Administrador');
+
+        $response->getBody()->write( $frontController->context->ExcelExportAdministradoresDPD() );
+
+        return $response;  
+
+    });
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////                                                                    REQUERIMIENTOS                 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1144,6 +1535,150 @@ return function (App $app) {
 
     });
 
+    // Devuelve el listado de comunidades asignadas a una empresa
+    $app->get('/empresa/{id}/comunidadesasignadas', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Empresa');
+
+        $idEmpresa = $params['id'];
+
+        $response->getBody()->write( $frontController->context->GetComunidadesAsignadas($idEmpresa) );
+
+        return $response;  
+
+    });
+
+    $app->post('/empresa/{empresaId:[0-9]+}/reasignar/{empresaDestinoId:[0-9]+}', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Empresa');
+        
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+        $paramEmpresaId = $params['empresaId'];
+        $empresaId = $data['empresaId'];
+        $paramEmpresaDestinoId = $params['empresaDestinoId'];
+        $empresaDestinoId = $data['empresaNuevaId'];
+
+        if($paramEmpresaDestinoId != $empresaDestinoId || $paramEmpresaId != $empresaId)
+        {
+            $response->getBody()->write( HelperController::errorResponse('error','La empresa de origen y la de destino no coinciden', 200) );    
+        }
+
+
+        $response->getBody()->write( $frontController->context->ReasignarComunidades($paramEmpresaId, $paramEmpresaDestinoId) );
+        return $response;
+
+    }); 
+
+    /**
+     * Recupera el listado de empresas susceptibles de seguimiento
+     */
+    $app->get('/empresa/seguimiento/list', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Empresa');
+
+        $response->getBody()->write( $frontController->context->EmpresasRegistradasSinAcceso() );
+
+        return $response;  
+
+    });
+
+    /**
+     * Recupera el listado de actuaciones de seguimiento realizadas a una empresa
+     */
+    $app->get('/empresa/{empresaId:[0-9]+}/seguimiento', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Empresa');
+        $empresaId = $params['empresaId'];
+        $response->getBody()->write( HelperController::successResponse($frontController->context->ListadoActuaciones($empresaId)) );
+
+        return $response;  
+
+    });
+
+    /**
+     * Finaliza el seguimiento a una empresa
+     */
+    $app->get('/empresa/{empresaId:[0-9]+}/seguimiento/finished', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Empresa');
+        $empresaId = $params['empresaId'];
+        $response->getBody()->write( $frontController->context->FinalizarSeguimiento($empresaId) );
+
+        return $response;  
+
+    });    
+    
+
+    /**
+     * Crea una actuacion de seguimiento para una empresa
+     */
+    $app->post('/empresa/{empresaId:[0-9]+}/actuacion', function (Request $request, Response $response, array $params)
+    {
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Empresa');
+        $empresaId = $params['empresaId'];
+
+        $response->getBody()->write( $frontController->context->CreateActuacion($empresaId, $data) );
+
+        return $response;  
+
+    });
+
+    /**
+     * Crea una actuacion de seguimiento para una empresa
+     */
+    $app->delete('/empresa/{empresaId:[0-9]+}/actuacion/{actuacionId:[0-9]+}', function (Request $request, Response $response, array $params)
+    {
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Empresa');
+        $empresaId = $params['empresaId'];
+        $actuacionId = $params['actuacionId'];
+
+        $response->getBody()->write( $frontController->context->DeleteActuacion($empresaId, $actuacionId) );
+
+        return $response;  
+
+    });
+
+    /**
+     * Reenvío de mensajes
+     */
     $app->get('/mensaje/{id}/resend', function (Request $request, Response $response, array $params)
     {
 
@@ -1231,7 +1766,7 @@ return function (App $app) {
         $ficheroContrato = $data['filebase64'];
         $ficheroNombre = $data['filename'];
 
-        $response->getBody()->write( HelperController::successResponse($frontController->context->SendSMSContrato( $phoneNumber, $sender, $message, $ficheroContrato, $ficheroNombre )) );
+        $response->getBody()->write( $frontController->context->SendSMSContrato( $phoneNumber, $sender, $message, $ficheroContrato, $ficheroNombre ) );
         return $response;
 
     }); 
@@ -1334,7 +1869,29 @@ return function (App $app) {
         return $response;
 
     });   
-    
+   
+    /**
+     * SMS certificados con contrato enviado
+     */
+    $app->get('/certificadodigital/administrador/smscontrato/list', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Sms');
+       
+        $response->getBody()->write( 
+            HelperController::successResponse
+            (
+                $frontController->context->GetEmailsCertificadosAdministrador()
+            ) 
+        );
+        return $response;
+
+    });       
+
     /**
      * Listado de comunidades que están pendientes de aprobar el certificado
      */
@@ -1529,6 +2086,35 @@ return function (App $app) {
         return $response;   
     });
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///                                                                 SERVICIOS
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * Actualización masiva de servicios para una comunidad
+     */
+    $app->put('/comunidad/{idcomunidad:[0-9]+}/servicios', function(Request $request, Response $response, array $params ): Response
+    {
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Servicios');
+
+        //  Validamos si ha proporcionado el id
+        if(!isset($params['idcomunidad']) && @empty($params['idcomunidad']) && @!is_numeric($params['idcomunidad']))
+        {
+            $response->getBody()->write( HelperController::errorResponse("", "No existe el ID proporcionado", 403) );
+        }else{
+            $response->getBody()->write( $frontController->Update(null, $data, null) );
+        }
+
+        return $response;
+
+    });
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////                                                                CRONS                     
@@ -1544,6 +2130,20 @@ return function (App $app) {
         $frontController->Init('Cron');
         //  Lanzamos la normalización para descargar los ficheros
         $respuesta = $frontController->context->NormalizarInformesMensatek();
+        $response->getBody()->write($respuesta);
+        return $response;               
+    });
+
+    /**
+     * Cron de normalización la comprobación de documentación CAE no enviada
+     */
+    $app->get('/cron/emailscertificados/pendientescae', function (Request $request, Response $response)
+    {
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+        $frontController = new $frontControllerName();
+        $frontController->Init('Cron');
+        //  Lanzamos la normalización la comprobación de documentación CAE no enviada
+        $respuesta = $frontController->context->PendientesEmision();
         $response->getBody()->write($respuesta);
         return $response;               
     });
@@ -1574,8 +2174,20 @@ return function (App $app) {
         return $response;
     });
 
+    /**
+     * Cron que reenvía e-mails de registro a las empresas que nunca han accedido
+    */
+    $app->get('/cron/empresa/pendienteenvioemail', function (Request $request, Response $response) {
 
-    //  Emails certificados
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+        $frontController = new $frontControllerName();
+        $frontController->Init('Cron');
+        $result = $frontController->context->EnvioAltaPlataformaPendienteEmpresas();
+        $response->getBody()->write( HelperController::successResponse('ejecutado',200) );
+        return $response;
+    });
+
+    //  Punto de entrada para los informes que envía Mensatek una vez procesados los e-mails
     $app->post('/emailcertificado', function(Request $request, Response $response, array $params ): Response
     {
         
@@ -1595,14 +2207,13 @@ return function (App $app) {
         {
             $resultado = $data['Resultado'];
             $idMensaje = $data['idMensaje'];
-            $emailDestinatario = $data['Destinatario'];
             // Si el resultado es 14 entonces quiere decir que ya está disponible el certificado
             /*
                 10: Apertura/Visualización
                 11: Entregado al destinatario
                 12: Lectura/Acceso al contenido
                 13: Entregado, acceso y descarga
-                14: El destinatario ha respondido
+                14: El destinatario ha respondido o SMS Certificado Entregado y Certificado
                 50: E-mail no válido
             */
             switch($resultado){
@@ -1612,11 +2223,33 @@ return function (App $app) {
                 case '13':
                 case '14':
                     $frontController->Init('Mensaje');
-                    $ficheroCertificacion = $frontController->getPDFEmailCertificado($idMensaje);
+                    $reportSMS = false;
+                    $movil = null;
+                    //  Cuando es un sms el id de envío es diferente
+                    if( $data['Servicio'] == 'SMSCERTIFICADO')
+                    {
+                        $movil = $data['Movil'];
+                        $reportSMS = true;
+                    }
+
+                    if($reportSMS)
+                    {
+                        //  Recuperamos el pdf del envío
+                        $ficheroCertificacion = $frontController->getPDFSMSCertificado($idMensaje, $movil);
+                    $frontController->WriteToLog('emailcertificado_informe','Routes -> /emailcertificado', 'SMS Certificado - Móvil: ' . $data['Movil'] . ' - Id Mensaje: ' . $idMensaje);
+
+                    }else{
+                        //  Recuperamos el pdf del envío
+                        $ficheroCertificacion = $frontController->getPDFEmailCertificado($idMensaje);
+                    }
+                    //  Guardamos el fichero recuperado
                     $frontController->context->saveFileEmailCertificado($idMensaje, $ficheroCertificacion);
+                    //  Logueamos la transacción
+                    $frontController->WriteToLog('emailcertificado_informe','Routes -> /emailcertificado', 'Servicio: ' . $data['Servicio'] . ' - Id Mensaje: ' . $idMensaje);
                     break;
                 case '50':
                     //  Incluimos el e-mail en una tabla de e-mails no válidos para evitar posteriores envíos
+                    $emailDestinatario = $data['Destinatario'];
                     $frontController->IncludeEmailIntoBlackList($emailDestinatario);
                     $frontController->WriteToLog('emailcertificado_informe','Routes -> /emailcertificado', 'Resultado del envío por error parte de Mensatek [Destinatario no válido]: ' . $resultado); 
                     break;
@@ -1639,12 +2272,38 @@ return function (App $app) {
         $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
-        $frontController->Init('Certificadodigital');
-        // $frontController->WriteToLog('pruebas','routes', 'prueba ok');        
-        $cert = $frontController->context->RequestCertificateToUanataca(143);
-        // $cert = $frontController->context->Test();
-        $response->getBody()->write( $cert );
+        $frontController->Init('IngresosCuenta');
+        $data = [];
+        $data['concepto'] = 'Test entrega cuenta';
+        $data['idadministrador'] = 1;
+        $data['total'] = 321.45;
+        $data['fechaingreso'] = '2024-01-01';
+        $res = $frontController->context->Create('IngresosCuenta', $data);
+        if(is_array($res)){
+            $res = HelperController::successResponse($res);
+        }else{
+            $res = HelperController::errorResponse('error', $res, 200);
+        }
+
+        $response->getBody()->write( $res );
         return $response;
     });
+
+    /** Punto de entrada para delete. Se utiliza para eliminar una entidad y sus relaciones */
+    $app->delete('/{controller}/{id}', function (Request $request, Response $response, array $params)
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+        
+        $frontController = new $frontControllerName();
+        $frontController->Init($params['controller']);
+
+        $response->getBody()->write( $frontController->Delete($params['id']) );
+
+        return $response->withHeader('Content-Type', 'application/json');  
+
+    });
+
 
 };

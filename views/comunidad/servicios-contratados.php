@@ -2,7 +2,7 @@
 
     <div class="col-12 d-flex">
 
-        <div class="card flex-fill">
+        <div class="card flex-fill card-principal">
 
             <div class="card-header pl-0 headerListado">
 

@@ -105,7 +105,7 @@ trait SecurityTrait{
             'userData' => [ // información del usuario
                 'id' => 1,
                 'login' => 'admin',
-                'email' => 'admin@fincatech.es',
+                'email' => 'info@fincatech.es',
                 'role' => 'ROLE_SUDO',
             ]
         );        

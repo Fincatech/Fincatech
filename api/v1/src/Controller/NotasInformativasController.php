@@ -104,6 +104,7 @@ class NotasinformativasController extends FrontController{
                 //  Si no estamos en modo debug enviamos el e-mail
                 if(!$debug){
                     $this->SendEmail($emailAdministrador, $administradorNombre, 'Fincatech - Nueva Nota Informativa disponible [ '.$tituloNota.' ]', $bodyToSend, true);
+                    $this->SendEmail('dpd@fincatech.es', 'DPD Fincatech', 'Fincatech - Nueva Nota Informativa disponible [ '.$tituloNota.' ]', $bodyToSend, false);
                 }else{
                     echo $administradorNombre . ' - ' . $emailAdministrador . '<br>';
                 }

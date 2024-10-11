@@ -89,7 +89,7 @@ class AutorizadoController extends FrontController{
             }
             unset($datos['comunidadesasignadas']);
         }
-
+        unset($datos['fichero']); 
         return $this->UsuarioController->Update('Usuario', $datos, $usuarioId); 
     }
 

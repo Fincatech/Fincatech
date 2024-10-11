@@ -41,6 +41,8 @@ use \HappySoftware\Entity\Schema;
 
 class DatabaseCore {
 	
+	use \HappySoftware\Controller\Traits\LogTrait;
+
 	public $objetoBBDD;
 	public $bResultado;
 	public $conectado;
@@ -68,6 +70,10 @@ class DatabaseCore {
 	// Propiedad que se utiliza para saber si se deben crear las tablas en base a la entidad no encontrada en el schema
 	private $createMissingTables;
 
+	private $helperController;
+
+	protected $logTrait;
+
 	public static function test()
 	{
 		die('Class working as expect. HappySoftware :-)');
@@ -78,8 +84,6 @@ class DatabaseCore {
 		global $database;
 
 		require_once('config.php');
-		//include_once('../../Entity/SchemaEntity.php');
-
 		$this->debug = false;
 		
 		$this->conectado = false;
@@ -178,9 +182,9 @@ class DatabaseCore {
 	public function cambiarConfiguracion($serverURLNew, $serverPortNew, $userNew, $passwordNew)
 	{
 		
-		$this->serverURL = $serverURLNew;
-		$this->serverPort = $serverPortNew;
-		$this->user = $userNew;
+		$this->urlServidor = $serverURLNew;
+		$this->puertoMySQL = $serverPortNew;
+		$this->usuario = $userNew;
 		$this->password = $passwordNew;
 		
 	}
@@ -270,6 +274,7 @@ class DatabaseCore {
 	 * Ejecuta una consulta sobre la base de datos y devuelve el cursor con la información
 	 * @param string $sentenciaSQL. SQL a ejecutar
 	 * @param boolean $debug. (Opcional) Por defecto es false. True pinta la consulta y no devuelve datos
+	 * @return mysqliresult Cursor con los datos
 	 */
 	public function queryRaw($sentenciaSQL, $debug = false)
 	{
@@ -282,6 +287,8 @@ class DatabaseCore {
 		// 	}	
 
 			$datos = mysqli_query($this->enlaceBBDD, $sentenciaSQL  );
+			$this->LogQuery($sentenciaSQL);
+
 			if($debug == true)
 			{
 				echo($sentenciaSQL) . '<br>';
@@ -705,7 +712,7 @@ class DatabaseCore {
 			}
 		}		
 		$sql = "SHOW TABLE STATUS FROM " . $this->esquemaBBDD . " LIKE '" . $tabla . "'";
-// die($sql);
+		// die($sql);
 		$datos = $this->enlaceBBDD->query($sql);
 
 		if($datos){
@@ -801,6 +808,21 @@ class DatabaseCore {
 	public function getCreateMissingTables()
 	{
 		return $this->createMissingTables;
+	}
+
+	private function LogQuery($querySQL)
+	{
+		return;
+       // $appSettings = $GLOBALS['appSettings'];;
+		//$logDir = '/public/log/';
+        $logFileName = ROOT_DIR . '/public/log/log_db.log';
+
+        $content = '--- [' . date('d-m-Y h:i') . '] --- ( ' . ' ) --- ' . PHP_EOL . PHP_EOL . $querySQL . PHP_EOL . PHP_EOL;
+        
+        $fileHanddler = fopen($logFileName, "a");
+
+        fwrite($fileHanddler, $content);
+        fclose( $fileHanddler );
 	}
 
 }

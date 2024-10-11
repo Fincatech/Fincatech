@@ -2,7 +2,7 @@
 
     <div class="col-12 d-flex">
 
-        <div class="card flex-fill shadow-neumorphic pl-3 pb-3 pt-2 pr-3">
+        <div class="card flex-fill shadow-neumorphic pl-3 pb-3 pt-2 pr-3 card-principal">
 
             <div class="card-header pl-1 mb-2">
 
@@ -18,12 +18,34 @@
                     <!-- Estado del usuario -->
                     <div class="form-group row mb-4 justify-content-end">
                         <!-- Pendiente de visita -->
-                        <div class="col-12 col-md-10 text-left justify-content-end d-flex flex-column align-items-start">
+                        <div class="col-12 col-md-2 text-left justify-content-end d-flex flex-column align-items-start">
                             <div class="form-check">
                                 <input class="form-check-input visitado data" type="checkbox" hs-entity="Usuario" hs-field="visitado" value="" id="visitado">
                                 <label class="form-check-label" for="visitado">Visitado</label>
                             </div>
+                            <div class="form-check">
+                                <input class="form-check-input aportacae data" type="checkbox" hs-entity="Usuario" hs-field="aportacae" value="" id="aportacae">
+                                <label class="form-check-label" for="aportacae">Aporta Documentación CAE</label>
+                            </div>
                         </div>
+                        <!-- Usuario Marca Blanca -->
+                        <div class="col-12 col-md-2 text-left justify-content-end d-flex flex-column align-items-start">
+                            <div class="form-check">
+                                <input class="form-check-input marcablanca data" type="checkbox" hs-entity="Usuario" hs-field="marcablanca" value="" id="marcablanca">
+                                <label class="form-check-label" for="marcablanca">Usuario Marca Blanca</label>
+                            </div>
+                        </div>
+                        <!-- Usuario Mostrar CAE / RGPD -->
+                        <div class="col-12 col-md-6 text-left justify-content-end d-flex flex-column align-items-start">
+                            <div class="form-check">
+                                <input class="form-check-input mostrarcae data" type="checkbox" hs-entity="Usuario" hs-field="mostrarcae" value="" id="mostrarcae">
+                                <label class="form-check-label" for="mostrarcae">Mostrar CAE</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input mostrarrgpd data" type="checkbox" hs-entity="Usuario" hs-field="mostrarrgpd" value="" id="mostrarrgpd">
+                                <label class="form-check-label" for="mostrarrgpd">Mostrar RGPD</label>
+                            </div>                            
+                        </div>                        
                         <!-- Estado del administrador -->
                         <div class="col-12 col-md-2 text-left">
                             <label for="estado"><i class="bi bi-geo-alt pr-2"></i>Estado</label>
@@ -76,7 +98,8 @@
                             <select id="provincia" name="provincia" class="select-data data custom-select form-control selectpicker" data-live-search="true" hs-entity="Usuario" hs-field="provinciaid" hs-list-entity="Provincia" hs-list-field="Nombre" hs-list-value="Id"></select>
                         </div>                        
                     </div>               
-                       
+                    <!-- Datos de contacto -->
+                    <span class="titulo d-block pl-0 font-weight-bold mb-3 text-dark text-uppercase">Datos de contacto</span>
                     <!-- Datos del administrador Nombre administrador, teléfono, e-mail -->                   
                     <div class="form-group row mb-4">
 
@@ -116,9 +139,8 @@
                         </div>  
 
                     </div>                  
-
-                <!-- Observaciones -->
-
+                    
+                    <!-- Observaciones -->
                     <div class="form-group row mb-4">
 
                         <div class="col-12">
@@ -127,6 +149,38 @@
                         </div>
 
                     </div>  
+
+                    <!-- Facturación -->
+                    <span class="titulo d-block pl-0 font-weight-bold mb-3 text-dark text-uppercase">Datos de facturación</span>
+                    <div class="form-group row mb-3">
+                        <div class="col-12 col-md-3">
+                            <label for="emailfacturacion"><i class="bi bi-person pr-2"></i>E-mail Facturación</label>                          
+                            <input type="email" class="form-control data text-left" maxlength="255" id="emailfacturacion" name="emailfacturacion" placeholder="E-mail donde enviar los correos relativos a facturación" hs-entity="Usuario" hs-field="emailfacturacion">
+                        </div>
+                        <div class="col-12 col-md-2">
+                            <label for="ibanliquidaciones"><i class="bi bi-credit-card-2-front pr-2"></i>IBAN Cuenta Liquidaciones</label>                          
+                            <input type="text" class="form-control data text-uppercase text-center" maxlength="20" id="ibanliquidaciones" name="ibanliquidaciones" placeholder="IBAN Liquidaciones" hs-entity="Usuario" hs-field="ibanliquidaciones">
+                        </div>                        
+                    </div>
+
+                    <!-- Opciones de facturación -->
+                    <div class="form-group row mb-3">
+
+                        <div class="col-12">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input data" hs-entity="Usuario" hs-field="optagrupaservicios" type="checkbox" id="chkAgrupaServicios">
+                                <label class="form-check-label" for="chkAgrupaServicios">Agrupar servicios en una misma factura</label>
+                            </div>                    
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input data" hs-entity="Usuario" hs-field="optenvioapi" type="checkbox" id="chkApiTuComunidad">
+                                <label class="form-check-label" for="chkApiTuComunidad">Enviar Facturas a TuComunidad</label>
+                            </div>                    
+                        </div>
+
+                    </div>
 
                     <?php if($App->getAction() == 'get'): ?>
 

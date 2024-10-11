@@ -84,31 +84,35 @@
 
             </div>
             <!-- Listado de comunidades -->
-            <div class="row">
+            <div class="row flex-grow-1">
 
                 <div class="col-12 d-flex">
 
-                    <div class="card flex-fill shadow-neumorphic">
+                    <div class="card flex-fill shadow-neumorphic h-100 card-principal overflow-hidden">
 
                         <div class="card-header">
 
                             <div class="row">
 
-                                <div class="col-12 col-md-9">
-                                    <h5 class="card-title mb-0"><i class="bi bi-building"></i> Tus comunidades</h5>
+                                <div class="col-12 col-md-6">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <h5 class="card-title mb-0"><i class="bi bi-building"></i> Tus comunidades</h5>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-12 col-md-3 text-right">
+
+                                <div class="col-12 col-md-6 text-right">
                                     <a href="comunidad/add" class="btn btn-outline-secondary text-uppercase rounded-pill shadow pl-2 pr-4"><i class="bi bi-plus-circle pr-3"></i> AÑADIR COMUNIDAD</a>
                                 </div>
+
                             </div>
-
-
 
                         </div>
                         
                         <div class="listado pl-3 pr-3 pb-3">
 
-                            <table class="table table-hover my-0 hs-tabla" name="listadoComunidad" id="listadoComunidad" data-model="comunidad">
+                            <table class="table table-bordered table-hover my-0 hs-tabla" name="listadoComunidad" id="listadoComunidad" data-model="comunidad">
                                 <thead class="thead"></thead>
                                 <tbody class="tbody"></tbody>
                             </table>

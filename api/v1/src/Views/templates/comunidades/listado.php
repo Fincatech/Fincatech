@@ -1,4 +1,4 @@
-<table class="table table-hover my-0 listadoComunidadesDashboard">
+<table class="table table-bordered table-hover my-0 listadoComunidadesDashboard">
     <thead>
         <tr>
             <th>Código</th>

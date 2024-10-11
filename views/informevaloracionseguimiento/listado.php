@@ -2,7 +2,7 @@
 
     <div class="col-12 d-flex">
 
-        <div class="card flex-fill">
+        <div class="card flex-fill card-principal">
 
             <div class="card-header pl-0 headerListado">
 
@@ -23,7 +23,7 @@
 
                     <div class="row">
                         <div class="col-sm-12">
-                            <table class="table table-hover my-0 hs-tabla no-footer no-clicable" data-order='[[ 0, "desc"]]' name="listadoInformevaloracionseguimiento" id="listadoInformevaloracionseguimiento" data-model="Notasinformativas">
+                            <table class="table table-bordered table-hover my-0 hs-tabla no-footer no-clicable" data-order='[[ 0, "desc"]]' name="listadoInformevaloracionseguimiento" id="listadoInformevaloracionseguimiento" data-model="Notasinformativas">
                                 <thead class="thead"></thead>
                                 <tbody class="tbody"></tbody>
                             </table>

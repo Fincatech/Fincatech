@@ -12,10 +12,10 @@
                     </div>
                 </div>
                 <div class="row mt-3 justify-content-center">
-                    <div class="col-12 col-md-3">
+                    <div class="col-12 col-md-3 fincatech--cae">
                         <a href="javascript:void(0);" class="btnRequisitosPendientesCAE d-block btn btn-outline-secondary rounded-pill text-uppercase shadow pl-2 pr-4"><i class="bi bi-shield-exclamation"></i> CAE</a>
                     </div>
-                    <div class="col-12 col-md-4">
+                    <div class="col-12 col-md-4 fincatech--rgpd">
                         <a href="javascript:void(0);" class="btnRequisitosPendientes d-block btn btn-outline-secondary rounded-pill  shadow text-uppercase pl-2 pr-4" data-tipo="rgpd"><i class="bi bi-shield-exclamation"></i> RGPD</a>
                     </div>
                 </div>

@@ -19,10 +19,13 @@
 
             <!-- Contrato -->
             <div class="form-group mb-3">
-                <label for="ficheroadjuntar" class="form-label">Cargue el contrato que desea ser firmado.<br><span class="text-danger">Solo se admiten ficheros PDF.</span></label>
-                <div class="custom-file">
-                    <input type="file" accept=".pdf" class="custom-file-input" name="ficheroadjuntar" id="ficheroadjuntar" lang="es">
-                    <label class="custom-file-label" for="documentoContrato">Seleccionar Archivo</label>
+                <p class="mb-0"><i class="bi bi-file-pdf-fill"></i>  Cargue el contrato para firmar.</p>
+                <p class="font-size-small text-primary">
+                    <small><i class="bi bi-info-circle-fill"></i> Solo se admite un fichero en formato PDF por envío</small>
+                </p>
+                <div class="custom-file w-100">
+                    <!-- <label class="form-label" for="ficheroadjuntarcontrato"><i class="bi bi-file-pdf-fill"></i> Seleccionar archivo</label> -->
+                    <input type="file" accept=".pdf" class="form-control form-control-sm border-0 shadow-inset p-2" name="ficheroadjuntarcontrato" id="ficheroadjuntarcontrato" lang="es">
                 </div>                
                     
             </div>

@@ -12,7 +12,7 @@
                 </div>
 
                 <div class="card-body">
-                    <table class="table table-hover my-0 hs-tabla w-100" name="listadoComunidadesAdministrador" id="listadoComunidadesAdministrador" data-model="comunidad">
+                    <table class="table table-bordered table-hover my-0 hs-tabla w-100" name="listadoComunidadesAdministrador" id="listadoComunidadesAdministrador" data-model="comunidad">
                         <thead class="thead"></thead>
                         <tbody class="tbody"></tbody>
                     </table>

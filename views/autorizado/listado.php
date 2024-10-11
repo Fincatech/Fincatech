@@ -23,7 +23,7 @@
 
                     <div class="row">
                         <div class="col-sm-12">
-                            <table class="table table-hover my-0 hs-tabla no-footer no-clicable" data-order='[[ 0, "desc"]]' name="listadoUsuariosAutorizados" id="listadoUsuariosAutorizados" data-model="Autorizado">
+                            <table class="table table-bordered table-hover my-0 hs-tabla no-footer no-clicable" data-order='[[ 0, "desc"]]' name="listadoUsuariosAutorizados" id="listadoUsuariosAutorizados" data-model="Autorizado">
                                 <thead class="thead"></thead>
                                 <tbody class="tbody"></tbody>
                             </table>

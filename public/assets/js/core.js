@@ -1,16 +1,19 @@
 
 let clickEventType = ((document.ontouchstart!==null)?'click':'touchstart');
-let environment = 'd';
 let baseURL = (environment == 'd' ? '/fincatech/' : '/');
 var role = null;
 var showingLoadComunidades = false;
+
+//  Eventos del core
+const eventCoreInitialized = new CustomEvent('coreInitialized');
+const eventModelLoaded = new CustomEvent('modelLoaded');
 
 let Constantes = {
 
    CargaComunidades: `
    <div class="row">
         <div class="col-12 text-center text-uppercase align-self-center">
-          <p class="m-0" style="display: block; font-size: 18px;"> Carga automática de comunidades</p>
+          <p class="m-0" style="display: block; font-size: 18px;">Importación de Comunidades</p>
         </div>
     </div>
     <div class="row mb-2 wrapperInformacion">
@@ -61,11 +64,13 @@ let Constantes = {
 
     <div class="wrapperProgresoCarga row" style="display: none;">
       <div class="col-12">
-          <label class="text-center mb-2 mt-3">Procesando fichero</label>
+          <label class="text-center mb-2 mt-3">Procesando</label>
           <div class="progress mb-3" style="height: 30px;">
             <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">Animated</div>
           </div>
-          <label class="progresoCarga">(n de y procesados)</label>
+          <label class="d-block text-left mb-3"><strong>Administrador</strong>: <span class="importacionAdministrador"></span></label>
+          <label class="d-block text-left mb-3"><strong>Comunidad</strong>: <span class="importacionComunidad"></span></label>
+          <label class="progresoCarga d-block">(0 de 0 procesados)</label>
           <div class="row mt-3 btnCerrarProceso" style="display: none;">
             <div class="col-12">
               <a href="javascript:swal.close();" class="btn btn-success">OK</a>
@@ -310,10 +315,21 @@ let core =
 
     }
 
-    core.Events();
+    let p = new Promise(async (resolve, reject) => {
+      await core.Security.getUserInfo().then(()=>{
+        resolve(true);
+      });
+    });
 
-    //  Recuperamos la info del usuario
-        core.Security.getUserInfo();
+    p.then((result) =>{
+      core.Events();
+      document.dispatchEvent(eventCoreInitialized);
+    });
+
+    // core.Events();
+
+    // //  Recuperamos la info del usuario
+    //     core.Security.getUserInfo();
 
   },
 
@@ -401,6 +417,32 @@ let core =
       return validRegex.test(email.toLowerCase());
     },
 
+    getCookie: function(cname) {
+      let name = cname + "=";
+      let decodedCookie = decodeURIComponent(document.cookie);
+      let ca = decodedCookie.split(';');
+      for(let i = 0; i <ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+          c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+          return c.substring(name.length, c.length);
+        }
+      }
+      return "";
+    },
+
+    parseJwt: function(token) {
+      var base64Url = token.split('.')[1];
+      var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+  
+      return JSON.parse(jsonPayload);
+  },    
+
   },
 
   /** Módulo de gestión de ficheros */
@@ -467,18 +509,28 @@ let core =
 
     },
 
+    /**
+     * Check if file is an excel file
+     * @param {*} idDOMInputFile 
+     * @returns 
+     */
     isExcelFile: function(idDOMInputFile)
     {
+        var fileNameToCheck = $(`#${idDOMInputFile}`).val().toLowerCase();
+        extension = fileNameToCheck.substring(fileNameToCheck.lastIndexOf('.') + 1)
+        return (extension === 'xls' || extension === 'xlsx');
+    },
 
-        var resultado = false;
-        var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xlsx|.xls)$/;  
-        /*Checks whether the file is a valid excel file*/  
-        if (regex.test($(`#${idDOMInputFile}`).val().toLowerCase())) {  
-          return true;
-        }else{
-          return false;
-        }
-
+    /**
+     * Check if file is a pdf file
+     * @param {*} idDOMInputFile 
+     * @returns 
+     */    
+    isPDFFile: function(idDOMInputFile)
+    {
+      var fileNameToCheck = $(`#${idDOMInputFile}`).val().toLowerCase();
+      extension = fileNameToCheck.substring(fileNameToCheck.lastIndexOf('.') + 1)
+      return (extension === 'pdf'); 
     }
 
   },
@@ -504,36 +556,38 @@ let core =
       }
 
       $('body').trigger('hsFormDataLoaded',$(formularioDestino).attr('id'));
-
+      document.dispatchEvent(eventModelLoaded);
     },
 
-    init: async function()
+    init: function()
     {
 
       // var promesa = new Promise(function(resolve, reject){
-      var promesa = new Promise(function(resolve, reject){
-          core.Forms.initializeSelectData( (resultado) =>{
-            console.log('----Resultado-----');
-            resolve(true);
-          });
+      let promesa = new Promise(async function(resolve, reject){
+          await core.Forms.initializeSelectData();
+          // console.log('----Resultado-----');
+          resolve(true);
       });
 
       promesa.then(function(){
-
-        console.log('Ha terminado el initialize y entra en la promesa.then');
-      
-        console.log(' *** Promesa terminada ***');
+        // console.log('Ha terminado el initialize y entra en la promesa.then');
+        // console.log(' *** Promesa terminada ***');
+        return true;
       });
 
     },
 
+    /**
+     * Recupera los  datos de la entidad en función del modelo y del ID que se va a consultar
+     */
     getModelo: function(){
 
-      // console.log('getModelo');
+
       if(core.modelId != "")
       {
-
-        apiFincatech.get(core.model.toLowerCase() + "/" + core.modelId).then( (result) =>{
+        
+        // apiFincatech.get(core.model.toLowerCase() + "/" + core.modelId).then( (result) =>{
+        apiFincatech.get(core.model + "/" + core.modelId).then( (result) =>{
 
           //  Primero controlamos el código de estado
           var estado = JSON.parse(result)["status"];
@@ -547,16 +601,21 @@ let core =
 
           }
 
+          //  FIX: ORR Se coge el nombre de la entidad desde el propio schema
+          let res = JSON.parse(result);
+          let keys = Object.getOwnPropertyNames(res.data.schema);
+          //  Establecemos el nombre de la entidad desde el propio objecto del schema
+          core.model = keys[0];
+          core.Modelo.entity[core.model] = res["data"][core.model];
+
           //  Mapeamos los datos en el formulario
-          core.Modelo.entity[core.model] = JSON.parse(result)["data"][core.model];
-
-          //console.log(core.Modelo.entity[core.model]);
           core.Forms.mapData();
+          // core.Modelo.entity[core.model] = JSON.parse(result)["data"][core.model];
+          // console.log(core.Modelo.entity[core.model]);
 
+          //  Inicializamos el valor del campo de password a nulo para evitar que se carguen datos
           if($('#password').length)
-          {
             $('#password').val('');
-          }
 
           //  Si no está definido, entonces dejamos por defecto el que viene
               if(CoreUI.tituloModulo !== null)
@@ -596,7 +655,7 @@ let core =
     initializeSelectData: async function()
     {
 
-      var promesaSelect;
+      let promesaSelect;
       var numeroCombos = $("body .form-data .select-data").length;
       var iCombo = 0;
 
@@ -622,33 +681,27 @@ let core =
                 insertarOpcionSeleccionar = ($(this).attr('hs-seleccionar') == 'false' ? false : true);              
               }
 
-              var promesaSelectActual = new Promise(async function(resolve2, reject2){
-                // console.log('Llamada a getselectdata');
-                core.Forms.getSelectData( entidadCombo, keyField, keyValue, null, null, elDOM, insertarOpcionSeleccionar ).then((result)=>{
-                  // console.log('--- Ha resuelto GetSelectData ---');
-                  iCombo++;
-                  // console.log('numeroCombos: ' + numeroCombos);
-                  // console.log('iCombo: ' + iCombo);
-                  if(iCombo >= numeroCombos)
-                  {
-                    // console.log('icombo>=n')
+              let promesaSelectActual = new Promise(async function(resolve, reject){
+                await core.Forms.getSelectData( entidadCombo, keyField, keyValue, null, null, elDOM, insertarOpcionSeleccionar ).then(()=>{
                     resolve(true);
-                  }
                 });
+              });
 
+              promesaSelectActual.then( result =>{
+                // console.log('Combo cargado');
+                resolve(true);
               });
 
           });
 
         }else{
-          // console.log('resolve2')
           resolve(true);
         }
         
       });
 
         promesaSelect.then(function(){
-          // console.log('------------ promSelect2');
+          // console.log('------------ Fin carga selectdata ------------');
           core.Forms.getModelo();
           return promesaSelect;
         }); 
@@ -662,7 +715,7 @@ let core =
         //  Vaciamos el combo
             $("body #" + elementoDOM).html("");
         //  Recuperamos los registros que correspondan según la entidad
-       var promSelect = new Promise( function(resolve, reject)
+       let promSelect = new Promise( function(resolve, reject)
         {
            apiFincatech.get(`${entidad}/list?target=cbo`).then( (data) =>
           // await apiFincatech.get(`${entidad}/list?target=cbo`).then( async (data) =>
@@ -737,15 +790,19 @@ let core =
                 var entidad = $(this).attr('hs-entity');
                 var campo = $(this).attr('hs-field') ;
                 var valor = '';
-                
+                console.log('entidad: ', entidad);
+                console.log('campo: ', campo);     
+
                 //  Comprobamos si el dato pertenece a una subentidad
                     if( typeof datosModelo[entidad] === 'undefined')
                     {
                         valor = datosModelo[campo];
+                        console.log('1');
                     }else{
                         valor = datosModelo[entidad][campo];
+                        console.log('2');
                     }
-
+ console.log('Valor: ' , valor);
                     if( campo != 'password' )
                     {
                     //  FIXME: Arregla el if para evitar tantas anidaciones
@@ -782,6 +839,7 @@ let core =
                             }
                           }else{
                             $(this).val( valor );
+                            console.log('Valor: ' , valor);
                           }
           
                         }
@@ -792,105 +850,139 @@ let core =
             });
     },
 
-    /** Mapeamos la información devuelta por el endpoint con los datos del formulario */
+    //TOFIX: Mejorar el mapeo de formularios, se debería de poder hacer mediante acceso directo y no por array a la entidad principal
+    //  Una solución podría pasar por especificar el nombre del modelo según el componente ¿?
+    /** Mapea la información desde un endpoint a un formulario en pantalla
+     * @param string formularioMapeo (optional). Defaults: Null. Nombre del formulario que se va a rellenar desde el modelo
+     */
     mapData: async function(formularioMapeo = null)
     {
-      var formularioDestino = 'body .form-data';
-      var valor = '';
-      if(formularioMapeo !== null)
-        formularioDestino = `body .${formularioMapeo}`;
+        try{
 
-      //  Comprobamos que esté declarado el formulario
-      // if($("body .form-data").length)
-      if( $(formularioDestino).length )
-      {
-        //  .form-data -> Dentro de este container se encuentran todos los datos
-        // $("body .data").each( function(){
-        $(`${formularioDestino} .data`).each( function(){
+          var formularioDestino = 'body .form-data';
+          var valor = '';
 
-          var entidad = $(this).attr('hs-entity') ;
-          var campo = $(this).attr('hs-field') ;
-          var entidadRelacionada = $(this).attr('hs-entity-related');
-         
-          //  Validamos que el campo venga informado desde el endpoint
-          if( typeof entidadRelacionada === 'undefined' )
+          var entidad;
+          var campo;
+          var entidadRelacionada;
+
+          if(formularioMapeo !== null)
+            formularioDestino = `body .${formularioMapeo}`;
+
+          //  Comprobamos que esté declarado el formulario
+          if( $(formularioDestino).length )
           {
+            //  .form-data -> Dentro de este container se encuentran todos los datos
+            $(`${formularioDestino} .data`).each( function(){
 
-            if(typeof core.Modelo.entity[ entidad ][0][campo] !== 'undefined')
-            {
-              valor = core.Modelo.entity[ entidad ][0][campo];
-            }
-          }else{
-            if(typeof core.Modelo.entity[ entidad ][0][entidadRelacionada][0][campo] !== 'undefined')
-            {
-               valor = core.Modelo.entity[ entidad ][0][entidadRelacionada][0][campo];
-            }
-          }
-
-
-
-          //var valor = core.Modelo.entity[ entidad ][0][campo];
-          if( campo != 'password' )
-          {
-          //  FIXME: Arregla el if para evitar tantas anidaciones
-              if($(this).hasClass("select-data"))
+              entidad = $(this).attr('hs-entity') ;
+              campo = $(this).attr('hs-field') ;
+              entidadRelacionada = $(this).attr('hs-entity-related');
+            
+              //  Validamos que el campo venga informado desde el endpoint
+              if( typeof entidadRelacionada === 'undefined' )
               {
-                //  Leemos el id
-                    var id = $(this).attr("id");
 
-                //  Validamos que exista el valor en el modelo antes de mapear
-                    if(typeof id !== 'undefined' && id !== -1){
-                        if(valor !== '' && valor !== null){
-                          // console.log('Valor: ' + valor);
-                          // console.log(`Campo: #${id} option[value=${valor}]`);
-                          $(`body #${id} option[value=${valor}]`).attr('selected','selected');
-                          $(`body #${id}`).val(valor);
-                          $(`body #${id}`).trigger('change');
-                          // console.log($(`body #${id} option:selected`).val());
-                        }
-                      }
-                    }else{
+                if(typeof core.Modelo.entity[ entidad ][0][campo] !== 'undefined')
+                  valor = core.Modelo.entity[ entidad ][0][campo];
+
+              }else{
+
+                if(typeof core.Modelo.entity[ entidad ][0][entidadRelacionada][0][campo] !== 'undefined')
+                  valor = core.Modelo.entity[ entidad ][0][entidadRelacionada][0][campo];
+
+              }
+
+              //  Validamos que no sea el campo de contraseña
+              if( campo != 'password' )
+              {
+              //  FIXME: Arregla el if para evitar tantas anidaciones
+                  if($(this).hasClass("select-data"))
+                  {
+                          //  Leemos el id del campo
+                          var id = $(this).attr("id");
+                          //  Validamos que exista el valor en el modelo antes de mapear
+                          if(typeof id !== 'undefined' && id !== -1)
+                          {
+
+                            console.log('Entra con valor: ', valor);
+
+                            if(valor !== '' && valor !== null)
+                            {
+                              $(`body #${id} option[value=${valor}]`).attr('selected','selected');
+                              $(`body #${id}`).val(valor);
+                              $(`body #${id}`).trigger('change');
+                            }
+                          }
+                  }else{
 
                       //  ¿ Es un checkbox ? 
                       if($(this).hasClass("form-check-input"))
                       {
-                        console.log('Valor checkbox campo : ' + campo + ' - ' +  valor);
                         if(valor == 1)
                         {
-                          console.log('Intentando checar')  ;
                           $(this).attr('checked', true);
                         }else{
-                        console.log('Intentando checar false')  ;
                           $(this).attr('checked', false);
                         }
                       }else{
+
+                        //  Si es un campo DATE hay que parsear el resultado para quitar la hora ya que 
+                        //  podría no coger correctamente el valor
+                        if($(this).is('[type="date"]')){
+                          valor = moment(valor).format('YYYY-MM-DD');
+                        }
+
                         $(this).val( valor );
+
+                        //  Si es un enlace hay que parsear el href para dotarlo de funcionalidad
+                        if($(this).is('a')){
+                          $(this).attr('href', valor);
+                        }
+
+                        //  Si es un label lo seteamos con el método html
+                        if($(this).is('label') || $(this).is('span') || $(this).is('div')){
+                          $(this).html( valor );
+                        }
+
                       }
 
-                    }
-          }else{
-            $(this).val('');
+                  }
+              }else{
+                $(this).val('');
+              }
+              
+            });
+
+                //  Inicializamos el selectpicker
+                // $('.selectpicker').select2({
+                //   theme: 'bootstrap4',           
+                // });
+
+                $('.selectpicker').each(function()
+                {
+                // $(this).trigger('change');
+                  // console.log($(this).val());
+                  // console.log(valor);
+                });
+                
+                //  Se utiliza para los servicios de comunidades
+                $('body input[type="number"]').each(function(e)
+                {
+
+                  //  Se comprueba si tiene informado el atributo value para evitar sobreescrituras inválidas
+                      if(typeof($(this).attr('value')) !== 'undefined')
+                      {
+                        $(this).val( $(this).attr('value') );  
+                      }
+
+                });
           }
-          
-        });
-
-            //  Inicializamos el selectpicker
-            // $('.selectpicker').select2({
-            //   theme: 'bootstrap4',           
-            // });
-
-            $('.selectpicker').each(function()
-            {
-             // $(this).trigger('change');
-              // console.log($(this).val());
-              // console.log(valor);
-            });
-            
-            $('body input[type="number"]').each(function(e)
-            {
-                $(this).val( $(this).attr('value') );
-            });
-      }
+        }catch(error){
+          console.error('Core.js. Line 979. ' + error);
+          console.error('Entidad: ', entidad, ' Campo: ', campo);
+          console.log(core.Modelo.entity[ entidad ]);
+        }
 
     },
 
@@ -1083,6 +1175,10 @@ let core =
       return core.Forms.errorMessage;
     },
 
+    /**
+     * Añade un error al control de errores del formulario
+     * @param {*} _message Mensaje que se desea añadir
+     */
     SetError: function(_message)
     {
         core.Forms.errorMessage = `${core.Forms.errorMessage}<br/><i class="bi bi-x-circle mr-3 text-danger"></i>${_message} `;
@@ -1099,7 +1195,7 @@ let core =
     /** Valida el formulario y devuelve la respuesta correspondiente */
     Validate: function(nombreFormulario = null)
     {
-      var result = true;
+      let result = true;
       core.Forms.errorMessage = '';
       $('.form-error').removeClass('form-error');
 
@@ -1151,7 +1247,7 @@ let core =
         data = params;
       }
       // await apiFincatech.get(`${core.model.toLowerCase()}/list`).then(async (data)=>
-      await apiFincatech.post(`${core.model.toLowerCase()}/list`, data).then(async (data)=>
+        await apiFincatech.post(`${core.modeltoLowerCase()}/list`, data).then(async (data)=>
       {
         result = JSON.parse(data);
         responseStatus = result.status;
@@ -1169,7 +1265,7 @@ let core =
     {
       await apiFincatech.post(`${entidadSave}/create`, postData, showLoading).then(async (response) =>
       {
-console.log(response);
+      console.log(response);
           var responseData = JSON.parse(response);
 
           if(responseData.status['response'] == "ok")
@@ -1193,7 +1289,7 @@ console.log(response);
               }else{
 
                 if(showMessage)
-                  CoreUI.Modal.Success("El registro se ha creado correctamente");    
+                  CoreUI.Modal.Success("Los datos se han guardado satisfactoriamente");    
               }
 
               if(entidadSave.toLowerCase() == 'comunidad' && core.Security.getRole() == 'ADMINFINCAS')          
@@ -1279,7 +1375,7 @@ console.log(response);
             if(responseData.status['response'] == "ok")
             {
 
-              CoreUI.Modal.Success("El registro se ha actualizado correctamente");
+              CoreUI.Modal.Success("Los datos se han actualizado satisfactoriamente");
 
             }else{
 
@@ -1297,6 +1393,7 @@ console.log(response);
   Security: {
 
       user: null,
+      userData: null,
 
       init: function(){
         this.events();
@@ -1308,10 +1405,12 @@ console.log(response);
         $('#password').val('');
         $('form').attr('autocomplete', 'off');
         $('input').attr('autocomplete', 'off');
+
       },
 
       events: function(){
 
+        /** Autenticación de usuario */
         $('body').on(core.helper.clickEventType, '.btnAuthenticate', function(e)
         {
           //  Validamos los campos obligatorios
@@ -1348,9 +1447,11 @@ console.log(response);
 
               respuesta = JSON.parse(response);
 
-              core.Security.user = respuesta.user.id;
-              core.Security.rgpd = respuesta.user.rgpd;
-
+              core.Security.user = respuesta.data.id;
+              core.Security.rgpd = respuesta.data.rgpd;
+              core.Security.userData = respuesta.data;
+// console.log('getUserInfo');
+// console.log(core.Security.userData);
               if(respuesta.user.nombre != null && respuesta.user.nombre != '')
               {
                   $('.usuarioFincatech').text(respuesta.user.nombre);
@@ -1674,7 +1775,7 @@ console.log(response);
 //  Inicialización del core
 $(function()
 {
-
+  
     apiFincatech.init();
     core.init();
     $('.loading').hide();

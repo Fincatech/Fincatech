@@ -2,22 +2,33 @@
 
 namespace  Fincatech\Controller;
 
-
-use Fincatech\Model\UsuarioModel;
 use HappySoftware\Controller\HelperController;
+use Fincatech\Model\UsuarioModel;
+use Fincatech\Controller\ComunidadController;
+
+use stdClass;
 
 class UsuarioController extends FrontController{
+    
 
     private $usuarioModel;
     public $UsuarioModel;
 
     private $usuario;
 
+    protected $ComunidadController;
+
     public function __construct($params = null)
     {
-        $this->InitModel('Usuario', $params);
+        //$this->InitModel('Usuario', $params);
+        $this->UsuarioModel = new UsuarioModel($params);
     }
 
+    /**
+     * Create user
+     * @param string $entidadPrincipal. Entity Name
+     * @param json $datos. JSON Object with values to create
+     */
     public function Create($entidadPrincipal, $datos)
     {
         $datos['salt'] = '';
@@ -38,6 +49,11 @@ class UsuarioController extends FrontController{
             $datos['emailcontacto'] = trim($datos['email']);
         }
 
+        //  Normalización IBAN
+        if(isset($datos['ibanliquidaciones'])){
+            $datos['ibanliquidaciones'] = HelperController::NormalizeIBAN($datos['ibanliquidaciones']);
+        }
+
         $datos['email'] = trim($datos['email']);
 
         if($this->ExisteEmailLogin( $datos['email'] ))
@@ -45,10 +61,10 @@ class UsuarioController extends FrontController{
             return HelperController::errorResponse('error','El e-mail ya existe', 200);
         }else{
             //  Llenamos el modelo y lo guardamos
-            $this->UsuarioModel->Fill('usuario');
-            $this->UsuarioModel->_Save();
+            // $this->UsuarioModel->Fill('usuario');
+            // $this->UsuarioModel->_Save();
             //  Llamamos al método de crear
-            //return $this->UsuarioModel->Create($entidadPrincipal, $datos);
+            return $this->UsuarioModel->Create($entidadPrincipal, $datos);
         }
 
         
@@ -56,7 +72,9 @@ class UsuarioController extends FrontController{
 
     public function Update($entidadPrincipal, $datos, $usuarioId)
     {
-        
+
+        //TODO: Hay que recuperar el usuario original para poder realizar la actualización de los datos que corresponda y que vengan informados
+
         if( isset($datos['password']) )
         {
             $datos['salt'] = '';
@@ -76,6 +94,21 @@ class UsuarioController extends FrontController{
             // $datos['email'] = $datos['emailcontacto'];
         }
 
+        //  Check if user status is H (Histórico) or B (Baja)
+        if(isset($datos['estado']))
+        {
+            //  Check if user status is H (Histórico) or B (Baja)
+            if($datos['estado'] == 'H' || $datos['estado'] == 'B')
+            {
+                $this->MoveCommunitiesToHistorico($usuarioId);
+            }
+        }
+
+        //  Normalización IBAN
+        if(isset($datos['ibanliquidaciones'])){
+            $datos['ibanliquidaciones'] = HelperController::NormalizeIBAN($datos['ibanliquidaciones']);
+        }
+
         return $this->UsuarioModel->Update($entidadPrincipal, $datos, $usuarioId); 
     }
 
@@ -86,13 +119,71 @@ class UsuarioController extends FrontController{
 
     public function Delete($id)
     {
+        $this->MoveCommunitiesToHistorico($id);
         return $this->UsuarioModel->Delete($id);
     }
 
     public function Get($id)
     {
+
         $this->usuario = $this->UsuarioModel->Get($id);
+
+        if(count($this->usuario) > 0)
+        {
+            //  Quitamos los campos de password
+            unset($this->usuario['Usuario'][0]['password']);
+        }
+
         return $this->usuario;
+    }
+
+    /**
+     * Este método se utiliza para recuperar únicamente la información esencial y necesaria para la parte del front
+     */
+    public function GetResumedInfo()
+    {
+
+        $usuarioId = $this->getLoggedUserId();
+        $this->usuario = $this->UsuarioModel->Get($usuarioId);
+
+        if(count($this->usuario) > 0)
+        {
+
+            $usuarioData = $this->usuario['Usuario'][0];
+
+            $rpgd = null;
+            $cae = null;
+
+            if(!is_null($usuarioData['idadministrador']))
+            {
+                $usuarioAdministrador = $this->UsuarioModel->Get($usuarioData['idadministrador']);
+                $rpgd = $usuarioAdministrador['Usuario'][0]['mostrarrgpd'];
+                $cae = $usuarioAdministrador['Usuario'][0]['mostrarcae'];
+            }
+
+            $usuario = [];
+            //  ID
+            $usuario['id'] = $usuarioData['id'];
+            //  Nombre
+            $usuario['nombre'] = $usuarioData['nombre'];
+            //  Email
+            $usuario['email'] = $usuarioData['email'];
+            //  Login
+            $usuario['login'] = $usuarioData['email'];
+            //  Admin autorizado
+            $usuario['authorized'] = $usuarioData['idadministrador'] == '' ? -1 : 1;
+            //  CAE
+            $usuario['mostrarcae'] = boolval(is_null($cae) ? $usuarioData['mostrarcae'] : $cae);
+            //  RGPD
+            $usuario['mostrarrgpd'] = boolval(is_null($rpgd) ? $usuarioData['mostrarrgpd'] : $rpgd);
+            //  ROL
+            $usuario['role'] = 'ROLE_' . strtoupper($usuarioData['rol'][0]['alias']);
+            //  RGPD Firmada
+            $usuario['rgpd'] = $usuarioData['rgpd'];
+
+        }
+
+        return $usuario;
     }
 
     public function List($params = null)
@@ -152,7 +243,7 @@ class UsuarioController extends FrontController{
         $usuario = $this->Get($userId);
 
         //  Si el usuario existe, recuperamos el id del administrador                
-        if(!empty($usuario) && @isset($usuario['Usuario']))
+        if(!empty($usuario) && @isset($usuario['Usuario']) && count($usuario) > 0)
         {
             $administradorId = $usuario['Usuario'][0]['idadministrador'];
         }
@@ -169,6 +260,48 @@ class UsuarioController extends FrontController{
     public function ExisteEmailLogin($email)
     {
         return $this->UsuarioModel->ValidateUserEmail($email);
+    }
+
+    /** Inserta en una cookie los accesos para cae y rgpd que tiene establecidos el usuario */
+    public function CheckAccess()
+    {
+
+        $accesos = Array(
+            'cae' => '',
+            'rgpd' =>  ''
+        );
+
+        if($this->isLogged()) 
+        {
+            $userId = $this->getLoggedUserId();
+            $usuario = $this->Get($userId);
+
+            $accesos['cae'] = $usuario['Usuario'][0]['mostrarcae'];
+            $accesos['rgpd'] = $usuario['Usuario'][0]['mostrarrgpd'];
+            $accesos = json_encode($accesos);
+            //  Eliminamos la cookie
+            setcookie('FINCATECHACCESS', '', time() - 3600, '/');
+            //  Actualizamos la cookie
+            setcookie('FINCATECHACCESS', $accesos, 0, '/');
+            //  Forzamos la actualización de la cookie
+            $_COOKIE['FINCATECHACCESS'] = $accesos;
+            return $accesos;
+        }else{
+            setcookie('FINCATECHACCESS', '', time() - 3600, '/');
+            return $accesos;
+        }
+    }
+
+    /**
+     * Moves communities of administrador to historic
+     * @param int $usuarioId Administrador ID
+     */
+    private function MoveCommunitiesToHistorico($usuarioId)
+    {
+        //  Move related communities to user to Historic
+        $this->InitController('Comunidad');
+        //  Update comunities to H (Historic) Status
+        $this->ComunidadController->BulkChangeStatus('H', null, $usuarioId);         
     }
 
 }

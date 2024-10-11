@@ -2,10 +2,14 @@
 
     <div class="col-12 d-flex">
 
-        <div class="card flex-fill shadow-neumorphic">
+        <div class="card flex-fill shadow-neumorphic card-principal">
 
-            <div class="card-header">
-                    <h5 class="card-title mb-0">Pre-Facturación</h5>
+            <div class="card-header pl-0 headerListado">
+                <div class="row">
+                    <div class="col-12">
+                        <h5 class="card-title mb-0 pl-4"><i class="bi bi-calculator pr-2"></i> Pre-Facturación</h5>
+                    </div>
+                </div>
             </div>
             
             <div class="card-body pt-0 space-between">

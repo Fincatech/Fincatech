@@ -161,6 +161,20 @@ let empresaCore = {
             comunidadesCore.asignarEmpresa( $(this).attr('data-id') );
         });
 
+        //  Ver actuaciones
+        $('body').on(core.helper.clickEventType, '.btnVerActuacionesEmpresa',function(ev){
+            ev.stopImmediatePropagation();
+            let idEmpresa = $(this).attr('data-idempresa');
+            empresaCore.Controller.MostrarModalActuacionesEmpresa(idEmpresa);
+        });
+
+        //  Ver incidencia email blacklist
+        $('body').on(core.helper.clickEventType, '.btnEmailBlackList', function(ev){
+            ev.stopImmediatePropagation();
+            let email = $(this).attr('data-email');
+            CoreUI.Modal.Error(`El e-mail <strong>${email}</strong> no es válido o no existe.<br>Por favor, verifíquelo.`);
+        });
+
     },
 
     /**
@@ -193,6 +207,60 @@ let empresaCore = {
     },
 
     Controller:{
+
+        MostrarModalActuacionesEmpresa: function(idEmpresa)
+        {
+            apiFincatech.get(`empresa/${idEmpresa}/seguimiento`).then((result)=>{
+                let res = JSON.parse(result);
+                if(result.data == 'error')
+                {
+                    CoreUI.Modal.Error(result.response.error);
+                }else{
+
+                    var actuaciones = res.data.actuaciones;
+                    let html = '';
+                    for(let i = 0; i < actuaciones.length; i++)
+                    {
+                        let fecha = moment(actuaciones[i].created).format('DD/MM/YYYY HH:mm');
+                        let observaciones = '';
+                        let tipo = '';
+                        if(!actuaciones[i].subject)
+                        {
+                            observaciones = actuaciones[i].observaciones;
+                            tipo = actuaciones[i].tipo;
+                        }else{
+                            tipo = 'Envío de E-mail';
+                            observaciones = 'Envío de e-mail informando del alta en la plataforma';
+                        }
+                        
+                        html = `${html}<li class="event" data-date="${fecha}"><h3>${tipo}</h3><p>${observaciones}</p></li>`;
+                    }
+
+                    if(html != '')
+                    {
+                        msgHTML = `<div class="row">
+                        <div class="col-md-12">
+                            <div class="card mb-0">
+                                <div class="card-body">
+                                    <h6 class="card-title">Seguimiento realizado</h6>
+                                    <div id="content">
+                                        <ul class="timeline">${html}</ul>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-12">
+                                        <a href="javascript:swal.close();" class="btn btn-primary px-3 py-2">Cerrar</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                        //  Mostramos el Cuadro de Diálogo
+                        CoreUI.Modal.CustomHTML(msgHTML,'',null,'90%');
+                    }
+                }
+
+            });
+        },
 
         /**
          * Muestra el label de ya existe el cif + la tabla según los datos obtenidos en la consulta
@@ -388,7 +456,10 @@ let empresaCore = {
                     {
                             core.Forms.mapFormDataToSave('formEmpresaComunidad');
                             core.Forms.data['fromcae'] = '1';
-                            core.Forms.data['comunidad'] = core.Modelo.entity.Comunidad[0].nombre;
+                            core.Forms.data['comunidad'] = Object();
+                            core.Forms.data['comunidad']['nombre'] = core.Modelo.entity.Comunidad[0].nombre;
+                            core.Forms.data['comunidad']['id'] = core.Modelo.entity.Comunidad[0].id;
+                            
                             core.Modelo.Insert('empresa', core.Forms.data, false, 'El registro se ha creado correctamente. Hemos remitido un e-mail al proveedor para que acceda y aporte los documentos requeridos.').then( (result)=>{
                                 //  Tenemos que asignar la empresa a la comunidad
                                 apiFincatech.post(`comunidad/${core.modelId}/empresa/${core.Modelo.insertedId}/asignar`, null).then(async ( response ) =>
@@ -526,13 +597,13 @@ let empresaCore = {
 
             //  Columna de acciones
                 var html = '<ul class="nav justify-content-center accionesTabla">';
-                    html += `<li class="nav-item"><a href="${baseURL}empresa/data:id$" class="btnEditarEmpresa d-inline-block" data-id="data:id$" data-nombre="data:razonsocial$"><i data-feather="edit" class="text-success img-fluid"></i></a></li>`;
-                    html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarEmpresa d-inline-block" data-id="data:id$" data-nombre="data:razonsocial$"><i data-feather="trash-2" class="text-danger img-fluid"></i></li></ul>';
+                    html += `<li class="nav-item"><a href="${baseURL}empresa/data:id$" class="btnEditarEmpresa d-inline-block" data-id="data:id$" data-nombre="data:razonsocial$"><i data-feather="edit" class="text-success img-fluid icono-accion"></i></a></li>`;
+                    html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarEmpresa d-inline-block" data-id="data:id$" data-nombre="data:razonsocial$"><i data-feather="trash-2" class="text-danger img-fluid icono-accion"></i></li></ul>';
                 CoreUI.tableData.addColumn('listadoEmpresa', null, "", html);
 
                 $('#listadoEmpresa').addClass('no-clicable');
                 // CoreUI.tableData.render("listadoEmpresa", "Empresa", "empresa/list", false, true, true, null, false, false, null, true);
-                CoreUI.tableData.render("listadoEmpresa", "Empresa", "empresa/list");
+                CoreUI.tableData.render('listadoEmpresa', 'Empresa', 'empresa/list', false, true, true,null,null,false,null,true);
         }
     },
 
@@ -700,7 +771,25 @@ let empresaCore = {
             CoreUI.tableData.addColumn('listadoEmpresaComunidad', "cif", "CIF", null, 'text-justify');
 
             //  Email
-            CoreUI.tableData.addColumn('listadoEmpresaComunidad', "email", "EMAIL", null, 'text-left');
+            // CoreUI.tableData.addColumn('listadoEmpresaComunidad', "email", "EMAIL", null, 'text-left');
+            CoreUI.tableData.addColumn('listadoEmpresaComunidad', function(row, type, val, meta)
+            {
+
+                let enlaceEmailBlackList = '';
+
+                //  Validación de e-mail en blacklist
+                if(row.blacklist == true)
+                {
+                    enlaceEmailBlackList = `<a class="btnEmailBlackList mr-1" data-email="${row.email}" href="javascript:void(0);" title="Email No Valido"><i data-feather="alert-triangle" class="text-danger img-fluid"></i></a> `;
+                }
+
+                html = `${enlaceEmailBlackList}${row.email}`;
+
+                return html;
+
+            }, "EMAIL", null, 'text-left');    
+
+
 
             //  Email
             CoreUI.tableData.addColumn('listadoEmpresaComunidad', "telefono", "TELEFONO", null, 'text-left');
@@ -743,25 +832,31 @@ let empresaCore = {
             CoreUI.tableData.addColumn('listadoEmpresaComunidad', function(row, type, val, meta)
             {
                 var enlaceEmailCertificado = '';
-                if(row.emailcertificado !== '' && row.emailcertificado !== 'null'  && row.emailcertificado !== null)
+
+                if( (row.emailcertificado !== '' && row.emailcertificado !== 'null'  && row.emailcertificado !== null) && row.blacklist != true)
                 {
-                    enlaceEmailCertificado = `<a class="btnDescargarEmailCertificado" href="${baseURL}public/storage/emailcertificados/${row.emailcertificado}" target="_blank" title="Email certificado"><i data-feather="mail" class="text-success img-fluid"></i></a> `;
+                    enlaceEmailCertificado = `<a class="btnDescargarEmailCertificado mr-1" href="${baseURL}public/storage/emailcertificados/${row.emailcertificado}" target="_blank" title="Email certificado"><i data-feather="mail" class="text-success img-fluid"></i></a> `;
                 }
 
-                //  Email certificado 
+                //  Actuaciones realizadas
+                let actuaciones = '';
+                if(row.estadoprotocolo == '1')
+                {
+                    actuaciones = `<a class="btnVerActuacionesEmpresa mr-1" data-idempresa="${row.id}" href="javascript:void(0);" title="Actuaciones realizadas"><i data-feather="calendar" class="text-primary img-fluid"></i></a>`;
+                }
 
-                var html = `<ul class="nav justify-content-center accionesTabla">`;
+                let html = '';
+                //  Email certificado 
+                html = `<ul class="nav justify-content-end accionesTabla">`;
+
+                if(actuaciones != '')
+                    html = `${html}<li class="nav-item">${actuaciones}</li>`;
 
                 if(enlaceEmailCertificado != '')
-                {
-                    html = `${html}
-                            <li class="nav-item">
-                                ${enlaceEmailCertificado}
-                            </li>`;
-                }
+                    html = `${html}<li class="nav-item">${enlaceEmailCertificado}</li>`;
 
                 html=`${html}<li class="nav-item">
-                                    <a href="javascript:void(0);" class="btnEliminarEmpresaComunidad d-inline-block" data-id="${row.id}" data-nombre="${row.razonsocial}">
+                                    <a href="javascript:void(0);" class="btnEliminarEmpresaComunidad d-inline-block mr-1" data-id="${row.id}" data-nombre="${row.razonsocial}">
                                         <i data-feather="trash-2" class="text-danger img-fluid"></i>
                                     </a>
 
@@ -775,7 +870,7 @@ let empresaCore = {
                 //        checked = ' checked="checked" ';
                 //     }
                 //     return '<input type="checkbox" ' + checked + '>';
-            }, "&nbsp;", null, 'text-center');    
+            }, "&nbsp;", null, 'text-left');    
 
             // //  Columna de acciones
             //     CoreUI.tableData.addColumn('listadoEmpresaComunidad', null, "", html);

@@ -4,13 +4,17 @@ namespace Fincatech\Controller;
 
 // Sustituir Model por el nombre del modelo real. Ej: UsuarioModel
 use Fincatech\Model\CronModel;
+use Fincatech\Controller\DocumentalController;
+use Fincatech\Controller\EmpresaController;
 use HappySoftware\Controller\Traits;
+use HappySoftware\Controller\HelperController;
 
 class CronController extends FrontController{
 
     public $CronModel;
     public $DocumentalController;
     public $MensajeController;
+    public $EmpresaController;
 
     //  Tabla de requerimientos de empresa. Se utiliza para marcar un requerimiento a estado pendiente y moverlo al historial
     private $_tablaRequerimientoEmpresa = 'empresarequerimiento';
@@ -282,6 +286,13 @@ class CronController extends FrontController{
     public function NormalizarInformesMensatek()
     {
         try{
+
+            // Activar la visualización de errores
+            ini_set('display_errors', 1);
+
+            // Reportar todos los errores
+            error_reporting(E_ALL);
+
             //  Establecemos el límite a 0 por si hay muchas peticiones
             set_time_limit(0);
             $emailDestinatarioCronCC = 'oscar.livin@gmail.com';
@@ -307,10 +318,13 @@ class CronController extends FrontController{
 
                 if(strpos($ficheroCertificacion, 'Res:') === false)
                 {
-                    $output .= ' -- Fichero: ' . $ficheroCertificacion . '<br>' . PHP_EOL;
-                    $mensaje .= ' -- Fichero: ' . $ficheroCertificacion . '<br>' . PHP_EOL;
+                    // $output .= ' -- Fichero: ' . $ficheroCertificacion . '<br>' . PHP_EOL;
+                    // $mensaje .= ' -- Fichero: ' . $ficheroCertificacion . '<br>' . PHP_EOL;
+                    $ficheroGenerado = $this->MensajeController->saveFileEmailCertificado($idMensaje, $ficheroCertificacion);
+                    //$this->MensajeController->saveFileEmailCertificado($idMensaje, $ficheroCertificacion);  
+                    $output .= ' -- Fichero: ' . $ficheroGenerado . '<br>' . PHP_EOL;
+                    $mensaje .= ' -- Fichero: ' . $ficheroGenerado . '<br>' . PHP_EOL;
 
-                    $this->MensajeController->saveFileEmailCertificado($idMensaje, $ficheroCertificacion);  
                 }else{
                     $output .= ' -- Fichero: No disponible y no descargado -- Respuesta Mensatek: '.$ficheroCertificacion.'<br>' . PHP_EOL;
                     $mensaje .= ' -- Fichero: No disponible y no descargado -- Respuesta Mensatek: '.$ficheroCertificacion.'<br>' . PHP_EOL;
@@ -321,7 +335,7 @@ class CronController extends FrontController{
             $body = 'Se ha ejecutado el Cron de descarga de informes pendientes de Mensatek<br><br>';
             $body .= $output;
 
-            $this->SendEmail($emailDestinatarioCron,'Fincatech','Cron Normalizacion Informes Mensatek', $body, false);
+            // $this->SendEmail($emailDestinatarioCron,'Fincatech','Cron Normalizacion Informes Mensatek', $body, false);
             $this->SendEmail($emailDestinatarioCronCC,'Fincatech','Cron Normalizacion Informes Mensatek', $body, false);           
             set_time_limit(180);
         }catch(\Exception $ex){
@@ -331,6 +345,41 @@ class CronController extends FrontController{
         }
 
         return $output;
+    }
+
+    /**
+     * Comprueba aquellas empresas que tienen la CAE completada pero que no se ha enviado e-mail a través de mensatek ni se ha recibido certificación
+     */
+    public function PendientesEmision()
+    {
+        try{
+            //  Incrementamos el límite
+            set_time_limit(3600);
+
+            $result = 'No hay documentación cae pendiente de enviar';
+            //  Instanciamos el controller de certificados digitales
+            $this->InitController('Documental');
+            //  Recuperamos los datos relativos a aquellas empresas + comunidad que no se ha enviado el e-mail
+            $emailsPendientes = $this->DocumentalController->PendienteEnviarDocumentacionCAE();
+
+            //  Iteramos sobre los datos recuperados para poder enviar los e-mails correspondientes
+            if(!is_null($emailsPendientes))
+            {
+                $iTotal = 0;
+                for($i = 0; $i < count($emailsPendientes); $i++)
+                {
+                    $idComunidad = $emailsPendientes[$i]['idcomunidad'];
+                    $idEmpresa = $emailsPendientes[$i]['idempresa'];
+                    $iTotal += $this->DocumentalController->comprobarDocumentacionComunidad($idComunidad, $idEmpresa);
+                }
+                $result = 'Se han procesado ' . $iTotal . ' registros';
+            }
+        }catch(\Exception $ex){
+            die('Ha ocurrido la siguiente excepcion: ' . $ex->getMessage());
+        }
+
+        return HelperController::successResponse($result,200);        
+
     }
 
     //============================================================================================
@@ -387,5 +436,86 @@ class CronController extends FrontController{
         return $mensaje;
     }
 
+    /**
+     * Cron que se encarga de enviar el e-mail de alta en la plataforma a aquellas empresas dadas de alta que no está registrado en el sistema de e-mails
+     */
+    public function EnvioAltaPlataformaPendienteEmpresas()
+    {
+        $iEnvios = 0;
+        $empresasEnvio = '';
+
+        try{
+
+            echo 'Cambiando el límite de ejecución en el servidor<br>';
+            $timeLimit = ini_set('max_execution_time', '0');
+            echo 'Resultado cambio tiempo límite: ' . ($timeLimit == true ? 'Ok' : 'No') . '<br>';
+            echo 'Límite de ejecución: ' . ini_get('max_execution_time') . '<br>';
+            
+            $empresasSinEmailAlta = $this->CronModel->ListEmpresasSinEnvioEmailAlta();
+
+            if(count($empresasSinEmailAlta) > 0)
+            {
+                //  Iniciamos el controller de empresas
+                // $empresaController = new \Fincatech\Controller\EmpresaController();
+                $this->InitController('Empresa');
+
+                for($iEmpresa = 0; $iEmpresa < count($empresasSinEmailAlta); $iEmpresa++)
+                {
+                    $empresa = null;
+                    $empresaProceso = $empresasSinEmailAlta[$iEmpresa];
+                    //  Recuperamos la empresa
+                    $empresa = $this->EmpresaController->Get($empresaProceso['id']);
+                    //  Comprobamos que exista la empresa ya que puede haberse eliminado previamente
+                    if(count($empresa['Empresa']) > 0)
+                    {
+                        $empresa = $empresa['Empresa'][0];
+                        
+                        //  Generamos una nueva password aleatoria
+                        $password = HelperController::GenerateRandomPassword(8);
+                        $data['password'] = md5($password);
+
+                        $empresasEnvio .= '<strong>' . $empresa['razonsocial'] . '</strong><br>' . $empresa['email'] . '<br>Nueva Password: ' . $password . '<br><br>';
+
+                        //  Guardamos en bbdd la nueva password
+                        $this->EmpresaController->Update('Empresa', $data, $empresa['id']);
+
+                        //  Recuperamos las comunidades en las que está asignada la empresa
+                        $comunidadesEmpresa = $this->EmpresaController->ComunidadesAsignadas($empresa['id']);
+
+                        //  Enviamos por cada 1 de ellas el e-mail de alta y asignación
+                        if(count($comunidadesEmpresa) > 0)
+                        {
+                            foreach($comunidadesEmpresa as $comunidad)
+                            {
+                                //  Enviamos el e-mail de alta al proveedor por cada una de las comunidades
+                                $this->EmpresaController->EnvioEmailAltaPlataforma($empresa, $comunidad['nombre'], null, $comunidad['administrador'], $password);
+                            }
+                        }else{
+                            //  Enviamos el e-mail del alta sin los datos de comunidad ni de administrador
+                            $this->EmpresaController->EnvioEmailAltaPlataforma($empresa, 'No asignada', null, 'Fincatech', $password);
+                        }
+                        $iEnvios++;
+                    }
+                }
+
+            }
+
+            //  Envío de e-mail con el resultado del cron al administrador del sistema y al dpto de desarrollo
+            $info = 'Nº de envíos realizados: ' . $iEnvios . '<br>';
+            $info .= str_pad("", 75, '-', STR_PAD_LEFT) . '<br>';
+            $info .= 'Empresas a las que se le ha enviado el e-mail de alta<br>';
+            $info .= str_pad("", 75, '-', STR_PAD_LEFT) . '<br><br>';
+            $info .= $empresasEnvio;
+            
+            $this->SendEmail('desarrollo@fincatech.es, oscar.livin@gmail.com','Desarrollo', 'Envío E-mails pendientes Alta Plataforma Empresas', $info, false);
+
+
+        }catch(\Exception $ex)
+        {
+            $this->SendEmail('desarrollo@fincatech.es','Desarrollo', '[Error] Envío E-mails pendientes Alta Plataforma Empresas', $ex->getMessage(), false);    
+        }
+
+
+    }
 
 }

@@ -40,8 +40,8 @@
                             <input type="text" class="form-control data form-required" id="nombre" name="nombre" placeholder="Nombre y apellidos" hs-entity="Autorizado" hs-field="nombre" form-error-message="Nombre" required>
                         </div>
                         <div class="col">
-                            <label for="nombreusuario">NIF/CIF*</label>
-                            <input type="text" class="form-control data form-required" id="cif" name="cif" placeholder="NIF/CIF" hs-entity="Autorizado" hs-field="cif" maxlength="12" form-error-message="NIF/CIF" required>
+                            <label for="nombreusuario">NIF/CIF</label>
+                            <input type="text" class="form-control data" id="cif" name="cif" placeholder="NIF/CIF" hs-entity="Autorizado" hs-field="cif" maxlength="12" form-error-message="NIF/CIF">
                         </div>                        
                         <div class="col col-lg-4">
                             <label for="nombreusuario">Teléfono</label>

@@ -6,7 +6,7 @@
 *
 **/
 namespace HappySoftware\Controller\Traits;
-use HappySoftware\Database\DatabaseCore;
+// use HappySoftware\Database\DatabaseCore;
 
 trait LogTrait{
 
@@ -24,6 +24,20 @@ trait LogTrait{
         fwrite($fileHanddler, $content);
         fclose( $fileHanddler );
 
+    }
+
+    public static function AddToLog($_logName, $_functionName, $_texto)
+    {
+        global $appSettings;
+
+        $logFileName = ROOT_DIR . $appSettings['storage']['log'] . 'log_' . $_logName . '.log';
+
+        $content = '--- [' . date('d-m-Y h:i') . '] --- ( ' . $_functionName . ' ) --- ' . PHP_EOL . PHP_EOL . $_texto . PHP_EOL . PHP_EOL;
+        
+        $fileHanddler = fopen($logFileName, "a");
+
+        fwrite($fileHanddler, $content);
+        fclose( $fileHanddler );
     }
 
 }

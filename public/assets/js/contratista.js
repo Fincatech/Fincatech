@@ -131,7 +131,6 @@ let contratista = {
 
             });
 
-
         }
 
         //  Carga de empleados de la comunidad
@@ -193,6 +192,19 @@ let contratista = {
             }});
 
         });        
+
+        //  Desasignar empleado. Solo contratistas
+        if(core.Security.getRole() === 'CONTRATISTA')
+        {
+            $('body').on(core.helper.clickEventType, '.btnDesasignarEmpleado', function(evt)
+            {
+                evt.stopImmediatePropagation();
+                let idEmpleado = $(this).attr('data-id');
+                let idComunidad = $(this).attr('data-idcomunidad');
+                let nombreEmpleado = $(this).attr('data-nombre');
+                empleadoCore.desasignarEmpleadoComunidad(idComunidad, idEmpleado, core.Modelo.entity.Comunidad[0].nombre, nombreEmpleado);
+            });
+        }
 
     },
 

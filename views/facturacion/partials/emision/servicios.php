@@ -1,0 +1,56 @@
+<!-- Servicios -->
+<div class="row">
+    <div class="col-12">
+        <label for="serviciosFacturacion" class="d-block col-12 font-weight-bold"><i class="bi bi-cart-check pr-2"></i>Servicios contratados y disponibles para facturar</label>
+        <div class="row mb-2 mt-2 emision--servicios-noinfo">
+            <div class="col-12">
+                <p class="mensaje">Seleccione un administrador para ver los servicios contratados susceptibles de ser facturados</p>
+            </div>
+        </div>
+
+        <div class="row mb-2 mt-2 emision--servicios-info" style="display: none;">
+            <div class="col-12 col-lg-3 d-flex align-items-center pb-2">
+                <p class="mb-0 text-secondary">Nombre del Servicio</p>
+            </div>
+            <div class="col-12 col-lg-9 pb-2">
+                <p class="mb-0 text-secondary">Concepto (Opcional)</p>
+            </div>
+        </div>
+
+        <div class="row mb-2 servicio-cae" style="display: none;">
+            <div class="col-12 col-lg-3 d-flex align-items-center">
+                <!-- CAE -->
+                <!-- <div class="form-check form-check-inline"> -->
+                    <!-- <input class="form-check-input chkServicio" type="checkbox" id="chkCAE" data-nombre="CAE" value="1" checked> -->
+                    <label class="form-check-label" for="chkCAE">CAE</label>
+                <!-- </div>                              -->
+            </div>
+            <div class="col-12 col-lg-9">
+                <input type="text" name="conceptoCAE" id="conceptoCAE" class="form-data form-control" placeholder="Concepto" maxlength="100" />
+            </div>
+        </div>
+
+        <!-- DPD -->
+        <div class="row mb-2 servicio-dpd" style="display: none;">
+            <div class="col-12 col-lg-3 d-flex align-items-center">         
+                <label class="form-check-label" for="chkDPD">DPD</label>
+            </div>
+            <div class="col-12 col-lg-9">
+                <input type="text" name="conceptoDPD" id="conceptoDPD" class="form-data form-control" placeholder="Concepto" maxlength="100" />
+            </div>            
+        </div>
+        <!-- Certificados digitales -->
+        <div class="row mb-2 servicio-certificadosdigitales" style="display: none;">
+            <div class="col-12 col-lg-3 d-flex align-items-center">         
+                <!-- <div class="form-check form-check-inline"> -->
+                    <!-- <input class="form-check-input chkServicio" type="checkbox" id="chkCertificado" data-nombre="Certificados Digitales" value="5" checked> -->
+                    <label class="form-check-label" for="chkCertificado">Certificados digitales</label>
+                <!-- </div>           -->
+            </div>
+            <div class="col-12 col-lg-9">
+                <input type="text" name="conceptoCertificadosDigitales" id="conceptoCertificadosDigitales" class="form-data form-control" placeholder="Concepto" maxlength="100" />
+            </div>            
+        </div>
+
+    </div>     
+</div>  

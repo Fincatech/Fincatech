@@ -5,7 +5,13 @@
 <script type="text/javascript" src="<?php echo ASSETS; ?>vendor/node_modules/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript" src="<?php echo ASSETS; ?>vendor/node_modules/izimodal/js/iziModal.min.js"></script>
 <script src="<?php echo ASSETS; ?>vendor/node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
+<!-- Trumbowyg -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/trumbowyg.min.js" integrity="sha512-YJgZG+6o3xSc0k5wv774GS+W1gx0vuSI/kr0E0UylL/Qg/noNspPtYwHPN9q6n59CTR/uhgXfjDXLTRI+uIryg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/langs/es.js" integrity="sha512-yO6uFeei9Tlur9ddXMLUuoRJHuYRv3DY71XJg08avjYd7+5Umyevjnu7uCTrFzd8SXDDIt9ZEdaZEWzJfrxGdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+<!-- <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script> -->
 
 <!-- <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
 <link rel="stylesheet" href="<?php echo ASSETS; ?>vendor/node_modules/sweetalert2/dist/sweetalert2.min.css">
@@ -44,8 +50,24 @@
 <script type="text/javascript" src="<?php echo ASSETS_JS; ?>app.js"></script>
 
 <!-- <script type="text/javascript" src="<?php //echo ASSETS_JS; ?>vendor/xlsx/dist/xlsx.js?v=<?php //echo time(); ?>"></script> -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.7.7/xlsx.core.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xls/0.7.4-a/xls.core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.7.7/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xls/0.7.4-a/xls.full.min.js"></script>
 <!-- Excel: https://github.com/SheetJS/sheetjs -->
 <!-- <script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.1/dist/xlsx.full.min.js"></script> -->
 <!-- <script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.1/dist/shim.min.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<!-- <script src="https://cdn.datatables.net/plug-ins/2.0.3/sorting/natural.js"></script> -->
+<!-- <script src="exceljs.js"></script> -->
+<script>
+    // $.extend($.fn.dataTable.ext.oSort, {
+    //     "natural-no-asc-pre": function(a) {
+    //         return a.replace(/\D/g, '') || null;
+    //     },
+    //     "natural-no-asc-asc": function(a, b) {
+    //         return a.localeCompare(b, undefined, { numeric: true });
+    //     },
+    //     "natural-no-asc-desc": function(a, b) {
+    //         return b.localeCompare(a, undefined, { numeric: true });
+    //     }
+    // });
+</script>

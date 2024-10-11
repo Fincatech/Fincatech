@@ -4,7 +4,7 @@
 
         <div class="col-12 d-flex">
 
-            <div class="card flex-fill shadow-neumorphic pl-3 pb-3 pt-2 pr-3">
+            <div class="card flex-fill shadow-neumorphic pl-3 pb-3 pt-2 pr-3 card-principal">
 
                 <div class="card-header pl-1 mb-2">
 
@@ -74,7 +74,7 @@
                                     </div>
                             <?php endif; ?>    
 
-                                    <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoDocumentacionComunidadCae" id="listadoDocumentacionComunidadCae" data-model="Comunidad">
+                                    <table class="table table-bordered table-hover my-0 hs-tabla w-100 no-clicable" name="listadoDocumentacionComunidadCae" id="listadoDocumentacionComunidadCae" data-model="Comunidad">
                                         <thead class="thead"></thead>
                                         <tbody class="tbody"></tbody>
                                     </table>
@@ -115,7 +115,7 @@
 
                                 <div class="card-body pt-0">
 
-                                    <table class="table table-hover my-0 hs-tabla w-100 no-clicable" data-order='[[ 1, "asc" ]]' name="listadoEmpresaComunidad" id="listadoEmpresaComunidad" data-model="empresa">
+                                    <table class="table table-bordered table-hover my-0 hs-tabla w-100 no-clicable" data-order='[[ 1, "asc" ]]' name="listadoEmpresaComunidad" id="listadoEmpresaComunidad" data-model="empresa">
                                         <thead class="thead"></thead>
                                         <tbody class="tbody"></tbody>
                                     </table>
@@ -190,7 +190,7 @@
                                         <?php endif; ?>    
                                         <div class="row">
                                             <div class="col-12">
-                                                <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoDocumentacionEmpresa" id="listadoDocumentacionEmpresa" data-model="documentacioncae">
+                                                <table class="table table-bordered table-hover my-0 hs-tabla w-100 no-clicable" name="listadoDocumentacionEmpresa" id="listadoDocumentacionEmpresa" data-model="documentacioncae">
                                                     <thead class="thead"></thead>
                                                     <tbody class="tbody"></tbody>
                                                 </table>
@@ -200,7 +200,7 @@
                                         <div class="row pl-3 pr-3">
                                             <div class="col-12 pl-0 pr-0 pt-0">
                                                 <h5 class="text-left br-10 mt-2" style="font-size: 1rem;"><i class="bi bi-file-earmark-arrow-down"></i> Relación de documentos descargados por la empresa</h5>
-                                                    <table class="table table-hover my-0 hs-tabla w-100 no-clicable mt-0" name="listadoDocumentacionDescargaEmpresa" id="listadoDocumentacionDescargaEmpresa" data-model="documentacioncae">
+                                                    <table class="table table-bordered table-hover my-0 hs-tabla w-100 no-clicable mt-0" name="listadoDocumentacionDescargaEmpresa" id="listadoDocumentacionDescargaEmpresa" data-model="documentacioncae">
                                                         <thead class="thead"></thead>
                                                         <tbody class="tbody"></tbody>
                                                     </table>
@@ -211,7 +211,7 @@
                                         <div class="tab-pane fade text-center" id="tab-2" role="tabpanel">
                                             <div class="row">
                                                 <div class="col-12">
-                                                    <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoEmpleadosComunidad" id="listadoEmpleadosComunidad" data-order='[[ 2, "asc" ]]'  data-model="Empleado">
+                                                    <table class="table table-bordered table-hover my-0 hs-tabla w-100 no-clicable" name="listadoEmpleadosComunidad" id="listadoEmpleadosComunidad" data-order='[[ 2, "asc" ]]'  data-model="Empleado">
                                                         <thead class="thead"></thead>
                                                         <tbody class="tbody"></tbody>
                                                     </table>

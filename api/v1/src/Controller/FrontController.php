@@ -7,20 +7,25 @@ use HappySoftware\Controller\HelperController;
 use HappySoftware\Controller\Traits\ConfigTrait;
 use HappySoftware\Controller\Traits\ExcelGen;
 use HappySoftware\Controller\Traits\FilesTrait;
+use HappySoftware\Controller\Traits\FtpTrait;
 use HappySoftware\Controller\Traits\LogTrait;
 use HappySoftware\Controller\Traits\MailTrait;
+use HappySoftware\Controller\Traits\PDFTrait;
 use HappySoftware\Controller\Traits\SmsTrait;
 use HappySoftware\Controller\Traits\SecurityTrait;
+use HappySoftware\Controller\Traits\TemplateTrait;
 use HappySoftware\Controller\Traits\UanatacaTrait;
 use \HappySoftware\Model\Model;
 
 use \PHPMailer\PHPMailer;
 use \PHPMailer\PHPMailer\SMTP;
 use \PHPMailer\PHPMailer\Exception;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 class FrontController{
 
-    use ConfigTrait, FilesTrait, LogTrait, MailTrait, SmsTrait, SecurityTrait;
+    use ConfigTrait, FilesTrait, LogTrait, MailTrait, SmsTrait, SecurityTrait, TemplateTrait, FtpTrait, PDFTrait;
     use UanatacaTrait;
 
     /**
@@ -80,14 +85,65 @@ class FrontController{
      */
     private function InstantiateController($controllerName, $params = null)
     {
-        $controllerName = ucfirst($controllerName).'Controller';
+        $encountered = true;
+
+        //  Validamos primero si existe el fichero con el nombre que viene dado
+        if(!file_exists(ABSPATH.'src/Controller/'.$controllerName.'Controller'.'.php')){
+            $controllerName = ucfirst($controllerName);
+            $encountered = false;
+        }
+
+        //  Si no se ha encontrado probamos con el sistema antiguo
+        if(!$encountered){
+            $encountered = file_exists(ABSPATH.'src/Controller/'.$controllerName.'Controller'.'.php');
+        }
+       
+        //  Si sigue sin encontrarlo vamos a comprobar los ficheros de la carpeta controller para asegurarnos
+        $fixController = $this->FixController($controllerName);
+
+        //  Si sigue sin encontrarse lanzamos una excepción
+        if(!$encountered && $fixController === false){
+            throw new Exception('No se ha encontrado el controller: ' . $controllerName);
+        }
+
+        $controllerName = $fixController;
+
         $controllerInstance = __NAMESPACE__ . '\\'. $controllerName;
+        $controllerInstance = str_replace('.php','',$controllerInstance);
 
         //  Incluimos el fichero
-        include_once(ABSPATH.'src/Controller/'.$controllerName.'.php');
+        include_once(ABSPATH.'src/Controller/' . $controllerName);
 
         //  Instanciamos el controller
         $this->context = new $controllerInstance($params);
+    }
+
+    /**
+     * Hasta que se modifique la arquitectura actual hay que verificar el nombre del controller sobre todo cuando está compuesto de 2 ó más palabras + Controller
+     * @param string $controllerName Nombre del controller
+     * @return string Nombre saneado del controller
+     */
+    private function FixController($controllerName)
+    {
+        $directory = new RecursiveDirectoryIterator(ABSPATH.'src/Controller/');
+        $iterator = new RecursiveIteratorIterator($directory);
+        $controllerName = str_replace('Controller','',$controllerName);
+
+        $resultado = false;
+
+        foreach($iterator as $file)
+        {
+            $nombreArchivo = $file->getFileName();
+
+            if(strtolower($nombreArchivo) === strtolower($controllerName.'controller.php'))
+            {
+                $resultado = $nombreArchivo;
+                break;
+            }
+        }
+
+        return $resultado;
+
     }
 
     /**
@@ -137,6 +193,7 @@ class FrontController{
 
     public function Create($entidadPrincipal, $jsonPostData)
     {
+        error_reporting(E_ERROR | E_PARSE);
         //  Llamamos al método crear del modelo
         $data = $this->context->Create($entidadPrincipal, $jsonPostData);
         //  Validar la respuesta por si tiene error        
@@ -153,8 +210,13 @@ class FrontController{
      */
     public function Delete($id)
     {
-        //  TODO: Evaluar si ha ocurrido algún error en la eliminación y devolverlo
-        return HelperController::successResponse($this->context->Delete($id));
+        //  Evaluar si ha ocurrido algún error en la eliminación y devolverlo
+        $result = $this->context->Delete($id);
+        if($result == 'ok'){
+            return HelperController::successResponse($result);
+        }else{
+            return HelperController::errorResponse('error', $result);
+        }
     }
 
     public function Update($entidadPrincipal, $jsonPostData, $entidadId)

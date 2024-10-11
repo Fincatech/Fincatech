@@ -50,7 +50,7 @@
 
                         <div class="col-12">
 
-                            <table data-search="false" class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoDocumentacionBasica" id="listadoDocumentacionBasica" data-model="Requerimiento">
+                            <table data-search="false" class="table table-bordered table-hover my-0 hs-tabla w-100 no-clicable" name="listadoDocumentacionBasica" id="listadoDocumentacionBasica" data-model="Requerimiento">
                                 <thead class="thead"></thead>
                                 <tbody class="tbody"></tbody>
                             </table>

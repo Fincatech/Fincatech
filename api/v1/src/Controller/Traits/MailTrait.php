@@ -6,6 +6,8 @@
 *
 **/
 nameSpace HappySoftware\Controller\Traits;
+
+use HappySoftware\Controller\HelperController;
 use HappySoftware\Database\DatabaseCore;
 
 trait MailTrait{
@@ -18,6 +20,7 @@ trait MailTrait{
     private $mensatek_api_url = 'https://api.mensatek.com/v7/';
     private $mensatek_api_endpoint_enviarmailcertificado = 'EnviarEMAILCERTIFICADO';
     private $mensatek_api_endpoint_recuperarpdf = 'GetCertificadoEMAILCERTIFICADO';
+    private $mensatek_api_endpoint_recuperarpdfSMS = 'GetSMSCERTIFICADO';
     private $mensatek_remitente = 'info@fincatech.es';
 
     public function SendPlainEmail($to, $name, $subject, $body)
@@ -84,22 +87,64 @@ trait MailTrait{
      */
     public function getPDFEmailCertificado($Idmensaje)
     {
+        try{
+            $curl = curl_init();
+            curl_setopt_array($curl, 
+                array(
+                    CURLOPT_URL => $this->mensatek_api_url . $this->mensatek_api_endpoint_recuperarpdf,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => array(
+                        'Idmensaje' => $Idmensaje, 
+                    ),
+                    CURLOPT_HTTPHEADER => array('Authorization: Basic ' . base64_encode($this->mensatek_api_user . ':' . $this->mensatek_api_token))  
+                )
+            );
+
+            $response = curl_exec($curl);
+            // $this->WriteToLog('emailcertificado_', 'MailTrait -> getPDFEmailCertificado', $response);
+            curl_close($curl);
+            return $response;
+        }catch(\Exception $ex){
+            die('Exception MailTrait (getPDFEmailCertificado): ' . $ex->getMessage());
+        }
+    }
+
+    /**
+     * Recupera el documento de acuse de recibo del sms certificado
+     */
+    public function getPDFSMSCertificado($IdMensaje, $telefono)
+    {
         $curl = curl_init();
-        curl_setopt_array($curl, array(
-        CURLOPT_URL => $this->mensatek_api_url . $this->mensatek_api_endpoint_recuperarpdf,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'POST',CURLOPT_POSTFIELDS => array(
-          'IDMENSAJE' => $Idmensaje, 
-        ),
-        CURLOPT_HTTPHEADER => array('Authorization: Basic ' . base64_encode($this->mensatek_api_user . ':' . $this->mensatek_api_token)),
-        ));
+
+        curl_setopt_array($curl, [
+          CURLOPT_URL => "https://api.mensatek.com/v7/GetSMSCERTIFICADO",
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => "",
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 30,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => "POST",
+          CURLOPT_POSTFIELDS => "-----011000010111000001101001\r\nContent-Disposition: form-data; name=\"Idmensaje\"\r\n\r\n" . $IdMensaje . "\r\n-----011000010111000001101001\r\nContent-Disposition: form-data; name=\"Telefono\"\r\n\r\n" . $telefono . "\r\n-----011000010111000001101001--\r\n",
+          CURLOPT_HTTPHEADER => [
+            "Authorization: Basic : "  . base64_encode($this->mensatek_api_user . ':' . $this->mensatek_api_token),
+            "Content-Type: multipart/form-data; boundary=---011000010111000001101001"
+          ],
+        ]);
+
         $response = curl_exec($curl);
-        // $this->WriteToLog('emailcertificado_', 'MailTrait -> getPDFEmailCertificado', $response);
-        curl_close($curl);
-        return $response;
+        $err = curl_error($curl);
+        
+        curl_close($curl);        
+        if ($err) 
+        {
+            return false;
+        }else{
+            return $response;
+        }
     }
 
     public function SendHTMLEmail($to, $name, $subject, $templateFile, $data)
@@ -116,83 +161,90 @@ trait MailTrait{
 
     public function SendEmailCertificadoAdjuntos($subject, $destinatarios, $body, $adjuntos = null)
     {
+        try{
 
-        //  Comprobamos si tiene adjuntos para poder enviarlos en el cuerpo de la petición
-            if(!is_null($adjuntos))
-            {
-                $ficherosAdjuntos = [];
-                for($x = 0; $x < count($adjuntos); $x++)
+            //  Comprobamos si tiene adjuntos para poder enviarlos en el cuerpo de la petición
+                if(!is_null($adjuntos))
                 {
-                    if(file_exists($adjuntos[$x]['ubicacion']))
+                    $ficherosAdjuntos = [];
+                    for($x = 0; $x < count($adjuntos); $x++)
                     {
-                        $ficheroContent = file_get_contents($adjuntos[$x]['ubicacion']);
-
-                        $fichero = [];
-
-                        // TODO: Recuperamos la extensión original del fichero para ponerla en el cuerpo
-                        $extensionFichero = '.pdf';
-
-                        $extension = explode('.', $adjuntos[$x]['nombre'] );
-                        if(is_array($extension) && @count($extension) >= 1)
+                        if(file_exists($adjuntos[$x]['ubicacion']))
                         {
-                            $extensionFichero = '.'.$extension[count($extension)-1];
-                        }
+                            $ficheroContent = file_get_contents($adjuntos[$x]['ubicacion']);
 
-                        $fichero['Nombre'] = 'doc_cae_'.($x+1) . $extensionFichero;//$adjuntos[$x]['nombre'];
-                        $fichero['Contenido'] = chunk_split(base64_encode($ficheroContent));
-                        $ficherosAdjuntos[] = $fichero;
+                            $fichero = [];
+
+                            // TODO: Recuperamos la extensión original del fichero para ponerla en el cuerpo
+                            $extensionFichero = '.pdf';
+
+                            $extension = explode('.', $adjuntos[$x]['nombre'] );
+                            if(is_array($extension) && @count($extension) >= 1)
+                            {
+                                $extensionFichero = '.'.$extension[count($extension)-1];
+                            }
+
+                            $fichero['Nombre'] = 'doc_cae_'.($x+1) . $extensionFichero;//$adjuntos[$x]['nombre'];
+                            $fichero['Contenido'] = chunk_split(base64_encode($ficheroContent));
+                            $ficherosAdjuntos[] = $fichero;
+                        }
                     }
                 }
-            }
 
-        //  Comprobamos si algún e-mail está en la blacklist
-            $blackList = $this->EmailBlackList();
-            $emailNotSents = array();
+            //  Inicializamos el api de Mensatek
+                $usuarioId = $this->getLoggedUserId();
+                if($usuarioId > 0)
+                {
+                    $this->InitializeAPIEmailCertificado($usuarioId);
+                }
+                
+            //  Comprobamos si algún e-mail está en la blacklist
+                $blackList = $this->EmailBlackList();
+                $emailNotSents = array();
 
-        //  Procesamos los destinatarios
-            $destinatariosEmail = [];
-            for($x = 0; $x < count($destinatarios); $x++)
-            {
-                $destinatario = [];
-                $destinatario['Nombre'] = $destinatarios[$x]['nombre'];
-                $destinatario['Email'] = $destinatarios[$x]['email'];
-                $destinatariosEmail[] = $destinatario;
-            }
+            //  Procesamos los destinatarios
+                $destinatariosEmail = [];
+                for($x = 0; $x < count($destinatarios); $x++)
+                {
+                    $destinatario = [];
+                    $destinatario['Nombre'] = $destinatarios[$x]['nombre'];
+                    $destinatario['Email'] = $destinatarios[$x]['email'];
+                    $destinatariosEmail[] = $destinatario;
+                }
 
-        //  Componemos el cuerpo de la petición
-            $cuerpoPeticion = array(
-                'Remitente' => 'info@fincatech.es',
-                'Asunto' => $subject,
-                'Mensaje' => $body,
-                'Destinatarios' => json_encode($destinatariosEmail),
-                'Adjuntos' => json_encode($ficherosAdjuntos),
-                'Resp' => 'XML',
-                'Report' => 1
-            );
+            //  Componemos el cuerpo de la petición
+                $cuerpoPeticion = array(
+                    'Remitente' => $this->mensatek_remitente,
+                    'Asunto' => $subject,
+                    'Mensaje' => $body,
+                    'Destinatarios' => json_encode($destinatariosEmail),
+                    'Adjuntos' => json_encode($ficherosAdjuntos),
+                    'Resp' => 'XML',
+                    'Report' => 1
+                );
 
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-        CURLOPT_URL => $this->mensatek_api_url . $this->mensatek_api_endpoint_enviarmailcertificado,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS => $cuerpoPeticion,
-        CURLOPT_HTTPHEADER => array('Authorization: Basic ' . base64_encode($this->mensatek_api_user . ':' . $this->mensatek_api_token)),
-        ));
+            // print_r($cuerpoPeticion);
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+            CURLOPT_URL => $this->mensatek_api_url . $this->mensatek_api_endpoint_enviarmailcertificado,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => $cuerpoPeticion,
+            CURLOPT_HTTPHEADER => array('Authorization: Basic ' . base64_encode($this->mensatek_api_user . ':' . $this->mensatek_api_token)),
+            ));
 
-        $response = curl_exec($curl);
-        // $infoSent = curl_getinfo($curl);
+            $response = curl_exec($curl);
+            curl_close($curl);
 
-        // $this->WriteToLog('emailcertificado', 'MailTrait -> CURL Sent Header', json_encode($infoSent));
-        //$this->WriteToLog('emailcertificado', 'MailTrait -> CURL Body Sent', json_encode($cuerpoPeticion));
-        curl_close($curl);
-
-        // print_r($cuerpoPeticion);
-        //  Pintamos la respuesta en el log
-        $this->WriteToLog('emailcertificado', 'MailTrait -> SendEmailCertificadoAdjuntos', $response);
-        return $response;
+            //  Pintamos la respuesta en el log
+            $this->WriteToLog('emailcertificado', 'MailTrait -> SendEmailCertificadoAdjuntos', $response);
+            return $response;
+        }catch(\Exception $ex){
+            die('Excepción en SendEmailCertificadoAdjuntos: ' . $ex->getMessage());
+        }
 
     }
 
@@ -216,10 +268,12 @@ trait MailTrait{
             }
         }
 
+        $subject = is_null($ficheroAdjunto) ? $subject : $subject . ' [documento adjunto]';
+
         //  Componemos el cuerpo de la petición
             $cuerpoPeticion = array(
                 'Remitente' => $this->mensatek_remitente,
-                'Asunto' => is_null($ficheroAdjunto) ? $subject : $subject . ' [documento adjunto]',
+                'Asunto' => $subject,
                 'Mensaje' => $body,
                 'Destinatarios' => json_encode($destinatariosEmail),
                 'Resp' => 'XML',
@@ -381,7 +435,7 @@ trait MailTrait{
     }
 
     /** Envía un e-mail mediante la cuenta de ionos */
-    public function SendEmail($to, $name, $subject, $body, $save = true)
+    public function SendEmail($to, $name, $subject, $body, $save = true, $adjuntos = null)
     {
         $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
         // $mail = new \PHPMailer\PHPMailer\PHPMailer();
@@ -400,7 +454,11 @@ trait MailTrait{
 
             //Recipients
             $mail->setFrom('no-reply@fincatech.es', 'Fincatech');
-            $mail->addAddress($to, $name);     //Add a recipient
+            $destinatarios = explode(',',$to);
+            foreach($destinatarios as $destinatario){
+                $mail->addAddress($destinatario, $name);     //Add a recipient
+            }
+
             // $mail->addAddress('oscar@happysoftware.es', 'tester');
             //Content
             $mail->isHTML(true);                                  //Set email format to HTML
@@ -408,16 +466,58 @@ trait MailTrait{
             $mail->Body    = $body;
             //$mail->AltBody = $body;
 
+            //  Comprobamos si tiene adjuntos para poder enviarlos en el cuerpo de la petición
+            if(!is_null($adjuntos) && is_array($adjuntos))
+            {
+                for($x = 0; $x < count($adjuntos); $x++)
+                {
+                    if(file_exists($adjuntos[$x]))
+                    {
+                        $mail->addAttachment($adjuntos[$x]);
+                    }
+                }
+            }
+
+            //  Si solo hay especificado un fichero adjunto
+            if(!is_null($adjuntos) && !is_array($adjuntos))
+            {
+                if(file_exists($adjuntos)){
+                    $mail->addAttachment($adjuntos);
+                }
+            }
+
             $mail->send();
             $this->registrarEnvioEmail($to, $subject, $body, $save);
             return true;
         } catch (\Exception $e) {
+            //  Registramos el error y enviamos al admin y desarrollo la información del error
+            // $this->SendErrorMail($mail->ErrorInfo, $subject, $body);
+            // $this->AddToLog('log_envioemail','SendEmail', 'No se ha podido enviar el e-mail con asunto: ' . $subject);
             return "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
         } 
     }
 
+    /**
+     * Envía un e-mail a soporte con la información del error de por qué no se ha podido enviar un e-mail
+     */
+    private function SendErrorMail($error, $subject, $body)
+    {
+        $this->SendEmail('desarrollo@fincatech.es','Desarrollo','Error envío e-mail', 'Ha ocurrido el siguiente error al intentar enviar el e-mail:<br><br>' . $error . '<br><br>Asunto: ' . $subject . '<br><br>E-mail:<br><br>' . $body, false);
+    }
+
+    /**
+     * Registra en bbdd el envío del e-mail
+     * @param string $to. Destinatario
+     * @param string $subject. Asunto del e-mail
+     * @param string $body. Cuerpo del e-mail
+     * @param bool $save (optional). Defaults: True. Si es true guarda el mensaje
+     */
     private function registrarEnvioEmail($to, $subject, $body, $save = true)
     {
+        //  Si no está marcado para guardar, devolvemos el control al método desde el que fue llamado
+        if(!$save)
+            return;
+
         //  Inicializamos el controller de Mensajes
         $params = [];
         $params['email'] = $to;

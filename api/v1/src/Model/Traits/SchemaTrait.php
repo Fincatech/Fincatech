@@ -16,7 +16,7 @@ trait SchemaTrait{
     public function getSchemaEntity($includeRelations = true)
     {
         $this->entitySchema = [];
-        
+        $d = $this->mainEntity;
         $this->entitySchema[$this->mainEntity] = $this->repositorio->getSchemaInfo( strtolower($this->mainEntity) );
 
         //  Comprueba si tiene relaciones establecidas y se ha pedido que incluya todos los schemas

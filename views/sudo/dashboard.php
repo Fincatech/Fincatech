@@ -49,7 +49,7 @@
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-8 mt-0">
-                                                <h5 class="card-title font-weight-normal">Comunidades</h5>
+                                                <h5 class="card-title font-weight-normal">Comunidades activas</h5>
                                                 <h1 class="mt-1 mb-3 stat-comunidades">-</h1>
                                             </div>
 
@@ -59,11 +59,42 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="mb-0">
-                                            <span class="badge badge-success-light"> <i class="mdi mdi-arrow-bottom-right"></i> 5.25% </span>
+                                        
+                                        <!-- Totales servicios contratados -->
+                                        <div class="mb-0 border-top pt-2">
+
+                                            <!-- <label class="text-center d-block text-dark mb-3">Total Servicios contratados</label> -->
+
+                                            <div class="row d-flex">
+
+                                                <!-- CAE -->
+                                                <div class="col d-flex flex-column align-items-center align-content-center justify-content-center">
+                                                    <p class="mb-0 py-2 text-dark text-center"><strong>CAE</strong><br><span class="stat-totalcae">0</span></p>
+                                                </div>
+
+                                                <!-- DPD -->
+                                                <div class="col d-flex flex-column align-items-center align-content-center justify-content-center">                                                    
+                                                    <p class="mb-0 py-2 text-dark text-center"><strong>DPD</strong><br><span class="stat-totaldpd">0</span></p>
+                                                </div>
+
+                                                <!-- DOC CAE -->
+                                                <div class="col d-flex flex-column align-items-center align-content-center justify-content-center">                                                   
+                                                    <p class="mb-0 py-2 text-dark text-center"><strong>DOC CAE</strong><br><span class="stat-totaldoccae">0</span></p>
+                                                </div>
+
+                                                <!-- Certificados digitales -->
+                                                <div class="col d-flex flex-column align-items-center align-content-center justify-content-center">
+                                                    <p class="mb-0 py-2 text-dark text-center"><strong>Cert. digitales</strong><br><span class="stat-totalcertificados">0</span></p>
+                                                </div>            
+
+                                            </div>
+
                                         </div>
+
                                     </div>
+
                                 </div>
+
                             </div>         
 
                         </div>          
@@ -176,7 +207,7 @@
                                 <p class="text-center font-weight-bold shadow-neumorphic pt-3 pb-3" style="border-radius:20px 20px 0px 0px;">COMUNIDADES PENDIENTES</p>
                                 <div class="row flex-grow-1">
                                     <div class="col-12 pl-4 pr-4" style="overflow-y: auto;">
-                                        <table class="table table-hover my-0 hs-tabla w-100 no-clicable" name="listadoComunidadesPendientes" id="listadoComunidadesPendientes" data-model="comunidadespendientes" >
+                                        <table class="table table-bordered table-hover my-0 hs-tabla w-100 no-clicable" name="listadoComunidadesPendientes" id="listadoComunidadesPendientes" data-model="comunidadespendientes" >
                                             <thead class="thead"></thead>
                                             <tbody class="tbody"></tbody>
                                         </table>
