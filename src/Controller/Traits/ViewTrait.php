@@ -44,12 +44,12 @@ trait ViewTrait{
     {
         global $appSettings;
         global $App;
-        
+
         //  Obtengo el nombre del controlador
         $includeFile = ABSPATH.'views/';
         
         //  Incluimos las opciones de menú a las que tiene acceso según su rol de usuario
-        if( $this->isLogged() )
+        if( $this->isLogged() && !$this->maintenanceMode)
         {
             if(file_exists(ABSPATH . 'views/' . security[$this->getUserRol()]['folder'] . '/menuacciones.php'))
                 include(ABSPATH . 'views/' . security[$this->getUserRol()]['folder'] . '/menuacciones.php');
@@ -65,6 +65,9 @@ trait ViewTrait{
                 break;
             case 'login':
                 $includeFile .= '/login/login';
+                break;
+            case 'maintenance':
+                $includeFile .= '/maintenance';
                 break;
             default:
                 switch( $accion )

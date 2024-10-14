@@ -10,7 +10,9 @@ define("JWT_SECRET_KEY", 'U_97$5TwNA3N8$qYV4vKK_#k');
 $appSettings["env"] = [];
 
 $appSettings = [
-    'env' => "dev", // Admite: "dev" para desarrollo o "prod" para producción
+    'env' => "dev", // Admite: "dev" para desarrollo o "prod" para producción,
+    //  Modo mantenimiento del site
+    'maintenance' => true,
     //  Configuración auxiliar para la base de datos
     'database' => [
         'checkintegrity' => ($appSettings[ENVIRONMENT] == "dev" ? true : false)

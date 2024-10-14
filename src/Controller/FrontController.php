@@ -7,10 +7,16 @@ use HappySoftware\Controller\Traits\SecurityTrait;
 use HappySoftware\Controller\Traits\ViewTrait;
 use HappySoftware\Controller\Traits\TableTrait;
 use HappySoftware\Controller\Traits\UtilsTrait;
+use Mpdf\Tag\Main;
 
 class MainController{
 
     use SecurityTrait, TableTrait, UtilsTrait, ViewTrait;
+
+    //  Modo mantenimiento
+    private $maintenanceMode = false;
+    //  Tiempo estimado de mantenimiento
+    private $estimatedMaintenanceTime = '24h';
 
     private $userRol;
     private $rgpdAceptado;
@@ -156,6 +162,11 @@ class MainController{
                 $this->setController( $_GET['route'] );
             }
 
+        //  Comprobamos si el modo mantenimiento está activado
+            if($this->maintenanceMode === true && $this->getcontroller() != 'maintenance'){
+                MainController::ShowMaintenancePage();
+            }
+
         //  Comprobamos la seguridad
             if(!$this->isLogged() && $this->getController() != 'login')
             {
@@ -199,6 +210,15 @@ class MainController{
     {
         header('Location: ' . HOME_URL . 'login');
         // header('Location: ' . HOME_URL . 'login');
+        exit;
+    }
+
+    /**
+     * Redirects to Maintenance Page
+     */
+    public static function ShowMaintenancePage()
+    {
+        header('Location: ' . HOME_URL . 'maintenance');
         exit;
     }
 
