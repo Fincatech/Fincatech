@@ -51,7 +51,7 @@ class RemesaController extends FrontController{
         $this->RemesaModel = new RemesaModel($params);
         $this->ConfiguracionController = new \Fincatech\Controller\ConfiguracionController(null);
         //  Recuperamos el Creditor ID desde la configuración
-        $this->_creditorId = $this->ConfiguracionController->GetValue('creditorid');
+        // $this->_creditorId = $this->ConfiguracionController->GetValue('creditorid');
         $this->_creditorName = $this->ConfiguracionController->GetValue('sepaempresa');
     }
 
@@ -69,8 +69,6 @@ class RemesaController extends FrontController{
 
         $this->RemesaModel->CreateRemesa($remesa);
         $remesaId = $remesa->Id();
-        //  Procesamos los datos del contenido de la remesa y lo almacenamos
-
     }
 
     public function Update($entidadPrincipal, $datos, $usuarioId)
@@ -133,11 +131,14 @@ class RemesaController extends FrontController{
      * @param array $invoiceData (optional). Información de la factura para ser incluida en el fichero de remesa
      * @param array $invoiceIds (optional). Id's de las facturas que se van a incluir en la remesa
      */
-    public function CreateRemesaXML(string $sepaFileName, int $customerId,  string $customerName, string $creditorIBAN, string $creditorBIC, int|null $invoiceId = null,  array|null $invoiceIds = null)
+    public function CreateRemesaXML(string $sepaFileName, string $creditorId, int $customerId,  string $customerName, string $creditorIBAN, string $creditorBIC, int|null $invoiceId = null,  array|null $invoiceIds = null)
     {
         global $appSettings;
 
         try{
+
+            //  Establecemos el creditor ID
+            $this->_creditorId = $creditorId;
 
             $this->_nombreFicheroRemesa = $sepaFileName;
             //  Generamos la referencia de la remesa
@@ -160,11 +161,11 @@ class RemesaController extends FrontController{
             $header->setInitiatingPartyName($this->_creditorName);
             $header->setInitiatingPartyId($this->_creditorId);
 
+            //  Normalizamos la cuenta IBAN para quitar guiones y espacios
             $creditorIBAN = HelperController::NormalizeIBAN($creditorIBAN);
-
-            // $directDebit = TransferFileFacadeFactory::createDirectDebit( $msgId, $this->_creditorName, 'pain.008.001.02');
+            //  Creamos el cargo directo con cabecera
             $directDebit = TransferFileFacadeFactory::createDirectDebitWithGroupHeader($header, 'pain.008.001.02');
-
+            //  Añadimos la información del pago
             $directDebit->addPaymentInfo($transactionId, array(
                 'id'                    => $transactionId,
                 'creditorName'          => $this->_creditorName,

@@ -1058,11 +1058,12 @@ class InvoiceController extends FrontController{
         //  Inicializamos el controller de la remesa
         $remesa = new RemesaController();
         //  Ejecutamos el proceso de generación de la remesa
-        //  Recuperamos el IBAN del banco seleccionado
+        //  Recuperamos el IBAN del banco seleccionado / BIC / CREDITOR ID
         $iban = $this->banco['iban'];
         $bic = $this->banco['bic'];
+        $creditorId = $this->banco['creditorid'];
 
-        $this->remesaGenerada = $remesa->CreateRemesaXML($tmpFile, (int)$this->administrador['id'], $this->administrador['nombre'], $iban, $bic, null, $this->invoiceIds);
+        $this->remesaGenerada = $remesa->CreateRemesaXML($tmpFile, $creditorId, (int)$this->administrador['id'], $this->administrador['nombre'], $iban, $bic, null, $this->invoiceIds);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
