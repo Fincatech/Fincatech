@@ -53,8 +53,10 @@ let facturacion = {
                 p.then(()=>{
                     let banco = facturacion.Bank.Model.Bank.nombre;
                     let cuenta = facturacion.Bank.Model.Bank.iban == null ? 'No establecido' : facturacion.Bank.Model.Bank.iban;
+                    let creditorid = facturacion.Bank.Model.Bank.creditorid == null ? 'No establecido' : facturacion.Bank.Model.Bank.creditorid;
                     $('.info-banco').html(`${banco}`);   
                     $('.info-iban').html(`${cuenta}`);   
+                    $('.info-creditorid').html(`${creditorid}`);   
                 });
 
             });
@@ -730,6 +732,11 @@ let facturacion = {
                 if(!facturacion.Bank.Model.CuentaAsociada){
                     mensaje = `${mensaje}-El banco seleccionado no tiene informado el IBAN<br>`;
                 }
+
+                //  Validación del creditor ID
+                if(!facturacion.Bank.Model.creditorid){
+                    mensaje = `${mensaje}-El banco seleccionado no tiene informado el Creditor ID<br>`;
+                }                
 
                 if(mensaje !== ''){
                     result = false;

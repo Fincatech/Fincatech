@@ -33,8 +33,16 @@
                     <p class="info-banco">No ha seleccionado ningún banco</p>  
                 </div>
                 <div class="col-12 col-md-6">
-                    <p class="font-weight-bold mb-0">IBAN Asociado</p>
+                    <p class="font-weight-bold mb-0">IBAN</p>
                     <p class="info-iban">No ha seleccionado ningún banco</p>  
+                </div>
+            </div>
+
+            <!-- CREDITOR ID -->
+            <div class="row">
+                <div class="col-12 col-md-6">
+                    <p class="font-weight-bold mb-0">Creditor ID</p>
+                    <p class="info-creditorid">No ha seleccionado ningún banco</p>  
                 </div>
             </div>
 

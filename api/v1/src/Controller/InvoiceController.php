@@ -1385,7 +1385,7 @@ class InvoiceController extends FrontController{
 
     /**
      * Devuelve el nombre del servicio en base a su ID.
-     * NOTA: Ahora mismo está hardcodeado pero lo suyo sería que lo devolviese de la bbdd instanciando el controller correspondiente
+     * REFACTORIZAR: Ahora mismo está hardcodeado pero lo suyo sería que lo devolviese de la bbdd instanciando el controller correspondiente
      */
     public function ServiceNameById($servicioId)
     {
@@ -1545,9 +1545,9 @@ class InvoiceController extends FrontController{
             }
             
             //  DOC CAE
-            if( in_array('3', array_column($idServicio, 'idservicio'))){
-                $referencia .= $this->confConceptoDOCCAE;
-            }
+            // if( in_array('3', array_column($idServicio, 'idservicio'))){
+            //     $referencia .= $this->confConceptoDOCCAE;
+            // }
 
             //  Certificados Digitales
             if( in_array('5', array_column($idServicio, 'idservicio')) ){
@@ -1566,8 +1566,9 @@ class InvoiceController extends FrontController{
                     $referencia = $this->confConceptoDPD;
                     break;
                 //  DOC CAE
-                case 3:
-                    $referencia = $this->confConceptoDOCCAE;
+                // case 3:
+                //      $referencia = $this->confConceptoDOCCAE;
+                //      break;
                 //  Certificados digitales
                 case 5:
                     $referencia = $this->confCertificadoDigital;
@@ -1593,9 +1594,9 @@ class InvoiceController extends FrontController{
             case 2: //  DPD
                 $result = $this->conceptoDPD;
                 break;
-            case 3: // DOC CAE
-                $result = $this->conceptoDOCCAE;
-                break;
+            // case 3: // DOC CAE
+            //     $result = $this->conceptoDOCCAE;
+            //     break;
             case 5: //  Certificados digitales
                 $result = $this->conceptoCertificadosDigitales;
                 break;
