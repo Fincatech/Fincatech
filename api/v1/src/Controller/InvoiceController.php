@@ -1636,7 +1636,7 @@ class InvoiceController extends FrontController{
             $this->pdfNames = [];
 
             if($this->agruparFacturasZip){             
-                $this->zipFileName = self::FICHERO_PREFIX . $this->InvoiceModel->CifAdministrador() . '_' . $this->InvoiceModel->Mes() . '_' . $this->InvoiceModel->Anyo() . '.zip';
+                $this->zipFileName = self::FICHERO_PREFIX . $this->InvoiceModel->CifAdministrador() . '_' . $this->InvoiceModel->Mes() . '_' . $this->InvoiceModel->Anyo() . '_' . date('H_i_s') . '.zip';
             }
 
             $administradorNombre = '';
