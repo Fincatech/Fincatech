@@ -46,34 +46,27 @@ let CoreUI = {
                     }
       
                     var promesaSelectActual = new Promise(async function(resolve2, reject2){
-                      // console.log('Llamada a getselectdata');
-                      CoreUI.Controller.GetSelectData( entidadCombo, keyField, keyValue, null, null, elDOM, insertarOpcionSeleccionar ).then((result)=>{
-                        // console.log('--- Ha resuelto GetSelectData ---');
-                        iCombo++;
-                        // console.log('numeroCombos: ' + numeroCombos);
-                        // console.log('iCombo: ' + iCombo);
-                        if(iCombo >= numeroCombos)
-                        {
-                          // console.log('icombo>=n')
-                          resolve(true);
-                        }
-                      });
+
+                        CoreUI.Controller.GetSelectData( entidadCombo, keyField, keyValue, null, null, elDOM, insertarOpcionSeleccionar ).then((result)=>{
+                            iCombo++;
+                            if(iCombo >= numeroCombos){
+                                resolve(true);
+                            }
+                        });
       
                     });
       
                 });
       
               }else{
-                // console.log('resolve2')
                 resolve(true);
               }
               
             });
       
             promesaSelect.then(function(){
-            // console.log('------------ promSelect2');
-            core.Forms.getModelo();
-            return promesaSelect;
+                core.Forms.getModelo();
+                return promesaSelect;
             }); 
         },
 
@@ -83,9 +76,10 @@ let CoreUI = {
         GetSelectData: async function(entidad, keyField, keyValue, keyOriginField, keyOriginValue, elementoDOM, insertarOpcionSeleccionar)
         {
             //  Vaciamos el combo
-            $("body #" + elementoDOM).html("");
+            $("body #" + elementoDOM).html('');
+
             //  Recuperamos los registros que correspondan según la entidad
-            var promSelect = new Promise( function(resolve, reject)
+            var promSelect = new Promise(function(resolve, reject)
             {
                 apiFincatech.get(`${entidad}/list?target=cbo`).then( (data) =>
                 // await apiFincatech.get(`${entidad}/list?target=cbo`).then( async (data) =>
@@ -98,13 +92,12 @@ let CoreUI = {
                     //  Validamos que exista el dato
                     if(!responseData[entidad])
                     {
-                        alert('Error. La entidad no es correcta para el select');
+                        alert(`Error. La entidad ${entidad} no es correcta para el select`);
                         console.log('Error en el select ', elementoDOM, ' entidad: ', entidad);
                         return;
                     }
 
-                    if(insertarOpcionSeleccionar)
-                    {
+                    if(insertarOpcionSeleccionar){
                         htmlOutput = '<option value="-1" disabled selected="selected">Seleccione una opción</option>';
                         $("body #" + elementoDOM).append(htmlOutput);
                     }

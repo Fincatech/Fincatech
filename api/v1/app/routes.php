@@ -2272,18 +2272,24 @@ return function (App $app) {
         $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
         $frontController = new $frontControllerName();
-        $frontController->Init('IngresosCuenta');
-        $data = [];
-        $data['concepto'] = 'Test entrega cuenta';
-        $data['idadministrador'] = 1;
-        $data['total'] = 321.45;
-        $data['fechaingreso'] = '2024-01-01';
-        $res = $frontController->context->Create('IngresosCuenta', $data);
-        if(is_array($res)){
-            $res = HelperController::successResponse($res);
-        }else{
-            $res = HelperController::errorResponse('error', $res, 200);
-        }
+        $frontController->Init('Test');
+        // $data = [];
+        // //string $sepaFileName, int $customerId,  string $customerName, string $creditorIBAN, string $creditorBIC, int|null $invoiceId = null,  array|null $invoiceIds = null
+        // $sepaFileName = 'FINCA_SEPA_fernando-brome-abarzuza_10_2024.xml';
+        // $customerId = 900;
+        // $customerName = 'FERNANDO BROME ABARZUZA';
+        // $creditorIBAN = 'ES3501280794090100055217';
+        // $creditorBIC = 'BKBKESMMXXX';
+        // $invoiceId = null;
+        // $invoiceIds = range(7, 306);
+
+        // $res = $frontController->context->CreateRemesaXML($sepaFileName, $customerId, $customerName, $creditorIBAN, $creditorBIC, $invoiceId, $invoiceIds);
+        $res = HelperController::successResponse($frontController->context->Test());
+        // if(is_array($res)){
+        //     $res = HelperController::successResponse($res);
+        // }else{
+        //     $res = HelperController::errorResponse('error', $res, 200);
+        // }
 
         $response->getBody()->write( $res );
         return $response;

@@ -123,11 +123,11 @@
                                         <input type="text" form-error-message="Nombre de la empresa que figurará en el fichero SEPA" class="form-control form-required data text-center" id="creditorid" name="creditorid" placeholder="Nombre de la empresa que figurará en el fichero SEPA" maxlength="70" hs-entity="Configuracion" hs-field="sepaempresa" required>
                                     </div> 
 
-                                    <!-- Creditor ID -->
+                                    <!-- Creditor ID
                                     <div class="col-12 col-xl-6 text-left">
                                         <label for="creditorid" class="text-center"><i class="bi bi-credit-card-2-front pr-2"></i>Creditor ID</label>              
                                         <input type="text" form-error-message="Creditor ID necesario para la generación de remesas SEPA" class="form-control form-required data text-center" id="creditorid" name="creditorid" placeholder="Creditor ID (SEPA)" maxlength="20" hs-entity="Configuracion" hs-field="creditorid" required>
-                                    </div> 
+                                    </div>  -->
 
                                 </div>
 

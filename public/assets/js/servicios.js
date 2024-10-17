@@ -339,7 +339,7 @@ let serviciosCore = {
 
                         $('.servicio-mesfacturacion').each(function(){
                             let valor = $(this).children('option:selected').val();
-                            console.log($(this).attr('id'), ' - ' ,valor);
+                            // console.log($(this).attr('id'), ' - ' ,valor);
                             $(this).select2({
                                 theme:'bootstrap4'
                             });

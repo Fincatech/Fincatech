@@ -16,7 +16,7 @@ use Slim\Factory\ServerRequestCreatorFactory;
 define('MASTERFINCATECH', 'Cris1964@t7+');
 define('ADMINMAIL', 'info@fincatech.es');
 // define('ADMINMAIL', 'oscar.livin@gmail.com');
-ini_set('memory_limit', '512M');
+ini_set('memory_limit', '1G');
 
 require __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../src/autoload.php';

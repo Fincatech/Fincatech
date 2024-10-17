@@ -49,7 +49,8 @@ trait ViewTrait{
         $includeFile = ABSPATH.'views/';
         
         //  Incluimos las opciones de menú a las que tiene acceso según su rol de usuario
-        if( $this->isLogged() && !$this->maintenanceMode)
+        if( $this->isLogged() && 
+            (!$this->maintenanceMode || ($this->maintenanceMode && $this->isAuthorizedIP)))
         {
             if(file_exists(ABSPATH . 'views/' . security[$this->getUserRol()]['folder'] . '/menuacciones.php'))
                 include(ABSPATH . 'views/' . security[$this->getUserRol()]['folder'] . '/menuacciones.php');
@@ -64,7 +65,12 @@ trait ViewTrait{
                 $includeFile .= security[$this->getUserRol()]['folder'] . '/dashboard';
                 break;
             case 'login':
-                $includeFile .= '/login/login';
+                if( ($this->maintenanceMode && !$this->isAuthorizedIP) )
+                {
+                    $includeFile .= '/maintenance';
+                }else{
+                    $includeFile .= '/login/login';
+                }
                 break;
             case 'maintenance':
                 $includeFile .= '/maintenance';
@@ -195,7 +201,8 @@ trait ViewTrait{
         include_once(ABSPATH.'views/comunes/header.php');
 
         // //  Renderiza el menú lateral
-        if( $this->renderMenuLateral() && $this->isLogged() )
+        if( $this->renderMenuLateral() && $this->isLogged() && 
+        (!$this->maintenanceMode || ($this->maintenanceMode && $this->isAuthorizedIP)))
         {
             //  Menú lateral
             require_once(ABSPATH.'views/' . security[$rol]['folder'] . '/menulateral.php');

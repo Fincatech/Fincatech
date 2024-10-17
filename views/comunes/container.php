@@ -2,7 +2,7 @@
 
     <?php 
 // if($App->getController() != 'login' && $App->isLogged()): 
-if( $App->isLogged() && !$App->maintenanceMode ): 
+if( $App->isLogged() && (!$App->maintenanceMode || ($App->maintenanceMode && $App->isAuthorizedIP))): 
 
         //  Incluímos la barra superior 
             include_once('menusuperior.php'); 

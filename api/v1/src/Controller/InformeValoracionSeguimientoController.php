@@ -12,7 +12,8 @@ class InformevaloracionseguimientoController extends FrontController{
 
     public function __construct($params = null)
     {
-        $this->InitModel('InformeValoracionSeguimiento', $params);
+        //$this->InitModel('InformeValoracionSeguimiento', $params);
+        $this->InformeValoracionSeguimientoModel = new InformeValoracionSeguimientoModel($params);
     }
 
     public function Create($entidadPrincipal, $datos)
@@ -74,7 +75,7 @@ class InformevaloracionseguimientoController extends FrontController{
         {
             $params['filterfield'] = 'usuarioId';
             $params['filtervalue'] = $this->getLoggedUserId();
-            return $this->InformeValoracionSeguimientoModel->List($params, false);
+            return $this->InformeValoracionSeguimientoModel->List($params, true);
         }else{
             return $this->InformeValoracionSeguimientoModel->List($params);
         }

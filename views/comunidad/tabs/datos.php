@@ -44,7 +44,7 @@
     <!-- Sólo pueden los sudo -->
     <div class="col-12 col-md-8">
         <label for="usuarioId"><i class="bi bi-person-fill pr-2"></i>Administrador asignado</label>
-        <select id="usuarioId" name="usuarioId" class="select-data custom-select data form-control selectpicker" data-live-search="false" hs-seleccionar="false" hs-entity="Comunidad" hs-field="usuarioId" hs-list-entity="Administrador" hs-list-field="Usuario.nombre" hs-list-value="Usuario.id"></select>
+        <select id="usuarioId" name="usuarioId" class="select-data custom-select data form-control selectpicker" data-live-search="false" hs-seleccionar="false" hs-entity="Comunidad" hs-field="usuarioId" hs-list-entity="Usuario" hs-list-field="Usuario.nombre" hs-list-value="Usuario.id"></select>
     </div>                 
     
     <!-- Límite de empresas por comunidad. Por defecto son 4 -->

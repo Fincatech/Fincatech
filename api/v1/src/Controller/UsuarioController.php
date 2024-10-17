@@ -142,9 +142,16 @@ class UsuarioController extends FrontController{
      */
     public function GetResumedInfo()
     {
+        
+        $usuario = [];
 
         $usuarioId = $this->getLoggedUserId();
-        $this->usuario = $this->UsuarioModel->Get($usuarioId);
+        // die('UsuarioId: [' . $usuarioId . ']');
+        if($usuarioId > 0 ){
+            $this->usuario = $this->UsuarioModel->Get($usuarioId);
+        }else{
+            $this->usuario = [];
+        }
 
         if(count($this->usuario) > 0)
         {
@@ -160,8 +167,7 @@ class UsuarioController extends FrontController{
                 $rpgd = $usuarioAdministrador['Usuario'][0]['mostrarrgpd'];
                 $cae = $usuarioAdministrador['Usuario'][0]['mostrarcae'];
             }
-
-            $usuario = [];
+            
             //  ID
             $usuario['id'] = $usuarioData['id'];
             //  Nombre
@@ -179,7 +185,11 @@ class UsuarioController extends FrontController{
             //  ROL
             $usuario['role'] = 'ROLE_' . strtoupper($usuarioData['rol'][0]['alias']);
             //  RGPD Firmada
-            $usuario['rgpd'] = $usuarioData['rgpd'];
+            if(isset($usuarioData['rgpd'])){
+                $usuario['rgpd'] = $usuarioData['rgpd'];
+            }else{
+                $usuario['rgpd'] = null;
+            }
 
         }
 

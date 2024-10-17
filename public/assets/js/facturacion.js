@@ -1556,7 +1556,7 @@ let facturacion = {
                     var html = '<ul class="nav justify-content-center accionesTabla">';
                     // html += '<li class="nav-item"><a href="javascript:void(0);" class="btnVerComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="eye" class="text-info img-fluid"></i></a></li>';
                     html += `<li class="nav-item"><a href="${baseURL}remesa/${row.id}" class="btnEditarRemesa d-inline-block"><i data-feather="eye" class="text-success img-fluid icono-accion" style="width:32px;height:32px;"></i></a></li>`;
-                    html += `<li class="nav-item"><a href="${baseURL}public/storage/remesas/${row.referencia}.xml" target="_blank" class="btnDescargarRemesa d-inline-block"><i data-feather="download-cloud" class="text-primary img-fluid icono-accion" style="width:26px;height:26px;"></i></li></ul>`;
+                    html += `<li class="nav-item"><a href="${baseURL}public/storage/remesas/${row.referencia}.xml" target="_blank" class="btnDescargarRemesa d-inline-block" download><i data-feather="download-cloud" class="text-primary img-fluid icono-accion" style="width:26px;height:26px;"></i></li></ul>`;
                     return html;
                 },'', null, 'text-center','80px');
                 // CoreUI.tableData.addColumn(nombreTabla, null, "", html, '','80px');
@@ -1627,7 +1627,7 @@ let facturacion = {
                 //     var html = '<ul class="nav justify-content-center accionesTabla">';
                 //     // html += '<li class="nav-item"><a href="javascript:void(0);" class="btnVerComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="eye" class="text-info img-fluid"></i></a></li>';
                 //     html += `<li class="nav-item"><a href="${baseURL}remesa/${row.id}" class="btnEditarRemesa d-inline-block"><i data-feather="search" class="text-success img-fluid icono-accion" style="width:32px;height:32px;"></i></a></li>`;
-                //     html += `<li class="nav-item"><a href="${baseURL}public/storage/remesas/${row.referencia}.xml" target="_blank" class="btnDescargarRemesa d-inline-block"><i data-feather="download-cloud" class="text-primary img-fluid icono-accion" style="width:26px;height:26px;"></i></li></ul>`;
+                //     html += `<li class="nav-item"><a href="${baseURL}public/storage/remesas/${row.referencia}.xml" target="_blank" class="btnDescargarRemesa d-inline-block" download><i data-feather="download-cloud" class="text-primary img-fluid icono-accion" style="width:26px;height:26px;"></i></li></ul>`;
                 //     return html;
                 // },'', null, 'text-center','80px');
 
@@ -2292,12 +2292,16 @@ let facturacion = {
 $(() =>{
     if(core.model == 'Prefacturacion')
     {
-        facturacion.Init();
+        // facturacion.Init();
     }
 
     document.addEventListener('coreInitialized', function(event) {
+
         facturacion.Init();  
         facturacion.Facturacion.Events();   
+        if(core.model == 'Prefacturacion' || core.model == 'emision'){
+            CoreUI.Controller.InitializeSelectData();
+        }
     });
 
 })

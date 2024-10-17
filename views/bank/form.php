@@ -34,7 +34,14 @@
                         <div class="col-12 col-md-6 col-xl-2 text-left">
                             <label for="cif" class="pl-0"><i class="bi bi-credit-card-2-front pr-2"></i>BIC/SWIFT*</label>
                             <input type="text" class="form-control data text-center form-required" id="bic" name="bic" maxlength="11" placeholder="BIC/SWIFT"  hs-entity="Bank" hs-field="bic" required>
-                        </div>                        
+                        </div>     
+                        
+                        <!-- CREDITOR ID -->
+                        <div class="col-12 col-md-6 col-xl-2 text-left">
+                            <label for="cif" class="pl-0"><i class="bi bi-credit-card-2-front pr-2"></i>CREDITOR ID*</label>
+                            <input type="text" class="form-control data text-center form-required" id="creditorid" name="creditorid" maxlength="20" placeholder="CREDITOR ID"  hs-entity="Bank" hs-field="creditorid" required>
+                        </div>     
+
                     </div>
 
                     <!-- IBAN -->

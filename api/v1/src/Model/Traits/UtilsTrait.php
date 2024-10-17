@@ -281,7 +281,7 @@ trait UtilsTrait{
 
 
         //  Filtro simple
-        if(!$multipleFilter && isset($params['filterfield']) && isset($params['filtervalue']))
+        if(!$multipleFilter && isset($filters['filterfield']) && isset($filters['filtervalue']))
         {
 
             if(strpos($this->queryToExecute, "where") !== false)
@@ -291,9 +291,9 @@ trait UtilsTrait{
                 $filterQuery .= " where ";
             }
 
-            $params['filteroperator'] = (isset($params['filteroperator']) ? $params['filteroperator'] : ' = ');
+            $filters['filteroperator'] = (isset($filters['filteroperator']) ? $filters['filteroperator'] : ' = ');
 
-            $filterQuery.= ' ' . $params['filterfield'] . $params['filteroperator'] . $params['filtervalue'] . " ";
+            $filterQuery.= ' ' . $filters['filterfield'] . $filters['filteroperator'] . $filters['filtervalue'] . " ";
             $this->queryToExecute .= $filterQuery;
         }
 

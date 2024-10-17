@@ -11,18 +11,27 @@ trait SecurityTrait{
         return $this->checkSecurity();
     }
 
+    /**
+     * Devuelve el ID del usuario autenticado
+     */
     public function getLoggedUserId()
     {
         $usuarioId = get_object_vars( $this->getJWTUserData()['data']->userData )['id'];
         return $usuarioId;
     }
 
+    /**
+     * Devuelve el rol que tiene asignado el usuario autenticado
+     */
     public function getLoggedUserRole()
     {
         $usuarioRol = get_object_vars( $this->getJWTUserData()['data']->userData )['role'];
         return $usuarioRol;
     }
 
+    /**
+     * Comprueba si es un usuario autorizado
+     */
     public function isAuhorizedUser()
     {
         $usuarioAutorizado = true;
@@ -68,6 +77,9 @@ trait SecurityTrait{
 
     }
 
+    /**
+     * Recupera el JWTToken desde la cookie
+     */
     private function getJWTToken()
     {
         return $_COOKIE['FINCATECHTOKEN'];
@@ -120,6 +132,26 @@ trait SecurityTrait{
         //  Recuperamos desde las settings si el rol tiene permiso
         //  para crear entidad, de ser así, renderizamos el botón de crear
 
+    }
+
+    /**
+     * Devuelve la IP de conexión
+     */
+    public function GetUserIP() {
+        // Comprueba si el usuario está detrás de un proxy
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+            // IP desde proxy compartido
+            $ip = $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            // IP pasada por el proxy
+            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else {
+            // IP directa del cliente
+            $ip = $_SERVER['REMOTE_ADDR'];
+        }
+    
+        // En caso de múltiples IPs separadas por comas, toma la primera
+        return explode(',', $ip)[0];
     }
 
     /*

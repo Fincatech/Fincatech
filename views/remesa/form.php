@@ -70,7 +70,7 @@
 
                                     <label class="d-block font-weight-bold">Fichero generado</label>
                                     <label class="d-block">
-                                        <a href="" target="_blank" class="form-data data btn btn-outline-secondary text-lowercase rounded-pill shadow pl-2 pr-3 py-0" hs-entity="Remesa" hs-field="remesafile"><i class="bi bi-cloud-arrow-down pr-2"></i> ver fichero remesa</a>  
+                                        <a href="" target="_blank" class="form-data data btn btn-outline-secondary text-lowercase rounded-pill shadow pl-2 pr-3 py-0" hs-entity="Remesa" hs-field="remesafile" download><i class="bi bi-cloud-arrow-down pr-2"></i> ver fichero remesa</a>  
                                         <label class="d-block form-data data text-lowercase mt-2" hs-entity="Remesa" hs-field="remesafile"></label>
                                     </label>
 

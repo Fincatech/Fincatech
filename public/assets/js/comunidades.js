@@ -811,48 +811,120 @@ let comunidadesCore = {
 
                     1: CAE
                     2: RGPD
-                    3: PRL
+                    3: DOC CAE
                     4: Instalaciones
                     5: Certificados digitales
 
                 */
                 // Comunidad.comunidadservicioscontratados[0].idcomunidad = jsonExcel[x].localidad;
+                //  CAE
                 infoServicio.idservicio = 1;
                 infoServicio.contratado = (jsonExcel[x]['cae.contratado'] === undefined ? 0 : jsonExcel[x]['cae.contratado'] );
-                infoServicio.precio = (jsonExcel[x]['cae.pvp'] === undefined ? 0 : jsonExcel[x]['cae.pvp']);
+
+                infoServicio.precio = 0;
+                if(jsonExcel[x]['cae.coste'] !== undefined)
+                    infoServicio.precio = jsonExcel[x]['cae.coste'];
+
+                if(jsonExcel[x]['cae.pvp'] !== undefined)
+                    infoServicio.precio = jsonExcel[x]['cae.pvp'];
+
+
                 infoServicio.preciocomunidad = (jsonExcel[x]['cae.preciocomunidad'] === undefined ? 0 : jsonExcel[x]['cae.preciocomunidad']);
                 infoServicio.mesfacturacion = (jsonExcel[x]['cae.mesfacturacion'] === undefined ? 0 : jsonExcel[x]['cae.mesfacturacion']);
 
                 Comunidad.comunidadservicioscontratados.push(infoServicio);
 
+                //  DPD
                 var infoServicio = new Object();
                 infoServicio.idservicio = 2;
                 infoServicio.contratado = (jsonExcel[x]['Rgpd.contratado'] === undefined ? 0 :jsonExcel[x]['Rgpd.contratado'] );
-                infoServicio.precio = ( jsonExcel[x]['Rgpd.pvp'] === undefined ? 0 : jsonExcel[x]['Rgpd.pvp'] );
+
+                infoServicio.precio = 0;
+                if(jsonExcel[x]['Rgpd.coste'] !== undefined)
+                    infoServicio.precio = jsonExcel[x]['Rgpd.coste'];
+
+                if(jsonExcel[x]['Rgpd.pvp'] !== undefined)
+                    infoServicio.precio = jsonExcel[x]['Rgpd.pvp'];
+
                 infoServicio.preciocomunidad = ( jsonExcel[x]['Rgpd.preciocomunidad'] === undefined ? 0 : jsonExcel[x]['Rgpd.preciocomunidad'] );
                 infoServicio.mesfacturacion = (jsonExcel[x]['Rgpd.mesfacturacion'] === undefined ? 0 : jsonExcel[x]['Rgpd.mesfacturacion']);                
                 Comunidad.comunidadservicioscontratados.push(infoServicio);
 
+                //  DOCCAE
                 var infoServicio = new Object();
                 infoServicio.idservicio = 3;
-                infoServicio.contratado = (jsonExcel[x]['prl.contratado'] === undefined ? 0 : jsonExcel[x]['prl.contratado']);
-                infoServicio.precio = (jsonExcel[x]['prl.pvp'] === undefined ? 0 : jsonExcel[x]['prl.pvp']);
-                infoServicio.preciocomunidad = (jsonExcel[x]['prl.preciocomunidad'] === undefined ? 0 : jsonExcel[x]['prl.preciocomunidad']);
-                infoServicio.mesfacturacion = (jsonExcel[x]['prl.mesfacturacion'] === undefined ? 0 : jsonExcel[x]['prl.mesfacturacion']);                
+
+                //  Compatibilidad con la versión antigua de la plantilla
+                //  DOCCAE/PRL Contratado
+                infoServicio.contratado = 0;
+                if(jsonExcel[x]['doccae.contratado'] !== undefined)
+                    infoServicio.contratado = jsonExcel[x]['doccae.contratado'];
+
+                if(jsonExcel[x]['prl.contratado'] !== undefined)
+                    infoServicio.contratado = jsonExcel[x]['prl.contratado'];
+                
+                //  DOCCAE/PRL Precio de coste (al que vende FT)
+                infoServicio.precio = 0;
+                if(jsonExcel[x]['doccae.coste'] !== undefined)
+                    infoServicio.precio = jsonExcel[x]['doccae.coste'];
+
+                if(jsonExcel[x]['doccae.pvp'] !== undefined)
+                    infoServicio.precio = jsonExcel[x]['doccae.pvp'];                
+
+                if(jsonExcel[x]['prl.coste'] !== undefined)
+                    infoServicio.precio = jsonExcel[x]['prl.coste'];
+
+                if(jsonExcel[x]['prl.pvp'] !== undefined)
+                    infoServicio.precio = jsonExcel[x]['prl.pvp'];  
+
+                //  DOCCAE/PRL -> Precio al que se vende a la comunidad
+                infoServicio.preciocomunidad = 0;
+
+                if(jsonExcel[x]['prl.preciocomunidad'] !== undefined)
+                    infoServicio.preciocomunidad = jsonExcel[x]['prl.preciocomunidad'];
+
+                if(jsonExcel[x]['doccae.preciocomunidad'] !== undefined)
+                    infoServicio.preciocomunidad = jsonExcel[x]['doccae.preciocomunidad'];
+
+                //  DOCCAE/PRL -> Mes de facturación
+                infoServicio.mesfacturacion = 0;
+
+                if(jsonExcel[x]['prl.mesfacturacion'] !== undefined)
+                    infoServicio.mesfacturacion = jsonExcel[x]['prl.mesfacturacion'];                
+
+                if(jsonExcel[x]['doccae.mesfacturacion'] !== undefined)
+                    infoServicio.mesfacturacion = jsonExcel[x]['doccae.mesfacturacion'];
+
                 Comunidad.comunidadservicioscontratados.push(infoServicio);
 
+                //  INSTALACIONES
                 var infoServicio = new Object();
                 infoServicio.idservicio = 4;
                 infoServicio.contratado = (jsonExcel[x]['instalaciones.contratado'] === undefined ? 0 : jsonExcel[x]['instalaciones.contratado']);
-                infoServicio.precio = (jsonExcel[x]['instalaciones.pvp'] === undefined ? 0 : jsonExcel[x]['instalaciones.pvp']);
+
+                infoServicio.precio = 0;
+                if(jsonExcel[x]['instalaciones.coste'] !== undefined)
+                    infoServicio.precio = jsonExcel[x]['instalaciones.coste'];
+
+                if(jsonExcel[x]['instalaciones.pvp'] !== undefined)
+                    infoServicio.precio = jsonExcel[x]['instalaciones.pvp'];  
+
                 infoServicio.preciocomunidad = (jsonExcel[x]['instalaciones.preciocomunidad'] === undefined ? 0 : jsonExcel[x]['instalaciones.preciocomunidad']);
                 infoServicio.mesfacturacion = (jsonExcel[x]['instalaciones.mesfacturacion'] === undefined ? 0 : jsonExcel[x]['instalaciones.mesfacturacion']);                
                 Comunidad.comunidadservicioscontratados.push(infoServicio);
 
+                //  CERTIFICADOS DIGITALES
                 var infoServicio = new Object();
                 infoServicio.idservicio = 5;
                 infoServicio.contratado = ( jsonExcel[x]['certificadosdigitales.contratado'] === undefined ? 0 : jsonExcel[x]['certificadosdigitales.contratado'] );
-                infoServicio.precio = ( jsonExcel[x]['certificadosdigitales.pvp'] === undefined ? 0 : jsonExcel[x]['certificadosdigitales.pvp'] );
+
+                infoServicio.precio = 0;
+                if(jsonExcel[x]['certificadosdigitales.coste'] !== undefined)
+                    infoServicio.precio = jsonExcel[x]['certificadosdigitales.coste'];
+
+                if(jsonExcel[x]['certificadosdigitales.pvp'] !== undefined)
+                    infoServicio.precio = jsonExcel[x]['certificadosdigitales.pvp'];  
+
                 infoServicio.preciocomunidad = ( jsonExcel[x]['certificadosdigitales.preciocomunidad'] === undefined ? 0 : jsonExcel[x]['certificadosdigitales.preciocomunidad'] ); 
                 infoServicio.mesfacturacion = (jsonExcel[x]['certificadosdigitales.mesfacturacion'] === undefined ? 0 : jsonExcel[x]['certificadosdigitales.mesfacturacion']);                
                 Comunidad.comunidadservicioscontratados.push(infoServicio);

@@ -32,11 +32,16 @@ class ComunidadController extends FrontController{
         $this->InitController('Autorizado');
     }
 
+    /**
+     * Crea una nueva comunidad en el sistema
+     * REFACTORIZAR: Refactorizar para utilizar la nueva arquitectura basandose en objetos
+     */
     public function Create($entidadPrincipal, $datos)
     {
 
         //  Comprobamos si es una creación desde el proceso de importación automático para el master
         $procesoImportacion = isset($datos['importacion']);
+        unset($datos['importacion']);
 
         //  Servicios contratados en el alta
         if(isset($datos['servicioCAE']))
@@ -49,6 +54,12 @@ class ComunidadController extends FrontController{
         {
             $servicioRGPDContratado = ($datos['servicioRGPD'] == '0' ? 0 : 1);
             unset($datos['servicioRGPD']);
+        }
+
+        if(isset($datos['servicioDOCCAE']))
+        {
+            $servicioDOCCAEContratado = ($datos['servicioDOCCAE'] == '0' ? 0 : 1);
+            unset($datos['servicioDOCCAE']);
         }
 
         //  Si no está informado, cogemos el usuario autenticado en el sistema
@@ -81,11 +92,9 @@ class ComunidadController extends FrontController{
         $datosServiciosContratados = null;
         if(isset($datos['comunidadservicioscontratados']))
         {
-            $datosServiciosContratados = $datos['comunidadservicioscontratados'];
-            
+            $datosServiciosContratados = $datos['comunidadservicioscontratados'];           
             //  Quitamos los datos para evitar que de error al guardar
             unset($datos['comunidadservicioscontratados']);
-            
         }
         
         //  Comprobamos si existe el IBAN para poder parsearlo
@@ -112,10 +121,17 @@ class ComunidadController extends FrontController{
             }
         }
 
-        // PRL, Instalaciones y Certificados digitales
+        if(isset($servicioDOCCAEContratado))
+        {
+            if(!$this->ComunidadModel->ExisteServicioComunidad($idComunidad['id'], 3))
+            {            
+                $this->ComunidadModel->InsertServicioContratado($idComunidad['id'], 3, '0', '0', $servicioDOCCAEContratado);
+            }
+        }
+
+        // Instalaciones y Certificados digitales
         if(isset($servicioCaeContratado) && isset($servicioRGPDContratado))
         {
-            $this->ComunidadModel->InsertServicioContratado($idComunidad['id'], 3, '0', '0', '0');
             $this->ComunidadModel->InsertServicioContratado($idComunidad['id'], 4, '0', '0', '0');
             $this->ComunidadModel->InsertServicioContratado($idComunidad['id'], 5, '0', '0', '0');
         }
@@ -127,7 +143,7 @@ class ComunidadController extends FrontController{
             {
                 $idServicio = $datosServiciosContratados[$x]['idservicio'];
                 $precio = $datosServiciosContratados[$x]['precio'];
-                $precioComunidad = $datosServiciosContratados[$x]['preciocomunidad'];
+                $precioComunidad = str_replace(',','.',$datosServiciosContratados[$x]['preciocomunidad']);
                 $contratado = $datosServiciosContratados[$x]['contratado'];
                 $mesfacturacion = $datosServiciosContratados[$x]['mesfacturacion'];
                 if(!$this->ComunidadModel->ExisteServicioComunidad($idComunidad['id'], $idServicio))

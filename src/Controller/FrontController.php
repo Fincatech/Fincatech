@@ -14,7 +14,11 @@ class MainController{
     use SecurityTrait, TableTrait, UtilsTrait, ViewTrait;
 
     //  Modo mantenimiento
-    private $maintenanceMode = false;
+    public $maintenanceMode = true;
+    //  IP's privadas para no activar modo mantenimiento
+    private $secureIP = array('87.220.218.115');
+    public $isAuthorizedIP = false;
+
     //  Tiempo estimado de mantenimiento
     private $estimatedMaintenanceTime = '24h';
 
@@ -162,8 +166,10 @@ class MainController{
                 $this->setController( $_GET['route'] );
             }
 
+            $this->isAuthorizedIP = $this->IsAuthorizedIPMaintenanceMode();
+
         //  Comprobamos si el modo mantenimiento está activado
-            if($this->maintenanceMode === true && $this->getcontroller() != 'maintenance'){
+            if($this->maintenanceMode === true && $this->getController() != 'login' && !$this->isAuthorizedIP){
                 MainController::ShowMaintenancePage();
             }
 
@@ -206,10 +212,12 @@ class MainController{
 
     }
 
+    /**
+     * Redirecciona a la página de login
+     */
     public static function redirectToLogin()
     {
         header('Location: ' . HOME_URL . 'login');
-        // header('Location: ' . HOME_URL . 'login');
         exit;
     }
 
@@ -218,7 +226,7 @@ class MainController{
      */
     public static function ShowMaintenancePage()
     {
-        header('Location: ' . HOME_URL . 'maintenance');
+        header('Location: ' . HOME_URL );
         exit;
     }
 
@@ -250,6 +258,15 @@ class MainController{
             12 => 'diciembre',
             ];        
         return ucfirst($months[intval($month)]);
+    }
+
+    /**
+     * Comprueba si la ip de conexión pertenece a una ip autorizada en modo mantenimiento
+     */
+    private function IsAuthorizedIPMaintenanceMode()
+    {
+        $ipConection = $this->GetUserIP();
+        return (in_array($ipConection, $this->secureIP));
     }
 
 }

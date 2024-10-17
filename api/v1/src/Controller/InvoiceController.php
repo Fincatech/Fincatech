@@ -342,7 +342,51 @@ class InvoiceController extends FrontController{
      */
     public function List($params = null)
     {
-       return $this->InvoiceModel->List($params, false);
+        $limitStart = (isset($params['start']) ? $params['start'] : null);
+        $limitLength = (isset($params['length']) ? $params['length'] : null);        
+        $orderType = 'asc';
+
+        //  Parámetros de búsqueda
+        if(isset( $params['search']['value'] ))
+        {
+            $params['searchfields'] =[];
+            $params['searchvalue'] = $params['search']['value'];
+
+            //  Número de factura
+            $searchCondition = [
+                'field' => 'numero',
+                'operator' => '%'
+            ];
+            $params['searchfields'][] = $searchCondition;
+            
+            //  Administrador
+            $searchCondition = [
+                'field' => 'administrador',
+                'condition' => 'or',
+                'operator' => '%'
+            ];
+            $params['searchfields'][] = $searchCondition;    
+
+            //  Nombre de la comunidad
+            $searchCondition = [
+                'field' => 'comunidad',
+                'condition' => 'or',
+                'operator' => '%'
+            ];
+            $params['searchfields'][] = $searchCondition;                
+            
+            //  Nombre de la comunidad
+            $searchCondition = [
+                'field' => 'iban',
+                'condition' => 'or',
+                'operator' => '%'
+            ];
+            $params['searchfields'][] = $searchCondition;  
+
+        }
+
+        return $this->InvoiceModel->List($params, false);
+
     }
 
     /**
@@ -1005,7 +1049,7 @@ class InvoiceController extends FrontController{
             $admin = substr($admin, 0, 50);
 
         $tmpFile = 'FINCA_SEPA_' . HelperController::GenerarLinkRewrite($this->administrador['nombre']);
-        $tmpFile .= '_' . str_pad(date('m', time()), 2, '0', STR_PAD_LEFT) . '_' . date('Y') . '.xml';
+        $tmpFile .= '_' . str_pad(date('m', time()), 2, '0', STR_PAD_LEFT) . '_' . date('Y') . '_' . date('d_H_i_s'). '.xml';
         $this->xmlSepaName = $tmpFile;
 
         //  Seteamos el nombre del fichero de la remesa
@@ -1057,10 +1101,15 @@ class InvoiceController extends FrontController{
         $data['facturacion_mes']['facturacion_estimada'] = $this->InvoiceModel->TotalFacturacion()[0];
         //  Total ingresos a cuenta pendientes de liquidar
         $data['ingresoscuentapendiente'] = $this->InvoiceModel->TotalIngresosCuentaPendienteLiquidacion()['total'];
-        $data['totalliquidaciones'] = $this->InvoiceModel->TotalLiquidaciones()['total'];
+        //  Total liquidaciones realizadas
+        $data['totalliquidaciones'] = abs($this->InvoiceModel->TotalLiquidaciones()['total']);
+        //  Total Remesas generadas
         $data['totalremesas'] = $this->InvoiceModel->TotalRemesas();
+        //  Total Facturas pendientes de cobro
         $facturasPendientesCobro = $this->InvoiceModel->PendientesCobro();
+        //  Nº Total Facturas devueltas
         $data['facturasdevueltas'] = $facturasPendientesCobro['total_facturas'];
+        //  Importe total Facturas pendientes devueltas
         $data['totalfacturasdevueltas'] = $facturasPendientesCobro['total_importe'];
         $bestCustomer = $this->InvoiceModel->BestCustomer();
         $data['bestcustomer'] = $bestCustomer['administrador'];
@@ -2091,7 +2140,7 @@ class InvoiceController extends FrontController{
         $urlXML = HelperController::RootDir() . '/public/storage/remesas/' . $this->ficheroRemesa;
         //  Enviamos sin guardar el mensaje en bbdd
         // $this->SendEmail($email, 'Fincatech', 'Proceso de Facturación Realizado', $html, false, $urlXML);
-        $this->SendEmail('desarrollo@fincatech.es', 'Fincatech', 'Proceso de Facturación Realizado', $html, false, $urlXML);
+        $this->SendEmail($email, 'Fincatech', 'Proceso de Facturación Realizado', $html, false, $urlXML);
 
     }
 
@@ -2104,8 +2153,14 @@ class InvoiceController extends FrontController{
         $html = $this->ParseHTMLInvoiceEmailProcesoFacturacionAdministrador();
 
         $email = $this->InvoiceModel->EmailAdministrador();
+        
+        //  Si no tiene asignado el e-mail de facturación se lo enviamos al Master
+        if($email == '' || is_null($email)){
+            $email = ADMINMAIL;
+        }
+
         //DEBUG: Quitar en producción
-        $email = 'desarrollo@fincatech.es';
+        // $email = 'desarrollo@fincatech.es';
 
         //  Enviamos sin guardar el mensaje en bbdd
         $this->SendEmail($email, 'Fincatech', 'Nuevas facturas disponibles', $html, false);
@@ -2175,13 +2230,13 @@ class InvoiceController extends FrontController{
         //  Enviamos al administrador de fincas
         $to = $email;
         //  DEBUG: Quitar al terminar
-        $to = 'desarrollo@fincatech.es';
+        // $to = 'desarrollo@fincatech.es';
         $nombre = $this->InvoiceModel->Administrador();
         $this->SendEmail($to, $nombre, $asunto, $html, false, $archivoAdjunto);
         //  Eliminamos el fichero descargado puesto que ya se ha adjuntado en el e-mail
         unlink($archivoAdjunto);
         //  Enviamos al Master de Fincatech
-        $this->SendEmail(\ADMINMAIL, 'Fincatech', $asunto, $html, false);
+        $this->SendEmail(ADMINMAIL, 'Fincatech', $asunto, $html, false);
         return HelperController::successResponse('ok');
     }
 

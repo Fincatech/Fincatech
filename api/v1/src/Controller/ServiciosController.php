@@ -20,7 +20,8 @@ class ServiciosController extends FrontController{
 
     public function __construct($params = null)
     {
-        $this->InitModel('Servicios', $params);
+        //  $this->InitModel('Servicios', $params);
+        $this->ServiciosModel = new ServiciosModel($params);
     }
 
     public function Create($entidadPrincipal, $datos)

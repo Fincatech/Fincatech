@@ -85,7 +85,8 @@ class ServiciosModel extends \HappySoftware\Model\Model{
         $sql .= 'precio = ' . $this->Precio() . ', ';
         $sql .= 'preciocomunidad = ' . $this->PrecioComunidad() . ', ';
         $sql .= 'mesfacturacion = ' . $this->MesFacturacion() . ', ';
-        $sql .= 'contratado = ' . $this->Contratado() . ' ';
+        $sql .= 'contratado = ' . $this->Contratado()  . ', ';
+        $sql .= 'updated = now() ';
         $sql .= ' where id = ' . $this->Id();
         $this->getRepositorio()->queryRaw($sql);
     }

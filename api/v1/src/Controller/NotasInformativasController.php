@@ -2,7 +2,6 @@
 
 namespace Fincatech\Controller;
 
-
 use Fincatech\Model\NotasinformativasModel;
 
 class NotasinformativasController extends FrontController{
@@ -13,7 +12,8 @@ class NotasinformativasController extends FrontController{
 
     public function __construct($params = null)
     {
-        $this->InitModel('Notasinformativas', $params);
+        //$this->InitModel('Notasinformativas', $params);
+        $this->NotasinformativasModel = new NotasinformativasModel($params);
     }
 
     public function Create($entidadPrincipal, $datos)

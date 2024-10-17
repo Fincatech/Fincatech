@@ -266,6 +266,10 @@ class RemesaController extends FrontController{
         return $directDebit;
     }
 
+    /**
+     * Genera el detalle de la remesa para la remesa que se está generando
+     * 
+     */
     private function CreateRemesaDetail(string $debtorMandate, $idRemesa, $invoiceId, $descripcion, $amount, $customerName, $customerBic, $customerIban)
     {
         $RemesaDetail = new RemesaDetalleController();
@@ -294,6 +298,14 @@ class RemesaController extends FrontController{
         //  Cogemos los 4 primeros dígitos para buscar por código de entidad el banco
         $entidad = substr($iban, 0,4);
         $bankController = new BankController();
+
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///                             UTILIDADES DE LA GENERACIÓN DE REMESAS
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public function RegenerateRemesa()
+    {
 
     }
 

@@ -10,7 +10,7 @@ class InvoiceModel extends \HappySoftware\Model\Model{
     private $tablaFacturacion = 'invoice';
     private $tablaFacturacionDetail = 'invoicedetail';
     private $tableIngresosCuenta = 'ingresoscuenta';
-    private $tableLiquidaciones = 'liquidaciones';
+    private $tableLiquidaciones = 'liquidacion';
     private $tableRemesas = 'remesa';
 
     //  ID
@@ -737,7 +737,7 @@ class InvoiceModel extends \HappySoftware\Model\Model{
      * Importe total facturas pendientes de cobro
      */
     public function PendientesCobro(){
-        $sql = 'select sum(total_taxes_inc) as total_importe, count(id) as total_facturas from ' . $this->tablaFacturacion . " where estado = 'P' ";
+        $sql = 'select (case when sum(total_taxes_inc) is null then 0 else sum(total_taxes_inc) end ) as total_importe, count(id) as total_facturas from ' . $this->tablaFacturacion . " where estado = 'P' ";
         $result = $this->query($sql, false);
         return mysqli_fetch_assoc($result);
     }
@@ -746,7 +746,7 @@ class InvoiceModel extends \HappySoftware\Model\Model{
      * Calcula el total de liquidaciones realizadas a lo largo del tiempo
      */
     public function TotalLiquidaciones(){
-        $sql = 'select sum(total_taxes_inc) as total from ' . $this->tablaFacturacion . " where estado = 'P' ";
+        $sql = 'select (case when sum(total_taxes_inc) is null then 0 else sum(total_taxes_inc) end ) as total from ' . $this->tableLiquidaciones . " where estado = 'P' ";
         $result = $this->query($sql, false);
         return mysqli_fetch_assoc($result);
     }
@@ -761,11 +761,11 @@ class InvoiceModel extends \HappySoftware\Model\Model{
     public function BestCustomer(){
         $sql = "select 
                     sum(i.total_taxes_inc) as total, i.idadministrador , administrador 
-                from invoice i
+                from " . $this-> tablaFacturacion . " i
                 where 
-                    estado = 'P'
+                    estado = 'c'
                 group by idadministrador
-                order by total asc
+                order by total desc
                 limit 1";
         $result = $this->query($sql, false);
         return mysqli_fetch_assoc($result);

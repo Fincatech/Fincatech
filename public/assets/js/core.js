@@ -303,7 +303,7 @@ let core =
       {
         case "get":
         case "add":
-          await core.Forms.init();
+          core.Forms.init();
           break;
         case "list":
           if(core.model != 'Dashboard'){
@@ -325,11 +325,6 @@ let core =
       core.Events();
       document.dispatchEvent(eventCoreInitialized);
     });
-
-    // core.Events();
-
-    // //  Recuperamos la info del usuario
-    //     core.Security.getUserInfo();
 
   },
 
@@ -395,7 +390,6 @@ let core =
           //  Lanzamos el modal de cambiar contraseña
               core.Security.resetPassword();
       });
-
   },
 
   helper:
@@ -565,7 +559,7 @@ let core =
       // var promesa = new Promise(function(resolve, reject){
       let promesa = new Promise(async function(resolve, reject){
           await core.Forms.initializeSelectData();
-          // console.log('----Resultado-----');
+          console.log('----Resultado-----');
           resolve(true);
       });
 
@@ -1775,7 +1769,6 @@ let core =
 //  Inicialización del core
 $(function()
 {
-  
     apiFincatech.init();
     core.init();
     $('.loading').hide();

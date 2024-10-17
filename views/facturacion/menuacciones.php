@@ -24,9 +24,9 @@
                     <?php $App->renderBotonMenu("Liquidaciones", "liquidaciones/list", "sudo-liquidaciones", null, "cash-stack"); ?>
                 </div>   
                 <!-- Ingresos a cuenta -->
-                <div class="col-6 col-sm-4 col-lg-3 col-xl-2 col-xxl">
-                    <?php $App->renderBotonMenu("Entregas a cuenta", "ingresoscuenta/list", "sudo-ingresoscuenta", null, "cash-coin"); ?>
-                </div>                                
+                <!-- <div class="col-6 col-sm-4 col-lg-3 col-xl-2 col-xxl">
+                    <?php //$App->renderBotonMenu("Entregas a cuenta", "ingresoscuenta/list", "sudo-ingresoscuenta", null, "cash-coin"); ?>
+                </div>                                 -->
                 <!-- Bancos -->                
                 <div class="col-6 col-sm-4 col-lg-3  col-xl-2 col-xxl">
                     <?php $App->renderBotonMenu("Bancos", "bank", "sudo-bank", null, "bank"); ?>

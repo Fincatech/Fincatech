@@ -390,7 +390,7 @@ class ComunidadModel extends \HappySoftware\Model\Model{
     }
 
     /** Inserta un servicio contratado por una comunidad 
-     *  TODO: Debería de hacerse directamente mediante el controller de servicios basándonos en objetos
+     *  REFACTORIZAR: Debería de hacerse directamente mediante el controller de servicios basándonos en objetos
     */
     public function InsertServicioContratado($idComunidad, $idServicio, $precio, $precioComunidad, $contratado, $mesFacturacion = 1 )
     {
@@ -407,7 +407,7 @@ class ComunidadModel extends \HappySoftware\Model\Model{
     }
 
     /** Actualiza un servicio para una comunidad
-     * TODO: Debería de hacerse directamente mediante el controller de servicios basándonos en objetos
+     * REFACTORIZAR: Debería de hacerse directamente mediante el controller de servicios basándonos en objetos
      */
     public function UpdateServicioContratado($idComunidad, $idServicio, $idServicioComunidad, $precio, $precioComunidad, $contratado, $mesFacturacion)
     {
