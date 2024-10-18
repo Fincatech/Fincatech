@@ -26,7 +26,11 @@
                 <!-- Ingresos a cuenta -->
                 <!-- <div class="col-6 col-sm-4 col-lg-3 col-xl-2 col-xxl">
                     <?php //$App->renderBotonMenu("Entregas a cuenta", "ingresoscuenta/list", "sudo-ingresoscuenta", null, "cash-coin"); ?>
-                </div>                                 -->
+                </div>      -->
+                <!-- Prefacturación -->
+                <div class="col-6 col-sm-4 col-lg-3 col-xl-2 col-xxl">
+                    <?php $App->renderBotonMenu("Pre-facturacion", "prefacturacion/form", "sudo-prefacturacion", null, "calendar2-check"); ?>
+                </div>
                 <!-- Bancos -->                
                 <div class="col-6 col-sm-4 col-lg-3  col-xl-2 col-xxl">
                     <?php $App->renderBotonMenu("Bancos", "bank", "sudo-bank", null, "bank"); ?>
