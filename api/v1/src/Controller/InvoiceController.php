@@ -741,7 +741,6 @@ class InvoiceController extends FrontController{
             $result .= '<strong>Servicio/s</strong>: ' . implode(', ', $serviciosNombre) . '<br>';
             $result .= '<strong>Mes de facturación</strong>: ' . HelperController::StringMonth($mesFacturacion) . ' ' . date('Y') . '<br>';
             $result .= '<strong>Banco utilizado para la remesa</strong>: ' . $bancoNombre . ' - Cuenta: ' . $this->banco['iban'] . '<br>';
-            // HelperController::sendProgressResponse(100, 100, $result, false);
 
         }else{
 
@@ -765,13 +764,13 @@ class InvoiceController extends FrontController{
             //  Fichero zip
             if($this->zipFileName !== ''){
                 $sepaFile = $this->xmlSepaName;
-                $result .= '<p class="mb-0"><i class="bi bi-file-earmark-zip text-success"></i> <a href="'. $this->invoiceServer . 'zip/'. $this->zipFileName . '" target="_blank">Descargar Fichero ZIP con las facturas generadas</a>';            
+                $result .= '<p class="mb-0"><i class="bi bi-file-earmark-zip text-success"></i> <a href="'. $this->invoiceServer . 'zip/'. $this->zipFileName . '" target="_blank" download>Descargar Fichero ZIP con las facturas generadas</a>';            
             }
     
             //  Fichero de la remesa si ha sido generada ya que no interesa mostrar el enlace en otras situaciones
             if($this->remesaGenerada){
                 $remesaPath = HelperController::RootURL() . '/public/storage/remesas/' . $this->ficheroRemesa;
-                $result .= '<p class="mb-0"><i class="bi bi-cloud-arrow-down text-success"></i> <a href="'.$remesaPath.'" target="_blank">Descargar fichero remesa</a></p>';
+                $result .= '<p class="mb-0"><i class="bi bi-cloud-arrow-down text-success"></i> <a href="'.$remesaPath.'" target="_blank" download>Descargar fichero remesa</a></p>';
             }
 
             //  Enviamos el e-mail del proceso al administrador de fincas
@@ -784,7 +783,7 @@ class InvoiceController extends FrontController{
         //  Si han ocurrido errores durante el proceso mostramos la información al usuario para que pueda descargarse el fichero
         if($this->haveError){
             $result .= '<p class="my-2"><i class="bi bi-x-octagon text-danger"></i> Se han producido ' . $this->iErrores . ' error(es) durante el proceso. ';
-            $result .= '<a href="' . HelperController::RootURL() . $this->erroresFileName . '" class="text-danger" target="_blank">Ver log de errores</a></p>';
+            $result .= '<a href="' . HelperController::RootURL() . $this->erroresFileName . '" class="text-danger" target="_blank" download>Ver log de errores</a></p>';
         }
 
         //  Fin del proceso
