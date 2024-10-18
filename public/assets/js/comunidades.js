@@ -68,7 +68,7 @@ let comunidadesCore = {
                     $('.tabDatos').show();
                 }
 
-            });
+        });
 
     },
 
@@ -620,6 +620,7 @@ let comunidadesCore = {
         {
             //  Cargamos el listado de comunidades
             CoreUI.tableData.init();
+            CoreUI.tableData.columns = [];
             //  Código
             CoreUI.tableData.addColumn('listadoComunidadesAdministrador', "codigo","COD");
             //  Nombre
@@ -1687,7 +1688,9 @@ function sleep(ms) {
 }
 
 document.addEventListener('coreInitialized', function(event) {
+    console.log('coreInitialized Comunidades');
     comunidadesCore.init();     
+    comunidadesCore.renderTablaComunidadesAdministrador(core.modelId);
 });
    
 document.addEventListener('modelLoaded', function(event) {

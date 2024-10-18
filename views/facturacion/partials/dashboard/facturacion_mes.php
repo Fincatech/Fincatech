@@ -20,26 +20,26 @@
                     <tr>
                         <td>CAE</td>
                         <td class="text-right"><span class="total_cae">0</span>€</td>
-                        <td class="text-right"><span class="">0</span>€</td>
-                        <td class="text-right"><span class="">0</span>€</td>
+                        <td class="text-right"><span class="total_cae_emitidas">0</span>€</td>
+                        <td class="text-right"><span class="total_cae_devueltsa">0</span>€</td>
                     </tr>
                     <tr>
                         <td>DPD</td>
                         <td class="text-right"><span class="total_dpd">0</span>€</td>
-                        <td class="text-right"><span class="">0</span>€</td>
-                        <td class="text-right"><span class="">0</span>€</td>
+                        <td class="text-right"><span class="total_dpd_emitidas">0</span>€</td>
+                        <td class="text-right"><span class="total_dpd_devueltas">0</span>€</td>
                     </tr>
                     <tr>
                         <td>Certificados digitales</td>
                         <td class="text-right"><span class="total_certificados">0</span>€</td>
-                        <td class="text-right"><span class="">0</span>€</td>
-                        <td class="text-right"><span class="">0</span>€</td>
+                        <td class="text-right"><span class="total_certificados_emitidas">0</span>€</td>
+                        <td class="text-right"><span class="total_certificados_devueltas">0</span>€</td>
                     </tr>
                     <tr>
                         <td class="text-right"><span class="font-weight-bold">Total</span></td>
                         <td class="text-right"><span class="total_mes">0</span>€</td>
-                        <td class="text-right"><span class="">0</span>€</td>
-                        <td class="text-right"><span class="">0</span>€</td>
+                        <td class="text-right"><span class="total_mes_facturas_emitidas">0</span>€</td>
+                        <td class="text-right"><span class="total_mes_facturas_devueltas">0</span>€</td>
                     </tr>
 
                 </tbody>

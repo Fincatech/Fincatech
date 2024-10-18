@@ -355,6 +355,30 @@ let facturacion = {
                 return facturacion.Facturacion.Model.IngresosCuentaPendiente;
             },
 
+            SetTotalFacturasMesEmitidas: function(value){
+                facturacion.Facturacion.Model.FacturasMesEmitidas = value;
+            },
+            /**
+             * Stats Total Mes en curso emitidas
+             * @returns 
+             */
+            TotalFacturasMesEmitidas: function()
+            {
+                return facturacion.Facturacion.Model.FacturasMesEmitidas;
+            },
+
+            SetTotalFacturasMesDevueltas: function(value){
+                facturacion.Facturacion.Model.FacturasMesDevueltas = value;
+            },
+            /**
+             * Stats Total Mes en curso devueltas
+             * @returns 
+             */
+            TotalFacturasMesDevueltas: function()
+            {
+                return facturacion.Facturacion.Model.FacturasMesDevueltas;
+            },
+
             /**
              * Sets total liquidaciones realizadas
              * @param {*} value 
@@ -472,7 +496,7 @@ let facturacion = {
             },
 
             /**
-             * 
+             * Guarda la configuración para la facturación
              */
             SaveConfiguration: async function(){
 
@@ -734,9 +758,9 @@ let facturacion = {
                 }
 
                 //  Validación del creditor ID
-                if(!facturacion.Bank.Model.creditorid){
-                    mensaje = `${mensaje}-El banco seleccionado no tiene informado el Creditor ID<br>`;
-                }                
+                // if(!facturacion.Bank.Model.creditorid){
+                //     mensaje = `${mensaje}-El banco seleccionado no tiene informado el Creditor ID<br>`;
+                // }                
 
                 if(mensaje !== ''){
                     result = false;
@@ -755,20 +779,46 @@ let facturacion = {
                 let totalDpd = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionAnual.total_dpd);
                 let totalCertificados = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionAnual.total_certificados);
                 let total = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionAnual.total);
+
                 $('.stats-facturacion-anual .total_cae').html(totalCae);
                 $('.stats-facturacion-anual .total_dpd').html(totalDpd);
                 $('.stats-facturacion-anual .total_certificados').html(totalCertificados);
                 $('.stats-facturacion-anual .total_anual').html(total);
 
-                //  Facturación Mes en curso
+                //  Facturación Estimada Mes en curso
+                let totalEmitidas = 0;
+                let totalDevueltas = 0;
                 let facturacionMes = facturacion.Facturacion.Controller.FacturacionMes();
-                totalCae = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionMes.facturacion_estimada.total_cae);
-                totalDpd = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionMes.facturacion_estimada.total_dpd);
-                totalCertificados = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionMes.facturacion_estimada.total_certificados);
+                let totalFacturasMesEmitidas = 0;
+                totalFacturasMesEmitidas += parseFloat(facturacionMes.facturacion_cobradas.total_cae) || 0;
+                totalFacturasMesEmitidas += parseFloat(facturacionMes.facturacion_cobradas.total_dpd) || 0;
+                totalFacturasMesEmitidas += parseFloat(facturacionMes.facturacion_cobradas.total_certificados) || 0;
+                totalFacturasMesEmitidas = facturacion.Facturacion.Controller.Utils.FormatearNumero(totalFacturasMesEmitidas);
+                $('.stats-facturacion-mes .total_mes_facturas_emitidas').html(totalFacturasMesEmitidas);
+
                 total = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionMes.facturacion_estimada.total);    
+                //  CAE
+                totalCae = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionMes.facturacion_estimada.total_cae);
+                totalEmitidas = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionMes.facturacion_cobradas.total_cae);
+                totalDevueltas = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionMes.facturacion_devueltas.total_cae);
                 $('.stats-facturacion-mes .total_cae').html(totalCae);
+                $('.stats-facturacion-mes .total_cae_emitidas').html(totalEmitidas);
+                $('.stats-facturacion-mes .total_cae_devueltas').html(totalDevueltas);
+                //  DPD
+                totalDpd = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionMes.facturacion_estimada.total_dpd);
+                totalEmitidas = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionMes.facturacion_cobradas.total_dpd);
+                totalDevueltas = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionMes.facturacion_devueltas.total_dpd);
                 $('.stats-facturacion-mes .total_dpd').html(totalDpd);
+                $('.stats-facturacion-mes .total_dpd_emitidas').html(totalEmitidas);
+                $('.stats-facturacion-mes .total_dpd_devueltas').html(totalDevueltas);                
+                //  Certificados digitales
+                totalCertificados = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionMes.facturacion_estimada.total_certificados);
+                totalEmitidas = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionMes.facturacion_cobradas.total_certificados);
+                totalDevueltas = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionMes.facturacion_devueltas.total_certificados);
                 $('.stats-facturacion-mes .total_certificados').html(totalCertificados);
+                $('.stats-facturacion-mes .total_certificados_emitidas').html(totalEmitidas);
+                $('.stats-facturacion-mes .total_certificados_devueltas').html(totalDevueltas);
+
                 $('.stats-facturacion-mes .total_mes').html(total);    
                 $('.stats-facturacion-mes .month').html(facturacion.Facturacion.Controller.MonthCalculo());    
                 $('.stats-facturacion-mes .year').html(facturacion.Facturacion.Controller.YearCalculo());    
@@ -1066,6 +1116,8 @@ let facturacion = {
             BestCustomerTotal: 0,
             FacturasDevueltas: 0,
             FacturasDevueltasTotal: 0,
+            FacturasMesEmitidas: 0,
+            FacturasMesDevueltas: 0,
 
             //  Modelo que se utiliza para almacenar la información previa a la generación de las facturas correspondientes
             InfoFacturacion: null,

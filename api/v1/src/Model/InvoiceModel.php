@@ -560,11 +560,11 @@ class InvoiceModel extends \HappySoftware\Model\Model{
         $sql = "
             select 
                 COUNT(case when i.estado = 'P' then 1 else null end) as pendientes,
-                SUM(case when i.estado = 'P' then i.total_taxes_inc else 0 end) as pendientes_total,
+                IFNULL(SUM(case when i.estado = 'P' then i.total_taxes_inc else 0 end), 0) as pendientes_total,
                 COUNT(case when i.estado = 'C' then 1 else  null end) as cobradas,
-                SUM(case when i.estado = 'C' then i.total_taxes_inc else 0 end) as cobradas_total,
+                IFNULL(SUM(case when i.estado = 'C' then i.total_taxes_inc else 0 end), 0) as cobradas_total,
                 COUNT(case when i.estado = 'D' then 1 else  null end) as devueltas,
-                SUM(case when i.estado = 'D' then i.total_taxes_inc else 0 end) as devueltas_total
+                IFNULL(SUM(case when i.estado = 'D' then i.total_taxes_inc else 0 end), 0) as devueltas_total
             from 
                 invoice i";
 
@@ -751,8 +751,41 @@ class InvoiceModel extends \HappySoftware\Model\Model{
         return mysqli_fetch_assoc($result);
     }
 
+    /** Devuelve el total de remesas generadas en el sistema */
     public function TotalRemesas(){
         return $this->getTotalRows($this->tableRemesas);
+    }
+
+    public function TotalesFacturacionMesPorServicio()
+    {
+        $sql = "
+            SELECT 
+                IFNULL(SUM(CASE WHEN d.idservicio = 1 THEN d.total_taxes_exc ELSE 0 END), 0) AS total_cae,
+                IFNULL(SUM(CASE WHEN d.idservicio = 2 THEN d.total_taxes_exc ELSE 0 END), 0) AS total_dpd,
+                IFNULL(SUM(CASE WHEN d.idservicio = 5 THEN d.total_taxes_exc ELSE 0 END), 0) AS total_certificados
+            FROM 
+                invoicedetail d
+            JOIN 
+                invoice i ON d.idinvoice = i.id and i.estado = 'C'
+            WHERE 
+                i.mes = " . intval($this->Month()) . "
+                AND i.anyo = " . intval($this->Anyo()) . " 
+        UNION ALL
+            SELECT 
+                IFNULL(SUM(CASE WHEN d.idservicio = 1 THEN d.total_taxes_exc ELSE 0 END), 0) AS total_cae,
+                IFNULL(SUM(CASE WHEN d.idservicio = 2 THEN d.total_taxes_exc ELSE 0 END), 0) AS total_dpd,
+                IFNULL(SUM(CASE WHEN d.idservicio = 5 THEN d.total_taxes_exc ELSE 0 END), 0) AS total_certificados
+            FROM 
+                invoicedetail d
+            JOIN 
+                invoice i ON d.idinvoice = i.id and i.estado = 'D'
+            WHERE 
+                i.mes = " . intval($this->Month()) . "
+                AND i.anyo = " . intval($this->Anyo());
+
+        $result = $this->query($sql, TRUE);
+        return $result;
+        return mysqli_fetch_assoc($result);
     }
 
     /**

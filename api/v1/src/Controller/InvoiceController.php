@@ -737,11 +737,11 @@ class InvoiceController extends FrontController{
         {
 
             $result = '<span class="d-block text-center text-danger font-weight-bold my-2">No hay facturas pendientes para el período y parámetros seleccionados</span>';
-            $result .= '<strong>Administrador</strong>: <br>';
+            $result .= '<strong>Administrador</strong>: ' . $this->InvoiceModel->Administrador() . '<br>';
             $result .= '<strong>Servicio/s</strong>: ' . implode(', ', $serviciosNombre) . '<br>';
             $result .= '<strong>Mes de facturación</strong>: ' . HelperController::StringMonth($mesFacturacion) . ' ' . date('Y') . '<br>';
             $result .= '<strong>Banco utilizado para la remesa</strong>: ' . $bancoNombre . ' - Cuenta: ' . $this->banco['iban'] . '<br>';
-            HelperController::sendProgressResponse(100, 100, $result, false);
+            // HelperController::sendProgressResponse(100, 100, $result, false);
 
         }else{
 
@@ -761,13 +761,7 @@ class InvoiceController extends FrontController{
                 $result .= '<strong>Mes de facturación</strong>: ' . HelperController::StringMonth($mesFacturacion) . ' ' . date('Y') . '<br>';
                 $result .= '<strong>Banco utilizado para la remesa</strong>: ' . $bancoNombre . ' - Cuenta: ' . $this->banco['iban'] . '<br>';     
             }
-    
-            //  Si han ocurrido errores durante el proceso mostramos la información al usuario para que pueda descargarse el fichero
-            if($this->haveError){
-                $result .= '<p class="my-2"><i class="bi bi-x-octagon text-danger"></i> Se han producido ' . $this->iErrores . ' error(es) durante el proceso. ';
-                $result .= '<a href="' . HelperController::RootURL() . $this->erroresFileName . '" class="text-danger" target="_blank">Ver log de errores</a></p>';
-            }
-    
+       
             //  Fichero zip
             if($this->zipFileName !== ''){
                 $sepaFile = $this->xmlSepaName;
@@ -785,6 +779,12 @@ class InvoiceController extends FrontController{
             //  Enviamos un informe al sudo del sistema con la información de la facturación generada ¿?
             $this->SendEmailProcesoFacturacion();
 
+        }
+
+        //  Si han ocurrido errores durante el proceso mostramos la información al usuario para que pueda descargarse el fichero
+        if($this->haveError){
+            $result .= '<p class="my-2"><i class="bi bi-x-octagon text-danger"></i> Se han producido ' . $this->iErrores . ' error(es) durante el proceso. ';
+            $result .= '<a href="' . HelperController::RootURL() . $this->erroresFileName . '" class="text-danger" target="_blank">Ver log de errores</a></p>';
         }
 
         //  Fin del proceso
@@ -1071,7 +1071,7 @@ class InvoiceController extends FrontController{
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Devuelve la información del total de facturación
+     * Devuelve la información del total de facturación para el dashboard
      * @param bool (optional) $anual Total de facturación anual para el año en curso. Defaults: True
      * @param int (optional) $mes Mes que se desea consultar. Defaults: Mes en curso
      * @param int (optional) $anyo Año que se desea consultar. Defaults: Año en curso
@@ -1089,6 +1089,7 @@ class InvoiceController extends FrontController{
 
         $this->InvoiceModel->SetAnual(true);
         $this->InvoiceModel->SetMonth($mes);
+        $this->InvoiceModel->SetAnyo($anyo);
 
         //  Facturación anual
         $data = [];
@@ -1099,7 +1100,12 @@ class InvoiceController extends FrontController{
         //  Facturación del mes solicitado. Por defecto debería ser el mes en curso
         $data['facturacion_mes'] = [];
         $this->InvoiceModel->SetAnual(false);
+        //  Facturación estimada del mes actual
         $data['facturacion_mes']['facturacion_estimada'] = $this->InvoiceModel->TotalFacturacion()[0];
+        //  Facturación real del mes en curso
+        $facturacionMesCurso = $this->InvoiceModel->TotalesFacturacionMesPorServicio();
+        $data['facturacion_mes']['facturacion_cobradas'] = $facturacionMesCurso[0];
+        $data['facturacion_mes']['facturacion_devueltas'] = $facturacionMesCurso[1];
         //  Total ingresos a cuenta pendientes de liquidar
         $data['ingresoscuentapendiente'] = $this->InvoiceModel->TotalIngresosCuentaPendienteLiquidacion()['total'];
         //  Total liquidaciones realizadas
@@ -2165,7 +2171,7 @@ class InvoiceController extends FrontController{
         // $email = 'desarrollo@fincatech.es';
 
         //  Enviamos sin guardar el mensaje en bbdd
-        $this->SendEmail($email, 'Fincatech', 'Nuevas facturas disponibles', $html, false);
+        $this->SendEmail($email, 'Fincatech', 'Fincatech - Nuevas facturas disponibles', $html, false);
 
     }
 
