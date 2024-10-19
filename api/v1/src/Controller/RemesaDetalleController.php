@@ -25,9 +25,14 @@ class RemesaDetalleController extends FrontController{
 
     private $remesaDetalleEntity;
 
-    public function __construct($params = null)
+    public RemesaDetalle $remesaDetalle;
+
+    public function __construct($params = null, $id = null)
     {
         $this->RemesaDetalleModel = new RemesaDetalleModel($params);
+        if(!is_null($id)){
+            $this->Get($id);
+        }
     }
 
     /**
@@ -36,19 +41,11 @@ class RemesaDetalleController extends FrontController{
     public function CreateRemesaDetalle(RemesaDetalle $datos)
     {
 
-        $remesaDetalle = new RemesaDetalle();
-        $remesaDetalle->SetIdRemesa($datos->IdRemesa());
-        $remesaDetalle->SetAmount($datos->Amount())
-        ->SetDescription($datos->Description())
-        ->SetInvoiceId($datos->InvoiceId())
-        ->SetCustomerBIC($datos->CustomerBIC())
-        ->SetCustomerIBAN($datos->CustomerIBAN())
-        ->SetCustomerName($datos->CustomerName())
-        ->SetUniqueId($datos->UniqueId())
-        ->SetUserCreate($this->getLoggedUserId());
+        $datos->presentado = 1;
+        $datos->usercreate = $this->getLoggedUserId();
 
-        $this->RemesaDetalleModel->CreateDetalleRemesa($remesaDetalle);
-        $remesaId = $remesaDetalle->Id();
+        $this->RemesaDetalleModel->CreateDetalleRemesa($datos);
+        $remesaId = $datos->id;
         //  Si ha ocurrido error, avisamos
         if($remesaId === false){
             return false;
@@ -77,9 +74,20 @@ class RemesaDetalleController extends FrontController{
 
     }
 
-    public function Update($entidadPrincipal, $datos, $usuarioId)
+    public function Update($entidadPrincipal, $datos, $id)
     {
-        return $this->RemesaDetalleModel->Update($entidadPrincipal, $datos, $usuarioId); 
+        return $this->RemesaDetalleModel->Update($entidadPrincipal, $datos, $id); 
+    }
+
+    /**
+     * Actualiza el detalle de la remesa
+     */
+    public function UpdateDetalle()
+    {
+        $this->remesaDetalle->updated = date('Y-m-d H:i:s', time());
+        $data = array_change_key_case(get_object_vars($this->remesaDetalle), CASE_LOWER);
+        $entidad = $this->RemesaDetalleModel->getEntidad();
+        $this->Update($entidad, $data, $this->remesaDetalle->id);
     }
 
     public function getSchemaEntity()
@@ -94,7 +102,24 @@ class RemesaDetalleController extends FrontController{
 
     public function Get($id)
     {
-        return $this->RemesaDetalleModel->Get($id);
+        $this->remesaDetalle = new RemesaDetalle();
+        $data = $this->RemesaDetalleModel->Get($id);
+        $data = [];
+
+        if($this->RemesaDetalleModel->remesa->id > 0)
+        {
+            $this->remesaDetalle = $this->RemesaDetalleModel->remesa;
+        }
+        
+        return $data;
+    }
+
+    public function GetByUniqueId($uniqueId)
+    {
+        $remesaDetalleId = $this->RemesaDetalleModel->GetIdByUniqueId($uniqueId);
+        if(count($remesaDetalleId) > 0){
+            $this->Get($remesaDetalleId[0]['id']);            
+        }
     }
 
     public function List($params = null)

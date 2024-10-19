@@ -32,6 +32,7 @@
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/plug-ins/2.1.8/features/scrollResize/dataTables.scrollResize.min.js"></script>
 
 <!-- Moment -->
 <script src="<?php echo ASSETS_JS; ?>vendor/moment/moment.js"></script>

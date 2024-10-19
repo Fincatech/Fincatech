@@ -37,7 +37,9 @@ class InvoiceModel extends \HappySoftware\Model\Model{
     //  Fecha de pago
     private $_datepaid;
     //  Fecha de devolución
-    private $_datereturned;
+    private string|null $_datereturned;
+    //  Mensaje de devolución
+    private $_returnedMessage;
     private $_mes;
     private $_anyo;
     //  Nombre del administrador
@@ -168,6 +170,15 @@ class InvoiceModel extends \HappySoftware\Model\Model{
     public function DatePaid(){return $this->_datepaid;}
     public function SetDatePaid($value){
         $this->_datepaid = $value;
+        return $this;
+    }
+
+    /**
+     * Mensaje de devolución
+     */
+    public function ReturnedMessage(){ return $this->_returnedMessage;}
+    public function SetReturnedMessage($value){
+        $this->_returnedMessage = $value;
         return $this;
     }
 
@@ -441,7 +452,7 @@ class InvoiceModel extends \HappySoftware\Model\Model{
         return $this->_administradores;
     }
 
-    private $services = Array('1,2,5');
+    private $services = Array('1,2,3,5');
     public function SetServices($value){
         $this->services = $value;
         return $this;
@@ -513,6 +524,17 @@ class InvoiceModel extends \HappySoftware\Model\Model{
             throw new Exception('Factura No encontrada');
         }
         return $invoice;
+    }
+
+    /**
+     * Devuelve el ID de la factura en base a su número de referencia
+     * @param string $numero Número de la factura
+     * @return Array|null ID de la factura o nulo si no ha encontrado nada
+     */
+    public function GetIdByNumero($numero)
+    {
+        $sql = "select id from " . $this->tablaFacturacion . " where numero='" . $numero . "'";
+        return $this->query($sql);
     }
 
     /**
@@ -616,6 +638,7 @@ class InvoiceModel extends \HappySoftware\Model\Model{
             select 
                 count(total_facturacion.comunidad_id) as total_comunidades,
                 IF(cae is null, 0, sum(cae) ) as total_cae, 
+                IF(doccae is null, 0, sum(doccae) ) as total_doccae, 
 			    IF(dpd is null, 0, sum(dpd)) as total_dpd, 
                 IF(certificados is null, 0, sum(certificados)) as total_certificados, 
                 IF(total_factura is null, 0, sum(total_factura)) as total
@@ -625,19 +648,20 @@ class InvoiceModel extends \HappySoftware\Model\Model{
                     c.nombre AS comunidad_nombre,
                     SUM(CASE WHEN ts.id = 1 THEN csc.preciocomunidad ELSE 0 END) AS cae,
                     SUM(CASE WHEN ts.id = 2 THEN csc.preciocomunidad ELSE 0 END) AS dpd,
+                    SUM(CASE WHEN ts.id = 3 THEN csc.preciocomunidad ELSE 0 END) AS doccae,
                     SUM(CASE WHEN ts.id = 5 THEN csc.preciocomunidad ELSE 0 END) as certificados,
-                    SUM(CASE WHEN ts.id = 1 THEN csc.preciocomunidad ELSE 0 END) + SUM(CASE WHEN ts.id = 2 THEN csc.preciocomunidad ELSE 0 END) + SUM(CASE WHEN ts.id = 5 THEN csc.preciocomunidad ELSE 0 END) AS total_factura
+                    SUM(CASE WHEN ts.id = 1 THEN csc.preciocomunidad ELSE 0 END) + SUM(CASE WHEN ts.id = 3 THEN csc.preciocomunidad ELSE 0 END) + SUM(CASE WHEN ts.id = 2 THEN csc.preciocomunidad ELSE 0 END) + SUM(CASE WHEN ts.id = 5 THEN csc.preciocomunidad ELSE 0 END) AS total_factura
                 FROM
                     comunidad c
                     INNER JOIN comunidadservicioscontratados csc ON c.id = csc.idcomunidad
                     INNER JOIN tiposservicios ts ON ts.id = csc.idservicio
                 WHERE
                     ts.id IN (". $services .")
+                    and csc.contratado = 1
                     and c.estado = 'A' ";
 
         //  Validate if are anual
-        if(!$this->Anual())
-        {
+        if(!$this->Anual()){
             $sql .= "and csc.mesfacturacion = " . intval($this->Month());
         }
 
@@ -681,6 +705,7 @@ class InvoiceModel extends \HappySoftware\Model\Model{
         $sql = "select
             MAX(CASE WHEN servicioscontratados.idservicio = 1 THEN 1 ELSE 0 END) AS cae,
             MAX(CASE WHEN servicioscontratados.idservicio = 2 THEN 1 ELSE 0 END) AS dpd,
+            MAX(CASE WHEN servicioscontratados.idservicio = 3 THEN 1 ELSE 0 END) AS doccae,
             MAX(CASE WHEN servicioscontratados.idservicio = 5 THEN 1 ELSE 0 END) AS certificadosdigitales
         from(
             SELECT csc.idservicio
@@ -762,6 +787,7 @@ class InvoiceModel extends \HappySoftware\Model\Model{
             SELECT 
                 IFNULL(SUM(CASE WHEN d.idservicio = 1 THEN d.total_taxes_exc ELSE 0 END), 0) AS total_cae,
                 IFNULL(SUM(CASE WHEN d.idservicio = 2 THEN d.total_taxes_exc ELSE 0 END), 0) AS total_dpd,
+                IFNULL(SUM(CASE WHEN d.idservicio = 3 THEN d.total_taxes_exc ELSE 0 END), 0) AS total_doccae,
                 IFNULL(SUM(CASE WHEN d.idservicio = 5 THEN d.total_taxes_exc ELSE 0 END), 0) AS total_certificados
             FROM 
                 invoicedetail d
@@ -774,6 +800,7 @@ class InvoiceModel extends \HappySoftware\Model\Model{
             SELECT 
                 IFNULL(SUM(CASE WHEN d.idservicio = 1 THEN d.total_taxes_exc ELSE 0 END), 0) AS total_cae,
                 IFNULL(SUM(CASE WHEN d.idservicio = 2 THEN d.total_taxes_exc ELSE 0 END), 0) AS total_dpd,
+                IFNULL(SUM(CASE WHEN d.idservicio = 3 THEN d.total_taxes_exc ELSE 0 END), 0) AS total_doccae,
                 IFNULL(SUM(CASE WHEN d.idservicio = 5 THEN d.total_taxes_exc ELSE 0 END), 0) AS total_certificados
             FROM 
                 invoicedetail d
@@ -840,6 +867,43 @@ class InvoiceModel extends \HappySoftware\Model\Model{
     {
         $sql = "update " . strtolower($this->entidad) . " set estado = '" . $this->Estado() . "' where id = " . $this->Id();
         $this->queryRaw($sql);
+    }
+
+    public function UpdateRejection()
+    {
+        
+    }
+
+    /**
+     * Recupera si el servicio doccae ha sido facturado para una comunidad
+     * @param int $idComunidad ID de la comunidad a comprobar
+     */
+    public function ServicioDOCCaeFacturado(int $idComunidad)
+    {
+        $sql = "select i.id 
+            from " . $this->tablaFacturacion . " i, " . $this->tablaFacturacionDetail . " id
+            where 
+                i.idcomunidad = " . $idComunidad . " 
+                and id.idinvoice = i.id
+                and id.idservicio = 3";
+        return $this->query($sql);
+    }
+    // private $iMesFacturacion = 1;
+    // private $iAnyoFacturacion = date('Y');
+    /**
+     * Comprueba si un servicio ya ha sido facturado para la comunidad, mes y año de facturación
+     */
+    public function ServicioFacturado(int $idComunidad, int $idServicio, int $mes, int $anyo)
+    {
+        $sql = "select i.id 
+            from " . $this->tablaFacturacion . " i, " . $this->tablaFacturacionDetail . " id
+            where 
+                i.idcomunidad = " . $idComunidad . "
+                and i.mes = " . $mes . " 
+                and i.anyo = " . $anyo . " 
+                and id.idinvoice = i.id
+                and id.idservicio = " . $idServicio;
+        return $this->query($sql); 
     }
 
 }

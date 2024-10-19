@@ -67,18 +67,23 @@
                     <p><span class="importe-facturacion">0,00</span>€</p>            
                 </div>
 
-                <div class="col-12 col-md-4 total-1 text-center d-none pt-3">
+                <div class="col-12 col-md-3 total-1 text-center d-none pt-3">
                     <p class="font-weight-bold mb-0">Total CAE</p>
                     <p><span class="importe">0</span>€</p>
                 </div>
 
-                <div class="col-12 col-md-4 total-2 text-center d-none pt-3">
+                <div class="col-12 col-md-3 total-3 text-center d-none pt-3">
+                    <p class="font-weight-bold mb-0">Total DOC CAE</p>
+                    <p><span class="importe">0</span>€</p>
+                </div>
+
+                <div class="col-12 col-md-3 total-2 text-center d-none pt-3">
                     <p class="font-weight-bold mb-0">Total DPD</p>
                     <p><span class="importe">0</span>€</p>
                 </div>
 
-                <div class="col-12 col-md-4 total-5 text-center d-none pt-3">
-                    <p class="font-weight-bold mb-0">Total Certificados</p>
+                <div class="col-12 col-md-3 total-5 text-center d-none pt-3">
+                    <p class="font-weight-bold mb-0">Total Cert.</p>
                     <p><span class="importe">0</span>€</p>
                 </div>                                
 

@@ -159,7 +159,6 @@ class Remesa extends EntityHelper{
             //  Indica si el campo se relaciona desde la entidad relacionada o desde la entidad principal
             'relationType' => RELACION_INVERSA
         ]);
-
     }
 
 }

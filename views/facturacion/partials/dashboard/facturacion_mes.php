@@ -24,6 +24,12 @@
                         <td class="text-right"><span class="total_cae_devueltsa">0</span>€</td>
                     </tr>
                     <tr>
+                        <td>DOC. CAE</td>
+                        <td class="text-right"><span class="total_doccae">0</span>€</td>
+                        <td class="text-right"><span class="total_doccae_emitidas">0</span>€</td>
+                        <td class="text-right"><span class="total_doccae_devueltsa">0</span>€</td>
+                    </tr>                    
+                    <tr>
                         <td>DPD</td>
                         <td class="text-right"><span class="total_dpd">0</span>€</td>
                         <td class="text-right"><span class="total_dpd_emitidas">0</span>€</td>

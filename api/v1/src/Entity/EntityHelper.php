@@ -15,6 +15,19 @@ class EntityHelper{
     {
     }
 
+    public function __get($nombre) {
+        // Usamos get_object_vars para acceder a las propiedades de la clase hija
+        $props = get_object_vars($this); // Devuelve las propiedades de la instancia actual
+        return $props[$nombre] ?? null;
+    }
+
+    public function __set($nombre, $valor) {
+        // Verificamos si la propiedad existe en la entidad hija
+        if (property_exists($this, $nombre)) {
+            $this->$nombre = $valor;
+        }
+    }
+
     public function setOrderType($value)
     {
         $this->_orderType = $value;

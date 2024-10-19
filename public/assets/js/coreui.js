@@ -914,6 +914,7 @@ let CoreUI = {
                     "serverSide": _serverSide,
                     "autoWidth": false,
                     "select": true,
+                    'scrollCollapse': true,
                     "retrieve": true,
                     "paging": usePagination,
                     "searching": _search,

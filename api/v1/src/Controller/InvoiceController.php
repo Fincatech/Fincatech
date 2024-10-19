@@ -25,6 +25,8 @@ use Throwable;
 
 class InvoiceController extends FrontController{
 
+    private $debugMode = true;
+
     public $InvoiceModel;
 
     //  Controllers
@@ -36,6 +38,8 @@ class InvoiceController extends FrontController{
     public const ESTADO_PENDIENTE = 'P';
     public const ESTADO_FACTURAS_DEVUELTAS = 'D';
     public const ESTADO_FACTURA_RECTIFICATIVA = 'R';
+
+    public const NOMENCLATURA_DOCCAE = 'DOCUMENTOS CAE';
 
     //  Asunto predefinido del envío de Factura
     private const EMAIL_ASUNTO = 'Fincatech - Fra. ';
@@ -99,10 +103,18 @@ class InvoiceController extends FrontController{
     //  Array que contiene los nombres de los ficheros PDF en caso que hayan de enviarse en un ZIP
     private $pdfFileNames = [];
 
+    //////////////////////////////////////////////////////
     //  Propiedades que se utilizan para la generación
+    //////////////////////////////////////////////////////
     private array $comunidadesFacturacion = [];
+    private $iMesFacturacion = 1;
+    private $iAnyoFacturacion;
+
+    //  Se utiliza para saber si para un administrador y comunidad ya se ha facturado este servicio ya que es único, no se factura 2 veces
+    private bool $servicioDOCCaeFacturado = false;
 
     private bool $servicioCAE = false;
+    private bool $servicioDocCAE = false;
     private bool $servicioDPD = false;
     private bool $servicioCertificadosDigitales = false;
 
@@ -201,9 +213,9 @@ class InvoiceController extends FrontController{
         //  Concepto DOC CAE
         if(isset($opciones['conceptoDOCCAE']))
         {
-            $this->conceptoCAE = (trim($opciones['conceptoDOCCAE']) !== '' ? $opciones['conceptoDOCCAE'] : 'C. ANUAL ' . $this->confConceptoDOCCAE);    
+            $this->conceptoDOCCAE = (trim($opciones['conceptoDOCCAE']) !== '' ? $opciones['conceptoDOCCAE'] : $this::NOMENCLATURA_DOCCAE);
         }else{
-            $this->conceptoDOCCAE = $this->confConceptoDOCCAE;
+            $this->conceptoDOCCAE = $this::NOMENCLATURA_DOCCAE;
         }
 
         //  Concepto DPD
@@ -334,6 +346,16 @@ class InvoiceController extends FrontController{
         }
 
         return $invoice;
+    }
+
+    public function GetIdByNumeroFactura($numeroFactura)
+    {
+        $id = $this->InvoiceModel->GetIdByNumero($numeroFactura);
+        if(!is_null($id)){
+            return $id;
+        }else{
+            return null;
+        }
     }
 
     /**
@@ -553,6 +575,7 @@ class InvoiceController extends FrontController{
 
         //  Año de facturación
         $anyoFacturacion = date('Y');
+        $this->iAnyoFacturacion = (int)$anyoFacturacion;
         //  Servicios
         $servicios = null;
         //  Resultado. Se utiliza para enviar información en formato HTML al buffer de salida
@@ -562,6 +585,8 @@ class InvoiceController extends FrontController{
 
         //  Con los parámetros correspondientes comprobamos el estado de la facturación
         $mesFacturacion = DatabaseCore::PrepareDBString($opciones['mesfacturacion']);
+        $this->iMesFacturacion = (int)$mesFacturacion;
+
         $sMesFacturacion = HelperController::StringMonth((int)$mesFacturacion);
         
         ////////////////////////////////////////////////////////////////////////////////////
@@ -683,37 +708,42 @@ class InvoiceController extends FrontController{
                         //  Iteramos sobre todas las comunidades que correspondan al administrador que se está facturando
                         foreach($comunidadesFacturacion as $comunidad)
                         {
-                            $this->comunidadToBill = $comunidad;
-                            
-                            $this->InvoiceModel->SetComunidad($comunidad['nombre'])
-                            ->SetIdComunidad( trim($comunidad['id']) )
-                            ->SetCifComunidad( trim($comunidad['cif']) )
-                            ->SetIBAN($comunidad['ibancomunidad'])
-                            ->SetIdAdministrador($idAdministrador)
-                            ->SetAdministrador($administradorNombre)
-                            ->SetMes($mesFacturacion)
-                            ->SetAnyo($anyoFacturacion)
-                            ->SetCodigoComunidad($comunidad['codigo'])
-                            ->SetServices( $comunidad['services'] )
-                            ->SetEstado($this::ESTADO_PENDIENTE);
-    
-                            //  Comprobamos que no esté ya generada
-                            if( !$this->ExistsInvoice() )
+
+                            $this->comunidadToBill = $comunidad;                       
+
+                            //  Comprobamos si la comunidad tiene servicios asociados
+                            if(isset($comunidad['services']))
                             {
-                                //  Creamos la factura en el sistema
-                                if($this->CreateInvoice() !== false)
-                                    $iFacturasGeneradas++;
+                                //  Comprobamos si tiene servicios pendientes de facturar
+                                if( count($comunidad['services']) > 0 )
+                                // if( !$this->ExistsInvoice() )
+                                {
 
-                                //  Enviamos el progreso actualizado del proceso por Comunidad
-                                $this->SendProgressResultMessage($iTotalComunidades, $iComunidad, $administradorNombre, $sMesFacturacion, $this->InvoiceModel->Comunidad(), null, $this->InvoiceModel->TotalTaxesInc() . '&euro;');
-                            }else{
-                                //TODO Registramos en el error que ya se ha encontrado una factura y recuperamos la información de la misma
-                                //  para poder mostrar la información al usuario en el log de errores
+                                    $this->InvoiceModel->SetComunidad($comunidad['nombre'])
+                                    ->SetIdComunidad( trim($comunidad['id']) )
+                                    ->SetCifComunidad( trim($comunidad['cif']) )
+                                    ->SetIBAN($comunidad['ibancomunidad'])
+                                    ->SetIdAdministrador($idAdministrador)
+                                    ->SetAdministrador($administradorNombre)
+                                    ->SetMes($mesFacturacion)
+                                    ->SetAnyo($anyoFacturacion)
+                                    ->SetCodigoComunidad($comunidad['codigo'])
+                                    ->SetServices( $comunidad['services'] )
+                                    ->SetEstado($this::ESTADO_PENDIENTE);
+        
+                                    //  Creamos la factura en el sistema
+                                    if($this->CreateInvoice() !== false)
+                                        $iFacturasGeneradas++;
 
-                            }                     
+                                    //  Enviamos el progreso actualizado del proceso por Comunidad
+                                    $this->SendProgressResultMessage($iTotalComunidades, $iComunidad, $administradorNombre, $sMesFacturacion, $this->InvoiceModel->Comunidad(), null, $this->InvoiceModel->TotalTaxesInc() . '&euro;');
+                                }else{
+                                    //TODO Registramos en el error que ya se ha encontrado una factura y recuperamos la información de la misma
+                                    //  para poder mostrar la información al usuario en el log de errores
 
+                                }                     
+                            }
                             $iComunidad++;
-
                         }
 
                         //  Por cada administrador generamos los pdf's correspondientes a la factura
@@ -773,10 +803,13 @@ class InvoiceController extends FrontController{
                 $result .= '<p class="mb-0"><i class="bi bi-cloud-arrow-down text-success"></i> <a href="'.$remesaPath.'" target="_blank" download>Descargar fichero remesa</a></p>';
             }
 
-            //  Enviamos el e-mail del proceso al administrador de fincas
-            $this->SendEmailProcesoFacturacionAdministrador();
-            //  Enviamos un informe al sudo del sistema con la información de la facturación generada ¿?
-            $this->SendEmailProcesoFacturacion();
+            if(!$this->debugMode)
+            {
+                //  Enviamos el e-mail del proceso al administrador de fincas
+                $this->SendEmailProcesoFacturacionAdministrador();
+                //  Enviamos un informe al sudo del sistema con la información de la facturación generada ¿?
+                $this->SendEmailProcesoFacturacion();
+            }
 
         }
 
@@ -836,7 +869,6 @@ class InvoiceController extends FrontController{
 
         //  Serie de facturación FAño/Serie. Ej: F24/00001
         $numeroFactura = $this->GenerateNumeroFactura();
-        // $this->InvoiceModel->SetNumero($this->prefijoSerieFacturacion . date('y') . '/' . str_pad($this->serieFacturacion, 6, '0', STR_PAD_LEFT) );
         $this->InvoiceModel->SetNumero($numeroFactura);
 
         //  Inicializamos el detalle
@@ -858,14 +890,13 @@ class InvoiceController extends FrontController{
                 //  Recuperamos el ID del servicio
                 $idServicio = (int)$servicio['idservicio'];
                 //  Recuperamos el precio del servicio
-                $precioServicio = (float)$servicio['preciocomunidad'];
+                $precioComunidad = (float)$servicio['preciocomunidad'];
                 //  Precio del administrador
-                // $precioComunidad = (float)$servicio['precio'];
-                $precioComunidad = 75;
+                $precioServicio = (float)$servicio['precio'];
                 //  Concepto para incluir en el detalle
                 $detalle = $this->GenerarDetalleLinea($idServicio);
                 
-                //  Añadimos la línea al modelo. TODO: Esto está mal
+                //  Añadimos la línea al modelo. 
                 $this->AddDetailLine($invoiceId, $idServicio, $detalle, $precioServicio, 1, $this->impuesto, $precioComunidad);
 
                 //  Si no requiere agrupación de servicios guardamos tanto la factura como el detalle asociado
@@ -875,8 +906,6 @@ class InvoiceController extends FrontController{
                     $this->InvoiceModel->SetReferenciaContrato( $this->GenerarReferenciaContrato($idServicio) );
                     //  Guardamos tanto el detalle como la factura
                     $this->SaveInvoice();
-                    // TODO: Comprobamos si se ha insertado correctamente, en caso afirmativo guardamos el detalle asociado
-                    //
                     //  Limpiamos el detalle anterior
                     $this->InvoiceDetailController->ClearDetailLines();                        
                     //  Recuperamos el siguiente ID para poder hacer la relación
@@ -1017,9 +1046,20 @@ class InvoiceController extends FrontController{
     /**
      * Actualiza el estado de una factura
      */
-    public function UpdateStatusInvoice(int $idInvoice, string $newStatus)
+    public function UpdateStatusInvoice(int $idInvoice, string $newStatus, string $dateReturned = null)
     {
-        $this->InvoiceModel->SetId($idInvoice)->SetEstado($newStatus)->UpdateStatus();
+        $this->InvoiceModel->SetId($idInvoice)->SetEstado($newStatus)->SetDateReturned($dateReturned)->UpdateStatus();
+    }
+
+    /**
+     * Actualiza el estado de devolución de una factura
+     */
+    public function UpdateRejectionStatus(float $idInvoice, string $dateReturned, string $motivo)
+    {
+        $this->InvoiceModel->SetDateReturned($dateReturned)
+        ->SetReturnedMessage($motivo)
+        ->setId($idInvoice)
+        ->UpdateRejection();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1157,10 +1197,16 @@ class InvoiceController extends FrontController{
     }
 
     /**
-     * TODO: Comprueba si el servicio DOC CAE ya ha sido facturado
+     * Comprueba si el servicio DOC CAE ya ha sido facturado
      * @return bool Estado de la facturación del Servicio de DOC CAE
      */
-    private function ServicioDOCCAEFacturado()
+    private function ServicioDOCCAEFacturado($idComunidad)
+    {
+        $facturado = $this->InvoiceModel->ServicioDOCCaeFacturado($idComunidad);
+        return (count($facturado) > 0);
+    }
+
+    private function TieneServiciosPendientesFacturar()
     {
 
     }
@@ -1214,7 +1260,7 @@ class InvoiceController extends FrontController{
 
     }
 
-    /**
+    /** TOFIX:
      * Devuelve la información de la facturación relativa a un mes según servicios y administrador
      * @param array $servicios. Servicios que se van a calcular
      * @param int $mesFacturación. Mes ordinal que se va a consultar
@@ -1258,6 +1304,10 @@ class InvoiceController extends FrontController{
                         $servicios[] = 2;
                         $this->servicioDPD = true;
                         break;
+                    case 'doccae':
+                        $servicios[] = 3;
+                        $this->servicioDocCAE = true;
+                        break;                        
                     case 'certificadosdigitales':
                         $servicios[] = 5;
                         $this->servicioCertificadosDigitales = true;
@@ -1300,6 +1350,7 @@ class InvoiceController extends FrontController{
         $totalFacturacion = 0;
         $totalFacturacion += $this->servicioCAE ? floatval($resultado['total_cae']) : 0;
         $totalFacturacion += $this->servicioDPD ? floatval($resultado['total_dpd']) : 0;
+        $totalFacturacion += $this->servicioDocCAE ? floatval($resultado['total_doccae']) : 0;
         $totalFacturacion += $this->servicioCertificadosDigitales ? floatval($resultado['total_certificados']) : 0;
 
         return [
@@ -1309,6 +1360,7 @@ class InvoiceController extends FrontController{
             'numerocomunidades' => $resultado['total_comunidades'],
             'totalfacturacion' => number_format((float)$totalFacturacion, 2, ',','.'),
             'total_cae' => number_format((float)$resultado['total_cae'], 2, ',','.'),
+            'total_doccae' => number_format((float)$resultado['total_doccae'], 2, ',','.'),
             'total_dpd' => number_format((float)$resultado['total_dpd'], 2, ',','.'),
             'total_certificados' => number_format((float)$resultado['total_certificados'], 2, ',','.'),
         ];
@@ -1354,6 +1406,7 @@ class InvoiceController extends FrontController{
         if(count($invoice['Invoice']) <= 0){
             return false;
         }
+
 
         return true;
 
@@ -1446,7 +1499,7 @@ class InvoiceController extends FrontController{
     /**
      * Construye el mensaje de progreso que se enviará durante el proceso de actualización
      */
-    private function SendProgressResultMessage($totalProgress, $currentProgress, $administrador, $mesfacturacion, $comunidad, $servicio, $importefactura)
+    public function SendProgressResultMessage($totalProgress, $currentProgress, $administrador, $mesfacturacion, $comunidad, $servicio, $importefactura)
     {
         //  Nombre del administrador
         $result = '<strong>Administrador</strong>: <span class="text-truncate">' . $administrador . '</span><br>';
@@ -1470,7 +1523,7 @@ class InvoiceController extends FrontController{
     /**
      * Envía un mensaje personalizado al buffer de salida del estado de progreso
      */
-    private function SendProgressResultCustomMessage($totalProgress, $currentProgress, $message)
+    public function SendProgressResultCustomMessage($totalProgress, $currentProgress, $message)
     {
         HelperController::sendProgressResponse($totalProgress, $currentProgress, $message);
     }
@@ -1505,10 +1558,29 @@ class InvoiceController extends FrontController{
 
                 //  Datos del servicio
                 $idServicio = (int)$comunidad['idservicio'];
-                $servicio = [];
-                $servicio['idservicio'] = $idServicio;
-                $servicio['preciocomunidad'] = $comunidad['preciocomunidad'];
-                $this->comunidadesFacturacion[$idComunidad]['services'][] = $servicio;     
+
+                //  Por defecto se factura el servicio
+                $facturarServicio = true;
+
+                //  Si el servicio es el de Doc CAE hay que comprobar si ya ha sido facturado con anterioridad ya que si no, no se incluye
+                if($idServicio == 3)
+                {
+                    //  Validamos que el servicio de DOC Cae no haya sido ya facturado para la comunidad
+                    $doccaeFacturado = $this->ServicioDOCCaeFacturado($idComunidad);
+                    $facturarServicio = $doccaeFacturado == true ? false : true;
+                }else{
+                    $servicioFacturado = $this->InvoiceModel->ServicioFacturado($idComunidad, $idServicio, $this->iMesFacturacion, $this->iAnyoFacturacion);
+                    $facturarServicio = count($servicioFacturado) <= 0;
+                }
+
+                if($facturarServicio)
+                {
+                    $servicio = [];
+                    $servicio['idservicio'] = $idServicio;
+                    $servicio['precio'] = $comunidad['precio'];
+                    $servicio['preciocomunidad'] = $comunidad['preciocomunidad'];
+                    $this->comunidadesFacturacion[$idComunidad]['services'][] = $servicio;         
+                }
 
             }
 
@@ -1523,7 +1595,7 @@ class InvoiceController extends FrontController{
         $this->ConfiguracionController->UpdateValue('seriefacturacion', $this->serieFacturacion);
     }
 
-    /**
+    /** TODO: Antes de generar la referencia del contrato hay que validar si hay que facturar el servicio
      * Genera el string que compone la referencia del contrato
      * @param int|array $idServicio (opcional) ID del servicio
      * @param bool $allServices (opcional) Defaults: false. Indica si se debe generar la referencia del contrato para todos los servicios o de forma individual
@@ -1550,9 +1622,9 @@ class InvoiceController extends FrontController{
             }
             
             //  DOC CAE
-            // if( in_array('3', array_column($idServicio, 'idservicio'))){
-            //     $referencia .= $this->confConceptoDOCCAE;
-            // }
+            if( in_array('3', array_column($idServicio, 'idservicio')) ){
+                $referencia .= $this->confConceptoDOCCAE;
+            }
 
             //  Certificados Digitales
             if( in_array('5', array_column($idServicio, 'idservicio')) ){
@@ -1571,9 +1643,9 @@ class InvoiceController extends FrontController{
                     $referencia = $this->confConceptoDPD;
                     break;
                 //  DOC CAE
-                // case 3:
-                //      $referencia = $this->confConceptoDOCCAE;
-                //      break;
+                case 3:
+                     $referencia = $this->confConceptoDOCCAE;
+                     break;
                 //  Certificados digitales
                 case 5:
                     $referencia = $this->confCertificadoDigital;
@@ -1599,9 +1671,9 @@ class InvoiceController extends FrontController{
             case 2: //  DPD
                 $result = $this->conceptoDPD;
                 break;
-            // case 3: // DOC CAE
-            //     $result = $this->conceptoDOCCAE;
-            //     break;
+            case 3: // DOC CAE
+                $result = $this::NOMENCLATURA_DOCCAE; //$this->conceptoDOCCAE;
+                break;
             case 5: //  Certificados digitales
                 $result = $this->conceptoCertificadosDigitales;
                 break;
@@ -2037,6 +2109,11 @@ class InvoiceController extends FrontController{
      */
     private function SincronizarFicherosGenerados()
     {
+        //  Si estamos en modo debug no se envía nada al servidor
+        if($this->debugMode){
+            return;
+        }
+
         $msg = '<p class="font-weight-bold">Sincronizando Ficheros con el almacén de Fincatech</p>';
                 
         //  Enviamos los ficheros pdf generados al servidor almacén
@@ -2141,8 +2218,9 @@ class InvoiceController extends FrontController{
 
         $email = ADMINMAIL;
 
-        //DEBUG: Quitar en producción
-        // $email = 'desarrollo@fincatech.es';
+        if($this->debugMode){
+            $email = 'desarrollo@fincatech.es';
+        }
 
         $urlXML = HelperController::RootDir() . '/public/storage/remesas/' . $this->ficheroRemesa;
         //  Enviamos sin guardar el mensaje en bbdd
@@ -2166,8 +2244,9 @@ class InvoiceController extends FrontController{
             $email = ADMINMAIL;
         }
 
-        //DEBUG: Quitar en producción
-        // $email = 'desarrollo@fincatech.es';
+        if($this->debugMode){
+            $email = 'desarrollo@fincatech.es';
+        }
 
         //  Enviamos sin guardar el mensaje en bbdd
         $this->SendEmail($email, 'Fincatech', 'Fincatech - Nuevas facturas disponibles', $html, false);

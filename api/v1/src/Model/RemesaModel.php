@@ -3,6 +3,7 @@
 namespace Fincatech\Model;
 
 use Fincatech\Entity\Remesa;
+use Fincatech\Entity\RemesaDevolucion;
 use HappySoftware\Controller\HelperController;
 use HappySoftware\Model\Model;
 
@@ -26,6 +27,10 @@ class RemesaModel extends \HappySoftware\Model\Model{
 
     }
 
+    /**
+     * Recupera una Remesa por su ID
+     * @param int $id ID de la remesa
+     */
     public function Get($id)
     {
 
@@ -40,8 +45,7 @@ class RemesaModel extends \HappySoftware\Model\Model{
             //  Fecha de generación convertimos a spanish iso
             $created = $data[$this->entidad][0]['created'];
             $data[$this->entidad][0]['created'] = date('d/m/Y H:i', strtotime($created));
-
-            //  Recibos
+            //  Nº de recibos asociados
             $data[$this->entidad][0]['numerorecibos'] = count($data[$this->entidad][0]['remesadetalle']);
             //  Total de la remesa
             $sumatorio = array_sum(array_column($data[$this->entidad][0]['remesadetalle'], 'amount'));
@@ -50,6 +54,7 @@ class RemesaModel extends \HappySoftware\Model\Model{
             $remesaFile = HelperController::RootURL() . $pathRemesas . $data[$this->entidad][0]['referencia'] . '.xml';
             $data[$this->entidad][0]['remesafile'] = $remesaFile;
         }
+
         return $data;
 
     }
@@ -58,6 +63,9 @@ class RemesaModel extends \HappySoftware\Model\Model{
         $sql = "select sum(";
     }
 
+    /**
+     * Crea una remesa en el sistema
+     */
     public function CreateRemesa(Remesa $remesa)
     {
         //  Construimos los datos que se van a almacenar
@@ -93,7 +101,9 @@ class RemesaModel extends \HappySoftware\Model\Model{
 
     }
 
-    /** Recupera todos los registros */
+    /** 
+     * Listado de remesas
+     */
     public function List($params = null, $useLoggedUserId = false)
     {
         $sql = "select * from remesa r
@@ -101,6 +111,9 @@ class RemesaModel extends \HappySoftware\Model\Model{
         return $this->query($sql);
     }
 
+    /**
+     * Recibos asociados a la remesa
+     */
     public function Recibos($idRemesa)
     {
         $sql = "select * from remesadetalle where idremesa = " . $idRemesa;

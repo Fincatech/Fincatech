@@ -6,8 +6,9 @@ use App\Application\Actions\User\ViewUserAction;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
-use Slim\App;
 
+use Slim\App;
+use Slim\Factory\AppFactory;
 use Slim\Psr7\Response as BaseResponse;
 use Slim\Interfaces\RouteCollectorProxyInterface as Group;
 
@@ -18,6 +19,7 @@ use Fincatech\Controller\FrontController;
 use HappySoftware\Controller\HelperController;
 use HappySoftware\Controller\Traits\ConfigTrait;
 use PHPUnit\TextUI\Help;
+use Slim\Psr7\Request as Psr7Request;
 
 $accessMiddleware = function(Request $request, RequestHandler $handler) use($app)
 {
@@ -392,8 +394,6 @@ return function (App $app) {
 
         $response->getBody()->write( HelperController::successResponse( $result ));
         return $response;
-        // $newResponse = $response->withStatus(400,  $result );
-        // return $newResponse;
 
     });
 
@@ -697,6 +697,54 @@ return function (App $app) {
         return $response;
 
     });
+
+    /**
+     * Procesa la devolución de una remesa con el fichero del banco
+     */
+    $app->post('/remesa/devolucion', function(Psr7Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Remesa');
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        //  Verificar si se ha subido un archivo
+        if ( isset($data['fichero']) ) {
+
+            $uploadedFile = $data['fichero'];
+
+            // Comprobar si el archivo es válido
+            if ($uploadedFile !== '') {
+                // Leer el contenido del archivo
+                $fileContent = $uploadedFile['base64'];
+                $fileContent = str_replace('data:text/xml;base64,','',$fileContent);
+                $fileContent = base64_decode($fileContent);
+                // Procesar el contenido del archivo
+                $xmlData = simplexml_load_string($fileContent);
+                if($xmlData === false){
+                    $response->getBody()->write( HelperController::errorResponse('error','El fichero XML no es válido'));
+                }else{
+                    // Llamar al método con los datos procesados
+                    $response->getBody()->write(HelperController::successResponse($frontController->context->ProcesarDevolucionRecibosRemesa($xmlData)));
+                }
+            } else {
+                //  Error al cargar el archivo
+                $response->getBody()->write( HelperController::errorResponse('error','El archivo no se ha podido cargar'));
+            }
+
+        } else {
+            // El usuario no ha subido ningún fichero
+            $response->getBody()->write( HelperController::errorResponse('error','No se ha subido ningún archivo'));
+        }
+
+        return $response;
+
+    }); 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///                                                                  ALMACÉN DOCUMENTAL

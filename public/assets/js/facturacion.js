@@ -35,7 +35,8 @@ let facturacion = {
 
         //  Inicialización del componente de Banco
         facturacion.Bank.Events();
-
+        //  Inicialización de los eventos de remesas
+        facturacion.Remesa.Events();
     },
 
     Bank: {
@@ -556,6 +557,8 @@ let facturacion = {
                 datos.envioAPI = $('#chkAPIComunidad').is(':checked');
                 //  Concepto CAE
                 datos.conceptoCAE = $('#conceptoCAE').val();
+                //  Concepto DOCCAE
+                datos.conceptoDOCCAE = $('#conceptoDOCCAE').val();                
                 //  Concepto DPD
                 datos.conceptoDPD = $('#conceptoDPD').val();
                 //  Certificados Digitales
@@ -714,6 +717,7 @@ let facturacion = {
                     if(resultado.status.response == 'error'){
                         //  Recuperamos los servicios que tiene activos/contratados el administrador
                         facturacion.Facturacion.Model.ContratadoCae = false;
+                        facturacion.Facturacion.Model.ContratadoDocCae = false;
                         facturacion.Facturacion.Model.ContratadoDpd = false;
                         facturacion.Facturacion.Model.ContratadoCertificadosDigitales = false;
                         facturacion.Facturacion.View.RemoveAllSelectedServices();
@@ -776,16 +780,19 @@ let facturacion = {
                 //  Facturacion Anual
                 let facturacionAnual = facturacion.Facturacion.Controller.FacturacionAnual();
                 let totalCae = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionAnual.total_cae);
+                let totalDocCae = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionAnual.total_doccae);
                 let totalDpd = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionAnual.total_dpd);
                 let totalCertificados = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionAnual.total_certificados);
                 let total = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionAnual.total);
 
                 $('.stats-facturacion-anual .total_cae').html(totalCae);
+                $('.stats-facturacion-anual .total_doccae').html(totalDocCae);
                 $('.stats-facturacion-anual .total_dpd').html(totalDpd);
                 $('.stats-facturacion-anual .total_certificados').html(totalCertificados);
                 $('.stats-facturacion-anual .total_anual').html(total);
-
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  Facturación Estimada Mes en curso
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 let totalEmitidas = 0;
                 let totalDevueltas = 0;
                 let facturacionMes = facturacion.Facturacion.Controller.FacturacionMes();
@@ -793,6 +800,7 @@ let facturacion = {
                 totalFacturasMesEmitidas += parseFloat(facturacionMes.facturacion_cobradas.total_cae) || 0;
                 totalFacturasMesEmitidas += parseFloat(facturacionMes.facturacion_cobradas.total_dpd) || 0;
                 totalFacturasMesEmitidas += parseFloat(facturacionMes.facturacion_cobradas.total_certificados) || 0;
+                totalFacturasMesEmitidas += parseFloat(facturacionMes.facturacion_cobradas.total_doccae) || 0;
                 totalFacturasMesEmitidas = facturacion.Facturacion.Controller.Utils.FormatearNumero(totalFacturasMesEmitidas);
                 $('.stats-facturacion-mes .total_mes_facturas_emitidas').html(totalFacturasMesEmitidas);
 
@@ -804,6 +812,15 @@ let facturacion = {
                 $('.stats-facturacion-mes .total_cae').html(totalCae);
                 $('.stats-facturacion-mes .total_cae_emitidas').html(totalEmitidas);
                 $('.stats-facturacion-mes .total_cae_devueltas').html(totalDevueltas);
+
+                // DOC CAE
+                totalDocCae = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionMes.facturacion_estimada.total_doccae);
+                totalEmitidas = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionMes.facturacion_cobradas.total_doccae);
+                totalDevueltas = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionMes.facturacion_devueltas.total_doccae);
+                $('.stats-facturacion-mes .total_doccae').html(totalDocCae);
+                $('.stats-facturacion-mes .total_doccae_emitidas').html(totalEmitidas);
+                $('.stats-facturacion-mes .total_doccae_devueltas').html(totalDevueltas);
+                
                 //  DPD
                 totalDpd = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionMes.facturacion_estimada.total_dpd);
                 totalEmitidas = facturacion.Facturacion.Controller.Utils.FormatearNumero(facturacionMes.facturacion_cobradas.total_dpd);
@@ -1124,6 +1141,7 @@ let facturacion = {
 
             //  Control de servicios contratados
             ContratadoCae: false,
+            ContratadoDocCae: false,
             ContratadoDpd: false,
             ContratadoCertificadosDigitales: false
 
@@ -1898,6 +1916,7 @@ let facturacion = {
                 //  Total servicios a facturar
                 $('.total-servicios .total-1 .importe').html(facturacion.Facturacion.Model.InfoFacturacion.total_cae);
                 $('.total-servicios .total-2 .importe').html(facturacion.Facturacion.Model.InfoFacturacion.total_dpd);
+                $('.total-servicios .total-3 .importe').html(facturacion.Facturacion.Model.InfoFacturacion.total_doccae);
                 $('.total-servicios .total-5 .importe').html(facturacion.Facturacion.Model.InfoFacturacion.total_certificados);
 
                 //  Nº total de facturas devueltas
@@ -1913,6 +1932,7 @@ let facturacion = {
 
                 //  Recuperamos los servicios que tiene activos/contratados el administrador
                 facturacion.Facturacion.Model.ContratadoCae = Boolean(Number(facturacion.Facturacion.Model.InfoFacturacion.servicios.cae));
+                facturacion.Facturacion.Model.ContratadoDocCae = Boolean(Number(facturacion.Facturacion.Model.InfoFacturacion.servicios.doccae));
                 facturacion.Facturacion.Model.ContratadoDpd = Boolean(Number(facturacion.Facturacion.Model.InfoFacturacion.servicios.dpd));
                 facturacion.Facturacion.Model.ContratadoCertificadosDigitales = Boolean(Number(facturacion.Facturacion.Model.InfoFacturacion.servicios.certificadosdigitales));
 
@@ -1923,6 +1943,11 @@ let facturacion = {
                 if(facturacion.Facturacion.Model.ContratadoCae === true){
                     facturacion.Facturacion.View.AddServicioToInfo(1, 'CAE');
                     $('.servicio-cae').show();
+                }
+
+                if(facturacion.Facturacion.Model.ContratadoDocCae === true){
+                    facturacion.Facturacion.View.AddServicioToInfo(3, 'DOCCAE');
+                    $('.servicio-doccae').show();
                 }
 
                 if(facturacion.Facturacion.Model.ContratadoDpd === true){
@@ -2006,9 +2031,9 @@ let facturacion = {
                 if(servicios <= 0){
                     $('.info-servicios').html('No ha seleccionado ningún servicio');
                     $('.total-servicios').addClass('d-none');
-                    $(`.total-servicios .total-1`).removeClass('d-none').addClass('d-none');
-                    $(`.total-servicios .total-2`).removeClass('d-none').addClass('d-none');
-                    $(`.total-servicios .total-5`).removeClass('d-none').addClass('d-none');
+                    for(let i = 1; i<=5; i++){
+                        $(`.total-servicios .total-${i}`).removeClass('d-none').addClass('d-none');
+                    }
                 }
                 
             },
@@ -2018,11 +2043,14 @@ let facturacion = {
              */
             RemoveAllSelectedServices: function()
             {
+                $('.servicio-doccae').hide();
                 $('.servicio-cae').hide();
+                $('.servicio-doccae').hide();
                 $('.servicio-dpd').hide();
                 $('.servicio-certificadosdigitales').hide();
                 facturacion.Facturacion.View.RemoveServicioFromInfo(1);
                 facturacion.Facturacion.View.RemoveServicioFromInfo(2);
+                facturacion.Facturacion.View.RemoveServicioFromInfo(3);
                 facturacion.Facturacion.View.RemoveServicioFromInfo(5);                
             },
 
@@ -2342,6 +2370,58 @@ let facturacion = {
                 
             });
 
+        }
+
+    },
+
+    Remesa:{
+
+        Events: function(){
+            //  Mostrar modal de devolución de recibos
+            $('body').on(core.helper.clickEventType, '.btnProcesarRemesaDevolucion', function(ev)
+            {
+                // Construimos el modal y lo lanzamos para mostrar la información
+                apiFincatech.getView("facturacion", "modal_devolucion_remesa").then((resultHTML)=>{                   
+                    CoreUI.Modal.CustomHTML(resultHTML, null, function(){
+                        core.Files.init();
+                    });
+                });      
+            })
+      
+            //  Procesar devolución de remesa de recibos
+            $('body').on(core.helper.clickEventType, '.btnUploadXML', function(ev){
+                facturacion.Remesa.ProcesarDevolucion();    
+            });
+
+        },
+
+        ProcesarDevolucion: function()
+        {
+            //  Comprobamos que tenga un fichero seleccionado
+            let fileInput = document.getElementById('ficheroadjuntar');
+
+            $('.wrapperMensajeErrorCarga').hide();
+
+            if(fileInput.files.length === 0){
+                $('.wrapperMensajeErrorCarga .mensaje').html('Debe adjuntar el fichero que desea procesar');
+                $('.wrapperMensajeErrorCarga').show();
+                return;
+            }
+
+            //  Si tiene fichero, construimos el objeto para enviar
+            let file = fileInput.files[0];
+            let formData = new FormData();
+            formData.append('file', file);
+            let p = new Promise(async(resolve, reject) =>{
+                apiFincatech.post('remesa/devolucion',formData).then((result)=>{
+                    console.log(result);
+                    resolve(result);
+                })
+            });
+
+            p.then((result)=>{
+
+            });
         }
 
     }

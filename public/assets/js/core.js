@@ -932,6 +932,8 @@ let core =
                         //  Si es un enlace hay que parsear el href para dotarlo de funcionalidad
                         if($(this).is('a')){
                           $(this).attr('href', valor);
+                          $(this).attr('download', valor);
+                          console.log($(this).attr('download'));
                         }
 
                         //  Si es un label lo seteamos con el método html

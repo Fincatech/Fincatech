@@ -11,12 +11,19 @@ use \HappySoftware\Database\DatabaseCore;
 use Fincatech\Controller\BankController;
 use Fincatech\Controller\ComunidadController;
 use Fincatech\Controller\ConfiguracionController as ControllerConfiguracionController;
+use Fincatech\Controller\InvoiceController;
 use Fincatech\Controller\InvoiceDetailController;
+use Fincatech\Controller\RemesaDetalleController;
+use Fincatech\Controller\RemesaDevolucionController;
 use Fincatech\Controller\UsuarioController;
 
 use Fincatech\Model\RemesaModel;
+use Fincatech\Model\RemesaDetalleModel;
+use Fincatech\Model\RemesaDevolucionModel;
+
 use Fincatech\Entity\Remesa;
 use Fincatech\Entity\RemesaDetalle;
+use Fincatech\Entity\RemesaDevolucion;
 
 //  Componente SEPA
 use Digitick\Sepa\TransferFile\Factory\TransferFileFacadeFactory;
@@ -30,10 +37,16 @@ use stdClass;
 
 class RemesaController extends FrontController{
 
-    public $ConfiguracionController;
+    //  Controllers
+    public  $ConfiguracionController;
+    private $RemesaDetalleController;
+    private $RemesaDevolucionController;
 
-    public $RemesaModel;
+    //  Modelos
+    public  $RemesaModel;
+    private $RemesaDevolucionModel;
 
+    //  Entidades
     private $remesaEntity;
 
     private string $_creditorId;    //  ID único que otorga el banco al crediticio
@@ -49,6 +62,11 @@ class RemesaController extends FrontController{
     {
         //$this->InitModel('Remesa', $params);
         $this->RemesaModel = new RemesaModel($params);
+        //  Instancia Remesa Detalle
+        $this->RemesaDetalleController = new RemesaDetalleController($params);
+        //  Instancia Remesa Devolución Controller
+        $this->RemesaDevolucionController = new RemesaDevolucionController($params);
+        //  Instancia controller de configuración
         $this->ConfiguracionController = new \Fincatech\Controller\ConfiguracionController(null);
         //  Recuperamos el Creditor ID desde la configuración
         // $this->_creditorId = $this->ConfiguracionController->GetValue('creditorid');
@@ -91,11 +109,29 @@ class RemesaController extends FrontController{
         return $this->RemesaModel->Get($id);
     }
 
+    /**
+     * Recupera los recibos asociados a una remesa por su ID
+     * @param int $remesaId ID De la remesa a recuperar su detalle
+     */
+    public function RecibosByRemesaId($remesaId)
+    {
+        $data = [];
+
+        //  Recuperamos los recibos asociados a la remesa
+        $params['filterfield'] = 'idremesa';
+        $params['filtervalue'] = $remesaId;
+        $params['filteroperator'] = '=';
+
+        $detalleRemesa = $this->RemesaDetalleController->List($params);       
+        $data['Recibos'] = $detalleRemesa['RemesaDetalle'];
+        return $data;
+    }
+
     public function List($params = null)
     {
         $result = [];
         $result['Remesa'] = $this->RemesaModel->List($params);
-       return $result;
+        return $result;
     }
 
     /**
@@ -275,31 +311,129 @@ class RemesaController extends FrontController{
     {
         $RemesaDetail = new RemesaDetalleController();
         $datosRemesa = new RemesaDetalle();
-        $datosRemesa->SetIdRemesa($idRemesa);
-        $datosRemesa->SetInvoiceId($invoiceId);
-        $datosRemesa->SetDescription($descripcion);
-        $datosRemesa->SetAmount((float)$amount);
-        $datosRemesa->SetCustomerName($customerName);
-        $datosRemesa->SetCustomerBIC($customerBic);
-        $datosRemesa->SetCustomerIBAN($customerIban);
-        $datosRemesa->SetUniqueId($debtorMandate);
+        $datosRemesa->idremesa = $idRemesa;
+        $datosRemesa->invoiceid = $invoiceId;
+        $datosRemesa->descripcion = $descripcion;
+        $datosRemesa->amount = (float)$amount;
+        $datosRemesa->customername = $customerName;
+        $datosRemesa->customerbic = $customerBic;
+        $datosRemesa->customeriban = $customerIban;
+        $datosRemesa->uniqid = $debtorMandate;
         $remesaDetalleId = $RemesaDetail->CreateRemesaDetalle($datosRemesa);
         return $remesaDetalleId;
     }
 
-    public function RecibosByRemesaId($remesaId)
+    /**
+     * Procesa la devolución de una remesa de recibos
+     */
+    public function ProcesarDevolucionRecibosRemesa($xml)
     {
-        $data = [];
-        $data['Recibos'] = $this->RemesaModel->Recibos($remesaId);
-        return $data;
+
+        $totalDevuelto = 0;
+        $numeroRecibosDevueltos = 0;
+        $nombreRemesa = '';
+
+        try{
+
+            //  Instanciamos el controller de facturación
+            $invoice = new InvoiceController();
+
+            // Registrar el espacio de nombres (namespace) si es necesario
+            // $namespaces = $xml->getNamespaces(true);
+
+            // Acceder al grupo <OrgnlGrpInfAndSts> para obtener OrgnlNbOfTxs y OrgnlCtrlSum
+            if (isset($xml->CstmrPmtStsRpt)) {
+                $numeroRecibosDevueltos = (string)$xml->CstmrPmtStsRpt->OrgnlGrpInfAndSts->OrgnlNbOfTxs;
+                $totalDevuelto = (string)$xml->CstmrPmtStsRpt->OrgnlGrpInfAndSts->OrgnlCtrlSum;
+                //  Nombre de la remesa que se presentó  CstmrPmtInfAndSts
+                $nombreRemesa = (string)$xml->CstmrPmtStsRpt->OrgnlPmtInfAndSts[0]->OrgnlPmtInfId;
+            }
+
+            // Acceder al grupo <OrgnlPmtInfAndSts> y recorrer los elementos <TxInfAndSts>
+            $informacionDevolucion = $xml->CstmrPmtStsRpt->OrgnlPmtInfAndSts;
+
+            foreach ($informacionDevolucion->TxInfAndSts as $infoRecibo) 
+            {
+                // Número de factura
+                $numeroFactura = (string)$infoRecibo->OrgnlEndToEndId;
+                $numeroFactura = str_replace('Factura ', '', $numeroFactura);
+                
+                //  Recuperamos el id de la factura en base al identificador del recibo
+                if(!is_null($numeroFactura)){
+
+                    // Estado del recibo
+                    $estadoRecibo = (string)$infoRecibo->TxSts;
+                
+                    // Referencia del recibo: uniqueid
+                    $reciboUniqueId = (string)$infoRecibo->OrgnlTxRef->MndtRltdInf->MndtId;
+
+                    // Motivo de la devolución
+                    $codigoDevolucion = (string)$infoRecibo->StsRsnInf->Rsn->Cd;
+                    $descripcionError = $this->DescripcionErrorSepa($codigoDevolucion);
+
+                    //  Importe de la devolución
+                    $importeDevolucion = (float)$infoRecibo->OrgnlTxRef->Amt->InstdAmt;
+
+                    //  Fecha de devolución
+                    $fechaDevolucion = (string)$infoRecibo->OrgnlTxRef->IntrBkSttlmDt;
+                    //  Recuperamos el detalle del recibo desde el modelo
+                    $this->RemesaDetalleController->GetByUniqueId($reciboUniqueId);
+                    //  Si lo ha encontrado empezamos a procesar
+                    if($this->RemesaDetalleController->remesaDetalle->id > 0)
+                    {
+                        $invoiceId = $this->RemesaDetalleController->remesaDetalle->invoiceid;
+                        //  Cambiamos el estado a la factura
+                        $invoice->UpdateStatusInvoice((int)$invoiceId, $invoice::ESTADO_FACTURAS_DEVUELTAS);
+
+                        //  Comprobamos si el recibo para la remesa ya ha sido devuelto ya que si el mismo recibo para una remesa no puede procesarse 2 veces
+                        if($this->ExisteDevolucionReciboRemesa()){
+                            //TODO:
+                        }else{
+                            //  Establecemos la fecha al día que marca el fichero
+                            $this->RemesaDetalleController->remesaDetalle->datereturned = $fechaDevolucion;
+                            //  Cambiamos el estado al recibo a devuelto
+                            $this->RemesaDetalleController->remesaDetalle->estado = $invoice::ESTADO_FACTURAS_DEVUELTAS;
+                            $this->RemesaDetalleController->UpdateDetalle();
+                            //  Insertamos el recibo devuelto en el repositorio correspondiente
+                            $this->CreateDevolucionRemesa($codigoDevolucion, $descripcionError, $importeDevolucion);
+                        }
+
+                    }else{
+                        // TODO: Registramos el error y lo adjuntamos al log de errores
+                        $a = 0;
+                    }
+                    //  Comprobamos si el recibo ya está marcado como devuelto para la remesa
+                    
+
+                }
+
+                // Mostrar la información extraída
+                echo "Nº factura: $numeroFactura, Estado: $estadoRecibo, Razón: $descripcionError\n";
+                $numeroRecibosDevueltos++;
+            }
+            
+            //  Devolvemos el mensaje al usuario
+            return HelperController::successResponse('ok');
+
+        }catch(\Throwable $ex){
+            return HelperController::errorResponse('error', $ex->getMessage());
+        }
     }
 
-    private function GetBICByIBAN($iban)
+    /**
+     * Crea una entrada en la tabla de devoluciones de remesas
+     */
+    private function CreateDevolucionRemesa(string $codigoDevolucion, string $mensajeDevolucion, float $importeDevolucion)
     {
-        //  Cogemos los 4 primeros dígitos para buscar por código de entidad el banco
-        $entidad = substr($iban, 0,4);
-        $bankController = new BankController();
-
+        $remesaDevolucion = new RemesaDevolucion();
+        $remesaDevolucion->idremesa = $this->RemesaDetalleController->remesaDetalle->idremesa;
+        $remesaDevolucion->idremesadetalle = $this->RemesaDetalleController->remesaDetalle->id;
+        $remesaDevolucion->datereturned = $this->RemesaDetalleController->remesaDetalle->datereturned;
+        $remesaDevolucion->amount = $importeDevolucion;
+        $remesaDevolucion->codigo = $codigoDevolucion;
+        $remesaDevolucion->message = $mensajeDevolucion;
+        $remesaDevolucion->usercreate = $this->getLoggedUserId();
+        $this->RemesaDevolucionController->CreateDevolucion($remesaDevolucion);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -308,6 +442,78 @@ class RemesaController extends FrontController{
     public function RegenerateRemesa()
     {
 
+    }
+
+    /**
+     * Devuelve el mensaje de error según el código que se lee del XML de devolución
+     */
+    private function DescripcionErrorSepa($codigoError)
+    {
+        /** Mensajes de error de devolución de recibo */
+        $motivosRechazoSEPA = [
+            'AC01' => 'Número de cuenta incorrecto',
+            'AC04' => 'Cuenta cerrada',
+            'AC06' => 'Cuenta bloqueada',
+            'AG01' => 'Operación prohibida',
+            'AG02' => 'Código de operación financiera inválido',
+            'AM01' => 'Importe es cero',
+            'AM02' => 'Importe no permitido',
+            'AM03' => 'Divisa no permitida',
+            'AM04' => 'Fondos insuficientes',
+            'AM05' => 'Duplicada',
+            'AM06' => 'Importe demasiado bajo',
+            'AM07' => 'Importe bloqueado',
+            'AM09' => 'Importe equivocado',
+            'AM10' => 'Suma de control inválida',
+            'BE01' => 'Incoherente con el cliente final',
+            'BE04' => 'Falta la dirección del acreedor',
+            'BE05' => 'Parte iniciadora no reconocida',
+            'BE06' => 'Cliente final desconocido',
+            'BE07' => 'Falta la dirección del deudor',
+            'DT01' => 'Fecha inválida',
+            'ED01' => 'Banco corresponsal no permitido',
+            'ED03' => 'Información del saldo solicitada',
+            'ED05' => 'Liquidación fallida',
+            'FF01' => 'Formato de fichero inválido',
+            'MD01' => 'Ausencia de orden de domiciliación',
+            'MD02' => 'Falta información obligatoria en la orden de domiciliación',
+            'MD03' => 'Formato del fichero inválido por razones distintas del indicador de agrupamiento',
+            'MD04' => 'Formato del fichero inválido debido al indicador de agrupamiento',
+            'MD06' => 'Solicitud de reembolso hecha por el cliente final',
+            'MD07' => 'Cliente final fallecido',
+            'MS02' => 'Razón no especificada, generada por el cliente',
+            'MS03' => 'Razón no especificada, generada por el agente',
+            'NARR' => 'Texto',
+            'RC01' => 'Identificador de la entidad financiera incorrecto',
+            'RF01' => 'Referencia de la operación no es única',
+            'RR01' => 'Falta el identificador en la cuenta del ordenante',
+            'RR02' => 'Falta el nombre o la dirección del ordenante',
+            'RR03' => 'Falta el nombre o la dirección del beneficiario',
+            'RR04' => 'Razones regulatorias',
+            'TM01' => 'Hora de cierre (Cut-off time)'
+        ];
+
+        $motivo = 'Devuelto';
+
+        if(array_key_exists($codigoError, $motivosRechazoSEPA) !== false){
+            $motivo = $motivosRechazoSEPA[$codigoError];
+        }
+
+        return $motivo;
+
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///                             VALIDACIONES
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Valida si existe ya una devolución asociada a la remesa y recibo
+     */
+    public function ExisteDevolucionReciboRemesa():bool
+    {
+        return $this->RemesaDevolucionController->ExistsByIdRemesaAndIdRecibo($this->RemesaDetalleController->remesaDetalle);
     }
 
 }

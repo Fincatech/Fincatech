@@ -4,6 +4,7 @@ namespace Fincatech\Model;
 
 use Fincatech\Entity\RemesaDetalle;
 use HappySoftware\Controller\HelperController;
+use HappySoftware\Database\DatabaseCore;
 use HappySoftware\Model\Model;
 
 class RemesaDetalleModel extends \HappySoftware\Model\Model{
@@ -12,11 +13,13 @@ class RemesaDetalleModel extends \HappySoftware\Model\Model{
     private $tablasSchema = array("remesadetalle", 'remesa');
 
     /**
-     * @var \Fincatech\Entity\Remesa
+     * @var \Fincatech\Entity\RemesaDetalle
      */
     public $remesa;
 
-    public function __construct($params = null)
+    public $remesaDetalle;
+
+    public function __construct($params = null, $id = null)
     {
         //  Inicializamos la entidad
         $this->InitEntity( $this->entidad );
@@ -24,26 +27,61 @@ class RemesaDetalleModel extends \HappySoftware\Model\Model{
         //  Inicializamos el modelo
         $this->InitModel($this->entidad, $params, $this->tablasSchema);
 
+        if(!is_null($id)){
+            $this->Get($id);
+        }
+
     }
 
-    public function Get($id){
-        $data = parent::Get($id);
+    /**
+     * Recupera el detalle por su ID
+     */
+    public function Get($id): RemesaDetalle
+    {
+
+        $remesa = parent::Get($id);
         //  Comprobamos si tiene información, si la tiene, rellenamos el modelo
+        $this->remesa = new RemesaDetalle();
+        if(count($remesa['RemesaDetalle']) > 0)
+        {
+            $remesa = $remesa['RemesaDetalle'][0];
+            $this->remesa->id = $id;
+            $this->remesa->idremesa = (int)$remesa['idremesa'];
+            $this->remesa->invoiceid = (int)$remesa['invoiceid'];
+            $this->remesa->uniqid = $remesa['uniqid'];
+            $this->remesa->descripcion = $remesa['descripcion'];
+            $this->remesa->amount = $remesa['amount'];
+            $this->remesa->customername = $remesa['customername'];
+            $this->remesa->customerbic = $remesa['customerbic'];
+            $this->remesa->customeriban = $remesa['customeriban'];
+            $this->remesa->presentado = $remesa['presentado'];
+            $this->remesa->estado = $remesa['estado'];
+            $this->remesa->datereturned = $remesa['datereturned'];
+            $this->remesa->updated = $remesa['updated'];
+            $this->remesa->usercreate = $remesa['usercreate'];
+            $this->remesa->created = $remesa['created'];
+        }
+
+        return $this->remesa;
 
     }
 
+    /**
+     * Devuelve el id de un recibo por su uniqueid
+     */
+    public function GetIdByUniqueId($uniqueId)
+    {
+        $uniqueId = DatabaseCore::PrepareDBString($uniqueId);
+        $sql = "select id from " . strtolower($this->entidad) . " where uniqid = '" . $uniqueId . "'";
+        return $this->query($sql);
+    }
+
+    /**
+     * Crea el detalle de una remesa en bbdd
+     */
     public function CreateDetalleRemesa(RemesaDetalle $remesaDetalle){
-        //  Construimos el almacenamiento
-        $data = [];
-        $data['idremesa'] = $remesaDetalle->IdRemesa();
-        $data['invoiceid'] = $remesaDetalle->InvoiceId();
-        $data['descripcion'] = $remesaDetalle->Description();
-        $data['amount'] = $remesaDetalle->Amount();
-        $data['customername'] = $remesaDetalle->CustomerName();
-        $data['customerbic'] = $remesaDetalle->CustomerBIC();
-        $data['customeriban'] = $remesaDetalle->CustomerIBAN();
-        $data['uniqid'] = $remesaDetalle->UniqueId();
-        $data['estado'] = $remesaDetalle->Estado();
+
+        $data = get_object_vars($remesaDetalle);
 
         $id = parent::Create($this->entidad, $data);
         //  Validamos que haya insertado
@@ -56,7 +94,7 @@ class RemesaDetalleModel extends \HappySoftware\Model\Model{
         //  Validamos que haya insertado
         if(intval($id) > 0){
             //  Seteamos el ID y devolvemos la entidad 
-            $remesaDetalle->SetId($id);
+            $remesaDetalle->id = $id;
         }else{
             return false;
         }
@@ -65,6 +103,11 @@ class RemesaDetalleModel extends \HappySoftware\Model\Model{
     }
 
     public function _Update($remesa){
+
+    }
+
+    public function ListByRemesaId()
+    {
 
     }
 

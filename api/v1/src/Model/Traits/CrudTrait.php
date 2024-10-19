@@ -34,6 +34,11 @@ trait CrudTrait{
     public function Create($entidadPrincipal, $data)
     {
 
+        //  Si viene informado el ID hay que quitarlo
+        if(isset($data['id'])){
+            unset($data['id']);
+        }
+
         //  Hay que inicializar los campos por si se van a procesar entidades relacionadas
             $this->fields = [];
             // $entidadPrincipal = strtolower($entidadPrincipal);

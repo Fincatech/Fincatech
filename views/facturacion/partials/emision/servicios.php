@@ -17,16 +17,23 @@
             </div>
         </div>
 
+        <!-- CAE -->
         <div class="row mb-2 servicio-cae" style="display: none;">
             <div class="col-12 col-lg-3 d-flex align-items-center">
-                <!-- CAE -->
-                <!-- <div class="form-check form-check-inline"> -->
-                    <!-- <input class="form-check-input chkServicio" type="checkbox" id="chkCAE" data-nombre="CAE" value="1" checked> -->
                     <label class="form-check-label" for="chkCAE">CAE</label>
-                <!-- </div>                              -->
             </div>
             <div class="col-12 col-lg-9">
                 <input type="text" name="conceptoCAE" id="conceptoCAE" class="form-data form-control" placeholder="Concepto" maxlength="100" />
+            </div>
+        </div>
+
+        <!-- DOC CAE -->
+        <div class="row mb-2 servicio-doccae" style="display: none;">
+            <div class="col-12 col-lg-3 d-flex align-items-center">
+                    <label class="form-check-label" for="chkDOCCAE">DOC. CAE</label>
+            </div>
+            <div class="col-12 col-lg-9">
+                <input type="text" name="conceptoDOCCAE" id="conceptoDOCCAE" class="form-data form-control" placeholder="Concepto" maxlength="100" />
             </div>
         </div>
 
@@ -42,10 +49,7 @@
         <!-- Certificados digitales -->
         <div class="row mb-2 servicio-certificadosdigitales" style="display: none;">
             <div class="col-12 col-lg-3 d-flex align-items-center">         
-                <!-- <div class="form-check form-check-inline"> -->
-                    <!-- <input class="form-check-input chkServicio" type="checkbox" id="chkCertificado" data-nombre="Certificados Digitales" value="5" checked> -->
-                    <label class="form-check-label" for="chkCertificado">Certificados digitales</label>
-                <!-- </div>           -->
+                <label class="form-check-label" for="chkCertificado">Certificados digitales</label>
             </div>
             <div class="col-12 col-lg-9">
                 <input type="text" name="conceptoCertificadosDigitales" id="conceptoCertificadosDigitales" class="form-data form-control" placeholder="Concepto" maxlength="100" />

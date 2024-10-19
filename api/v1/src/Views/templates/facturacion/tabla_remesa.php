@@ -16,7 +16,6 @@
         </tr>
     </thead>
     <tbody>
-    <!-- <?php //for($x = 0; $x < count($data); $x++): ?>         -->
         <?php for($i = 0; $i < count($data); $i++): ?>
             <?php 
                 // Enlace descarga XML
@@ -32,7 +31,7 @@
                         <a href="<?php echo HelperController::RootURL(); ?>/remesa/<?php echo $data[$i]['idremesa'];?>" class="mr-2 d-inline-block"><i class="bi bi-eye" style="font-size: 21px;"></i></a>
                     </li>
                     <li class="nav-item">
-                        <a href="<?php echo $remesaPath . '/' . $file; ?>" class="d-inline-block" target="_blank"><i class="bi bi-cloud-arrow-down" style="font-size: 21px;"></i></a>
+                        <a href="<?php echo $remesaPath . '/' . $file; ?>" class="d-inline-block" target="_blank" download><i class="bi bi-cloud-arrow-down" style="font-size: 21px;"></i></a>
                     </li>
                 </ul>
             </td>
