@@ -2,16 +2,19 @@
 
 namespace Fincatech\Controller;
 
+use DateTime;
 use Fincatech\Model\UsuarioModel;
 use Fincatech\Controller\UsuarioController;
+use Fincatech\Model\AdministradorModel;
 use HappySoftware\Controller\HelperController;
 use Happysoftware\Controller\Traits;
+use HappySoftware\Database\DatabaseCore;
 use PHPUnit\TextUI\Help;
 
 class AdministradorController extends FrontController{
 
     private $usuarioModel;
-    public $AdministradorModel;
+    public  $AdministradorModel;
     public $ComunidadController;
     public $UsuarioController;
 
@@ -74,7 +77,6 @@ class AdministradorController extends FrontController{
     {
         $this->InitController('Usuario');
         return $this->UsuarioController->Delete($id);
-        // return $this->AdministradorModel->Delete($id);
     }
 
     public function Get($id)
@@ -85,30 +87,58 @@ class AdministradorController extends FrontController{
     /** Devuelve el listado de administradores */
     public function List($params = null)
     {
-        $this->InitController('Usuario', $params);
-        $this->InitModel('Usuario', $params);
+        $administradores = [];
+        $this->UsuarioController = new UsuarioController();
         $datos = $this->UsuarioController->ListAdministradoresFincas($params);
+        $administradores['Administrador'] = $datos['Usuario'];
+        //  Ordenamos por nombre por defecto
+        usort($administradores['Administrador'], function($a, $b) {
+            return strcmp($a['nombre'], $b['nombre']);
+        });
+
         //  Por cada uno de los administradores recuperamos el total de comunidades que tiene activas
-        for($x = 0; $x < count($datos['Usuario']); $x++)
+        for($x = 0; $x < count( $administradores['Administrador'] ); $x++)
         {
-            $datos['Usuario'][$x]['numerocomunidades'] = $this->AdministradorModel->GetNumeroComunidades($datos['Usuario'][$x]['id']);
+            $administradores['Administrador'][$x]['numerocomunidades'] = $this->AdministradorModel->GetNumeroComunidades($administradores['Administrador'][$x]['id']);
         }
-        return $datos;
+        return $administradores;        
     }
 
+    /**
+     * Genera un fichero excel de prefacturación
+     */
     public function GetExcelPrefacturacion($idAdministrador, $data)
     {
             global $appSettings;
 
-        //  Instanciamos el controller de comunidades
-            $this->InitController('Comunidad', null);
+            $idAdministrador = DatabaseCore::PrepareDBString($idAdministrador);
+            //  Instanciamos el controller de comunidades
+            $this->ComunidadController = new ComunidadController();
 
-        //  Introducimos el valor del id de administrador para acotar la búsqueda
+            //  Introducimos el valor del id de administrador para acotar la búsqueda
             $params = [];
-            $params['administradorId'] = $idAdministrador;
+            $fechaDesde = DatabaseCore::PrepareDBString( $data['fechaDesde'] );
+            $fechaHasta = DatabaseCore::PrepareDBString( $data['fechaHasta'] );
+
+            $params['administradorId'] = DatabaseCore::PrepareDBString($idAdministrador);
             $params['servicios'] = true;
-            $params['fechaDesde'] = $data['fechaDesde'];
-            $params['fechaHasta'] = $data['fechaHasta'];
+            $params['fechaDesde'] = $fechaDesde;
+            $params['fechaHasta'] = $fechaHasta;
+
+            // $comunidades = [];
+            // $comunidades['Comunidad'] = $this->GetComunidadesAdministrador($idAdministrador, $fechaDesde, $fechaHasta);
+            // if(count($comunidades['Comunidad']) > 0){
+
+            //     //  Ordenamos el listado
+            //     if(count($comunidades['Comunidad']) > 0)
+            //     {
+            //         usort($comunidades['Comunidad'], fn($a, $b) => $a['codigo'] <=> $b['codigo']);//sort($listadoComunidades)
+            //     }                
+
+            // }else{
+
+            //     return HelperController::errorResponse('error','El administrador seleccionado no tiene comunidades o bien las tiene en estado de baja o histórico.', 200);
+            // }
 
             //$comunidadesAdministrador = $this->ComunidadController->ComunidadModel->ListComunidadesByAdministradorId($idAdministrador);
             $comunidadesAdministrador = $this->ComunidadController->List($params);
@@ -131,7 +161,7 @@ class AdministradorController extends FrontController{
 
                 \HappySoftware\Controller\Traits\ExcelGen::fromArray($datosComunidades, 'pre-facturacion')->saveAs(ROOT_DIR . $nombreFichero);
 
-                $path = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/';
+                $path = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];// . '/';
                 return HelperController::successResponse($path.$nombreFichero);
 
             }else{
@@ -139,6 +169,26 @@ class AdministradorController extends FrontController{
                 return HelperController::errorResponse('error','El administrador seleccionado no tiene comunidades o bien las tiene en estado de baja o histórico.', 200);
             }
 
+    }
+
+    /**
+     * Recupera las comunidades que tiene asignado un administrador
+     */
+    private function GetComunidadesAdministrador(int $idAdministrador, string|null $dateFrom = null, string|null $dateTo = null)
+    {
+
+        $this->AdministradorModel->idAdministrador = $idAdministrador;
+
+        if(!is_null($dateFrom)){
+            $dateFrom = date('Y-m-d', strtotime($dateFrom));
+        }
+
+        if(!is_null($dateTo)){
+            $dateTo = date('Y-m-d', strtotime($dateTo));
+        }
+
+        $comunidades = $this->AdministradorModel->ComunidadesAdministrador($dateFrom, $dateTo);
+        return $comunidades;
     }
 
     /**

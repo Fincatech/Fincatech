@@ -10,6 +10,7 @@ namespace Fincatech\Controller;
 use Fincatech\Model\ServiciosModel;
 use HappySoftware\Controller\HelperController;
 use Fincatech\Controller\ComunidadController;
+use PHPUnit\TextUI\Command;
 
 class ServiciosController extends FrontController{
 
@@ -84,7 +85,7 @@ class ServiciosController extends FrontController{
     {
         //  Mapeamos los datos de la comunidad
         $this->ServiciosModel->SetIdComunidad($data['Id Comunidad']);
-        $servicios = Array('DPD', 'CAE','Certificados Digitales');
+        $servicios = Array('DPD', 'CAE','DOCCAE', 'Certificados Digitales');
 
         for($iServicio = 0; $iServicio < count($servicios); $iServicio++)
         {
@@ -162,7 +163,7 @@ class ServiciosController extends FrontController{
     {
         //  Instanciamos el controller de comunidad para recuperar las comunidades junto con sus servicios por el id del administrador que 
         //  se va a exportar
-        $this->InitController('Comunidad');
+        $this->ComunidadController = new ComunidadController();
         $data = $this->ComunidadController->ListComunidadesWithServicesByAdministradorId($idAdministrador);
         //  Metemos la información en un array asociativo por id de comunidad
         if(count($data) <= 0)
@@ -174,6 +175,7 @@ class ServiciosController extends FrontController{
             $comunidadesExcel[] = Array('Id Comunidad', 'Código comunidad', 'Comunidad', 'Dirección', 'Localidad', 'Provincia','Cif','IBAN','Mes Facturación', 
                     'ID Interno CAE','CAE Contratado','CAE Precio','CAE Precio Comunidad', 'CAE Mes Facturación', 
                     'ID Interno DPD','DPD Contratado', 'DPD Precio', 'DPD Precio Comunidad', 'DPD Mes Facturación',
+                    'ID Interno DOCCAE','DOCCAE Contratado','DOCCAE Precio','DOCCAE Precio Comunidad', 'DOCCAE Mes Facturación', 
                     'ID Interno Certificados Digitales','Certificados Digitales Contratado', 'Certificados Digitales Precio', 'Certificados Digitales Precio Comunidad', 'Certificados Digitales Mes Facturación');
             for($x = 0; $x < count($data); $x++)
             {
@@ -204,8 +206,8 @@ class ServiciosController extends FrontController{
                     case 2: // RGPD
                         $servicio = 'dpd';
                         break;
-                    case 3:
-                    case 4:
+                    case 3: //  DOCCAE
+                        $servicio = 'doccae';
                         break;
                     case 5: //  Certificados digitales
                         $servicio = 'certificados_digitales';

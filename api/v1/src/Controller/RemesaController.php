@@ -329,8 +329,9 @@ class RemesaController extends FrontController{
     public function ProcesarDevolucionRecibosRemesa($xml)
     {
 
-        $totalDevuelto = 0;
+        $totalDevolucionProcesada = 0;
         $numeroRecibosDevueltos = 0;
+        $iRecibosProcesados = 0;
         $nombreRemesa = '';
 
         try{
@@ -373,7 +374,7 @@ class RemesaController extends FrontController{
 
                     //  Importe de la devolución
                     $importeDevolucion = (float)$infoRecibo->OrgnlTxRef->Amt->InstdAmt;
-
+                    $totalDevolucionProcesada += (float)$importeDevolucion;
                     //  Fecha de devolución
                     $fechaDevolucion = (string)$infoRecibo->OrgnlTxRef->IntrBkSttlmDt;
                     //  Recuperamos el detalle del recibo desde el modelo
@@ -408,12 +409,17 @@ class RemesaController extends FrontController{
                 }
 
                 // Mostrar la información extraída
-                echo "Nº factura: $numeroFactura, Estado: $estadoRecibo, Razón: $descripcionError\n";
-                $numeroRecibosDevueltos++;
+                // echo "Nº factura: $numeroFactura, Estado: $estadoRecibo, Razón: $descripcionError\n";
+                $iRecibosProcesados++;
             }
             
+            $msg = '<p>El proceso de devolución ha finalizado correctamente</p>';
+            $msg .= '<p class="mb-0 text-left"><strong>Remesa afectada</strong>: ' . $nombreRemesa . '</p>';
+            $msg .= '<p class="mb-0 text-left"><strong>Total Recibos procesados</strong>: ' . $iRecibosProcesados . '</p>';
+            $msg .= '<p class="mb-0 text-left"><strong>Importe total</strong>: ' . number_format($totalDevolucionProcesada, 2, ',','.') . '&euro;</p>';
+
             //  Devolvemos el mensaje al usuario
-            return HelperController::successResponse('ok');
+            return $msg;
 
         }catch(\Throwable $ex){
             return HelperController::errorResponse('error', $ex->getMessage());

@@ -188,7 +188,7 @@ let administradorCore = {
                         html = '<a href="javascript:void(0);" class="btnExportarComunidades btn btn-primary d-inline-block" data-id="data:id$" data-nombre="data:nombre$">Exportar comunidades</a>';
                         CoreUI.tableData.addColumn(nombreTabla, null, "", html, 'text-center');                
                     }
-                CoreUI.tableData.render(nombreTabla, "Usuario", "administrador/list");
+                CoreUI.tableData.render(nombreTabla, "Administrador", "administrador/list");
         }
     },
 

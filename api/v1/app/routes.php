@@ -397,7 +397,7 @@ return function (App $app) {
 
     });
 
-    //  Fichero de prefacturación en formato Excel
+    //  Generación de factura rectificativa
     $app->post('/factura/{id:[0-9]+}/rectificativa/create', function(Request $request, Response $response, array $params ): Response
     {
 

@@ -660,7 +660,12 @@ class ComunidadModel extends \HappySoftware\Model\Model{
 
         $sql = "SELECT 
                     csc.id, c.codigo, csc.idcomunidad, c.nombre as comunidad, csc.idservicio, 
-                    ts.nombre as servicio, csc.contratado as servicio_contratado, csc.precio, csc.preciocomunidad, 
+                    CASE 
+                        WHEN csc.idservicio = 3 THEN 'DOCCAE'
+                        ELSE ts.nombre
+                    END AS servicio,                     
+                    #ts.nombre as servicio,
+                    csc.contratado as servicio_contratado, csc.precio, csc.preciocomunidad, 
                     c.direccion, c.localidad, c.provincia, c.cif, c.ibancomunidad, csc.mesfacturacion comunidadmesfacturacion
                 FROM
                     comunidadservicioscontratados csc left join comunidad c on c.id = csc.idcomunidad,

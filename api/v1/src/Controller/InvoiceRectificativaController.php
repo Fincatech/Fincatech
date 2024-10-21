@@ -19,6 +19,8 @@ use stdClass;
 
 class InvoiceRectificativaController extends FrontController{
 
+    private $debugMode = true;
+
     //  Prefijos ficheros PDF y ZIP
     private const FICHERO_PREFIX = 'FINCATECH_FACTRECT_';
 
@@ -142,7 +144,9 @@ class InvoiceRectificativaController extends FrontController{
         //  Generamos el PDF con la factura rectificativa
         $this->CreatePdfInvoiceRectificativa();
         //  Enviamos la factura rectificativa al administrador
-        $this->SendFacturaRectificativa($invoiceRectificativa);
+        if(!$this->debugMode){
+            $this->SendFacturaRectificativa($invoiceRectificativa);
+        }
 
         //  Devolvemos el id de la inserción
         return $invoiceRectificativaId;

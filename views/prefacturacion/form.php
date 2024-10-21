@@ -17,7 +17,7 @@
                 <div class="row g-3">
                     <div class="col-12 col-md-8 text-left">
                         <label for="usuarioId"><i class="bi bi-person-fill pr-2"></i>Seleccione el administrador para el que desea realizar el cálculo de la prefacturación</label>
-                        <select id="usuarioId" name="usuarioId" class="select-data custom-select data form-control selectpicker" data-live-search="true" hs-list-entity="Usuario" hs-list-field="Usuario.nombre" hs-list-value="Usuario.id"></select>
+                        <select id="usuarioId" name="usuarioId" class="select-data custom-select data form-control selectpicker" data-live-search="true" hs-list-entity="Administrador" hs-list-field="Administrador.nombre" hs-list-value="Administrador.id"></select>
                     </div>                   
                 </div>
                 

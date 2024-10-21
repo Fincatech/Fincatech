@@ -1499,7 +1499,7 @@ let facturacion = {
              */
             TableFacturasEmitidasPendiente: function()
             {
-                facturacion.Facturacion.View.TableFacturas('listadoFacturasEmitidasPendiente','P');
+                facturacion.Facturacion.View.TableFacturas('listadoFacturasEmitidasPendiente','D');
             },
 
             TableFacturasRectificativas: function()
@@ -2414,7 +2414,14 @@ let facturacion = {
             formData.append('file', file);
             let p = new Promise(async(resolve, reject) =>{
                 apiFincatech.post('remesa/devolucion',formData).then((result)=>{
-                    console.log(result);
+                    // console.log(result);
+                    let res = JSON.parse(result);
+                    if(res.status.response == 'error')
+                    {
+                        CoreUI.Modal.Error('Ha ocurrido el siguiente error:<br><br>' + res.status.error);
+                    }else{
+                        CoreUI.Modal.Success(res.data);
+                    }
                     resolve(result);
                 })
             });
