@@ -19,7 +19,7 @@ use stdClass;
 
 class InvoiceRectificativaController extends FrontController{
 
-    private $debugMode = true;
+    private $debugMode = false;
 
     //  Prefijos ficheros PDF y ZIP
     private const FICHERO_PREFIX = 'FINCATECH_FACTRECT_';
@@ -119,7 +119,7 @@ class InvoiceRectificativaController extends FrontController{
     /**
      * Crea una nueva factura rectificativa
      */
-    public function Insert(InvoiceRectificativa $invoiceRectificativa)
+    public function Insert(InvoiceRectificativa $invoiceRectificativa, bool|null $enviarEmail = false)
     {
 
         $invoiceRectificativa->SetNumero($this->GenerateNumeroFactura());
@@ -144,7 +144,7 @@ class InvoiceRectificativaController extends FrontController{
         //  Generamos el PDF con la factura rectificativa
         $this->CreatePdfInvoiceRectificativa();
         //  Enviamos la factura rectificativa al administrador
-        if(!$this->debugMode){
+        if(!$this->debugMode && $enviarEmail == true){
             $this->SendFacturaRectificativa($invoiceRectificativa);
         }
 

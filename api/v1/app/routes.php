@@ -411,7 +411,6 @@ return function (App $app) {
         $data = json_decode($body, true);
 
         $idInvoice = $params['id'];
-
         $response->getBody()->write( $frontController->context->CreateInvoiceRectificativa($idInvoice, $data) );
         return $response;
 
@@ -658,26 +657,10 @@ return function (App $app) {
 
     });
 
-    /**
-     * Listado de facturas rectificativas
-     */
-    // $app->get('/facturacion/rectificativa/list', function(Request $request, Response $response, array $params ): Response
-    // {
 
-    //     // Instanciamos el controller principal
-    //     $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
-
-    //     $frontController = new $frontControllerName();
-    //     $frontController->Init('Invoice');
-
-    //     $result = $frontController->context->ListRectificativas();
-
-    //     $response->getBody()->write( HelperController::successResponse($result, 200) );
-
-    //     return $response;
-
-    // });
-
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///                                                                  REMESAS
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Listado de recibos asociados a remesas
      */
@@ -693,6 +676,24 @@ return function (App $app) {
         $remesaId = $params['remesaId'];
 
         $response->getBody()->write( HelperController::successResponse($frontController->context->RecibosByRemesaId($remesaId) ));
+
+        return $response;
+
+    });
+
+    /**
+     * Listado de recibos devueltos
+     */
+    $app->get('/remesa/recibosdevueltos/list', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Remesa');
+
+        $response->getBody()->write( HelperController::successResponse($frontController->context->ListRecibosDevueltos() ));
 
         return $response;
 

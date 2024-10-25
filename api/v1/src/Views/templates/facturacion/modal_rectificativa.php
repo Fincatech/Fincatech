@@ -10,6 +10,15 @@
 </div>
 
 <!-- Captura de datos -->
+<!-- Check Enviar E-mail -->
+<div class="row mb-2">
+    <div class="col-12 text-left">
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="chkEnviarEmail" control-id="ControlID-26">
+            <label class="form-check-label" for="chkEnviarEmail">Enviar e-mail al administrador</label>
+        </div>
+    </div>
+</div>
 <!-- Concepto -->
 <div class="row mb-2">
     <div class="col-12 col-lg-9">

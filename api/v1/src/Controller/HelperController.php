@@ -395,10 +395,9 @@ class HelperController
     /**
      * Redondea un número hacia arriba
      */
-    public static function Redondeo($number, $decimals = 2)
+    public static function Redondeo($number, $decimals = 3)
     {
-        $factor = pow(10, $decimals);
-        return ceil($number * $factor) / $factor;
+        return floor($number * 100) / 100;
     }
 
     /** Extraido del core de Prestashop: classes/Tools.php */

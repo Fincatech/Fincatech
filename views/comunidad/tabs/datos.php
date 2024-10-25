@@ -50,7 +50,7 @@
     <!-- Límite de empresas por comunidad. Por defecto son 4 -->
     <div class="col-12 col-md-3">
         <label for="limiteEmpresas"><i class="bi bi-shop pr-2"></i>Límite de asignación de empresas</label>
-        <input type="number" step="1" min="1" max="10" class="form-control data text-center form-required" id="limiteempresas" name="limiteempresas" hs-entity="Comunidad" hs-field="limiteempresas" required>
+        <input type="number" step="1" min="1" max="20" class="form-control data text-center form-required" id="limiteempresas" name="limiteempresas" hs-entity="Comunidad" hs-field="limiteempresas" required>
     </div>
 
 </div>

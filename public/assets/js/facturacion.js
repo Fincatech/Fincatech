@@ -631,7 +631,7 @@ let facturacion = {
                     data.concepto = $('body #conceptoFacturaRectificativa').val();
                     data.importe = $('body #importeFacturaRectificativa').val();
                     data.cuerpo = $('.emailbody').trumbowyg('html');
-
+                    data.enviaremail = $('body #chkEnviarEmail').is(':checked') ? 1 : 0;
                     //  Llamamos al WS para generar al rectificativa en el sistema
                     let p = new Promise(async(resolve, reject) =>{
                         await apiFincatech.post(`factura/${idFactura}/rectificativa/create`, data).then((result)=>{
@@ -2376,6 +2376,8 @@ let facturacion = {
 
     Remesa:{
 
+        todos: false,
+
         Events: function(){
             //  Mostrar modal de devolución de recibos
             $('body').on(core.helper.clickEventType, '.btnProcesarRemesaDevolucion', function(ev)
@@ -2392,6 +2394,23 @@ let facturacion = {
             $('body').on(core.helper.clickEventType, '.btnUploadXML', function(ev){
                 facturacion.Remesa.ProcesarDevolucion();    
             });
+
+            $('body').on(core.helper.clickEventType, '.chkDeseleccionar', function(ev){
+                window['tablelistadoRecibosDevueltos'].rows().every(function() {
+                    $(this.node()).find('input[type="checkbox"].chkRecibo').prop('checked', false);
+                });
+            });
+
+            $('body').on(core.helper.clickEventType, '.chkSeleccionarTodo', function(ev){
+                window['tablelistadoRecibosDevueltos'].rows({ search: 'applied' }).every(function() {
+                    // Buscar el checkbox dentro de cada fila
+                    $(this.node()).find('input[type="checkbox"].chkRecibo').prop('checked', true);
+                }).nodes();
+                window['tablelistadoRecibosDevueltos'].draw();
+            });
+
+
+            facturacion.Remesa.View.RenderTables();
 
         },
 
@@ -2429,7 +2448,104 @@ let facturacion = {
             p.then((result)=>{
 
             });
+        },
+
+        View:{
+
+            /**
+             * Renderiza aquellas tablas que pertenecen a remesas si son detectadas
+             */
+            RenderTables: function()
+            {
+                //  Tabla de Recibos Devueltos
+                facturacion.Remesa.View.TablaRecibosDevueltos();
+            },
+
+            TablaRecibosDevueltos: function()
+            {
+                if($('#listadoRecibosDevueltos').length)
+                {
+                    let tabla = 'listadoRecibosDevueltos';
+                        //  Cargamos el listado de comunidades
+                        CoreUI.tableData.init();
+
+                        //  Fecha de presentación
+                        CoreUI.tableData.addColumn(tabla, function(row, type, val, meta)
+                        {
+                            return `<input class=" chkRecibo" type="checkbox" name="chkRemesa${row.id}" id="chkRemesa${row.id}" data-id="${row.id}">`;
+        
+                        }, 'asdf ', null);         
+
+                        //  Remesa
+                        // CoreUI.tableData.addColumn(tabla, "referencia", "Ref. Remesa");
+            
+                        //  Administrador
+                        CoreUI.tableData.addColumn(tabla, "customername", "Administrador");
+
+                        //  Comunidad
+                        CoreUI.tableData.addColumn(tabla, "comunidad", "Comunidad");
+                        
+                        //  Descripción del recibo
+                        CoreUI.tableData.addColumn(tabla, "descripcion", "Recibo");
+
+                        //  Amount
+                        CoreUI.tableData.addColumn(tabla, function(row, type, val, meta)
+                        {
+                            return `${row.amount}&euro;`;
+                        }, 'Importe');
+
+                        //  IBAN
+                        // CoreUI.tableData.addColumn(tabla, "customeriban", "IBAN");
+
+                        //  Fecha de presentación
+                        CoreUI.tableData.addColumn(tabla, function(row, type, val, meta)
+                        {
+                            let salida = '';
+                            if(row.created){
+                                let fecha = moment(row.created).locale('es').format('L');
+                                salida = `${fecha}`;
+                            }
+                            return salida;
+        
+                        }, 'Fecha', null, 'text-center', '120px');                        
+
+
+                        //  Fecha de devolución del banco
+                        CoreUI.tableData.addColumn(tabla, function(row, type, val, meta)
+                        {
+                            let salida = 'N/D';
+                            if(row.fechadevolucionbanco){
+                                let fecha = moment(row.fechadevolucionbanco).locale('es').format('L');
+                                salida = `${fecha}`;
+                            }
+                            return salida;
+        
+                        }, 'Fecha Devolución', null, 'text-center', '120px');                        
+
+                        //  Mensaje devolución
+                        // CoreUI.tableData.addColumn(tabla, function(row, type, val, meta)
+                        // {
+                        //     return `<span class="text-danger">${row.message}</span>`;
+                        // }, 'Motivo');
+
+                        //  Presentado
+                        // CoreUI.tableData.addColumn(tabla, "presentado", "Nº Presentaciones");                        
+
+                        //  Columna de acciones
+                        var html = '<ul class="nav justify-content-center accionesTabla">';
+                        // html += '<li class="nav-item"><a href="javascript:void(0);" class="btnVerComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="eye" class="text-info img-fluid"></i></a></li>';
+                        // html += `<li class="nav-item"><a href="${baseURL}bank/data:id$?view=1" class="btnEditarBanco d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid icono-accion" style="width:32px;height:32px;"></i></a></li>`;
+                        html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarBanco d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid icono-accion" style="width:26px;height:26px;"></i></li></ul>';
+                        // CoreUI.tableData.addColumn(tabla, null, "", html, '','80px');
+
+                        //  Render
+                        $('#' + tabla).addClass('no-clicable');
+                        CoreUI.tableData.render(tabla, "Remesa", `remesa/recibosdevueltos/list`, true, true, true, null, false, false, null, false,'GET',false);
+                    }
+            }
+
         }
+
 
     }
 

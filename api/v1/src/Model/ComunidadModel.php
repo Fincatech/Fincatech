@@ -181,7 +181,9 @@ class ComunidadModel extends \HappySoftware\Model\Model{
         return $data;        
     }
 
-    /** Lista las comunidades en el menú lateral */
+    /** 
+     * REFACTORIZAR: Hay que mejorar la recuperación de los servicios, en vez de por nombre se debería hacer por ID Servicio.
+     * Lista las comunidades en el menú lateral */
     public function ListComunidadesMenu($params = null, $useLoggedUserId = true, $administradorId = null)
     {
         $data = [];

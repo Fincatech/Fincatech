@@ -476,6 +476,9 @@ class InvoiceController extends FrontController{
         $concepto = DatabaseCore::PrepareDBString($data['concepto']);
         //  Importe impuestos excluidos
         $totalTaxesExc = DatabaseCore::PrepareDBString($data['importe']);
+        //  Enviar Email
+        $enviarEmail = (int)DatabaseCore::PrepareDBString($data['enviaremail']) == 0 ? false : true;
+
         if($totalTaxesExc == ''){
             $totalTaxesExc = $this->InvoiceModel->TotalTaxesExc();
         }else{
@@ -525,7 +528,7 @@ class InvoiceController extends FrontController{
                 ->SetAdministrador($this->InvoiceModel->Administrador())
                 ->SetEmail($this->InvoiceModel->Email());
                 //  Creamos la factura rectificativa con los datos recibidos
-                $InvoiceRectificativaController->Insert($rectificativa);
+                $InvoiceRectificativaController->Insert($rectificativa, $enviarEmail);
                 $idFacturaRectificativa = $rectificativa->Numero();
                 //  Actualizamos el ID de la factura rectificativa en la factura original
                 $this->InvoiceModel->SetIdRectificativa($rectificativa->Id());
@@ -942,18 +945,20 @@ class InvoiceController extends FrontController{
     private function AddDetailLine($idinvoice, $idservicio, $detail, $unit_price_tax_exc, $quantity, $tax_rate, $unitPriceComunidad)
     {
 
+        //  Hay que coger el precio que está marcado para la comunidad
+        $unit_price_tax_exc = $unitPriceComunidad;
+
         //  Calculamos el total sin impuestos
         $totalTaxesExc = HelperController::Redondeo($unit_price_tax_exc * $quantity);
 
         //  Calculamos el total por artículo impuestos
-        $unit_price_tax_inc = $unit_price_tax_exc + ($unit_price_tax_exc * ($tax_rate / 100));
+        $totalImpuestos = HelperController::Redondeo(($unit_price_tax_exc * ($tax_rate / 100)));
+        $unit_price_tax_inc = $unit_price_tax_exc + $totalImpuestos;
         $unit_price_tax_inc = HelperController::Redondeo($unit_price_tax_inc);
 
         //  Calculamos el total con impuestos incluidos
         $totalTaxesInc = ($unit_price_tax_inc * $quantity);
         $totalTaxesInc = HelperController::Redondeo($totalTaxesInc);
-
-
 
         $detailLine = [];
         $detailLine['idinvoice'] = $idinvoice;

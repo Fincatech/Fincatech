@@ -111,6 +111,19 @@ class RemesaDetalleModel extends \HappySoftware\Model\Model{
 
     }
 
+    public function RecibosDevueltos()
+    {
+        $sql = "select 
+            r.referencia, r.customername, 
+            rd.id, rd.idremesa, rd.invoiceid, rd.descripcion, rd.amount, rd.customername as comunidad, rd.customeriban, rd.presentado, rd.datereturned, rd.created,
+            rdev.codigo, rdev.message, rdev.datereturned as fechadevolucionbanco
+        from 
+	        remesa r, remesadetalle rd, remesadevolucion rdev
+        where 
+	        rd.idremesa = r.id and rd.estado = 'D' and rdev.idremesadetalle = rd.id";
+        return $this->query($sql);
+    }
+
     // /** Recupera todos los registros */
     // public function List($params = null)
     // {

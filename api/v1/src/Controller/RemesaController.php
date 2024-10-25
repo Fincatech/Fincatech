@@ -127,6 +127,15 @@ class RemesaController extends FrontController{
         return $data;
     }
 
+    /**
+     * Recupera el listado de recibos devueltos para todas las remesas
+     */
+    public function ListRecibosDevueltos()
+    {
+        $data['Remesa'] = $this->RemesaDetalleController->ListRecibosDevueltos();
+        return $data;
+    }
+
     public function List($params = null)
     {
         $result = [];
@@ -445,6 +454,8 @@ class RemesaController extends FrontController{
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///                             UTILIDADES DE LA GENERACIÓN DE REMESAS
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    //TODO:
     public function RegenerateRemesa()
     {
 
