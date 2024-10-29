@@ -136,6 +136,15 @@ class RemesaController extends FrontController{
         return $data;
     }
 
+    /**
+     * Recupera el listado de recibos cobrados para todas las remesas
+     */
+    public function ListRecibosCobrados()
+    {
+        $data['Remesa'] = $this->RemesaDetalleController->ListRecibosCobrados();
+        return $data;
+    }
+
     public function List($params = null)
     {
         $result = [];
@@ -455,6 +464,45 @@ class RemesaController extends FrontController{
     ///                             UTILIDADES DE LA GENERACIÓN DE REMESAS
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
+    /**
+     * Procesa la devolución individual de un recibo
+     * @param int $idRemesa. ID De la remesa
+     * @param int $idRecibo. ID del recibo que se va a procesar
+     */
+    public function ReciboReturn(int $idRemesa, int $idRecibo)
+    {
+        //  Recuperamos el Recibo de la remesa
+        $this->RemesaDetalleController->Get($idRecibo);
+
+        //  Validamos que el recibo corresponda a la remesa a la cuál deseamos procesar la devolución
+        if($idRemesa != $this->RemesaDetalleController->remesaDetalle->idremesa){
+            return 'El recibo que intenta devolver no ha sido encontrado en la remesa';
+        }
+
+        //  Comprobamos que el recibo exista
+        if($this->RemesaDetalleController->remesaDetalle->id >= 1)
+        {
+            //  Marcamos la factura como devuelta
+            $invoice = new InvoiceController();
+            $invoice->UpdateStatusInvoice(((int)$this->RemesaDetalleController->remesaDetalle->invoiceid), $invoice::ESTADO_FACTURAS_DEVUELTAS);            
+            //  Establecemos la fecha al día que marca el fichero
+            $this->RemesaDetalleController->remesaDetalle->datereturned = date('Y-m-d');
+            //  Cambiamos el estado al recibo a devuelto
+            $this->RemesaDetalleController->remesaDetalle->estado = $invoice::ESTADO_FACTURAS_DEVUELTAS;
+            $this->RemesaDetalleController->UpdateDetalle();
+            //  Creamos el apunte de devolución 
+            $codigoDevolucion = 'FINC';
+            //  Mensaje descriptivo de la devolución
+            $descripcionError = $this->DescripcionErrorSepa($codigoDevolucion);
+            //  Importe de la devolución
+            $importeDevolucion = $this->RemesaDetalleController->remesaDetalle->amount;
+            $this->CreateDevolucionRemesa($codigoDevolucion, $descripcionError, $importeDevolucion);
+            return true;
+        }else{
+            return 'El recibo no se ha encontrado en el sistema';
+        }
+    }
+
     //TODO:
     public function RegenerateRemesa()
     {
@@ -468,6 +516,7 @@ class RemesaController extends FrontController{
     {
         /** Mensajes de error de devolución de recibo */
         $motivosRechazoSEPA = [
+            'FINC' => 'Devuelto por Fincatech',
             'AC01' => 'Número de cuenta incorrecto',
             'AC04' => 'Cuenta cerrada',
             'AC06' => 'Cuenta bloqueada',

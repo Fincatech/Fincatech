@@ -53,8 +53,8 @@ class InvoiceController extends FrontController{
     private int     $iErrores = 0;      //  Se utiliza para contabilizar el número de errores ocurridos durante la generación
 
     //  Total de la facturación generada
-    private float $totalFacturado = 0;
-    private int $totalFacturas = 0;
+    public float $totalFacturado = 0;
+    public int $totalFacturas = 0;
 
     //  Facturas que se han generado en el proceso para generar el SEPA
     private array $remesaInvoiceIds   = [];
@@ -64,13 +64,13 @@ class InvoiceController extends FrontController{
     private string $xmlSepaName;
     //  Comunidad que se va a facturar
     private $comunidadToBill;
-    
+
     //////////////////////////////////////////////////
     //  Propiedades reutilizables de configuración
     //////////////////////////////////////////////////
 
     //  Simulación de facturación
-    private bool    $simulacion = false;
+    private bool $simulacion = false;
 
     //  Serie de facturación
     private string  $prefijoSerieFacturacion = '';
@@ -657,6 +657,11 @@ class InvoiceController extends FrontController{
 
         //  Iteramos sobre todos los administradores
         $administradores = $this->InvoiceModel->Administradores()['Usuario'];
+
+        //  Validamos que tenga el e-mail de facturación informado ya que si no hay que parar el proceso y avisar al usuario
+        if(is_null($administradores[0]['emailfacturacion']) || trim($administradores[0]['emailfacturacion']) == '')
+            return HelperController::errorResponse('error','El administrador seleccionado no tiene configurado el e-mail de facturación');
+
         $totalAdministradores = count($administradores);
 
         $iAdministrador = 1; // Variable para el contador del administrador que se está procesando
@@ -2255,6 +2260,7 @@ class InvoiceController extends FrontController{
 
         //  Enviamos sin guardar el mensaje en bbdd
         $this->SendEmail($email, 'Fincatech', 'Fincatech - Nuevas facturas disponibles', $html, false);
+        $this->SendEmail(ADMINMAIL, 'Fincatech', 'Fincatech - Nuevas facturas disponibles', $html, false);
 
     }
 

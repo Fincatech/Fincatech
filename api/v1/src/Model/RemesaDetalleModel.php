@@ -111,6 +111,9 @@ class RemesaDetalleModel extends \HappySoftware\Model\Model{
 
     }
 
+    /**
+     * Recibos Devueltos
+     */
     public function RecibosDevueltos()
     {
         $sql = "select 
@@ -121,6 +124,21 @@ class RemesaDetalleModel extends \HappySoftware\Model\Model{
 	        remesa r, remesadetalle rd, remesadevolucion rdev
         where 
 	        rd.idremesa = r.id and rd.estado = 'D' and rdev.idremesadetalle = rd.id";
+        return $this->query($sql);
+    }
+
+    /**
+     * Recibos cobrados
+     */
+    public function RecibosCobrados()
+    {
+        $sql = "select 
+            r.referencia, r.customername, 
+            rd.id, rd.idremesa, rd.invoiceid, rd.descripcion, rd.amount, rd.customername as comunidad, rd.customeriban, rd.presentado, rd.datereturned, rd.created
+        from 
+	        remesa r, remesadetalle rd
+        where 
+	        rd.idremesa = r.id and rd.estado = 'C' ";
         return $this->query($sql);
     }
 

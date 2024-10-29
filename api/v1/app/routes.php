@@ -682,6 +682,38 @@ return function (App $app) {
     });
 
     /**
+     * Devolución de recibo individual
+     */
+    $app->post('/remesa/{remesaId:[0-9]+}/recibo/{reciboId:[0-9]+}/devolucion', function(Psr7Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Remesa');
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        //  ID de la remesa
+        $idRemesa = (int)$params['remesaId'];
+        $idRecibo = (int)$params['reciboId'];
+
+        $resultado = $frontController->context->ReciboReturn($idRemesa, $idRecibo);
+        
+        if($resultado !== true)
+        {
+            $response->getBody()->write(HelperController::errorResponse('error', $resultado));
+        }else{
+            $response->getBody()->write(HelperController::successResponse('ok'));
+        }
+
+        return $response;
+
+    }); 
+
+    /**
      * Listado de recibos devueltos
      */
     $app->get('/remesa/recibosdevueltos/list', function(Request $request, Response $response, array $params ): Response
@@ -694,6 +726,24 @@ return function (App $app) {
         $frontController->Init('Remesa');
 
         $response->getBody()->write( HelperController::successResponse($frontController->context->ListRecibosDevueltos() ));
+
+        return $response;
+
+    });
+
+    /**
+     * Listado de recibos cobrados
+     */
+    $app->get('/remesa/reciboscobrados/list', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Remesa');
+
+        $response->getBody()->write( HelperController::successResponse($frontController->context->ListRecibosCobrados() ));
 
         return $response;
 

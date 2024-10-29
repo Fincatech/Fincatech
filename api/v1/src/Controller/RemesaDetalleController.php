@@ -130,6 +130,14 @@ class RemesaDetalleController extends FrontController{
         return $this->RemesaDetalleModel->RecibosDevueltos();
     }
 
+    /**
+     * Listado de recibos cobrados
+     */
+    public function ListRecibosCobrados()
+    {
+        return $this->RemesaDetalleModel->RecibosCobrados();
+    }
+
     public function List($params = null)
     {
        return $this->RemesaDetalleModel->List($params);

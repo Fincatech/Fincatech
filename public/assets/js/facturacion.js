@@ -1700,13 +1700,17 @@ let facturacion = {
 
 
                 //  Columna de acciones
-                // CoreUI.tableData.addColumn(nombreTabla, function(row, type, val, meta){
-                //     var html = '<ul class="nav justify-content-center accionesTabla">';
-                //     // html += '<li class="nav-item"><a href="javascript:void(0);" class="btnVerComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="eye" class="text-info img-fluid"></i></a></li>';
-                //     html += `<li class="nav-item"><a href="${baseURL}remesa/${row.id}" class="btnEditarRemesa d-inline-block"><i data-feather="search" class="text-success img-fluid icono-accion" style="width:32px;height:32px;"></i></a></li>`;
-                //     html += `<li class="nav-item"><a href="${baseURL}public/storage/remesas/${row.referencia}.xml" target="_blank" class="btnDescargarRemesa d-inline-block" download><i data-feather="download-cloud" class="text-primary img-fluid icono-accion" style="width:26px;height:26px;"></i></li></ul>`;
-                //     return html;
-                // },'', null, 'text-center','80px');
+                CoreUI.tableData.addColumn(nombreTabla, function(row, type, val, meta){
+                    let html = '';
+                    if(row.estado !== 'D')
+                    {
+                        html = '<ul class="nav justify-content-center accionesTabla">';
+                        //  Botón devolver recibo manualmente
+                        html += `<li class="nav-item"><a href="javascript:void(0);" data-idremesa="${row.idremesa}" data-idrecibo="${row.id}" class="btnDevolverRecibo d-inline-block"><i data-feather="rotate-ccw" class="text-danger img-fluid"></i></a></li>`;
+                        html += '</ul>';
+                    }
+                    return html;
+                },'', null, 'text-center','80px');
 
                 //  Render
                 $('#' + nombreTabla).addClass('no-clicable');
@@ -2378,6 +2382,58 @@ let facturacion = {
 
         todos: false,
 
+        Controller: {
+
+            /**
+             * Selecciona un recibo para su devolución o lanzamiento al cobro de nuevo
+             * @param {*} idRecibo 
+             */
+            SeleccionarRecibo: function(idRecibo){
+
+                if(facturacion.Remesa.Model.ExisteReciboSeleccionado(idRecibo)){
+                    return;
+                }
+
+                //  Añadimos el recibo al modelo siempre que no exista previamente
+                if(!facturacion.Remesa.Model.recibos.indexOf(idRecibo))
+                    facturacion.Remesa.Model.recibos.push(idRecibo);
+
+            },
+
+            DeseleccionarRecibo: function(idRecibo){
+
+                //  Validamos que exista información previa
+                if(facturacion.Remesa.Model.ExisteReciboSeleccionado(idRecibo) || facturacion.Remesa.Model.recibos.length > 0){
+                    return;
+                }
+
+                //  Comprobamos que exista la clave en la matriz
+                if(facturacion.Remesa.Model.recibos.indexOf(idRecibo)){
+                    //  Quitamos el elemento del array
+                    facturacion.Remesa.Model.recibos.splice(idRecibo,1);
+                }
+
+            },
+
+        },
+
+        Model: {
+            //  Propiedad que se utiliza para almacenar los id's de los posibles recibos seleccionados
+            recibos: Array(),
+
+            ExisteReciboSeleccionado: function(idRecibo)
+            {
+                if(recibos !== null)
+                {
+                    for(let iRecibo = 0; iRecibo < facturacion.Remesa.Model.recibos.length; iRecibo++)
+                    {
+                        
+                    }
+                }
+
+            }
+        },
+
         Events: function(){
             //  Mostrar modal de devolución de recibos
             $('body').on(core.helper.clickEventType, '.btnProcesarRemesaDevolucion', function(ev)
@@ -2401,17 +2457,63 @@ let facturacion = {
                 });
             });
 
+            //  Seleccionar todos los recibos devueltos
             $('body').on(core.helper.clickEventType, '.chkSeleccionarTodo', function(ev){
                 window['tablelistadoRecibosDevueltos'].rows({ search: 'applied' }).every(function() {
                     // Buscar el checkbox dentro de cada fila
                     $(this.node()).find('input[type="checkbox"].chkRecibo').prop('checked', true);
                 }).nodes();
                 window['tablelistadoRecibosDevueltos'].draw();
+                facturacion.Remesa.todos = true;
             });
 
+            //  Botón de devolución de recibo
+            $('body').on(core.helper.clickEventType, '.btnDevolverRecibo', function(ev){
 
+                let reciboID = $(this).attr('data-idrecibo');
+                let remesaId = $(this).attr('data-idremesa');
+                facturacion.Remesa.DevolverRecibo(remesaId, reciboID);
+            });
+
+            //  Renderización de tablas de remesas
             facturacion.Remesa.View.RenderTables();
 
+        },
+
+        /**
+         * Devuelve el recibo perteneciente a una remesa
+         * @param {*} idRemesa ID Remesa
+         * @param {*} idRecibo ID Recibo
+         */
+        DevolverRecibo: function(idRemesa, idRecibo)
+        {
+            if(!idRemesa && !idRecibo)
+            {
+                CoreUI.Modal.Error('No se ha proporcionado la remesa y recibo a devolver');
+                return;
+            }
+
+            //  Preguntamos al usuario si está seguro de querer devolver el recibo
+            CoreUI.Modal.Question('¿Desea procesar la devolución de este recibo?','Devolución de recibo', 'Devolver', function()
+            {
+                let p = new Promise( (resolve, reject) =>{
+                    //  Intentamos realizar la devolución del recibo
+                    apiFincatech.post(`remesa/${idRemesa}/recibo/${idRecibo}/devolucion`).then((result)=>{
+                        let r = JSON.parse(result);
+                        if(r.status.response === 'error')
+                        {
+                            //  Mostramos el mensaje de error
+                            CoreUI.Modal.Error(r.status.error, 'Devolución de recibo');
+                        }else{
+                            //  Mostramos el mensaje de confirmación
+                            CoreUI.Modal.Success('El recibo ha sido devuelto satisfactoriamente');
+                            //  Recargamos la tabla
+                            window['tablelistadoRecibosCobrados'].ajax.reload();
+                        }
+                        resolve(true);
+                    });
+                });
+            });
         },
 
         ProcesarDevolucion: function()
@@ -2459,13 +2561,85 @@ let facturacion = {
             {
                 //  Tabla de Recibos Devueltos
                 facturacion.Remesa.View.TablaRecibosDevueltos();
+                //  Tabla de recibos cobrados
+                facturacion.Remesa.View.TablaRecibosCobrados();
             },
 
+            /**
+             * Renderiza la tabla de recibos ya cobrados
+             */
+            TablaRecibosCobrados: function()
+            {
+                let tabla = 'listadoRecibosCobrados';
+                if($(`#${tabla}`).length > 0)
+                {
+
+                    //  Cargamos el listado de comunidades
+                    CoreUI.tableData.init();
+
+                    //  Fecha de presentación
+                    CoreUI.tableData.addColumn(tabla, function(row, type, val, meta)
+                    {
+                        return `<p class="text-center mb-0"><input class="chkRecibo" type="checkbox" name="chkRecibo${row.id}" id="chkRecibo${row.id}" data-id="${row.id}"></p>`;
+                    }, 'Seleccionar', null, 'text-center');         
+
+                    //  Fecha de presentación
+                    CoreUI.tableData.addColumn(tabla, function(row, type, val, meta)
+                    {
+                        let salida = '';
+                        if(row.created){
+                            let fecha = moment(row.created).locale('es').format('L');
+                            salida = `${fecha}`;
+                        }
+                        return salida;
+    
+                    }, 'Fecha', null, 'text-center', '120px');   
+
+                    //  Descripción del recibo
+                    CoreUI.tableData.addColumn(tabla, "descripcion", "Recibo");
+
+                    //  Remesa
+                    CoreUI.tableData.addColumn(tabla, "referencia", "Remesa");
+        
+                    //  Administrador
+                    CoreUI.tableData.addColumn(tabla, "customername", "Administrador");
+
+                    //  Comunidad
+                    CoreUI.tableData.addColumn(tabla, "comunidad", "Comunidad");
+                
+                    //  Amount
+                    CoreUI.tableData.addColumn(tabla, function(row, type, val, meta)
+                    {
+                        return `<p class="mb-0 text-right pr-2">${row.amount}&euro;</p>`;
+                    }, 'Importe', null, 'text-center');
+                     
+                    //  Presentado
+                    // CoreUI.tableData.addColumn(tabla, "presentado", "Nº Presentaciones");                        
+
+                    //  Columna de acciones
+                    CoreUI.tableData.addColumn(tabla, function(row, type, val, meta)
+                    {                    
+                        let html = '<ul class="nav justify-content-center accionesTabla">';
+                        html += `<li class="nav-item"><a href="javascript:void(0);" data-idremesa="${row.idremesa}" data-idrecibo="${row.id}" class="btnDevolverRecibo d-inline-block"><i data-feather="rotate-ccw" class="text-danger img-fluid"></i></a></li>`;
+                        html = `${html}</ul>`;
+                        return html;
+                    }, '',null, 'text-center');
+
+                    //  Render
+                    $('#' + tabla).addClass('no-clicable');
+                    CoreUI.tableData.render(tabla, "Remesa", `remesa/reciboscobrados/list`, true, true, true, null, false, false, null, false,'GET',false);                    
+                }
+            },
+
+            /** 
+             * Renderiza la tabla de recibos devueltos
+             * */ 
             TablaRecibosDevueltos: function()
             {
                 if($('#listadoRecibosDevueltos').length)
                 {
                     let tabla = 'listadoRecibosDevueltos';
+
                         //  Cargamos el listado de comunidades
                         CoreUI.tableData.init();
 
@@ -2541,7 +2715,7 @@ let facturacion = {
                         //  Render
                         $('#' + tabla).addClass('no-clicable');
                         CoreUI.tableData.render(tabla, "Remesa", `remesa/recibosdevueltos/list`, true, true, true, null, false, false, null, false,'GET',false);
-                    }
+                }
             }
 
         }

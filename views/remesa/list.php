@@ -13,6 +13,7 @@
                     </div>
                     <div class="col-12 col-md-6 text-right">
                         <a href="create" class="btn btn-outline-secondary text-uppercase rounded-pill shadow pl-2 pr-4 mr-2"><i class="bi bi-plus-circle pr-3"></i> Crear Remesa manual</a>
+                        <a href="devolucion" class="btn btn-outline-primary text-uppercase rounded-pill shadow pl-2 pr-4 mr-2"><i class="bi bi-check2-square pr-3"></i> Devolución manual</a>
                         <a href="javascript:void(0);" class="btn btnProcesarRemesaDevolucion btn-outline-danger text-uppercase rounded-pill shadow pl-2 pr-4"><i class="bi bi-arrow-repeat pr-3"></i> Procesar devolución remesa</a>
                     </div>
         

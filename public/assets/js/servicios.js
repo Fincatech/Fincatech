@@ -55,9 +55,9 @@ let serviciosCore = {
                 {
                     $('.wrapperProgresoCarga .progresoCarga').html(`(${x+1} de ` + (excelData.length) + ')');
                     //  Llamamos al endpoint de actualización de servicio
-                    // console.log(excelData[x]);
+                    console.log(excelData[x]);
                     excelData[x]['type'] = 'single'; // Especificamos que es el update de tipo unitario
-                    await apiFincatech.put(`comunidad/${excelData[x]['Id Comunidad']}/servicios`, excelData[x]);
+                    // await apiFincatech.put(`comunidad/${excelData[x]['Id Comunidad']}/servicios`, excelData[x]);
                 }
                 CoreUI.Modal.Success('Los servicios se han actualizado satisfactoriamente','Actualización masiva de servicios');
             });

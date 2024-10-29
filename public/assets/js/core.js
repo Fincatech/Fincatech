@@ -30,7 +30,7 @@ let Constantes = {
     <div class="row mb-4 wrapperSelectorAdministrador">
       <div class="col-12 text-left"><form>
       <label for="administradorCargaId" class="mb-2">Seleccione el Administrador</label>
-      <select id="administradorCargaId" name="administradorCargaId" class="custom-select data form-control selectpicker mt-2" data-live-search="true" hs-entity="Administrador" hs-field="usuarioId" hs-list-entity="Administrador" hs-list-field="Usuario.nombre" hs-list-value="Usuario.id"></select></form>
+      <select id="administradorCargaId" name="administradorCargaId" class="custom-select data form-control selectpicker mt-2" data-live-search="true" hs-entity="Administrador" hs-field="usuarioId" hs-list-entity="Administrador" hs-list-field="nombre" hs-list-value="id"></select></form>
       </div>  
     </div>
 
@@ -359,7 +359,8 @@ let core =
             core.Files.init();
 
             //  Cargamos la lista de administradores de fincas disponibles
-            core.Forms.getSelectData( 'Administrador', 'Usuario.nombre', 'Usuario.id', 'usuarioId', $('#administradorCargaId').attr("hs-value"), $('#administradorCargaId').prop("id"), false ).then(()=>{
+            // core.Forms.getSelectData( 'Administrador', 'Usuario.nombre', 'Usuario.id', 'usuarioId', $
+            core.Forms.getSelectData( 'Administrador', 'nombre', 'id', 'usuarioId', $('#administradorCargaId').attr("hs-value"), $('#administradorCargaId').prop("id"), false ).then(()=>{
               $('#administradorCargaId').select2({
                 dropdownParent: $('.swal2-container')
               });
@@ -714,7 +715,6 @@ let core =
            apiFincatech.get(`${entidad}/list?target=cbo`).then( (data) =>
           // await apiFincatech.get(`${entidad}/list?target=cbo`).then( async (data) =>
           {
-
               var htmlOutput = "";
               var result = JSON.parse(data);
               responseData = result.data;

@@ -110,7 +110,7 @@
 
                     <?php endif; ?>
                     <!-- Si pertenece al grupo de usuarios de seguimiento no se deja modificar la información de la empresa -->
-                    <?php if($App->getAction() == 'get' && $App->getUserRol() != 'ROLE_SEGPROV'): ?>
+                    <?php if(($App->getAction() == 'get' || $App->getAction() == 'add') && $App->getUserRol() != 'ROLE_SEGPROV'): ?>
                         <?php $App->renderActionButtons(); ?>
                     <?php endif; ?>
 

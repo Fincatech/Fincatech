@@ -90,10 +90,17 @@ class ServiciosController extends FrontController{
         for($iServicio = 0; $iServicio < count($servicios); $iServicio++)
         {
             $contratado = $data[$servicios[$iServicio] . ' Contratado'];
-            $precio = $data[$servicios[$iServicio] . ' Precio'];
-            $precioComunidad = $data[$servicios[$iServicio] . ' Precio Comunidad'];
-            $mesFacturacion = $data[$servicios[$iServicio] . ' Mes Facturación'];
-            // $mesFacturacion = $data['Mes Facturación'];
+            //  Si no está contratado obviamos que su precio es 0 y el mes de facturación diciembre
+            if(boolval($contratado) == true)
+            {
+                $precio = $data[$servicios[$iServicio] . ' Precio'];
+                $precioComunidad = $data[$servicios[$iServicio] . ' Precio Comunidad'];
+                $mesFacturacion = $data[$servicios[$iServicio] . ' Mes Facturación'];    
+            }else{
+                $precio = 0;
+                $precioComunidad = 0;
+                $mesFacturacion = isset($data[$servicios[$iServicio] . ' Mes Facturación']) ? $data[$servicios[$iServicio] . ' Mes Facturación'] : 12;
+            }
 
             $this->ServiciosModel->SetId($data['ID Interno ' . $servicios[$iServicio]]);
             $this->ServiciosModel->SetContratado($contratado);
