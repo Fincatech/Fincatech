@@ -351,7 +351,7 @@ class RemesaController extends FrontController{
         $numeroRecibosDevueltos = 0;
         $iRecibosProcesados = 0;
         $nombreRemesa = '';
-
+        $remesasAfectadas = Array();
         try{
 
             //  Instanciamos el controller de facturación
@@ -371,68 +371,82 @@ class RemesaController extends FrontController{
             // Acceder al grupo <OrgnlPmtInfAndSts> y recorrer los elementos <TxInfAndSts>
             $informacionDevolucion = $xml->CstmrPmtStsRpt->OrgnlPmtInfAndSts;
 
-            foreach ($informacionDevolucion->TxInfAndSts as $infoRecibo) 
+            $numeroRemesas = count($informacionDevolucion);
+
+            for($iRemesa = 0; $iRemesa < $numeroRemesas; $iRemesa++)
             {
-                // Número de factura
-                $numeroFactura = (string)$infoRecibo->OrgnlEndToEndId;
-                $numeroFactura = str_replace('Factura ', '', $numeroFactura);
-                
-                //  Recuperamos el id de la factura en base al identificador del recibo
-                if(!is_null($numeroFactura)){
-
-                    // Estado del recibo
-                    $estadoRecibo = (string)$infoRecibo->TxSts;
-                
-                    // Referencia del recibo: uniqueid
-                    $reciboUniqueId = (string)$infoRecibo->OrgnlTxRef->MndtRltdInf->MndtId;
-
-                    // Motivo de la devolución
-                    $codigoDevolucion = (string)$infoRecibo->StsRsnInf->Rsn->Cd;
-                    $descripcionError = $this->DescripcionErrorSepa($codigoDevolucion);
-
-                    //  Importe de la devolución
-                    $importeDevolucion = (float)$infoRecibo->OrgnlTxRef->Amt->InstdAmt;
-                    $totalDevolucionProcesada += (float)$importeDevolucion;
-                    //  Fecha de devolución
-                    $fechaDevolucion = (string)$infoRecibo->OrgnlTxRef->IntrBkSttlmDt;
-                    //  Recuperamos el detalle del recibo desde el modelo
-                    $this->RemesaDetalleController->GetByUniqueId($reciboUniqueId);
-                    //  Si lo ha encontrado empezamos a procesar
-                    if($this->RemesaDetalleController->remesaDetalle->id > 0)
+                $datosDevolucion = $informacionDevolucion[$iRemesa];
+                //  Validamos que sea una remesa de Fincatech
+                if(strpos($datosDevolucion->OrgnlPmtInfId, 'FINCATECH') !== false)
+                {
+                    //  Incluimos el nombre de la remesa para control interno
+                    array_push($remesasAfectadas, $datosDevolucion->OrgnlPmtInfId);
+                    //  PROCESAMOS TODOS LOS RECIBOS QUE HAYAN PODIDO VENIR DEVUELTOS
+                    foreach ($datosDevolucion->TxInfAndSts as $infoRecibo) 
                     {
-                        $invoiceId = $this->RemesaDetalleController->remesaDetalle->invoiceid;
-                        //  Cambiamos el estado a la factura
-                        $invoice->UpdateStatusInvoice((int)$invoiceId, $invoice::ESTADO_FACTURAS_DEVUELTAS);
-
-                        //  Comprobamos si el recibo para la remesa ya ha sido devuelto ya que si el mismo recibo para una remesa no puede procesarse 2 veces
-                        if($this->ExisteDevolucionReciboRemesa()){
-                            //TODO:
-                        }else{
-                            //  Establecemos la fecha al día que marca el fichero
-                            $this->RemesaDetalleController->remesaDetalle->datereturned = $fechaDevolucion;
-                            //  Cambiamos el estado al recibo a devuelto
-                            $this->RemesaDetalleController->remesaDetalle->estado = $invoice::ESTADO_FACTURAS_DEVUELTAS;
-                            $this->RemesaDetalleController->UpdateDetalle();
-                            //  Insertamos el recibo devuelto en el repositorio correspondiente
-                            $this->CreateDevolucionRemesa($codigoDevolucion, $descripcionError, $importeDevolucion);
+                        // Número de factura
+                        $numeroFactura = (string)$infoRecibo->OrgnlEndToEndId;
+                        $numeroFactura = str_replace('Factura ', '', $numeroFactura);
+                        
+                        //  Recuperamos el id de la factura en base al identificador del recibo
+                        if(!is_null($numeroFactura)){
+        
+                            // Estado del recibo
+                            $estadoRecibo = (string)$infoRecibo->TxSts;
+                        
+                            // Referencia del recibo: uniqueid
+                            $reciboUniqueId = (string)$infoRecibo->OrgnlTxRef->MndtRltdInf->MndtId;
+        
+                            // Motivo de la devolución
+                            $codigoDevolucion = (string)$infoRecibo->StsRsnInf->Rsn->Cd;
+                            $descripcionError = $this->DescripcionErrorSepa($codigoDevolucion);
+        
+                            //  Importe de la devolución
+                            $importeDevolucion = (float)$infoRecibo->OrgnlTxRef->Amt->InstdAmt;
+                            $totalDevolucionProcesada += (float)$importeDevolucion;
+                            //  Fecha de devolución
+                            $fechaDevolucion = (string)$infoRecibo->OrgnlTxRef->IntrBkSttlmDt;
+                            //  Recuperamos el detalle del recibo desde el modelo
+                            $this->RemesaDetalleController->GetByUniqueId($reciboUniqueId);
+                            //  Si lo ha encontrado empezamos a procesar
+                            if($this->RemesaDetalleController->remesaDetalle->id > 0)
+                            {
+                                $invoiceId = $this->RemesaDetalleController->remesaDetalle->invoiceid;
+                                //  Cambiamos el estado a la factura
+                                $invoice->UpdateStatusInvoice((int)$invoiceId, $invoice::ESTADO_FACTURAS_DEVUELTAS);
+        
+                                //  Comprobamos si el recibo para la remesa ya ha sido devuelto ya que si el mismo recibo para una remesa no puede procesarse 2 veces
+                                if($this->ExisteDevolucionReciboRemesa()){
+                                    //TODO:
+                                }else{
+                                    //  Establecemos la fecha al día que marca el fichero
+                                    $this->RemesaDetalleController->remesaDetalle->datereturned = $fechaDevolucion;
+                                    //  Cambiamos el estado al recibo a devuelto
+                                    $this->RemesaDetalleController->remesaDetalle->estado = $invoice::ESTADO_FACTURAS_DEVUELTAS;
+                                    $this->RemesaDetalleController->UpdateDetalle();
+                                    //  Insertamos el recibo devuelto en el repositorio correspondiente
+                                    $this->CreateDevolucionRemesa($codigoDevolucion, $descripcionError, $importeDevolucion);
+                                }
+        
+                            }else{
+                                // TODO: Registramos el error y lo adjuntamos al log de errores
+                                $a = 0;
+                            }
+                            //  Comprobamos si el recibo ya está marcado como devuelto para la remesa
+                            
+        
                         }
-
-                    }else{
-                        // TODO: Registramos el error y lo adjuntamos al log de errores
-                        $a = 0;
+        
+                        // Mostrar la información extraída
+                        // echo "Nº factura: $numeroFactura, Estado: $estadoRecibo, Razón: $descripcionError\n";
+                        $iRecibosProcesados++;
                     }
-                    //  Comprobamos si el recibo ya está marcado como devuelto para la remesa
-                    
-
                 }
-
-                // Mostrar la información extraída
-                // echo "Nº factura: $numeroFactura, Estado: $estadoRecibo, Razón: $descripcionError\n";
-                $iRecibosProcesados++;
             }
             
             $msg = '<p>El proceso de devolución ha finalizado correctamente</p>';
-            $msg .= '<p class="mb-0 text-left"><strong>Remesa afectada</strong>: ' . $nombreRemesa . '</p>';
+            // $msg .= '<p class="mb-0 text-left"><strong>Remesa(s) afectada(s)</strong>: ' . $nombreRemesa . '</p>';
+            $msg .= '<p class="mb-0 text-left"><strong>Remesa(s) afectada(s)</strong>: ' . implode(', ', $remesasAfectadas) . '</p>';
             $msg .= '<p class="mb-0 text-left"><strong>Total Recibos procesados</strong>: ' . $iRecibosProcesados . '</p>';
             $msg .= '<p class="mb-0 text-left"><strong>Importe total</strong>: ' . number_format($totalDevolucionProcesada, 2, ',','.') . '&euro;</p>';
 

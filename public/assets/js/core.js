@@ -281,7 +281,9 @@ let Constantes = {
 
 let core =
 {
-  
+  //  Controlamos si el modelo ha sido inicializado ya que hasta que no esté inicializado no se dispara el evento del coreInitialized
+  modelInitialized: false,
+
   model: null,
   actionModel: null,
   modelId: null,
@@ -323,9 +325,20 @@ let core =
 
     p.then((result) =>{
       core.Events();
-      document.dispatchEvent(eventCoreInitialized);
+      let timer = setInterval(function() {
+          // Tu lógica aquí
+          console.log(core.actionModel);
+          if (core.modelInitialized || (core.actionModel == 'list') ) {
+              clearInterval(timer); // Destruye el timer
+              // Lógica adicional si la condición es verdadera
+              document.dispatchEvent(eventCoreInitialized);
+              if(core.actionModel == 'list'){
+                document.dispatchEvent(eventModelLoaded);
+              }
+              console.log('coreInitialized');
+          }
+      }, 100);           
     });
-
   },
 
   Events: function()
@@ -581,6 +594,8 @@ let core =
 
       $('body').trigger('hsFormDataLoaded',$(formularioDestino).attr('id'));
       document.dispatchEvent(eventModelLoaded);
+      core.modelInitialized = true;
+      console.log('eventModelLoaded');
     },
 
     init: function()
@@ -589,13 +604,11 @@ let core =
       // var promesa = new Promise(function(resolve, reject){
       let promesa = new Promise(async function(resolve, reject){
           await core.Forms.initializeSelectData();
-          console.log('----Resultado-----');
           resolve(true);
       });
 
       promesa.then(function(){
         // console.log('Ha terminado el initialize y entra en la promesa.then');
-        // console.log(' *** Promesa terminada ***');
         return true;
       });
 

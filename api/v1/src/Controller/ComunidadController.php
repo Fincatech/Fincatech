@@ -183,6 +183,8 @@ class ComunidadController extends FrontController{
             $datos['ibancomunidad'] = HelperController::NormalizeIBAN($datos['ibancomunidad']);
         
 
+        $comunidadId = $datos['id'];
+
         //  Creamos la comunidad y obtenemos el id del registro para procesar los posibles servicios contratados
         //  así como los precios 
         if(isset($datos['comunidadservicioscontratados']))
@@ -204,7 +206,7 @@ class ComunidadController extends FrontController{
                 }
         }
 
-        return $this->ComunidadModel->Update($entidadPrincipal, $datos, $usuarioId); 
+        return $this->ComunidadModel->Update($entidadPrincipal, $datos, $comunidadId); 
 
     }
 

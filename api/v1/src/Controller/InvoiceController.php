@@ -25,7 +25,7 @@ use Throwable;
 
 class InvoiceController extends FrontController{
 
-    private $debugMode = true;
+    private $debugMode = false;
 
     public $InvoiceModel;
 
@@ -488,7 +488,7 @@ class InvoiceController extends FrontController{
         ////////////////////////////////////////////////////////////////////////////////////
         ///                             INICIO PROCESO
         ////////////////////////////////////////////////////////////////////////////////////        
-        $fileName = 'FINCATECH_FACTURACION_SIMULACION_' . str_pad($mesFacturacion, 2,'0') . '_' . date('Y') . '.xlsx';
+        
 
         //  Año de facturación
         $anyoFacturacion = date('Y');
@@ -534,12 +534,9 @@ class InvoiceController extends FrontController{
             $idAdministrador = $administrador['id'];
 
             $this->InvoiceModel->SetIdAdministrador($idAdministrador);
-            $this->InvoiceModel->SetEmail($administrador['email']);
-            $this->InvoiceModel->SetEmailAdministrador($administrador['email']);
-            $this->InvoiceModel->SetCifAdministrador($administrador['cif']);
 
             $administradorNombre = $administrador['nombre'];
-
+            $fileName = 'FINCATECH_FACTURACION_SIMULACION_' . str_pad($mesFacturacion, 2,'0') . '_' . date('Y') . '_' . HelperController::GenerarLinkRewrite($administradorNombre) . '.xlsx';
             //  Comprobamos si el usuario es un admin autorizado y un usuario de tipo administrador
             $authorizedAdmin = $this->UsuarioController->IsAuthorizedUserByAdmin($idAdministrador);
             $roleId = $administrador['rolid'];
@@ -556,43 +553,13 @@ class InvoiceController extends FrontController{
                 {
                     //  Agrupamos los servicios contratados por cada comunidad del administrador
                     $this->AgruparServiciosComunidades($comunidades);
-                    $iTotalComunidades = count($this->comunidadesFacturacion);
-                    $iComunidad = 1;
+                    $iTotalComunidades = count($comunidades);
 
                     //  Si hay comunidades para procesar comenzamos a facturar
                     if( $iTotalComunidades > 0)
                     {
-                        $comunidadesFacturacion = $this->comunidadesFacturacion;
-
-                        //  Iteramos sobre todas las comunidades que correspondan al administrador que se está facturando
-                        foreach($comunidadesFacturacion as $comunidad)
-                        {
-
-                            $this->comunidadToBill = $comunidad;                       
-
-                            //  Comprobamos si la comunidad tiene servicios asociados
-                            if(isset($comunidad['services']))
-                            {
-                                //  Comprobamos si tiene servicios pendientes de facturar
-                                if( count($comunidad['services']) > 0 )
-                                {
-                                    $this->InvoiceModel->SetComunidad($comunidad['nombre'])
-                                    ->SetIdComunidad( trim($comunidad['id']) )
-                                    ->SetCifComunidad( trim($comunidad['cif']) )
-                                    ->SetIBAN($comunidad['ibancomunidad'])
-                                    ->SetIdAdministrador($idAdministrador)
-                                    ->SetAdministrador($administradorNombre)
-                                    ->SetMes($mesFacturacion)
-                                    ->SetAnyo($anyoFacturacion)
-                                    ->SetCodigoComunidad($comunidad['codigo'])
-                                    ->SetServices( $comunidad['services'] );
-                                }                     
-                            }
-                            $iComunidad++;
-                        }
-
                         //  Generamos el fichero Excel para devolver al usuario
-                        $base64Excel = $this->ProcessExcelSimulacion($fileName, $comunidadesFacturacion);
+                        $base64Excel = $this->ProcessExcelSimulacion($fileName, $this->comunidadesFacturacion);
                         if($base64Excel === false){
                             return 'El fichero de simulación no ha podido generarse';
                         }else{
@@ -1665,8 +1632,14 @@ class InvoiceController extends FrontController{
                 $totalComunidad = (float)$subtotal + (float)$impuestos;
                 $totalComunidad = HelperController::Redondeo($totalComunidad);
 
+                $ibanComunidad = $comunidad['ibancomunidad'];
                 //  Validamos el IBAN de la comunidad
-                $ibanValido = HelperController::ValidateIban($comunidad['ibancomunidad']);
+                $ibanValido = HelperController::ValidateIban($ibanComunidad);
+
+                if(!$ibanValido){
+                    $errorIBAN = $etiquetaError . ($ibanComunidad == '' ? 'No tiene IBAN' : 'IBAN No válido: ' . $ibanComunidad);
+                    $errores++;
+                }
 
                 //  Validamos el CIF de la comunidad
                 $cifValido = HelperController::ValidarNIFCIF($comunidad['cif']);
@@ -1682,7 +1655,7 @@ class InvoiceController extends FrontController{
                 $datosComunidades[] = [
                     $comunidad['codigo'], 
                     $comunidad['nombre'], 
-                    $ibanValido ? $comunidad['ibancomunidad'] : $etiquetaError . $comunidad['ibancomunidad'], 
+                    $ibanValido ? $ibanComunidad : $errorIBAN, 
                     $cif,
                     $servicios, 
                     $subtotal,

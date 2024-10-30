@@ -15,7 +15,7 @@ let comunidadesCore = {
     
         //  Validamos los accesos del administrador
         let p = new Promise(async(resolve, reject)=>{
-            await comunidadesCore.checkAccess();
+            comunidadesCore.checkAccess();
             resolve(true);
         });
         
@@ -1689,11 +1689,12 @@ function sleep(ms) {
 
 document.addEventListener('coreInitialized', function(event) {
     console.log('coreInitialized Comunidades');
-    comunidadesCore.init();     
     comunidadesCore.renderTablaComunidadesAdministrador(core.modelId);
+      
 });
    
 document.addEventListener('modelLoaded', function(event) {
+    comunidadesCore.init();  
     if(core.actionModel == 'get' && core.model.toLowerCase() == "comunidad"){
         let titulo = `${core.Modelo.entity['Comunidad'][0]['codigo']} - ${core.Modelo.entity['Comunidad'][0]['nombre']}`;
         CoreUI.Utils.setTituloPantalla(null, null, titulo);
