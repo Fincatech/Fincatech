@@ -885,6 +885,7 @@ class InvoiceModel extends \HappySoftware\Model\Model{
             where 
                 i.idcomunidad = " . $idComunidad . " 
                 and id.idinvoice = i.id
+                and i.idrectificativa is null
                 and id.idservicio = 3";
         return $this->query($sql);
     }
@@ -902,6 +903,7 @@ class InvoiceModel extends \HappySoftware\Model\Model{
                 and i.mes = " . $mes . " 
                 and i.anyo = " . $anyo . " 
                 and id.idinvoice = i.id
+                and i.idrectificativa is null
                 and id.idservicio = " . $idServicio;
         return $this->query($sql); 
     }

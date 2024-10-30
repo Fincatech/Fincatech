@@ -397,6 +397,35 @@ return function (App $app) {
 
     });
 
+    /**
+     * Recupera la configuración de la facturación
+     */
+    $app->post('/facturacion/simulacion', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Invoice');
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        $result = $frontController->context->SimularFacturacion($data);
+
+        if( isset($result['base64']) )
+        {
+            $result = HelperController::successResponse($result);
+        }else{
+            $result = HelperController::errorResponse('error',$result);
+        }
+
+        $response->getBody()->write( $result );
+        return $response;
+
+    });
+
     //  Generación de factura rectificativa
     $app->post('/factura/{id:[0-9]+}/rectificativa/create', function(Request $request, Response $response, array $params ): Response
     {

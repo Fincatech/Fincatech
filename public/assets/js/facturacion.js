@@ -131,6 +131,12 @@ let facturacion = {
                 facturacion.Facturacion.Controller.GenerarFacturacion();
             });
 
+            //  Simulación de facturación
+            $('body').on(core.helper.clickEventType, '.btnSimularFacturacion', function(ev)
+            {
+                facturacion.Facturacion.Controller.SimularFacturacion();
+            });
+
             //  Cambio de mes
             $('#mesFacturacion').on('change', function(ev)
             {
@@ -569,11 +575,39 @@ let facturacion = {
             },
 
             /**
+             * Llama al proceso de simular facturación
+             */
+            SimularFacturacion: function()
+            {
+                $('body').removeClass('progress');
+                if(facturacion.Facturacion.Controller.ValidateSimulacion() === true){
+
+                    // Construimos el objeto para enviar al WS
+                    let datos = facturacion.Facturacion.Controller.GetOptions();
+
+                    apiFincatech.post('facturacion/simulacion', datos).then((result) =>{
+
+                        let resultado = JSON.parse(result);
+                        if (resultado.data == 'error') {
+                            CoreUI.Modal.Error('Error: ' + resultado.status.error, 'Error');
+                        } else {
+                            //  Mostramos el fichero de descarga
+                            CoreUI.Modal.Success('La simulación se ha generado satisfactoriamente.<br><br>El fichero se descargará una vez cerrado este popup','',function(){
+                                core.Files.ForceDownloadFile(resultado.data.base64, resultado.data.filename, resultado.data.type);
+                            });
+                        }
+                    });
+                }
+            },
+
+            /**
              * Genera facturación en el sistema
              */
             GenerarFacturacion: function() {
                 $('body').removeClass('progress');
-                if (facturacion.Facturacion.Controller.ValidateFacturacion() === true) {
+                if (facturacion.Facturacion.Controller.ValidateFacturacion() === true) 
+                {
+
                     CoreUI.Progress.Show();
             
                     // Construimos el objeto para enviar al WS
@@ -729,6 +763,29 @@ let facturacion = {
                         facturacion.Facturacion.View.RenderInfoFacturacion();
                     }
                 });
+            },
+
+            /**
+             * Valida los datos obligatorios para procesar la facturación
+             * @returns 
+             */
+            ValidateSimulacion: function()
+            {
+                let result = true;
+                let mensaje = '';
+
+                //  Validación de administrador seleccionado
+                let id = $('#usuarioId').val() == null ? -1 : $('#usuarioId').val();
+                if(parseInt(id) <= 0){
+                    mensaje = `${mensaje}-No ha seleccionado ningún administrador<br>`;
+                }
+
+                if(mensaje !== ''){
+                    result = false;
+                    CoreUI.Modal.Error(`<p class="text-left">No se ha podido simular la facturación debido a los siguientes problemas:</p><p class="text-left mb-0">${mensaje}</p>`,'Error de validación');
+                }
+
+                return result;
             },
 
             /**

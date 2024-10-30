@@ -457,6 +457,168 @@ class InvoiceController extends FrontController{
 
     }
 
+    /**
+     * Proceso que simula la facturación para un administrador y un mes en concreto
+     */
+    public function SimularFacturacion($data)
+    {
+        //  Validamos que esté informado al menos el mes y el ID del administrador
+        if(!isset($data['mesfacturacion']) && !isset($data['idadministrador'])){
+            return 'Los parámetros enviados no son correctos';
+        }
+
+        $simulacionGenerada = false;
+
+        //  Validamos que el mes de facturación y el id sean numéricos
+        $mesFacturacion = DatabaseCore::PrepareDBString($data['mesfacturacion']);
+        $idAdministrador = DatabaseCore::PrepareDBString($data['idadministrador']);
+
+        //  Recuperamos el administrador
+        //  Seteamos el administrador en el modelo
+        $this->InvoiceModel->SetIdAdministrador($idAdministrador);
+        //  Administradores
+        $administradores = $this->Administradores( $this->InvoiceModel->IdAdministrador() );        
+
+        if(count($this->InvoiceModel->Administradores()['Usuario']) > 0){
+            $administradores = $this->InvoiceModel->Administradores()['Usuario'];
+        }else{
+            return 'El administrador seleccionado no existe';
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////
+        ///                             INICIO PROCESO
+        ////////////////////////////////////////////////////////////////////////////////////        
+        $fileName = 'FINCATECH_FACTURACION_SIMULACION_' . str_pad($mesFacturacion, 2,'0') . '_' . date('Y') . '.xlsx';
+
+        //  Año de facturación
+        $anyoFacturacion = date('Y');
+        $this->iAnyoFacturacion = (int)$anyoFacturacion;
+        //  Servicios
+        $servicios = null;
+        //  Mes Facturación
+        $mesFacturacion = DatabaseCore::PrepareDBString($mesFacturacion);
+        $this->iMesFacturacion = (int)$mesFacturacion;
+
+        ////////////////////////////////////////////////////////////////////////////////////
+        ///                             SERVICIOS
+        ////////////////////////////////////////////////////////////////////////////////////
+        //  Servicios que se van a facturar para el administrador seleccionado
+        if(count($data['servicios']) > 0){
+            $servicios = $data['servicios'];
+        }else{
+            $servicios = $this->InvoiceModel->IdsServiciosContratados();
+            if(count($servicios) > 0)
+            {
+                $servicios = array_column($servicios, 'idservicio');
+                $this->InvoiceModel->SetServices($servicios);
+            }else{
+                $this->InvoiceModel->SetServices(null);
+            }
+        }
+
+        //  Si no hay servicios para facturar avisamos y salimos del proceso
+        if(is_null($this->InvoiceModel->Services())){
+            return 'Este administrador no tiene servicios contratados para facturar';
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////
+        //  Establecemos el impuesto
+        ////////////////////////////////////////////////////////////////////////////////////
+        $this->InvoiceModel->SetTaxRate($this->impuesto);
+
+        //  Iteramos sobre todos los posibles administradores que haya seleccionado el usuario que puede ser 1 ó todos
+        foreach($administradores as $administrador)
+        {
+           
+            //  ID del administrador
+            $idAdministrador = $administrador['id'];
+
+            $this->InvoiceModel->SetIdAdministrador($idAdministrador);
+            $this->InvoiceModel->SetEmail($administrador['email']);
+            $this->InvoiceModel->SetEmailAdministrador($administrador['email']);
+            $this->InvoiceModel->SetCifAdministrador($administrador['cif']);
+
+            $administradorNombre = $administrador['nombre'];
+
+            //  Comprobamos si el usuario es un admin autorizado y un usuario de tipo administrador
+            $authorizedAdmin = $this->UsuarioController->IsAuthorizedUserByAdmin($idAdministrador);
+            $roleId = $administrador['rolid'];
+
+            //  Si el usuario es de facturación
+            if($roleId == 5 && $authorizedAdmin === false)
+            {
+                //  Establecemos el administrador en la propiedad del controller
+                $this->administrador = $administrador;
+                //  Recuperamos las posibles comunidades que tenga el administrador
+                $comunidades = $this->ComunidadController->ListComunidadesWithServicesByAdministradorId($idAdministrador, $mesFacturacion, $this->InvoiceModel->Services());
+                //  Si tiene comunidades, comenzamos con la facturación de las comunidades del administrador susceptibles de ser facturadas
+                if( count($comunidades) > 0)
+                {
+                    //  Agrupamos los servicios contratados por cada comunidad del administrador
+                    $this->AgruparServiciosComunidades($comunidades);
+                    $iTotalComunidades = count($this->comunidadesFacturacion);
+                    $iComunidad = 1;
+
+                    //  Si hay comunidades para procesar comenzamos a facturar
+                    if( $iTotalComunidades > 0)
+                    {
+                        $comunidadesFacturacion = $this->comunidadesFacturacion;
+
+                        //  Iteramos sobre todas las comunidades que correspondan al administrador que se está facturando
+                        foreach($comunidadesFacturacion as $comunidad)
+                        {
+
+                            $this->comunidadToBill = $comunidad;                       
+
+                            //  Comprobamos si la comunidad tiene servicios asociados
+                            if(isset($comunidad['services']))
+                            {
+                                //  Comprobamos si tiene servicios pendientes de facturar
+                                if( count($comunidad['services']) > 0 )
+                                {
+                                    $this->InvoiceModel->SetComunidad($comunidad['nombre'])
+                                    ->SetIdComunidad( trim($comunidad['id']) )
+                                    ->SetCifComunidad( trim($comunidad['cif']) )
+                                    ->SetIBAN($comunidad['ibancomunidad'])
+                                    ->SetIdAdministrador($idAdministrador)
+                                    ->SetAdministrador($administradorNombre)
+                                    ->SetMes($mesFacturacion)
+                                    ->SetAnyo($anyoFacturacion)
+                                    ->SetCodigoComunidad($comunidad['codigo'])
+                                    ->SetServices( $comunidad['services'] );
+                                }                     
+                            }
+                            $iComunidad++;
+                        }
+
+                        //  Generamos el fichero Excel para devolver al usuario
+                        $base64Excel = $this->ProcessExcelSimulacion($fileName, $comunidadesFacturacion);
+                        if($base64Excel === false){
+                            return 'El fichero de simulación no ha podido generarse';
+                        }else{
+                            $simulacionGenerada = true;
+                        }
+                    }else{
+                        return 'Este administrador no tiene comunidades para facturar en el período seleccionado';
+                    }
+                }
+            }
+        }
+
+        if( $simulacionGenerada ){
+            return [
+                'base64'    => $base64Excel,
+                'filename'  => $fileName,
+                'type'      => 'excel'
+            ];
+    
+        }else{
+            return 'Este administrador no tiene comunidades para facturar en el período seleccionado';
+        }
+
+
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     ///                                 PROCESOS DE FACTURACION
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1425,6 +1587,145 @@ class InvoiceController extends FrontController{
     ////////////////////////////////////////////////////////////////////////////////////////////////
     ///                                 HELPERS Y METODOS AUXILIARES
     ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Genera el fichero en excel de los datos facilitados
+     * @param string $fileName Nombre del fichero que se va a generar
+     * @return string|bool Devuelve el fichero codificado en base64 o false si no se pudo generar
+     */
+    private function ProcessExcelSimulacion(string $fileName, $comunidades)
+    {
+        $path = ROOT_DIR . DIRECTORY_SEPARATOR . $fileName;
+        $errores = 0;
+        $etiquetaError = '<style bgcolor="#FF0000" color="#ffffff"><b>Error</b></style>: ';
+        //  Nombre del administrador
+        $nombreAdministrador = $this->administrador['nombre'];
+
+        //  Email de facturación
+        if($this->administrador['emailfacturacion'] == '' || is_null($this->administrador['emailfacturacion'])){
+            $errores++;
+        }
+
+        $emailFacturacion = ($this->administrador['emailfacturacion'] == '' || is_null($this->administrador['emailfacturacion']) ? $etiquetaError . 'No configurado' : $this->administrador['emailfacturacion']);
+        //  Total facturación estimada
+        $totalFacturacion = 0;
+
+        $mesFacturacion = HelperController::StringMonth($this->iMesFacturacion);
+
+        //  Recuperamos la información de las comunidades para calcular totales y pintarlo después
+        $iComunidades = 0;
+        $datosComunidades = [];
+        foreach($comunidades as $comunidad)
+        // for($iComunidad = 0; $iComunidad < count($comunidades); $iComunidad++)
+        {
+            $serviciosFacturables = [];
+            $subtotal = 0;
+            $servicios = 0;
+
+            if(isset($comunidad['services']))
+            {
+
+                //  Procesamos los servicios
+                for($i = 0; $i < count($comunidad['services']); $i++)
+                {
+
+                    $idServicio = $comunidad['services'][$i]['idservicio'];
+                    $precioServicio =  (float)$comunidad['services'][$i]['preciocomunidad'];
+
+                    //  Comprobamos si el servicio ya ha sido facturado con anterioridad
+                    $servicioFacturado = false;
+                    
+                    $idComunidad = (int)$comunidad['id'];
+
+                    if($idServicio == 3) // DOCCAE
+                    {
+                        $servicioFacturado = $this->ServicioDOCCaeFacturado($idComunidad);
+                    }else{
+                        $servicioFacturado = count($this->InvoiceModel->ServicioFacturado($idComunidad, (int)$idServicio, (int)$this->iMesFacturacion, (int)date('Y'))) > 0;
+                    }
+
+                    if(!$servicioFacturado){
+                        $serviciosFacturables[] = $this->ServiceNameById( $idServicio ) . ': ' . $precioServicio . '€ ';
+                        $subtotal = (float)$subtotal + (float)$comunidad['services'][$i]['preciocomunidad'];
+                        $servicios++;
+                    }
+                }
+
+            }
+
+            //  Comprobamos si la comunidad tiene servicios facturables ya que si no, hay que quitarla
+            if($servicios > 0)
+            {
+                $iComunidades++;
+                $servicios = implode(', ',$serviciosFacturables);
+
+                $impuestos = ( (float)$this->impuesto * (float)$subtotal ) / 100;
+                $impuestos = HelperController::Redondeo($impuestos);
+
+                $totalComunidad = (float)$subtotal + (float)$impuestos;
+                $totalComunidad = HelperController::Redondeo($totalComunidad);
+
+                //  Validamos el IBAN de la comunidad
+                $ibanValido = HelperController::ValidateIban($comunidad['ibancomunidad']);
+
+                //  Validamos el CIF de la comunidad
+                $cifValido = HelperController::ValidarNIFCIF($comunidad['cif']);
+                if(!$cifValido){
+                    $errores++;
+                    $cif = $etiquetaError . (trim($comunidad['cif']) == '' ? 'No tiene CIF/NIF' : $comunidad['cif']);
+                }else{
+                    $cif = $comunidad['cif'];
+                }
+
+                //  Acumulamos el total de la facturación global
+                $totalFacturacion = (float)$subtotal + (float)$impuestos + (float)$totalFacturacion;
+                $datosComunidades[] = [
+                    $comunidad['codigo'], 
+                    $comunidad['nombre'], 
+                    $ibanValido ? $comunidad['ibancomunidad'] : $etiquetaError . $comunidad['ibancomunidad'], 
+                    $cif,
+                    $servicios, 
+                    $subtotal,
+                    $impuestos,
+                    $totalComunidad
+                ];
+
+            }
+
+        }
+        //  Montamos la cabecera del fichero Excel
+        $datosExcel = [];
+        $datosExcel[] = ['<b>Administrador</b>:', '<center>' . $nombreAdministrador . '</center>', '<b>E-mail de Facturación</b>:', $emailFacturacion];
+        $datosExcel[] = ['<b>Mes de facturación</b>:' , '<center>'.ucfirst($mesFacturacion).'</center>', '<b>Año de facturación</b>:' , '<center>' . $this->iAnyoFacturacion . '</center>'];
+        $datosExcel[] = ['<b>Nº de comunidades para facturar</b>:', '<center>' . $iComunidades . '</center>', '<b>Total Facturación estimada</b>:', '<right>' . $totalFacturacion . '€</right>'];
+        $datosExcel[] = ['<b>Errores detectados</b>:', '<center>'. $errores . '</center>'];
+
+        $datosExcel[] = ['' => ''];
+        //  Montamos la cabecera para las comunidades que son susceptibles de facturación
+        $datosExcel[] = ['<b><right>Cód.</right>', 
+        '<b>Comunidad</b>', 
+        '<b>IBAN</b>', 
+        '<b>CIF</b>', 
+        '<b>Servicios facturables</b>', 
+        '<b><center>Subtotal</center></b>', 
+        '<b><center>Impuestos</center></b>',
+        '<b><center>Total</center></b>'];
+
+        //  Metemos la información de las comunidades que se van a facturar
+        foreach($datosComunidades as $dato){
+            $datosExcel[] = $dato;
+        }
+
+        \HappySoftware\Controller\Traits\ExcelGen::fromArray($datosExcel, $nombreAdministrador)->saveAs($path);
+        //  Validamos que se haya generado correctamente
+        if(file_exists($path)){
+            $base64 = base64_encode(file_get_contents($path));
+            unlink($path);
+            return $base64;
+        }else{
+            return false;
+        }
+    }
 
     /**
      * Genera un número de factura válido 

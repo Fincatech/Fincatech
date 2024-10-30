@@ -90,9 +90,10 @@
             </div>
 
             <!-- Botón de acción -->
-            <div class="row flex-grow-1 align-items-end">
+            <div class="row flex-grow-1 align-items-end mt-3">
                 <div class="col-12 text-center">
-                    <a href="javascript:void(0);" class="btnGenerarFactura d-block btn btn-success br-8" title="Generar factura">Generar facturación</a>
+                    <a href="javascript:void(0);" class="btnSimularFacturacion btn btn-dark br-8" title="Generar factura">Simular facturación</a>
+                    <a href="javascript:void(0);" class="btnGenerarFactura btn btn-success br-8" title="Generar factura">Generar facturación</a>
                 </div>
             </div>  
 

@@ -505,6 +505,35 @@ let core =
     },
 
     /**
+     * Fuerza la descarga de un fichero en base64 obtenido desde el WS
+     * @param {*} base64Data 
+     * @param {*} filename 
+     * @param {*} type 
+     * @returns 
+     */
+    ForceDownloadFile: function(base64Data, filename, type = 'excel') {
+
+        let cabecera = '';
+        switch(type){
+            case 'excel':
+              cabecera = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;';
+              break;
+        }
+
+        if(cabecera == ''){
+          alert('Error al procesar el fichero para su descarga');
+          return;
+        }
+
+        let link = document.createElement('a');
+        link.href = `${cabecera}base64,${base64Data}`;
+        link.download = filename; // Nombre del archivo a descargar
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    },
+
+    /**
      * Check if file is an excel file
      * @param {*} idDOMInputFile 
      * @returns 
