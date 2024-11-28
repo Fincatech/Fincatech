@@ -57,6 +57,10 @@ class RemesaController extends FrontController{
     public function NombreFicheroRemesa(){
         return $this->_nombreFicheroRemesa;
     }
+    public function SetNombreFicheroRemesa(string $value){
+        $this->_nombreFicheroRemesa = $value;
+        return $this;
+    }
 
     public function __construct($params = null)
     {
@@ -182,8 +186,14 @@ class RemesaController extends FrontController{
 
     /**
      * Genera una remesa SEPA en fichero XML con la información de las facturas recuperadas
-     * @param array $invoiceData (optional). Información de la factura para ser incluida en el fichero de remesa
-     * @param array $invoiceIds (optional). Id's de las facturas que se van a incluir en la remesa
+     * @param string $sepaFileName. Nombre del fichero sepa que se va a generar
+     * @param string $creditorId. Creditor ID del banco de destino
+     * @param int $customerId. ID del cliente
+     * @param string $customerName. Nombre del cliente
+     * @param string $creditorIBAN. IBAN de Fincatech
+     * @param string $creditorBIC. BIC del banco seleccionado
+     * @param int|null $invoiceID. Defaults: null
+     * @param array|null $invoiceIds. Defaults: null
      */
     public function CreateRemesaXML(string $sepaFileName, string $creditorId, int $customerId,  string $customerName, string $creditorIBAN, string $creditorBIC, int|null $invoiceId = null,  array|null $invoiceIds = null)
     {
@@ -474,10 +484,163 @@ class RemesaController extends FrontController{
         $this->RemesaDevolucionController->CreateDevolucion($remesaDevolucion);
     }
 
+    /**
+     * Crea una remesa de manera manual
+     */
+    public function GenerateRemesaManual($datos)
+    {
+        //  Comprobamos si el usuario es de facturación por seguridad
+        if(!$this->isFacturacion())
+            return HelperController::errorResponse('error','Acceso denegado', 200);
+
+        //  Validamos que vengan informados todos los datos
+        $validator = $this->ValidateGenerateRemesaManual($datos);
+        if($validator !== true){
+            return HelperController::errorResponse('error',$validator, 200);
+        }
+
+        //  Recuperamos los id's de las facturas de todos los recibos seleccionados
+        $recibosDevueltos = $datos['recibos'];
+        $invoiceIds = array_column(array_filter($recibosDevueltos, function($obj){
+            return $obj['seleccionado'] === true;
+        }), 'invoiceid');
+
+        //  Validamos que haya al menos 1 recibo seleccionado por seguridad
+        if(count($invoiceIds) <= 0){
+            return HelperController::errorResponse('error','No se han detectado recibos seleccionados y asociados a facturas', 200);
+        }
+
+        //  ID del banco
+        $idBanco = DatabaseCore::PrepareDBString($datos['idbanco']);
+        //  Recuperamos el banco mediante su ID
+        $bankController = new BankController();
+        $banco = $bankController->Get( $idBanco );
+        //  Si el banco existe, recuperamos la información que necesitamos de él
+        if(count($banco['Bank']) > 0){
+            $banco = $banco['Bank'][0];
+            $creditorId = $banco['creditorid'];
+            $creditorIBAN = $banco['iban'];
+            $creditorBIC = $banco['bic'];
+        }else{
+            return HelperController::errorResponse('error','El banco seleccionado no existe');
+        }
+
+        //  Validamos los datos obligatorios para el banco
+        if( is_null($creditorId) || is_null($creditorIBAN) || is_null($creditorBIC) ){
+            return HelperController::errorResponse('error','El banco seleccionado no tiene los datos obligatorios informados: Creditor ID, IBAN, BIC');
+        }
+
+        $invoiceId = null;
+
+        //  Generamos el nombre del fichero SEPA
+        $sepaFileName = $this->GenerateFileName('fincatech');
+        $customerName = $this->_creditorName;
+        
+        //  Obtenemos el nombre del usuario en sesión
+        $usuarioController = new UsuarioController();
+        //  Recuperamos la información simple del usuario
+        $usuario = $usuarioController->GetResumedInfo();
+        //  Customer ID es el id del usuario autenticado en el sistema
+        $customerId = $usuario['id'];
+        $customerName = $usuario['nombre'];
+
+        //  Procesamos la remesa
+        $result = $this->CreateRemesaXML($sepaFileName, $creditorId, $customerId, $customerName, $creditorIBAN, $creditorBIC, $invoiceId, $invoiceIds);
+        if($result){
+
+            //  Establecemos todos los recibos procesados como "Cobrados"
+            $this->ChangeStatusRecibosReprocessed($recibosDevueltos);
+            //  Creamos el mensaje
+            $remesaPath = HelperController::RootURL() . '/public/storage/remesas/' . $this->NombreFicheroRemesa();
+            $result = '<p>La remesa ha sido generada correctamente</p>';
+            $result .= '<p class="mb-0"><i class="bi bi-cloud-arrow-down text-success"></i> <a href="'.$remesaPath.'" target="_blank" download>Descargar fichero remesa</a></p>';
+            return HelperController::successResponse($result);
+        }else{
+            return HelperController::errorResponse('error','No se ha podido generar la remesa debido a los siguientes errores: <br><br>' . $result );
+        }
+
+    }
+
+    /**
+     * Cambia el estado de los recibos insertados en una nueva remesa a Cobrado
+     */
+    private function ChangeStatusRecibosReprocessed($datos)
+    {
+        for($x = 0; $x < count($datos); $x++){
+            $id = $datos[$x]['id'];
+            $this->RemesaDetalleController->Get($id);
+            $this->RemesaDetalleController->remesaDetalle->estado = 'C';
+            $this->RemesaDetalleController->UpdateDetalle();
+        }
+
+    }
+
+    /**
+     * Valida los datos obligatorios para generar una remesa de forma manual
+     */
+    private function ValidateGenerateRemesaManual($datos): bool
+    {
+        //  Validación de recibos informados
+        if(!isset($datos['recibos'])){
+            return 'No hay datos de recibos<br>';
+        }
+
+        //  Validación de recibos seleccionados
+        $recibosDevuetos = $datos['recibos'];
+        $invoiceIds = array_filter($recibosDevuetos, function($obj){
+            return $obj['seleccionado'] === true;
+        });
+
+        $invoiceIds = array_column($invoiceIds, 'invoiceid');
+
+        //  Validamos que haya al menos 1 recibo seleccionado por seguridad
+        if(count($invoiceIds) <= 0){
+            return 'No se han detectado recibos seleccionados y/o asociados a facturas';
+        }
+
+        //  Validamos que el banco venga informado
+        if(!isset($datos['idbanco'])){
+            return 'No ha seleccionado un banco';
+        }
+
+        return true;
+    }
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///                             UTILIDADES DE LA GENERACIÓN DE REMESAS
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
     
+    /**
+     * Genera un nombre válido para la remesa
+     */
+    public function GenerateFileName($nombreAdministrador): string
+    {
+        ///////////////////////////////////////////////
+        //          Nomenclatura fichero SEPA 
+        ///////////////////////////////////////////////
+        //  FINCA_SEPA_NB_MM_YYYY.XML
+        //  + AD: Nombre del administrador saneado. Máximo 50 caracteres incluyendo _
+        //  + NB: Nombre del banco saneado
+        //  + MM: Mes 2 dígitos
+        //  + YYYY: Año 4 dígitos
+        //
+        ////////////////////////////////
+
+        //  Componemos el nombre del fichero SEPA
+        $admin = HelperController::GenerarLinkRewrite($nombreAdministrador);
+        if(strlen($admin) > 50)
+            $admin = substr($admin, 0, 50);
+
+        $tmpFile = 'FINCA_SEPA_' . HelperController::GenerarLinkRewrite($nombreAdministrador);
+        $tmpFile .= '_' . str_pad(date('m', time()), 2, '0', STR_PAD_LEFT) . '_' . date('Y') . '_' . date('d_H_i_s'). '.xml';
+
+        //  Establecemos el nombre del fichero de la remesa
+        $this->SetNombreFicheroRemesa($tmpFile);
+
+        //  Devolvemos el nombre del fichero
+        return $tmpFile;       
+    }
+
     /**
      * Procesa la devolución individual de un recibo
      * @param int $idRemesa. ID De la remesa
@@ -515,12 +678,6 @@ class RemesaController extends FrontController{
         }else{
             return 'El recibo no se ha encontrado en el sistema';
         }
-    }
-
-    //TODO:
-    public function RegenerateRemesa()
-    {
-
     }
 
     /**

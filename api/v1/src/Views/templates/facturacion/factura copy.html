@@ -1,12 +1,5 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <style>
 
-    @page{
-        margin-top: 30px; /* create space for header */
-        margin-bottom: 10px; /* create space for footer */
-    }
+    <style media="print">
         p{
             font-family: "Arial", sans-serif;
             font-optical-sizing: auto;
@@ -55,8 +48,7 @@
         }
 
     </style>
-</head>
-<body>
+
 <table border="0">
     <tr>
         <td>
@@ -67,7 +59,7 @@
                         <img src="[logo]" style="width:200px;height:65px;">
                     </td>
                     <td style="width: 50%;">                    
-                        <p><strong>FACTURA RECTIFICATIVA Nº</strong>: [factura_numero]</p>
+                        <p><strong>FACTURA Nº</strong>: [factura_numero]</p>
                         <p><strong>FECHA</strong>: [factura_fecha]</p>
                     </td>
                 </tr>
@@ -92,6 +84,7 @@
                             <p>[comunidad_cif]</p>                    
                             <p>[comunidad_localidad]</p>
                             <p><strong>REF. CONTRATO</strong>: [referencia_contrato]</p>
+                            <p><strong>CLIENTE</strong>: [administrador_id]</p>
                         </td>
                     </tr>
                 </tbody>
@@ -123,6 +116,27 @@
                             [detalle_importes]
                         </td>
                     </tr>
+
+                    <!-- Espacio -->
+                    <tr>
+                        <td class="text-right">
+                            <p>&nbsp;</p>
+                        </td>
+                        <td class="text-right">
+                            <p>&nbsp;</p>
+                        </td>
+                    </tr>
+
+                    <!-- TOTAL BRUTO ANTES DE IMPUESTOS -->
+                    <tr>
+                        <td class="text-right">
+                            <p><span class="font-weight-bold">SUBTOTAL</span></p>
+                        </td>
+                        <td class="text-right">
+                            <p>[factura_total_taxes_excl]&euro;</p>
+                        </td>
+                    </tr>                    
+
                     <!-- Subtotal -->
                     <tr>
                         <td class="text-right">
@@ -132,6 +146,17 @@
                             <p>[impuesto_importe_total]&euro;</p>
                         </td>
                     </tr>
+
+                    <!-- Espacio -->
+                    <tr>
+                        <td class="text-right">
+                            <p>&nbsp;</p>
+                        </td>
+                        <td class="text-right">
+                            <p>&nbsp;</p>
+                        </td>
+                    </tr>
+
                     <!-- TOTAL -->
                     <tr>
                         <td class="text-right">
@@ -165,11 +190,14 @@
 
             <p class="text-light-gray text-footer">DPD certificado por la Agencia Española de Protección de Datos. La mejor forma de estar protegido ante el RGPD.</p>
 
+            <div class="clearfix">&nbsp;</div>
+
+            <p class="text-light-gray text-footer">Servicio contratado según concepto facturado. El abono de la factura supone la confirmación del servicio contratado.</p>
+
             <div class="clearfix">&nbsp;</div>             
         </td>
     </tr>
 
 </table>
-<footer></footer>
-</body>
-</html>
+
+

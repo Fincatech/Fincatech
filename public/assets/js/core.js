@@ -328,11 +328,11 @@ let core =
       let timer = setInterval(function() {
           // Tu lógica aquí
           console.log(core.actionModel);
-          if (core.modelInitialized || (core.actionModel == 'list') ) {
+          if (core.modelInitialized || ( core.actionModel != 'get' && core.actionModel != 'add') ) {
               clearInterval(timer); // Destruye el timer
               // Lógica adicional si la condición es verdadera
               document.dispatchEvent(eventCoreInitialized);
-              if(core.actionModel == 'list'){
+              if(core.actionModel == 'list' || core.actionModel == 'Dashboard'){
                 document.dispatchEvent(eventModelLoaded);
               }
               console.log('coreInitialized');

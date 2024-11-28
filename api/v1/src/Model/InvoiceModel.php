@@ -47,14 +47,14 @@ class InvoiceModel extends \HappySoftware\Model\Model{
     //  Email del administrador
     private $_emailAdministrador;    
     //  CIF Del administrador
-    private string $_cifAdministrador;
+    private string|null $_cifAdministrador = '';
     //  Comunidad
     private $_comunidad;
     //  CIF Comunidad
-    private $_cifComunidad;
+    private string|null $_cifComunidad = '';
     private $_codigoComunidad;
     //  IBAN
-    private $_iban;
+    private string|null $_iban = '';
     //  Email
     private $_email;
     //  Notas
@@ -906,6 +906,11 @@ class InvoiceModel extends \HappySoftware\Model\Model{
                 and i.idrectificativa is null
                 and id.idservicio = " . $idServicio;
         return $this->query($sql); 
+    }
+
+    public function DatosInforme()
+    {
+
     }
 
 }

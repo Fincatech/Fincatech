@@ -32,6 +32,7 @@ $appSettings = [
         'certificados'  => '/public/storage/emailcertificados', 
         'private'       => '/public/storage/private', 
         'log'           => '/public/log/', 
+        
     ],
     //  Servidores FTP
     'ftp_servers' =>[

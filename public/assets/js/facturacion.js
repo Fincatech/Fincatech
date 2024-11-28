@@ -272,11 +272,33 @@ let facturacion = {
                 });
             });
 
+            //  Mostrar modal de generación de informe
+            $('body').on(core.helper.clickEventType, '.btnExportar', function(ev)
+            {
+                let datos = [];
+                datos['type'] = $(this).attr('data-type');
+                let pFR = new Promise(async(resolve, reject) =>{
+                    await apiFincatech.getView('modals','informes/modal_excel',JSON.stringify(datos)).then((result)=>{
+                        CoreUI.Modal.CustomHTML(result,'', async function(){
+                            //  Administradores
+                            await core.Forms.initializeSelectData();
+
+                        }, '50%');
+                        resolve(true);
+                    });                    
+                });
+            });
+
             //  Botón de confirmación de envío desde modal de envío por e-mail de factura
             $('body').on(core.helper.clickEventType, '.btnModalEnviarFactura', function(ev)
             {
                 let id = $(this).attr('data-id');
                 facturacion.Facturacion.Controller.EnviarFactura(id);
+            });
+
+            //  Botón de generar informe excel
+            $('body').on(core.helper.clickEventType, '.btnGenerarInformeExcel', function(ev){
+                facturacion.Facturacion.Controller.ExportarInformeExcel();
             });
 
         },
@@ -1003,44 +1025,72 @@ let facturacion = {
             },
 
             /**
-             * Controller de Bancos
+             * Genera un informe de excel con las facturas según parámetros seleccionados por el usuario
              */
-            Bank: {
+            ExportarInformeExcel: function(){
+                //  Recuperamos la información y la enviamos al ws
+                let idAdministrador = $('#usuarioId').val();
 
-                /**
-                 * Guarda un banco en el repositorio
-                 */
-                Save: function()
-                {
-                    let bic = $('#bic').val();
+                if(idAdministrador == '')
+                    idAdministrador = -1;
 
-                    if(!facturacion.Facturacion.Controller.Utils.ValidateBIC(bic))
-                    {
-                        CoreUI.Modal.Error('El código SWIFT/BIC no es válido. Por favor, revíselo para poder continuar', 'Error BIC/Swift');
-                        return;
-                    }
-
-                    if(core.Forms.Validate('form-banco'))
-                    {
-            
-                    //  Mapeamos los datos
-                        core.Forms.mapDataToSave();
-            
-                    //  Guardamos los datos ya mapeados correctamente
-                        core.Forms.Save( true );
-            
+                let data = Object();
+                data.idadministrador = idAdministrador;
+                data.datefrom =  $('#exportDateFrom').val();
+                data.dateto =  $('#exportDateTo').val();
+                data.estado = $('input[name=rbEstado]:checked').val();
+               
+                apiFincatech.post('facturacion/informe', data).then( (result) =>{
+                    let resultado = JSON.parse(result);
+                    if(resultado.data == 'error'){
+                        CoreUI.Modal.Error('No se ha podido generar el informe por el siguiente motivo:<br><br>' + resultado.status.error);
                     }else{
-                        CoreUI.Modal.Error('Rellene los campos obligatorios para poder guardar el banco', 'Formulario incompleto');
+                        CoreUI.Modal.Success('El informe se ha generado satisfactoriamente.<br><br>El fichero se descargará una vez cerrado este popup','',function(){
+                            core.Files.ForceDownloadFile(resultado.data.base64, resultado.data.filename, resultado.data.type);
+                        });
                     }
-                },
+                });
 
-                /**
-                 * Eliminar Banco
-                 */
-                Delete: function(id, nombre){
-                    core.Modelo.Delete("bank", id, nombre, "listadoBank");                    
+            },
+        /**
+         * Controller de Bancos
+         */
+        Bank: {
+
+            /**
+             * Guarda un banco en el repositorio
+             */
+            Save: function()
+            {
+                let bic = $('#bic').val();
+
+                if(!facturacion.Facturacion.Controller.Utils.ValidateBIC(bic))
+                {
+                    CoreUI.Modal.Error('El código SWIFT/BIC no es válido. Por favor, revíselo para poder continuar', 'Error BIC/Swift');
+                    return;
+                }
+
+                if(core.Forms.Validate('form-banco'))
+                {
+        
+                //  Mapeamos los datos
+                    core.Forms.mapDataToSave();
+        
+                //  Guardamos los datos ya mapeados correctamente
+                    core.Forms.Save( true );
+        
+                }else{
+                    CoreUI.Modal.Error('Rellene los campos obligatorios para poder guardar el banco', 'Formulario incompleto');
                 }
             },
+
+            /**
+             * Eliminar Banco
+             */
+            Delete: function(id, nombre){
+                core.Modelo.Delete("bank", id, nombre, "listadoBank");                    
+            }
+        },
 
 
             /**
@@ -1435,7 +1485,7 @@ let facturacion = {
                 // CoreUI.tableData.addColumn(nombreTabla, null, "", html, '','80px');
                 $('#' + nombreTabla).addClass('no-clicable');
                 //  Render
-                CoreUI.tableData.render(nombreTabla, "Invoice", `invoice/list`, false, true, true, null, true, false, false, true, 'GET', false, true);  
+                CoreUI.tableData.render(nombreTabla, "Invoice", `invoice/list`, false, true, true, null, true, false, false, true, 'GET', false, false);  
             },
 
             TableFacturas: function(domTablaNombre, estado)
@@ -2472,11 +2522,91 @@ let facturacion = {
 
             },
 
+            /**
+             * Genera una remesa de manera manual sobre los recibos seleccionados
+             */
+            GenerarRemesaManual: function()
+            {
+                let msj = '';
+                let iRecibosSeleccionados = 0;
+                let totalRecibosSeleccionados = 0;
+                let idBanco = $('#bancoRemesa option:selected').val();
+                let recibosDevueltos = [];
+                //  Validamos que haya recibos devueltos
+                if(!facturacion.Remesa.Model.recibosDevueltos){
+                    msj = '<p class="text-left mb-0"><i class="bi bi-x-circle text-danger"></i> No hay recibos devueltos para poder crear una remesa manual</p>';
+                }
+
+                //  Validamos que haya al menos 1 recibo seleccionado en el modelo
+                facturacion.Remesa.Model.recibosDevueltos.each( (data, rowIndex) =>{
+                    if(facturacion.Remesa.Model.recibosDevueltos[rowIndex].seleccionado == true){
+                        recibosDevueltos.push(facturacion.Remesa.Model.recibosDevueltos[rowIndex]);
+                        iRecibosSeleccionados++;
+                    }
+                });
+                //  Validación nº recibos seleccionados
+                if(iRecibosSeleccionados == 0){
+                    msj = `${msj}<p class="text-left mb-0"><i class="bi bi-x-circle text-danger"></i> Debe seleccionar al menos 1 recibo para poder generar una nueva remesa</p>`;
+                }
+
+                //  Validación banco seleccionado
+                if(idBanco <= 0){
+                    msj = `${msj}<p class="text-left mb-0"><i class="bi bi-x-circle text-danger"></i> Debe seleccionar el banco al que desea enviar la remesa</p>`;
+                }
+
+                if(msj !== ''){
+                    CoreUI.Modal.Error(`<p class="text-left">No se ha podido crear la remesa por los siguientes motivos:</p><br>${msj}`);
+                }else{
+
+                    msj = '<p class="text-center">Se va a proceder a crear una remesa manual. Por favor, revise si es correcto antes de continuar</p><br>';
+                    msj = `${msj}<p class="text-center mb-0"><span class="font-weight-bold">Nº recibos</span></p><p class="text-center">${iRecibosSeleccionados}</p>`;
+                    msj = `${msj}<p class="text-center mb-0"><span class="font-weight-bold">Importe de la remesa</span></p><p class="text-center"> ${CoreUI.Utils.formatNumberToCurrency(facturacion.Remesa.Model.importeDevolucion)}€</p>`;
+                    //  Preguntamos al usuario si desea continuar con el proceso
+                    CoreUI.Modal.Question(msj,'Creación remesa manual', 'Sí, crear remesa manual', function()
+                    {
+                        let datos = Object();
+                        
+                        datos.recibos = recibosDevueltos;
+                        datos.idbanco = idBanco;
+
+                        // Llamamos a postWithProgress directamente, ya que es una función asíncrona que retorna una promesa
+                        apiFincatech.post('remesa/generacionmanual', datos, true)
+                            .then((result) => {
+                                try {
+                                    let resultado = JSON.parse(result);
+                                    if (resultado.data == 'error') {
+                                        CoreUI.Modal.Error('Error: ' + resultado.data, 'Error');
+                                    } else {
+                                        CoreUI.Modal.Success(resultado.data, 'Remesa generada correctamente', function(){
+                                            //  Recargamos la tabla
+                                            facturacion.Remesa.View.TablaRecibosDevueltos();
+                                            //  Mostramos la información de selección
+                                            $('#informacionRecibosNuevaRemesa .total-recibos-seleccionados').html('0');
+                                            $('#informacionRecibosNuevaRemesa .total-importe-recibos-seleccionados').html('0€');
+                                        });                                        
+                                    }
+                                } catch (error) {
+                                    CoreUI.Modal.Error('Error al procesar la respuesta: ' + error.message, 'Error');
+                                }
+                            })
+                            .catch((error) => {
+                                CoreUI.Progress.Hide();
+                                CoreUI.Modal.Error('Error: ' + error.status.error, 'Error');
+                            });
+                        });
+                }
+
+
+            },
+
         },
 
         Model: {
+            importeDevolucion: 0,
             //  Propiedad que se utiliza para almacenar los id's de los posibles recibos seleccionados
             recibos: Array(),
+            //  Listado de recibos devueltos
+            recibosDevueltos: null,
 
             ExisteReciboSeleccionado: function(idRecibo)
             {
@@ -2492,6 +2622,7 @@ let facturacion = {
         },
 
         Events: function(){
+
             //  Mostrar modal de devolución de recibos
             $('body').on(core.helper.clickEventType, '.btnProcesarRemesaDevolucion', function(ev)
             {
@@ -2508,20 +2639,65 @@ let facturacion = {
                 facturacion.Remesa.ProcesarDevolucion();    
             });
 
-            $('body').on(core.helper.clickEventType, '.chkDeseleccionar', function(ev){
-                window['tablelistadoRecibosDevueltos'].rows().every(function() {
-                    $(this.node()).find('input[type="checkbox"].chkRecibo').prop('checked', false);
+            //  Deseleccionar todos
+            $('body').on(core.helper.clickEventType, '.chkDeseleccionar', function(ev)
+            {
+
+                let tabla = `table${$(this).attr('data-table')}`;
+                let chkTarget = `input[type="checkbox"].${$(this).attr('data-target')}`;
+
+                //  Deseleccionamos todos del modelo
+                facturacion.Remesa.Model.recibosDevueltos.each( (data, rowIndex) =>{
+                    facturacion.Remesa.Model.recibosDevueltos[rowIndex].seleccionado = false;
                 });
+
+                //  Deseleccionamos en la tabla para la presentación
+                facturacion.Remesa.View.RenderEstadoCheckboxSeleccion(tabla, chkTarget, false);
+                
+                // window[tabla].draw();
+                facturacion.Remesa.View.RenderInformacionRecibosDevueltos();
             });
 
             //  Seleccionar todos los recibos devueltos
-            $('body').on(core.helper.clickEventType, '.chkSeleccionarTodo', function(ev){
-                window['tablelistadoRecibosDevueltos'].rows({ search: 'applied' }).every(function() {
-                    // Buscar el checkbox dentro de cada fila
-                    $(this.node()).find('input[type="checkbox"].chkRecibo').prop('checked', true);
-                }).nodes();
-                window['tablelistadoRecibosDevueltos'].draw();
-                facturacion.Remesa.todos = true;
+            $('body').on(core.helper.clickEventType, '.chkSeleccionarTodo', function(ev)
+            {
+
+                let tabla = `table${$(this).attr('data-table')}`;
+                let chkTarget = `input[type="checkbox"].${$(this).attr('data-target')}`;
+
+                //  Seleccionamos todos en el modelo para asegurar la persistencia de la selección
+                facturacion.Remesa.Model.recibosDevueltos.each( (data, rowIndex) =>{
+                    facturacion.Remesa.Model.recibosDevueltos[rowIndex].seleccionado = false;
+                });
+
+                //  Modificamos en el modelo la selección del recibo
+                let datosFiltrados = window[tabla].rows({ search: 'applied' }).data();
+                datosFiltrados.each(function(row, index){
+
+                    let id = row.id;
+                    let reciboSeleccion = facturacion.Remesa.Model.recibosDevueltos.toArray().find( recibo => recibo.id === id);
+                    if(reciboSeleccion){
+                        reciboSeleccion.seleccionado = true;
+                    }
+
+                });
+
+                //  Modificamos el estado del checkbox en la tabla
+                facturacion.Remesa.View.RenderEstadoCheckboxSeleccion(tabla, chkTarget, true);
+                facturacion.Remesa.View.RenderInformacionRecibosDevueltos();
+
+            });
+
+            //  Check de selección de recibo individual
+            $('body').on(core.helper.clickEventType, '.chkReciboDevuelto', function(ev){
+                //  Seleccionamos en el modelo el recibo
+                let id = $(this).attr('data-id');
+                let recibo = facturacion.Remesa.Model.recibosDevueltos.toArray().find( recibo => recibo.id === id);
+                if(recibo){
+                    //  Actualizamos la selección en el modelo
+                    recibo.seleccionado = $(this).is(':checked');
+                }
+                facturacion.Remesa.View.RenderInformacionRecibosDevueltos();
             });
 
             //  Botón de devolución de recibo
@@ -2532,9 +2708,14 @@ let facturacion = {
                 facturacion.Remesa.DevolverRecibo(remesaId, reciboID);
             });
 
+            $('body').on(core.helper.clickEventType, '.btnGenerarRemesaManual', function(ev){
+                //  Llamamos al proceso de generación manual de remesa con los recibos seleccionados
+                facturacion.Remesa.Controller.GenerarRemesaManual();
+            });
+
             //  Renderización de tablas de remesas
             facturacion.Remesa.View.RenderTables();
-
+            core.Forms.initializeSelectData();
         },
 
         /**
@@ -2565,7 +2746,7 @@ let facturacion = {
                             //  Mostramos el mensaje de confirmación
                             CoreUI.Modal.Success('El recibo ha sido devuelto satisfactoriamente');
                             //  Recargamos la tabla
-                            window['tablelistadoRecibosCobrados'].ajax.reload();
+                            window['tablelistadoRecibos'].ajax.reload();
                         }
                         resolve(true);
                     });
@@ -2612,6 +2793,45 @@ let facturacion = {
         View:{
 
             /**
+             * 
+             * @param {*} tabla 
+             * @param {*} chkTarget 
+             * @param {*} estado 
+             */
+            RenderEstadoCheckboxSeleccion: function(tabla, chkTarget, estado)
+            {
+                //  Modificamos el estado del checkbox en la tabla
+                window[tabla].rows({ search: 'applied' }).every(function() 
+                {
+                    $(this.node()).find(chkTarget).prop('checked', estado);
+                }).nodes();
+            },
+
+            /**
+             * Renderiza la información de los recibos seleccionados
+             */
+            RenderInformacionRecibosDevueltos: function()
+            {
+                //  Primero comprobamos si están deseleccionados todos
+                let iTotal = 0;
+                let iTotalDevuelto = 0;
+
+                //  Calculamos el importe total
+                facturacion.Remesa.Model.recibosDevueltos.each((data, rowIndex) =>
+                {
+                    if(data.seleccionado == true)
+                    {
+                        iTotal++;
+                        iTotalDevuelto = parseFloat(data.amount) + parseFloat(iTotalDevuelto);
+                    }
+                });
+                facturacion.Remesa.Model.importeDevolucion = iTotalDevuelto;
+                $('#informacionRecibosNuevaRemesa .total-recibos-seleccionados').html(iTotal);
+                $('#informacionRecibosNuevaRemesa .total-importe-recibos-seleccionados').html(`${CoreUI.Utils.formatNumberToCurrency(iTotalDevuelto)}€`);
+
+            },
+
+            /**
              * Renderiza aquellas tablas que pertenecen a remesas si son detectadas
              */
             RenderTables: function()
@@ -2633,6 +2853,7 @@ let facturacion = {
 
                     //  Cargamos el listado de comunidades
                     CoreUI.tableData.init();
+                    CoreUI.tableData.columns = [];
 
                     //  Fecha de presentación
                     CoreUI.tableData.addColumn(tabla, function(row, type, val, meta)
@@ -2699,16 +2920,14 @@ let facturacion = {
 
                         //  Cargamos el listado de comunidades
                         CoreUI.tableData.init();
+                        CoreUI.tableData.columns = [];
 
                         //  Fecha de presentación
                         CoreUI.tableData.addColumn(tabla, function(row, type, val, meta)
                         {
-                            return `<input class=" chkRecibo" type="checkbox" name="chkRemesa${row.id}" id="chkRemesa${row.id}" data-id="${row.id}">`;
+                            return `<input class="chkReciboDevuelto" type="checkbox" name="chkRemesa${row.id}" id="chkRemesa${row.id}" data-invoiceid="${row.invoiceid}" data-id="${row.id}">`;
         
-                        }, 'asdf ', null);         
-
-                        //  Remesa
-                        // CoreUI.tableData.addColumn(tabla, "referencia", "Ref. Remesa");
+                        }, '&nbsp;', null);         
             
                         //  Administrador
                         CoreUI.tableData.addColumn(tabla, "customername", "Administrador");
@@ -2722,11 +2941,8 @@ let facturacion = {
                         //  Amount
                         CoreUI.tableData.addColumn(tabla, function(row, type, val, meta)
                         {
-                            return `${row.amount}&euro;`;
+                            return `<p class="mb-0 text-right pr-2">${row.amount}&euro;</p>`;
                         }, 'Importe');
-
-                        //  IBAN
-                        // CoreUI.tableData.addColumn(tabla, "customeriban", "IBAN");
 
                         //  Fecha de presentación
                         CoreUI.tableData.addColumn(tabla, function(row, type, val, meta)
@@ -2764,14 +2980,44 @@ let facturacion = {
 
                         //  Columna de acciones
                         var html = '<ul class="nav justify-content-center accionesTabla">';
-                        // html += '<li class="nav-item"><a href="javascript:void(0);" class="btnVerComunidad d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="eye" class="text-info img-fluid"></i></a></li>';
-                        // html += `<li class="nav-item"><a href="${baseURL}bank/data:id$?view=1" class="btnEditarBanco d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="edit" class="text-success img-fluid icono-accion" style="width:32px;height:32px;"></i></a></li>`;
-                        html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminarBanco d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid icono-accion" style="width:26px;height:26px;"></i></li></ul>';
+                        html += '<li class="nav-item"><a href="javascript:void(0);" class="btnEliminar d-inline-block" data-id="data:id$" data-nombre="data:nombre$"><i data-feather="trash-2" class="text-danger img-fluid icono-accion" style="width:26px;height:26px;"></i></li></ul>';
                         // CoreUI.tableData.addColumn(tabla, null, "", html, '','80px');
 
                         //  Render
                         $('#' + tabla).addClass('no-clicable');
                         CoreUI.tableData.render(tabla, "Remesa", `remesa/recibosdevueltos/list`, true, true, true, null, false, false, null, false,'GET',false);
+
+                        //  Evento de datos cargados por completo para alimentar el modelo
+                        window['table' + tabla].on('init', function(e, settings, json){
+                            facturacion.Remesa.Model.recibosDevueltos = window['tablelistadoRecibosDevueltos'].rows().data();
+                            let iTotal = 0;
+                            let iTotalDevuelto = 0;
+                            if(facturacion.Remesa.Model.recibosDevueltos.rows().data().length > 0){
+                                
+                                facturacion.Remesa.Model.recibosDevueltos.each(function(rowData, index){
+                                    //  Calculamos el total
+                                    iTotal++;
+                                    iTotalDevuelto = parseFloat(facturacion.Remesa.Model.recibosDevueltos[index].amount) + parseFloat(iTotalDevuelto);
+                                    facturacion.Remesa.Model.recibosDevueltos[index].seleccionado = false;
+                                });
+                            } 
+
+                            $('#informacionRemesaDevuelta .infoRecibosDevueltos').html(iTotal);
+                            $('#informacionRemesaDevuelta .infoRecibosDevueltosImporte').html(CoreUI.Utils.formatNumberToCurrency(iTotalDevuelto) + '&euro;');
+
+                        });
+
+                        //  Paginación para mantener estado de checkboxes de selección
+                        window['table' + tabla].on('draw', function()
+                        {
+                            if(facturacion.Remesa.Model.recibosDevueltos){
+                                $(`#${tabla} tbody input[type="checkbox"]`).each(function(){
+                                    let id = $(this).attr('data-id');
+                                    let recibo = facturacion.Remesa.Model.recibosDevueltos.toArray().find( recibo => recibo.id === id);
+                                    $(this).prop('checked', recibo.seleccionado);
+                                });    
+                            }
+                        });                        
                 }
             }
 

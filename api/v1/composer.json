@@ -25,6 +25,7 @@
         "php": "^7.0 || ^8.0",
         "ext-json": "*",
         "digitick/sepa-xml": "dev-master",
+        "dompdf/dompdf": "^3.0",
         "firebase/php-jwt": "^5.4",
         "monolog/monolog": "^2.2",
         "mpdf/mpdf": "^8.2",

@@ -262,7 +262,7 @@ let apiFincatech =
 
                         } catch (err) {
                             respuestaFinal = dataString;                           
-                            CoreUI.Progress.Hide();
+                            // CoreUI.Progress.Hide();
                             // Pinta información detallada del error en la consola
                             console.error('Error al procesar JSON:', err.message); // Mensaje del error
                             console.error('Cadena con el problema:', dataString); // Cadena que intentabas procesar

@@ -73,26 +73,7 @@ class RemesaDevolucionController extends FrontController{
         $data = $this->RemesaDevolucioneModel->Get($id);
         $data = [];
 
-        // if($this->RemesaDevolucioneModel->remesa->id > 0){
-
-        //     $rd = $this->RemesaDevolucioneModel->remesa;
-        //     $this->remesaDetalle->amount = $rd->amount;
-        //     $this->remesaDetalle->created = $rd->created;
-        //     $this->remesaDetalle->customerBIC = $rd->customerBIC;
-        //     $this->remesaDetalle->customerIBAN = $rd->customerIBAN;
-        //     $this->remesaDetalle->customerName = $rd->customerName;
-        //     $this->remesaDetalle->dateReturned = $rd->dateReturned;
-        //     $this->remesaDetalle->descripcion = $rd->descripcion;
-        //     $this->remesaDetalle->estado = $rd->estado;
-        //     $this->remesaDetalle->id = $id;
-        //     $this->remesaDetalle->idRemesa = $rd->idRemesa;
-        //     $this->remesaDetalle->invoiceId = $rd->invoiceId;
-        //     $this->remesaDetalle->presentado = $rd->presentado;
-        //     $this->remesaDetalle->uniqId = $rd->uniqId;
-        //     $this->remesaDetalle->updated = $rd->updated;
-        //     $this->remesaDetalle->usercreate = $rd->usercreate;
-        // }
-        
+       
         // return $data;
     }
 

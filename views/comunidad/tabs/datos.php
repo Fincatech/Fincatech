@@ -13,6 +13,8 @@
 
 <?php endif; ?>
 
+<span class="titulo d-block pl-0 font-weight-bold my-3 text-dark text-uppercase">Datos de la comunidad</span>
+
 <!-- Código - CIF - Nombre -->
 <div class="form-group row mb-2">
 
@@ -44,7 +46,7 @@
     <!-- Sólo pueden los sudo -->
     <div class="col-12 col-md-8">
         <label for="usuarioId"><i class="bi bi-person-fill pr-2"></i>Administrador asignado</label>
-        <select id="usuarioId" name="usuarioId" class="select-data custom-select data form-control selectpicker" data-live-search="false" hs-seleccionar="false" hs-entity="Comunidad" hs-field="usuarioId" hs-list-entity="Usuario" hs-list-field="Usuario.nombre" hs-list-value="Usuario.id"></select>
+        <select id="usuarioId" name="usuarioId" class="select-data custom-select data form-control selectpicker" data-live-search="false" hs-seleccionar="false" hs-entity="Comunidad" hs-field="usuarioId" hs-list-entity="Administrador" hs-list-field="nombre" hs-list-value="id"></select>
     </div>                 
     
     <!-- Límite de empresas por comunidad. Por defecto son 4 -->
@@ -56,6 +58,8 @@
 </div>
 
 <?php endif; ?>
+
+<span class="titulo d-block pl-0 font-weight-bold my-3 text-dark text-uppercase">Dirección</span>
 
 <!-- Spa -->
 <!-- <div class="form-group row mb-2">
@@ -107,6 +111,7 @@
 </div>                     
 -->
 
+<span class="titulo d-block pl-0 font-weight-bold my-3 text-dark text-uppercase">Datos bancarios</span>
 <!-- IBAN y mes de facturación -->
 <div class="form-group row mb-2">
     <div class="col-12 col-sm-3">
@@ -128,6 +133,23 @@
 </div>
 <?php endif; ?>
 
+<?php if($App->isSudo()) : ?>
+    <span class="titulo d-block pl-0 font-weight-bold my-3 text-dark text-uppercase">Datos adicionales</span>
+    <!-- Check de seguimiento -->
+    <div class="form-group row mb-3">
+        <div class="col-12">
+            <input class="form-check-input data" type="checkbox" hs-entity="Comunidad" hs-field="gestionada" value="" id="chkgestionada">
+            <label class="form-check-label" for="chkgestionada">Gestionada</label>            
+        </div>
+    </div>
+    <!-- Observaciones -->
+    <div class="form-group row">
+        <div class="col-12">
+            <label for="observaciones"><i class="bi bi-pencil pr-2"></i>Observaciones</label>              
+            <textarea rows="5" class="form-control data text-left shadow-inset border-0" id="observaciones" name="observaciones"  hs-entity="Comunidad" hs-field="observaciones"></textarea>          
+        </div>        
+    </div>
+<?php endif; ?>
 <!-- Servicios contratados -->
 <?php if($App->isSudo()): ?>
 <div class="form-group row mb-2">

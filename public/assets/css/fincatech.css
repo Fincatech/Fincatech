@@ -68,12 +68,13 @@ span.select2-dropdown.select2-dropdown--below {
   left: 0;
   top: 0;
   bottom: 0;
-  background-color: rgba(255, 255, 255, 0.75);
+  background-color: rgba(0, 0, 0, 0.75);
   animation: 300ms all ease-in-out;
   z-index: 999999999999999;
   align-items: center;
   justify-content: center;
   display: flex;
+  flex-direction: column;
 }
 
 /* TABLA DE LISTADOS */
@@ -840,6 +841,7 @@ button.btn.btn-secondary.buttons-copy, button.btn.btn-secondary.buttons-csv {
 
 .dropdown-menu.show {
   box-shadow: 4px 4px 8px 4px #cdcdcd !important;
+  z-index: 99999;
 }
 
 body.progress::before {
@@ -897,4 +899,12 @@ label.info {
   padding-left: 6px;
   margin-bottom: 12px;
   margin-top: 6px;
+}
+
+/** Títulos **/
+.titulo {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: "Dosis";
+  color: #17a2b8;
 }/*# sourceMappingURL=fincatech.css.map */

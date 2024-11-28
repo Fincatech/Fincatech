@@ -203,9 +203,16 @@ let CoreUI = {
          */
         formatNumberToCurrency: function(numero)
         {
+            // let total = parseFloat(numero);
+            // total = total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&.');//.replace(',', '.');
+            // return total;
             let total = parseFloat(numero);
-            total = total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&.').replace(',', '.');
-            return total;
+            total = Math.round(total * 100) / 100; // Redondea al segundo decimal
+            total = total
+                .toString()
+                .replace('.', ',') // Cambia el separador decimal a coma
+                .replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Inserta puntos como separadores de miles
+            return total;          
         },
 
         parse: function(valor, data)
@@ -986,7 +993,12 @@ let CoreUI = {
                 CoreUI.tableData.tableEventsClick(id, detailRows, endpoint);
                 resolve(true);
             });
+
+            promesaTabla.then((result)=>{
+                return result;
+            });
         }        
+
 
     },
 

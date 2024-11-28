@@ -586,6 +586,94 @@ class InvoiceController extends FrontController{
 
     }
 
+    /**
+     * Genera un informe de facturación con los datos que ha indicado el usuario
+     */
+    public function InformeFacturacion($data)
+    {
+        $idAdministrador = isset($data['idadministrador']) ? DatabaseCore::PrepareDBString($data['idadministrador']) : -1;
+        $dateFrom = isset($data['datefrom']) ? DatabaseCore::PrepareDBString($data['datefrom']) : '2020-01-01';
+        if($dateFrom == ''){
+            $dateFrom = '2020-01-01';
+        }
+        $dateTo = isset($data['dateto']) ? DatabaseCore::PrepareDBString($data['dateto']) : date('Y-m-d');
+        if($dateTo == ''){
+            $dateTo = date('Y-m-d');
+        }
+        
+        $estado = DatabaseCore::PrepareDBString($data['estado']);
+
+        //  Recuperamos el listado de facturas según los parámetros seleccionados
+        $params['fields'] =[];
+
+        //  Administrador
+        if((int)$idAdministrador > 0){
+            $searchCondition = [
+                'field'     => 'idadministrador',
+                'search'    => $idAdministrador,
+                'searchtype'  => 'eq',
+                'type'      => 'int'
+            ];
+            $params['fields'][] = $searchCondition;
+        }
+
+        //  Fecha desde
+        $searchCondition = [
+            'field'     => 'dateinvoice',
+            'search'    => $dateFrom,
+            'searchtype'  => 'gt',
+            'type'      => 'date'
+        ];
+        $params['fields'][] = $searchCondition;                
+        
+        //  Fecha hasta
+        $searchCondition = [
+            'field'     => 'dateinvoice',
+            'search'    => $dateTo,
+            'searchtype'  => 'lt',
+            'type'      => 'date'
+        ];
+        $params['fields'][] = $searchCondition; 
+
+        //  Estado
+        $searchCondition = [
+            'field'     => 'estado',
+            'search'    => $estado,
+            'searchtype'  => 'eq',
+            'type'      => 'string'
+        ];
+        $params['fields'][] = $searchCondition; 
+
+        $datos =  $this->InvoiceModel->List($params, false);
+        $simulacionGenerada = false;
+
+        $datos = $datos['Invoice'];
+
+        if(count($datos) <= 0){
+            return 'No hay facturas con los parámetros proporcionados';
+        }
+
+        //  Procesamos los datos para generar el fichero Excel
+        $fileName = 'FINCATECH_INFORME_FACTURACION_' . date('d_m_Y') . '.xlsx';
+        $base64Excel = $this->ProcessExcelInforme($fileName, $idAdministrador, $estado, $dateFrom, $dateTo, $datos);
+        //  Validamos que el informe se haya generado correctamente
+        if($base64Excel === false){
+            return 'El Informe de facturación no ha podido generarse';
+        }else{
+            $simulacionGenerada = true;
+        }
+
+        if( $simulacionGenerada ){
+            return [
+            'base64'    => $base64Excel,
+            'filename'  => $fileName,
+            'type'      => 'excel'
+            ];        
+        }
+        
+
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     ///                                 PROCESOS DE FACTURACION
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -977,8 +1065,15 @@ class InvoiceController extends FrontController{
         $serviciosFacturarComunidad = $this->InvoiceModel->Services();
         $agruparServicios = $this->agruparServicios;
 
+        $ibanValido = HelperController::ValidateIban( $this->InvoiceModel->IBAN() );
+
+        //  Si el IBAN no viene informado también le dejamos
+        if(trim($this->InvoiceModel->IBAN()) == ''){
+            $ibanValido = true;
+        }
+
         //  Si el IBAN de la comunidad no es válido, añadimos al log de errores para mostrar al usuario
-        if(!HelperController::ValidateIban( $this->InvoiceModel->IBAN() ))
+        if(!$ibanValido)
         {
             $mensaje = 'Administrador: ' . $this->InvoiceModel->Administrador() . PHP_EOL;
             $mensaje .= 'El código IBAN [' . $this->InvoiceModel->IBAN() . ']';
@@ -990,7 +1085,7 @@ class InvoiceController extends FrontController{
 
         //  Validamos que el IBAN tenga código BIC/Swift asociado
         $bicIBAN = HelperController::GetBICFromIBAN(trim($this->InvoiceModel->IBAN()));
-        if($bicIBAN == '' || is_null($bicIBAN))
+        if(($bicIBAN == '' || is_null($bicIBAN)) && $ibanValido)
         {
             $mensaje = 'Administrador: ' . $this->InvoiceModel->Administrador() . PHP_EOL;
             $mensaje .= 'El código IBAN [' . $this->InvoiceModel->IBAN() . ']';
@@ -999,6 +1094,18 @@ class InvoiceController extends FrontController{
             $this->AddErrorToLog($mensaje);
             return false;  
         }
+
+        //  Validamos que el CIF sea correcto
+        $cifValido = HelperController::ValidarNIFCIF($this->InvoiceModel->CifComunidad());
+        if(!$cifValido)
+        {
+            $mensaje = 'Administrador: ' . $this->InvoiceModel->Administrador() . PHP_EOL;
+            $mensaje .= 'El CIF [' . $this->InvoiceModel->CifComunidad() . ']';
+            $mensaje .= ' de la comunidad ' . $this->InvoiceModel->CodigoComunidad() . ' - ' . strtoupper($this->InvoiceModel->Comunidad()) . ' ';
+            $mensaje .= ' no es válido';
+            $this->AddErrorToLog($mensaje);
+            return false;  
+        }        
 
         //  Establecemos la fecha de la factura
         $fechaFactura = date('Y-m-d');
@@ -1210,31 +1317,14 @@ class InvoiceController extends FrontController{
      */
     private function GenerarRemesaFacturasGeneradas()
     {
-        ///////////////////////////////////////////////
-        //          Nomenclatura fichero SEPA 
-        ///////////////////////////////////////////////
-        //  FINCA_SEPA_NB_MM_YYYY.XML
-        //  + AD: Nombre del administrador saneado. Máximo 50 caracteres incluyendo _
-        //  + NB: Nombre del banco saneado
-        //  + MM: Mes 2 dígitos
-        //  + YYYY: Año 4 dígitos
-        //
-        ////////////////////////////////
-
-        //  Componemos el nombre del fichero SEPA
-        $admin = HelperController::GenerarLinkRewrite($this->administrador['nombre']);
-        if(strlen($admin) > 50)
-            $admin = substr($admin, 0, 50);
-
-        $tmpFile = 'FINCA_SEPA_' . HelperController::GenerarLinkRewrite($this->administrador['nombre']);
-        $tmpFile .= '_' . str_pad(date('m', time()), 2, '0', STR_PAD_LEFT) . '_' . date('Y') . '_' . date('d_H_i_s'). '.xml';
+        //  Inicializamos el controller de la remesa
+        $remesa = new RemesaController();
+        //  Generamos el nombre del fichero
+        $tmpFile = $remesa->GenerateFileName($this->administrador['nombre']);
         $this->xmlSepaName = $tmpFile;
-
         //  Seteamos el nombre del fichero de la remesa
         $this->ficheroRemesa = $tmpFile;
 
-        //  Inicializamos el controller de la remesa
-        $remesa = new RemesaController();
         //  Ejecutamos el proceso de generación de la remesa
         //  Recuperamos el IBAN del banco seleccionado / BIC / CREDITOR ID
         $iban = $this->banco['iban'];
@@ -1243,6 +1333,7 @@ class InvoiceController extends FrontController{
 
         $this->remesaGenerada = $remesa->CreateRemesaXML($tmpFile, $creditorId, (int)$this->administrador['id'], $this->administrador['nombre'], $iban, $bic, null, $this->invoiceIds);
     }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     ///                               INFORMACIÓN DE FACTURACION
@@ -1554,6 +1645,115 @@ class InvoiceController extends FrontController{
     ////////////////////////////////////////////////////////////////////////////////////////////////
     ///                                 HELPERS Y METODOS AUXILIARES
     ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Genera el fichero en excel de los datos facilitados
+     * @param string $fileName Nombre del fichero que se va a generar
+     * @param int $idAdministrador ID del administrador
+     * @param string $estado Estado de la factura
+     * @param string $dateFrom Fecha desde
+     * @param string $dateTo Fecha Hasta
+     * @return string|bool Devuelve el fichero codificado en base64 o false si no se pudo generar
+     */
+    private function ProcessExcelInforme(string $fileName, $idAdministrador, $estado, $dateFrom, $dateTo, $facturas)
+    {
+        $path = ROOT_DIR . DIRECTORY_SEPARATOR . $fileName;
+
+        $totalFacturacion = 0;
+        $nombreAdministrador = (int)$idAdministrador <= 0 ? 'Todos' : $facturas[0]['administrador'];
+        $datosFacturas = [];
+
+        $dateFrom = date('d/m/Y', strtotime($dateFrom));
+        $dateTo = date('d/m/Y', strtotime($dateTo));
+
+        foreach($facturas as $factura)
+        {
+
+            $rectificativaNumero = '';
+            $rectificativaFecha = '';
+            $rectificativaImporte = '';
+
+            if( count($factura['invoicerectificativa']) > 0 ){
+                $rectificativa = $factura['invoicerectificativa'][0];
+                $rectificativaNumero = $rectificativa['numero'];
+                $rectificativaFecha = $rectificativa['created'];
+                $rectificativaImporte = HelperController::Redondeo($rectificativa['total_taxes_inc']);
+                $rectificativaFecha = date('d/m/Y', strtotime($rectificativaFecha));
+            }
+
+            $totalFacturacion = (float)$totalFacturacion + (float)$factura['total_taxes_inc'];
+            $datosFactura = [
+                // Nº. Fra. 
+                '<center>' . $factura['numero'] . '</center>',
+                // Referencia contrato
+                $factura['referenciacontrato'],                
+                // Fecha 
+                date('d/m/Y', strtotime($factura['dateinvoice'])),
+                // Mes Facturación
+                $factura['mes'],
+                // Año Facturación
+                $factura['anyo'],
+                // Administrador
+                $factura['administrador'],
+                // Comunidad
+                $factura['comunidad'][0]['nombre'],
+                // CIF
+                $factura['comunidad'][0]['cif'],
+                // IBAN
+                $factura['iban'],
+                // Total Fra.
+                HelperController::Redondeo($factura['total_taxes_inc']),
+                // Fra. Rectificativa
+                $rectificativaNumero,
+                // Fecha
+                $rectificativaFecha,
+                // Importe
+                $rectificativaImporte,
+            ];
+
+            $datosFacturas[] = $datosFactura;
+        }
+
+        //  Montamos la cabecera del fichero Excel
+        $datosExcel = [];
+        $datosExcel[] = ['<b>Administrador</b>:', '<center>' . $nombreAdministrador . '</center>'];
+        $datosExcel[] = ['<b>Desde</b>:' , '<center>'. $dateFrom . '</center>', '<b>Hasta</b>:' , '<center>' . $dateTo . '</center>'];
+        $datosExcel[] = ['<b>Estado</b>:' , '<center>'. $estado . '</center>'];
+        $datosExcel[] = ['<b>Nº de facturas generadas</b>:', '<center>' . count($facturas) . '</center>', '<b>Total Facturación</b>:', '<right>' . $totalFacturacion . '€</right>'];
+        
+        $datosExcel[] = ['' => ''];
+        //  Montamos la cabecera para las facturas
+        $datosExcel[] = [
+            '<b><center>Nº. Fra.</center>', 
+            '<b>Referencia Contrato</b>', 
+            '<b><center>Fecha</center>', 
+            '<b><center>Mes Facturación</center>', 
+            '<b><center>Año Facturación</center>', 
+            '<b>Administrador</b>', 
+            '<b>Comunidad</b>', 
+            '<b>CIF</b>', 
+            '<b>IBAN</b>', 
+            '<b><center>Total Fra.</center></b>', 
+            '<b><center>Fra. Rectificativa</center></b>',
+            '<b><center>Fecha</center></b>',
+            '<b><center>Importe</center></b>',
+        ];
+
+        //  Metemos la información de las comunidades que se van a facturar
+        foreach($datosFacturas as $dato){
+            $datosExcel[] = $dato;
+        }
+
+        \HappySoftware\Controller\Traits\ExcelGen::fromArray($datosExcel, $nombreAdministrador)->saveAs($path);
+        //  Validamos que se haya generado correctamente
+        if(file_exists($path)){
+            $base64 = base64_encode(file_get_contents($path));
+            unlink($path);
+            return $base64;
+        }else{
+            return false;
+        }
+    }
 
     /**
      * Genera el fichero en excel de los datos facilitados
@@ -2088,7 +2288,6 @@ class InvoiceController extends FrontController{
         //  Inicializamos los pdf's generados
         $this->pdfNames = [];
 
-        
     }
 
     /**
@@ -2105,28 +2304,31 @@ class InvoiceController extends FrontController{
      */
     private function CreatePdfInvoice(string $fileName, array $invoice_data, bool $oneFile = false, bool $finalPage = false)
     {
-        global $appSettings;
-        $footerHTML = self::GetTemplate('facturacion/factura_footer.html');
+        try{
+            global $appSettings;
+            $footerHTML = self::GetTemplate('facturacion/factura_footer.html');
 
-        //  Reemplazamos la url donde está disponible la factura para su descarga
-        $invoiceServer = $appSettings['ftp_servers']['facturacion']['server_url'];
-        $invoiceUrl = $invoiceServer . 'pdf/' . basename($fileName) . '.pdf';
-        $footerHTML = str_replace('[url_factura]', $invoiceUrl, $footerHTML);
+            //  Reemplazamos la url donde está disponible la factura para su descarga
+            $invoiceServer = $appSettings['ftp_servers']['facturacion']['server_url'];
+            $invoiceUrl = $invoiceServer . 'pdf/' . basename($fileName) . '.pdf';
+            $footerHTML = str_replace('[url_factura]', $invoiceUrl, $footerHTML);
 
-        //  Generamos el nombre del fichero
-        $this->InitializePDF($fileName);
-        //  Parseamos el contenido del template con los datos reales de la factura
-        $parsedHTML = $this->ParseHTMLInvoice($invoice_data);
-        //  Si va agrupado en un solo PDF incluimos el salto de página
-        if($oneFile){ 
-            // n Facturas por Administrador
-            $this->WriteToPDF($parsedHTML, $footerHTML, true, $finalPage);
-        }else{ 
-            // 1 Factura por Comunidad
-            $this->WriteToPDF($parsedHTML, $footerHTML, false, false);
-            return $this->MakePDF();
+            //  Generamos el nombre del fichero
+            $this->InitializePDF($fileName);
+            //  Parseamos el contenido del template con los datos reales de la factura
+            $parsedHTML = $this->ParseHTMLInvoice($invoice_data);
+            //  Si va agrupado en un solo PDF incluimos el salto de página
+            if($oneFile){ 
+                // n Facturas por Administrador
+                $this->WriteToPDF($parsedHTML, $footerHTML, true, $finalPage);
+            }else{ 
+                // 1 Factura por Comunidad
+                $this->WriteToPDF($parsedHTML, $footerHTML, false, false);
+                return $this->MakePDF();
+            }
+        }catch(Throwable $ex){
+            $this->WriteToLog('error_desarrollo', 'createPdfInvoice', $ex->getMessage());
         }
-
     }
 
     /**
@@ -2158,7 +2360,7 @@ class InvoiceController extends FrontController{
             $html = str_replace('[referencia_contrato]', $factura['referenciacontrato'], $html);
             //  Nombre de la comunidad
             $html = str_replace('[comunidad_codigo]', $comunidad['codigo'], $html);
-            $html = str_replace('[comunidad_nombre]', $comunidad['nombre'], $html);
+            $html = str_replace('[comunidad_nombre]', substr($comunidad['nombre'],0,30), $html);
             //  Localidad de la comunidad
             $html = str_replace('[comunidad_localidad]', $comunidad['localidad'], $html);
             //  CIF de la comunidad

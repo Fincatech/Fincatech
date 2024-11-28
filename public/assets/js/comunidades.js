@@ -83,16 +83,6 @@ let comunidadesCore = {
     events: function()
     {
 
-        $('body').on(core.helper.clickEventType,'.btnLimpiarBusqueda', function(evt){
-            $('.busquedaComunidad').val('');
-            CoreUI.Sidebar.Comunidades.buscarComunidad();
-        });
-
-        $('body').on('keyup', '.busquedaComunidad', function(evt)
-        {
-            CoreUI.Sidebar.Comunidades.buscarComunidad();
-        });
-
         $('body .form-comunidad').off(core.helper.clickEventType).on(core.helper.clickEventType, '.btnSaveData', (evt)=>{
             evt.stopImmediatePropagation();
             comunidadesCore.guardarComunidad();
@@ -506,6 +496,16 @@ let comunidadesCore = {
                 $('.navComunidades').append(html);
             }
             
+            $('body').on(core.helper.clickEventType,'.btnLimpiarBusqueda', function(evt){
+                $('.busquedaComunidad').val('');
+                CoreUI.Sidebar.Comunidades.buscarComunidad();
+            });
+    
+            $('body').on('keyup', '.busquedaComunidad', function(evt)
+            {
+                CoreUI.Sidebar.Comunidades.buscarComunidad();
+            });
+
         });
             feather.replace();
         });
@@ -1695,6 +1695,7 @@ document.addEventListener('coreInitialized', function(event) {
    
 document.addEventListener('modelLoaded', function(event) {
     comunidadesCore.init();  
+    console.log('init com');
     if(core.actionModel == 'get' && core.model.toLowerCase() == "comunidad"){
         let titulo = `${core.Modelo.entity['Comunidad'][0]['codigo']} - ${core.Modelo.entity['Comunidad'][0]['nombre']}`;
         CoreUI.Utils.setTituloPantalla(null, null, titulo);

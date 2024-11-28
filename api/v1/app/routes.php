@@ -426,6 +426,35 @@ return function (App $app) {
 
     });
 
+    /**
+     * Genera un fichero excel con información de la facturación
+     */
+    $app->post('/facturacion/informe', function(Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Invoice');
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        $result = $frontController->context->InformeFacturacion($data);
+
+        if( isset($result['base64']) )
+        {
+            $result = HelperController::successResponse($result);
+        }else{
+            $result = HelperController::errorResponse('error',$result);
+        }
+
+        $response->getBody()->write( $result );
+        return $response;
+
+    });
+
     //  Generación de factura rectificativa
     $app->post('/factura/{id:[0-9]+}/rectificativa/create', function(Request $request, Response $response, array $params ): Response
     {
@@ -743,6 +772,28 @@ return function (App $app) {
     }); 
 
     /**
+     * Devolución de recibo individual
+     */
+    $app->post('/remesa/generacionmanual', function(Psr7Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Remesa');
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        $result = $frontController->context->GenerateRemesaManual($data);
+        $response->getBody()->write( $result );
+
+        return $response;
+
+    }); 
+
+    /**
      * Listado de recibos devueltos
      */
     $app->get('/remesa/recibosdevueltos/list', function(Request $request, Response $response, array $params ): Response
@@ -865,8 +916,6 @@ return function (App $app) {
         }else{
             $response->getBody()->write( HelperController::successResponse($frontController->context->GetRequerimientosPendientesCAEGeneral( $destino )) );
         }
-
-
         return $response;  
     });
 
@@ -874,7 +923,9 @@ return function (App $app) {
     ///                                                                         RGPD
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /** Recupera la documentación básica dada de alta en el sistema */
+    /** 
+     * Recupera la documentación básica dada de alta en el sistema 
+     */
     $app->get('/rgpd/documentacionbasica', function (Request $request, Response $response, array $params)
     {
         //$frontController = new Fincatech\Controller\FrontController();
@@ -1014,6 +1065,7 @@ return function (App $app) {
     ///                                                                 COMUNIDAD
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    //  Estado cámara de seguridad para una comunidad
     $app->post('/comunidad/{idcomunidad}/camaraseguridad', function(Request $request, Response $response, array $params ): Response
     {
 
@@ -1189,8 +1241,6 @@ return function (App $app) {
     $app->post('/comunidad/{idcomunidad}/empleado/{idempleado}/asignar', function(Request $request, Response $response, array $params ): Response
     {
 
-        // $data = $request->getParsedBody();
-
         // Instanciamos el controller principal
         $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
 
@@ -1287,6 +1337,9 @@ return function (App $app) {
     ///                                                                 ADMINISTRADOR
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * 
+     */
     $app->get('/administrador/{id}/comunidades', function (Request $request, Response $response, array $params)
     {
 
@@ -1324,6 +1377,9 @@ return function (App $app) {
 
     });    
 
+    /**
+     * 
+     */
     $app->get('/empleado/{id}/empresas', function (Request $request, Response $response, array $params)
     {
 
@@ -1341,6 +1397,9 @@ return function (App $app) {
 
     });
 
+    /**
+     * 
+     */
     $app->get('/empleado/{id}/documentacion', function (Request $request, Response $response, array $params)
     {
 
@@ -1358,6 +1417,9 @@ return function (App $app) {
 
     });
    
+    /**
+     * 
+     */
     $app->get('/administrador/exportar/dpd', function (Request $request, Response $response, array $params)
     {
 
@@ -1372,10 +1434,14 @@ return function (App $app) {
         return $response;  
 
     });
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////                                                                    REQUERIMIENTOS                 
+    ///                                                                    REQUERIMIENTOS                 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * 
+     */
     $app->post('/requerimiento/{destino}/create', function(Request $request, Response $response, array $params ): Response
     {
 
@@ -1397,7 +1463,9 @@ return function (App $app) {
 
     });   
 
-    // Punto de entrada para eliminación de un requerimiento
+    /**
+     *  Punto de entrada para eliminación de un requerimiento
+     */
     $app->delete('/requerimiento/{destino}/{id}', function (Request $request, Response $response, array $params)
     {
 
@@ -1413,7 +1481,9 @@ return function (App $app) {
 
     });
     
-    // Asigna un documento a un requerimiento según el destino: Empresa, Comunidad, Empleado 
+    /**
+     *  Asigna un documento a un requerimiento según el destino: Empresa, Comunidad, Empleado 
+     */
     $app->post('/requerimiento/{destino}/{idrequerimiento}', function(Request $request, Response $response, array $params ): Response
     {
 
@@ -1435,6 +1505,9 @@ return function (App $app) {
 
     }); 
 
+    /**
+     * 
+     */
     $app->get('/requerimiento/comunidad/{idcomunidad}/empresa/{idempresa}/infodescarga', function (Request $request, Response $response, array $params)
     {
 
@@ -1453,6 +1526,9 @@ return function (App $app) {
 
     });
 
+    /**
+     * 
+     */
     $app->get('/requerimiento/{tiporequerimiento}/pendientes/list', function (Request $request, Response $response, array $params)
     {
 
@@ -1470,7 +1546,9 @@ return function (App $app) {
 
     });
 
-    //  Histórico de un requerimiento
+    /**
+     *  Histórico de un requerimiento
+     */ 
     $app->get('/requerimiento/{entidad}/{idrelacionrequerimiento}/historico', function (Request $request, Response $response, array $params)
     {
 
@@ -1489,7 +1567,9 @@ return function (App $app) {
 
     });    
 
-    //  Cron de requerimientos para comprobar
+    /**
+     *  Cron de requerimientos para comprobar
+     */
     $app->get('/requerimiento/cron/checkcaducados', function (Request $request, Response $response, array $params)
     {
 
@@ -1505,11 +1585,14 @@ return function (App $app) {
 
     });     
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////                                                           GESTOR DOCUMENTAL                 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // Refleja la descarga
+    /**
+     * Refleja la descarga
+     */ 
     $app->post('/storage/descarga', function(Request $request, Response $response, array $params ): Response
     {
 
@@ -1527,6 +1610,9 @@ return function (App $app) {
 
     }); 
 
+    /**
+     * 
+     */
     $app->get('/revision/pendientes', function (Request $request, Response $response, array $params)
     {
 
@@ -1542,7 +1628,9 @@ return function (App $app) {
 
     });
 
-    //  Cambia el estado de un requerimiento por parte de un técnico de revisión
+    /**
+     *  Cambia el estado de un requerimiento por parte de un técnico de revisión
+     */ 
     $app->post('/requerimiento/{entidad}/{idrequerimiento}/estado', function(Request $request, Response $response, array $params ): Response
     {
 
@@ -1568,10 +1656,12 @@ return function (App $app) {
     }); 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////                                                                EMPRESA                     
+    //                                                                EMPRESA                     
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    //  Empleados de una empresa
+    /**
+     * Empleados de una empresa
+     */ 
     $app->get('/empresa/{id}/empleados', function (Request $request, Response $response, array $params)
     {
 
@@ -1589,7 +1679,9 @@ return function (App $app) {
 
     });
 
-    // Comprobación documento operatoria entre empresa externa y comunidad
+    /**
+     * Comprobación documento operatoria entre empresa externa y comunidad
+     */ 
     $app->get('/empresa/{idempresa}/comunidad/{idcomunidad}/operatoria', function (Request $request, Response $response, array $params)
     {
 
@@ -1608,7 +1700,9 @@ return function (App $app) {
 
     });
 
-    // Recupera los empleados de una empresa para una comunidad 
+    /**
+     * Recupera los empleados de una empresa para una comunidad 
+     */ 
     $app->get('/empresa/{idempresa}/comunidad/{idcomunidad}/empleados', function (Request $request, Response $response, array $params)
     {
 
@@ -1627,7 +1721,9 @@ return function (App $app) {
 
     });
 
-    // Documentación de una empresa 
+    /**
+     * Documentación de una empresa 
+     */ 
     $app->get('/empresa/{id}/documentacion', function (Request $request, Response $response, array $params)
     {
 

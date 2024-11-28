@@ -286,7 +286,18 @@ trait CrudTrait{
             
         // }
 
-        $this->queryToExecute .= $this->ProcessFieldsToSearch($params);
+        //  Construimos las condiciones lógicas para el filtrado
+        $sqlFilters = $this->ProcessFieldsToSearch($params);
+        if($sqlFilters != '')
+        {
+            //  Comprobamos si está incluida la condición where
+            if(strpos($this->queryToExecute,'where') === false)
+            {
+                $this->queryToExecute .= ' WHERE ';
+            }
+        }
+
+        $this->queryToExecute .= $sqlFilters;
 
         /////////////////////////////////////////////////////////////////////
         ///                         CAMPOS DE BÚSQUEDA

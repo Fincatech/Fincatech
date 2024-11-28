@@ -12,7 +12,7 @@
                         <h5 class="card-title mb-0 text-uppercase font-weight-normal pl-3 pt-1">Facturas</h5>
                     </div>
                     <div class="col-12 col-md-3 text-right">
-                        <!-- <a href="add" class="btn btn-outline-secondary text-uppercase rounded-pill shadow pl-2 pr-4"><i class="bi bi-plus-circle pr-3"></i> REGISTRAR INGRESO A CUENTA</a> -->
+                        <a href="javascript:void(0);" data-type="invoice" class="btn btn-outline-secondary btnExportar text-uppercase rounded-pill shadow pl-2 pr-4"><i class="bi bi-file-earmark-spreadsheet pr-2"></i> EXPORTAR A FICHERO EXCEL</a>
                     </div>
         
                 </div>
