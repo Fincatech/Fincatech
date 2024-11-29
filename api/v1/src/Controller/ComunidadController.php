@@ -246,7 +246,7 @@ class ComunidadController extends FrontController{
         }
 
         //  Si el usuario es un autorizado o pertenece a los roles: Sudo, Contratista ó Técnico RAO, se le concede el acceso
-        if($idUsuarioAcceso == $comunidad['Comunidad'][0]['usuarioId'] || $this->isSudo() || $this->isContratista() || $this->isTecnicoRao())
+        if($idUsuarioAcceso == $comunidad['Comunidad'][0]['usuarioId'] || $this->isFacturacion() || $this->isSudo() || $this->isContratista() || $this->isTecnicoRao())
         {
             $tieneAcceso = true;
         }

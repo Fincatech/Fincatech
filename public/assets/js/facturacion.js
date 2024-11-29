@@ -2492,44 +2492,12 @@ let facturacion = {
         Controller: {
 
             /**
-             * Selecciona un recibo para su devolución o lanzamiento al cobro de nuevo
-             * @param {*} idRecibo 
-             */
-            SeleccionarRecibo: function(idRecibo){
-
-                if(facturacion.Remesa.Model.ExisteReciboSeleccionado(idRecibo)){
-                    return;
-                }
-
-                //  Añadimos el recibo al modelo siempre que no exista previamente
-                if(!facturacion.Remesa.Model.recibos.indexOf(idRecibo))
-                    facturacion.Remesa.Model.recibos.push(idRecibo);
-
-            },
-
-            DeseleccionarRecibo: function(idRecibo){
-
-                //  Validamos que exista información previa
-                if(facturacion.Remesa.Model.ExisteReciboSeleccionado(idRecibo) || facturacion.Remesa.Model.recibos.length > 0){
-                    return;
-                }
-
-                //  Comprobamos que exista la clave en la matriz
-                if(facturacion.Remesa.Model.recibos.indexOf(idRecibo)){
-                    //  Quitamos el elemento del array
-                    facturacion.Remesa.Model.recibos.splice(idRecibo,1);
-                }
-
-            },
-
-            /**
              * Genera una remesa de manera manual sobre los recibos seleccionados
              */
             GenerarRemesaManual: function()
             {
                 let msj = '';
                 let iRecibosSeleccionados = 0;
-                let totalRecibosSeleccionados = 0;
                 let idBanco = $('#bancoRemesa option:selected').val();
                 let recibosDevueltos = [];
                 //  Validamos que haya recibos devueltos
@@ -2544,6 +2512,7 @@ let facturacion = {
                         iRecibosSeleccionados++;
                     }
                 });
+
                 //  Validación nº recibos seleccionados
                 if(iRecibosSeleccionados == 0){
                     msj = `${msj}<p class="text-left mb-0"><i class="bi bi-x-circle text-danger"></i> Debe seleccionar al menos 1 recibo para poder generar una nueva remesa</p>`;
@@ -2595,30 +2564,88 @@ let facturacion = {
                             });
                         });
                 }
-
-
             },
+
+            /**
+             * Devuelve todos los recibos seleccionados en el listado
+             */
+            DevolucionMasiva: function()
+            {
+                let msj = '';
+                let iRecibosSeleccionados = 0;
+                let recibosDevolucion = [];
+
+                //  Validamos que haya recibos cobrados
+                if(!facturacion.Remesa.Model.recibosDevueltos){
+                    msj = '<p class="text-left mb-0"><i class="bi bi-x-circle text-danger"></i> No hay recibos generados en el sistema</p>';
+                }
+
+                //  Validamos que haya al menos 1 recibo seleccionado en el modelo
+                facturacion.Remesa.Model.recibosDevueltos.each( (data, rowIndex) =>{
+                    if(facturacion.Remesa.Model.recibosDevueltos[rowIndex].seleccionado == true){
+                        recibosDevolucion.push(facturacion.Remesa.Model.recibosDevueltos[rowIndex]);
+                        iRecibosSeleccionados++;
+                    }
+                });
+
+                //  Validación nº recibos seleccionados
+                if(iRecibosSeleccionados == 0){
+                    msj = `${msj}<p class="text-left mb-0"><i class="bi bi-x-circle text-danger"></i> Debe seleccionar al menos 1 recibo para poder generar la devolución</p>`;
+                }
+
+                if(msj !== ''){
+                    CoreUI.Modal.Error(`<p class="text-left">No se ha podido realizar la devolución por los siguientes motivos:</p><br>${msj}`);
+                }else{
+
+                    msj = '<p class="text-center">Se va a proceder a realizar la devolución de recibos cobrados. Por favor, revise si es correcto antes de continuar</p><br>';
+                    msj = `${msj}<p class="text-center mb-0"><span class="font-weight-bold">Nº recibos</span></p><p class="text-center">${iRecibosSeleccionados}</p>`;
+                    msj = `${msj}<p class="text-center mb-0"><span class="font-weight-bold">Importe de los recibos seleccionados</span></p><p class="text-center"> ${CoreUI.Utils.formatNumberToCurrency(facturacion.Remesa.Model.importeDevolucion)}€</p>`;
+                    //  Preguntamos al usuario si desea continuar con el proceso
+                    CoreUI.Modal.Question(msj,'Devolución manual de recibos', 'Sí, procesar devolución', function()
+                    {
+                        let datos = Object();
+                        
+                        datos.recibos = recibosDevolucion;
+
+                        // Llamamos a postWithProgress directamente, ya que es una función asíncrona que retorna una promesa
+                        apiFincatech.post('remesa/recibo/devolucionmasiva', datos, true)
+                            .then((result) => {
+                                try {
+                                    let resultado = JSON.parse(result);
+                                    if (resultado.data == 'error') {
+                                        CoreUI.Modal.Error('Error: ' + resultado.data, 'Error');
+                                    } else {
+                                        CoreUI.Modal.Success(resultado.data, 'Devolución realizada correctamente', function(){
+                                            //  Recargamos la tabla
+                                            facturacion.Remesa.View.TablaRecibosCobrados();
+                                            //  Mostramos la información de selección
+                                            $('#informacionRecibosProcesoDevolucion .total-recibos-seleccionados').html('0');
+                                            $('#informacionRecibosProcesoDevolucion .total-importe-recibos-seleccionados').html('0€');
+                                        });                                        
+                                    }
+                                } catch (error) {
+                                    CoreUI.Modal.Error('Error al procesar la respuesta: ' + error.message, 'Error');
+                                }
+                            })
+                            .catch((error) => {
+                                CoreUI.Progress.Hide();
+                                CoreUI.Modal.Error('Error: ' + error.status.error, 'Error');
+                            });
+                        });
+                }
+
+            }
 
         },
 
         Model: {
+            //  Importe total devolución
             importeDevolucion: 0,
             //  Propiedad que se utiliza para almacenar los id's de los posibles recibos seleccionados
-            recibos: Array(),
+            recibos: null,
             //  Listado de recibos devueltos
             recibosDevueltos: null,
 
-            ExisteReciboSeleccionado: function(idRecibo)
-            {
-                if(recibos !== null)
-                {
-                    for(let iRecibo = 0; iRecibo < facturacion.Remesa.Model.recibos.length; iRecibo++)
-                    {
-                        
-                    }
-                }
-
-            }
         },
 
         Events: function(){
@@ -2654,8 +2681,12 @@ let facturacion = {
                 //  Deseleccionamos en la tabla para la presentación
                 facturacion.Remesa.View.RenderEstadoCheckboxSeleccion(tabla, chkTarget, false);
                 
-                // window[tabla].draw();
-                facturacion.Remesa.View.RenderInformacionRecibosDevueltos();
+                if($('#informacionRecibosDevolucion').length){
+                    facturacion.Remesa.View.RenderInformacionRecibosDevolucion();
+                }else{
+                    facturacion.Remesa.View.RenderInformacionRecibosDevueltos();
+                }
+                
             });
 
             //  Seleccionar todos los recibos devueltos
@@ -2684,7 +2715,11 @@ let facturacion = {
 
                 //  Modificamos el estado del checkbox en la tabla
                 facturacion.Remesa.View.RenderEstadoCheckboxSeleccion(tabla, chkTarget, true);
-                facturacion.Remesa.View.RenderInformacionRecibosDevueltos();
+                if($('#informacionRecibosDevolucion').length){
+                    facturacion.Remesa.View.RenderInformacionRecibosDevolucion();
+                }else{
+                    facturacion.Remesa.View.RenderInformacionRecibosDevueltos();
+                }
 
             });
 
@@ -2700,6 +2735,18 @@ let facturacion = {
                 facturacion.Remesa.View.RenderInformacionRecibosDevueltos();
             });
 
+            //  Check de selección de recibo individual
+            $('body').on(core.helper.clickEventType, '.chkRecibo', function(ev){
+                //  Seleccionamos en el modelo el recibo
+                let id = $(this).attr('data-id');
+                let recibo = facturacion.Remesa.Model.recibosDevueltos.toArray().find( recibo => recibo.id === id);
+                if(recibo){
+                    //  Actualizamos la selección en el modelo
+                    recibo.seleccionado = $(this).is(':checked');
+                }
+                facturacion.Remesa.View.RenderInformacionRecibosDevolucion();
+            });
+
             //  Botón de devolución de recibo
             $('body').on(core.helper.clickEventType, '.btnDevolverRecibo', function(ev){
 
@@ -2708,9 +2755,16 @@ let facturacion = {
                 facturacion.Remesa.DevolverRecibo(remesaId, reciboID);
             });
 
+            //  Botón de generar remesa manual
             $('body').on(core.helper.clickEventType, '.btnGenerarRemesaManual', function(ev){
                 //  Llamamos al proceso de generación manual de remesa con los recibos seleccionados
                 facturacion.Remesa.Controller.GenerarRemesaManual();
+            });
+
+            //  Botón de procesar devolución masiva
+            $('body').on(core.helper.clickEventType, '.btnRecibosDevolucionMasiva', function(ev){
+                //  Llamamos al proceso de generación manual de remesa con los recibos seleccionados
+                facturacion.Remesa.Controller.DevolucionMasiva();
             });
 
             //  Renderización de tablas de remesas
@@ -2754,6 +2808,10 @@ let facturacion = {
             });
         },
 
+        /**
+         * Procesa la devolución de recibos desde un fichero SEPA
+         * @returns 
+         */
         ProcesarDevolucion: function()
         {
             //  Comprobamos que tenga un fichero seleccionado
@@ -2808,6 +2866,30 @@ let facturacion = {
             },
 
             /**
+             * Renderiza la información de los recibos que van a ser devueltos
+             */
+            RenderInformacionRecibosDevolucion: function()
+            {
+                //  Primero comprobamos si están deseleccionados todos
+                let iTotal = 0;
+                let iTotalDevuelto = 0;
+
+                //  Calculamos el importe total
+                facturacion.Remesa.Model.recibosDevueltos.each((data, rowIndex) =>
+                {
+                    if(data.seleccionado == true)
+                    {
+                        iTotal++;
+                        iTotalDevuelto = parseFloat(data.amount) + parseFloat(iTotalDevuelto);
+                    }
+                });
+                facturacion.Remesa.Model.importeDevolucion = iTotalDevuelto;
+                $('#informacionRecibosDevolucion .total-recibos-seleccionados').html(iTotal);
+                $('#informacionRecibosDevolucion .total-importe-recibos-seleccionados').html(`${CoreUI.Utils.formatNumberToCurrency(iTotalDevuelto)}€`);
+
+            },
+
+            /**
              * Renderiza la información de los recibos seleccionados
              */
             RenderInformacionRecibosDevueltos: function()
@@ -2858,7 +2940,9 @@ let facturacion = {
                     //  Fecha de presentación
                     CoreUI.tableData.addColumn(tabla, function(row, type, val, meta)
                     {
-                        return `<p class="text-center mb-0"><input class="chkRecibo" type="checkbox" name="chkRecibo${row.id}" id="chkRecibo${row.id}" data-id="${row.id}"></p>`;
+                        // return `<p class="text-center mb-0"><input class="chkRecibo" type="checkbox" name="chkRecibo${row.id}" id="chkRecibo${row.id}" data-id="${row.id}"></p>`;
+                        return `<input class="chkRecibo" type="checkbox" name="chkRemesa${row.id}" id="chkRemesa${row.id}" data-invoiceid="${row.invoiceid}" data-id="${row.id}">`;
+
                     }, 'Seleccionar', null, 'text-center');         
 
                     //  Fecha de presentación
@@ -2906,6 +2990,39 @@ let facturacion = {
                     //  Render
                     $('#' + tabla).addClass('no-clicable');
                     CoreUI.tableData.render(tabla, "Remesa", `remesa/reciboscobrados/list`, true, true, true, null, false, false, null, false,'GET',false);                    
+
+                        //  Evento de datos cargados por completo para alimentar el modelo
+                        window['table' + tabla].on('init', function(e, settings, json){
+                            facturacion.Remesa.Model.recibosDevueltos = window['tablelistadoRecibosCobrados'].rows().data();
+                            let iTotal = 0;
+                            let iTotalDevuelto = 0;
+                            if(facturacion.Remesa.Model.recibosDevueltos.rows().data().length > 0){
+                                
+                                facturacion.Remesa.Model.recibosDevueltos.each(function(rowData, index){
+                                    //  Calculamos el total
+                                    iTotal++;
+                                    iTotalDevuelto = parseFloat(facturacion.Remesa.Model.recibosDevueltos[index].amount) + parseFloat(iTotalDevuelto);
+                                    facturacion.Remesa.Model.recibosDevueltos[index].seleccionado = false;
+                                });
+                            } 
+
+                            $('#informacionRecibosDevolucion .infoRecibosTotal').html(CoreUI.Utils.formatNumberToCurrency(iTotal));
+                            $('#informacionRecibosDevolucion .infoRecibosImporte').html(CoreUI.Utils.formatNumberToCurrency(iTotalDevuelto) + '&euro;');
+
+                        });
+
+                        //  Paginación para mantener estado de checkboxes de selección
+                        window['table' + tabla].on('draw', function()
+                        {
+                            if(facturacion.Remesa.Model.recibosDevueltos){
+                                $(`#${tabla} tbody input[type="checkbox"]`).each(function(){
+                                    let id = $(this).attr('data-id');
+                                    let recibo = facturacion.Remesa.Model.recibosDevueltos.toArray().find( recibo => recibo.id === id);
+                                    $(this).prop('checked', recibo.seleccionado);
+                                });    
+                            }
+                        });          
+
                 }
             },
 

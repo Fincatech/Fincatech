@@ -49,6 +49,9 @@ class RemesaController extends FrontController{
     //  Entidades
     private $remesaEntity;
 
+    //  Se utiliza para controlar si es una remesa nueva o viene de una devolución de recibos anterior
+    private bool $isRegeneration = false;
+
     private string $_creditorId;    //  ID único que otorga el banco al crediticio
     private string $_creditorName;  //  Nombre de la empresa que emite los recibos
     private string $_tipoEmision = 'D';   //  D: (Adeudo directo) | T: (Transferencia de créditos)
@@ -257,6 +260,7 @@ class RemesaController extends FrontController{
             if(!is_null($recibos))
             {
                 $invoiceController = new InvoiceController();
+                $comunidadController = new ComunidadController();
 
                 for($i = 0; $i < count($recibos); $i++)
                 {
@@ -270,7 +274,13 @@ class RemesaController extends FrontController{
                         $referenciaFactura = $invoiceData['numero'];
                         $descripcion = 'FINCATECH C. ANUAL ' . $invoiceData['anyo'] . ' ' . $invoiceData['referenciacontrato'];
                         $amount = str_replace(',','.', $invoiceData['total_taxes_inc']);
-                        $customerIban = $invoiceData['iban'];
+                        //  Comprobamos si es una regeneración de recibos ya que la cuenta puede haber cambiado desde la anterior presentación
+                        if($this->isRegeneration){
+                            $comunidad = $comunidadController->Get($idComunidad);
+                            $customerIban = $comunidad['Comunidad'][0]['ibancomunidad'];
+                        }else{
+                            $customerIban = $invoiceData['iban'];
+                        }
                         $customerBIC = HelperController::GetBICFromIBAN($customerIban);
                         $comunidad = $comunidadData['nombre'];
                         $customerName = $comunidadData['nombre'];      
@@ -544,6 +554,9 @@ class RemesaController extends FrontController{
         $customerId = $usuario['id'];
         $customerName = $usuario['nombre'];
 
+        //  Indicamos que es una regeneración sobre recibos devueltos
+        $this->isRegeneration = true;
+
         //  Procesamos la remesa
         $result = $this->CreateRemesaXML($sepaFileName, $creditorId, $customerId, $customerName, $creditorIBAN, $creditorBIC, $invoiceId, $invoiceIds);
         if($result){
@@ -681,11 +694,54 @@ class RemesaController extends FrontController{
     }
 
     /**
+     * Procesa la devolución masiva de recibos
+     */
+    public function ReciboReturnMasivo($datos)
+    {
+
+        //  Validamos que el usuario sea de facturación
+        //  Comprobamos si el usuario es de facturación por seguridad
+        if(!$this->isFacturacion())
+            return HelperController::errorResponse('error','Acceso denegado', 200);
+
+        //  Validamos la información que hemos recibido
+        if(!isset($datos['recibos']))
+            return HelperController::errorResponse('error','Los parámetros no son correctos', 403);
+
+
+        $msjError = '';
+        $iDevolucion = 0;
+        $iDevolucionError = 0;
+
+        //  Si ha pasado la validación, empezamos a procesar todos los recibos
+        foreach($datos['recibos'] as $recibo)
+        {
+            $idRemesa = DatabaseCore::PrepareDBString($recibo['idremesa']);
+            $idRecibo = DatabaseCore::PrepareDBString($recibo['id']);
+            $resDevolucion = $this->ReciboReturn($idRemesa, $idRecibo);
+            if(!$resDevolucion === true){
+                $msjError .= $resDevolucion . '<br>';
+                $iDevolucionError++;
+            }else{
+                $iDevolucion++;
+            }
+        }
+
+        //  Construimos el mensaje de información del proceso
+        $msj = '<p class="text-left">El proceso ha terminado ' . ($iDevolucionError == 0 ? 'correctamente sin errores' : 'con ' . $iDevolucionError . ' errores') . '</p>';
+        $msj .= '<p class="mb-0 text-left"><i class="bi bi-check-square-fill text-success"></i> <strong>Recibos devueltos</strong>: ' . $iDevolucion . '</p>';
+        $msj .= '<p class="mb-0 text-left"><i class="bi bi-x-square-fill text-danger"></i> <strong>Errores detectados</strong>: ' . $iDevolucionError . '</p>';
+
+        return $msj;
+
+    }
+
+    /**
      * Devuelve el mensaje de error según el código que se lee del XML de devolución
      */
     private function DescripcionErrorSepa($codigoError)
     {
-        /** Mensajes de error de devolución de recibo */
+        // Mensajes de error de devolución de recibo 
         $motivosRechazoSEPA = [
             'FINC' => 'Devuelto por Fincatech',
             'AC01' => 'Número de cuenta incorrecto',

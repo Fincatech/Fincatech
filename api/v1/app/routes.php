@@ -772,6 +772,29 @@ return function (App $app) {
     }); 
 
     /**
+     * Devolución de 1 a n recibos
+     */
+    $app->post('/remesa/recibo/devolucionmasiva', function(Psr7Request $request, Response $response, array $params ): Response
+    {
+
+        // Instanciamos el controller principal
+        $frontControllerName = ConfigTrait::getHSNamespaceName() . 'Controller\\FrontController';
+
+        $frontController = new $frontControllerName();
+        $frontController->Init('Remesa');
+
+        $body= file_get_contents("php://input"); 
+        $data = json_decode($body, true);
+
+        $resultado = $frontController->context->ReciboReturnMasivo($data);
+       
+        $response->getBody()->write(HelperController::successResponse($resultado));
+
+        return $response;
+
+    }); 
+
+    /**
      * Devolución de recibo individual
      */
     $app->post('/remesa/generacionmanual', function(Psr7Request $request, Response $response, array $params ): Response

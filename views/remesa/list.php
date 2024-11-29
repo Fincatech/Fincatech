@@ -9,7 +9,7 @@
                 <div class="row">
 
                     <div class="col-12 col-md-6">
-                        <h5 class="card-title mb-0 text-uppercase font-weight-normal pl-3 pt-1">Remesas</h5>
+                        <h5 class="card-title mb-0 text-uppercase font-weight-normal pl-3 pt-1">Remesas presentadas</h5>
                     </div>
                     <div class="col-12 col-md-6 text-right">
                         <a href="create" class="btn btn-outline-secondary text-uppercase rounded-pill shadow pl-2 pr-4 mr-2"><i class="bi bi-plus-circle pr-3"></i> Crear Remesa manual</a>
