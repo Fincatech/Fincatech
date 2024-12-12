@@ -18,8 +18,8 @@ class EmpresaController extends FrontController{
 
     public function __construct($params = null)
     {
-        $this->InitModel('empresa', $params);
-    //    $this->EmpresaModel = new EmpresaModel($params);
+        // $this->InitModel('empresa', $params);
+        $this->EmpresaModel = new EmpresaModel($params);
     }
 
     public function Create($entidadPrincipal, $datos)
@@ -102,7 +102,25 @@ class EmpresaController extends FrontController{
 
     public function Update($entidadPrincipal, $datos, $usuarioId)
     {
-        return $this->EmpresaModel->Update($entidadPrincipal, $datos, $usuarioId); 
+        //  Actualizamos el registro de empresa
+        $result = $this->EmpresaModel->Update($entidadPrincipal, $datos, $usuarioId); 
+        //  Actualizamos siempre el e-mail de empresa en el del usuario asociado
+        $empresa = $this->Get($usuarioId);
+        $userId = $empresa['empresa'][0]['idusuario'];
+        $usuarioController = new UsuarioController();
+        $usuarioController->UpdateUserEmail($userId, $datos['email']);
+        return $result;
+    }
+
+    /**
+     * Actualiza el e-mail de la empresa sin tener que recuperar la entidad principal
+     */
+    public function UpdateEmail(int $usuarioPrincipalId, string $newEmail)
+    {
+        $newEmail = DatabaseCore::PrepareDBString($newEmail);
+        $this->EmpresaModel->SetEmail($newEmail)->SetId($usuarioPrincipalId);
+        //  Actualizamos el e-mail
+        $this->EmpresaModel->UpdateEmail();
     }
 
     public function getSchemaEntity()

@@ -214,6 +214,15 @@ class EmpresaModel extends \HappySoftware\Model\Model{
         return $data;
     }
 
+    /**
+     * Actualiza únicamente el e-mail de la empresa
+     */
+    public function UpdateEmail()
+    {
+        $sql = "update empresa set email = '" . $this->Email() . "' where idusuario = " . $this->Id();
+        $this->queryRaw($sql);
+    }
+
     public function GetDocumentacionCAE($idEmpresa)
     {
         //  Recuperamos los documentos asociados a CAE de empresa y su estado

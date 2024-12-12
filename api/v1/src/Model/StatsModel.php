@@ -6,6 +6,10 @@ use Fincatech\Entity\Stats;
 
 class StatsModel extends \HappySoftware\Model\Model{
 
+    public int $totalAdministradores = 0;
+    public int $totalNotasInformativas = 0;
+    public int $totalInformesSeguimiento = 0;
+
     private $entidad = 'Spa';
 
     private $tablasSchema = array("spa", "usuario", "usuarioRol");
@@ -75,6 +79,17 @@ class StatsModel extends \HappySoftware\Model\Model{
             csc.contratado = 1
             and c.id = csc.idcomunidad and c.estado = 'A' ";
         return mysqli_fetch_assoc($this->getRepositorio()->queryRaw($sql));
+    }
+
+    public function Dashboard()
+    {
+        $sql = "select * from
+            (select count(*) administradores from usuario where rolid = 5 and estado = 'A') as administradores,
+            (select count(*) informevaloracion from informevaloracionseguimiento) as informeValoracionSeguimiento,
+            (select count(*) notasinformativas from notasinformativas) as notasInformativas,
+            (select count(*) consultasdpd from dpd) as consultas";
+        $result = $this->query($sql);
+        return $result;
     }
 
     // /** Recupera todos los registros */

@@ -716,7 +716,7 @@ class ComunidadModel extends \HappySoftware\Model\Model{
     {
         $sql = "select 
             ce.idcomunidad, c.codigo,  c.codigo as codigocomunidad, concat(c.codigo, ' - ', c.nombre) as comunidad, ce.idempresa, 
-            e.razonsocial as empresa, ce.created as fecha_asignacion
+            e.razonsocial as empresa, e.email, ce.created as fecha_asignacion
         from 
 			comunidad c 
             left join comunidadempresa ce on ce.idcomunidad = c.id
@@ -737,7 +737,7 @@ class ComunidadModel extends \HappySoftware\Model\Model{
     {
         $sql = "select 
             ce.idcomunidad, c.codigo, c.codigo as codigocomunidad, concat(c.codigo, ' - ', c.nombre) as comunidad, ce.idempresa, 
-            e.razonsocial as empresa, ce.created as fecha_asignacion
+            e.razonsocial as empresa, e.email, ce.created as fecha_asignacion
         from 
 			comunidadautorizado ca,
 			comunidad c 

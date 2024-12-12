@@ -16,10 +16,7 @@
                         <td class="font-weight-bold">Total pendiente de cobro</td>
                         <td class="text-right"><span class="estadisticapendientecobro">0</span>€</td>
                     </tr>
-                    <!-- <tr>
-                        <td>Ingresos a cuenta pendiente liquidación</td>
-                        <td class="text-right"><span class="total_ingresoscuenta_pendiente"></span>&euro;</td>
-                    </tr>                     -->
+
                     <tr>
                         <td class="font-weight-bold">Total liquidaciones realizadas </td>
                         <td class="text-right"><span class="total_liquidaciones"></span>&euro;</td>

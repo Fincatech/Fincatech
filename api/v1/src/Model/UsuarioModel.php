@@ -368,10 +368,14 @@ class UsuarioModel extends \HappySoftware\Model\Model{
         return (count($existe) === 0 ? false : true);
     }
 
-    // /** Recupera todos los registros */
-    // public function List($params = null)
-    // {
-    //     return parent::List($params);
-    // }
+    /**
+     * Actualiza el e-mail del usuario
+     */
+    public function UpdateEmail()
+    {
+        //  Actualizamos asegurándonos que es un usuario de tipo contratista
+        $sql = "update " . strtolower($this->entidad) . " set email = '" . $this->Email() . "' where id = " . $this->Id() . " and rolid = 6";
+        $this->queryRaw($sql);
+    }
 
 }

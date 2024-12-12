@@ -12,7 +12,7 @@ let dpdCore = {
     {
 
         this.events();
-        if($('#listadoDpd').length && core.model == 'Dpd')
+        if($('#listadoDpd').length)
         {
             dpdCore.renderTabla();
         }
@@ -25,7 +25,7 @@ let dpdCore = {
         //  Si está la lista cargamos los datos
         if($('#listadoDpd').length)
         {
-        
+            dpdCore.renderTabla();
         }
 
         //  Responer consulta de dpd
@@ -74,6 +74,11 @@ let dpdCore = {
         $('body').on(core.helper.clickEventType, '.dpd-exportar', function(e){
             dpdCore.Controller.ExportarAdministradoresDPD();
         });
+
+        //  Carga de estadísticas
+        if($('.stats-dpd').length){
+            dpdCore.Controller.LoadStatsDashboard();
+        }
 
     },
 
@@ -143,6 +148,51 @@ let dpdCore = {
                     });
                 }
             }); 
+        },
+
+        /**
+         * Carga las estadísticas en el dashboard
+         */
+        LoadStatsDashboard: function()
+        {
+            let p = new Promise(async(resolve, reject) => {
+                await apiFincatech.get('stats/dpd').then((result) =>{
+                   let res = JSON.parse(result);
+                   if(res.status.response == 'ok'){
+                    //  Cargamos las estadísticas
+                        dpdCore.Model.Stats.administradores = res.data.administradores;
+                        dpdCore.Model.Stats.consultasdpd = res.data.consultasdpd;
+                        dpdCore.Model.Stats.informevaloracion = res.data.informevaloracion;
+                        dpdCore.Model.Stats.notasinformativas = res.data.notasinformativas;
+                   }
+                   resolve(true);
+                });
+            });
+
+            p.then((res) =>{
+                dpdCore.Controller.View.RenderStatsDashboard();
+            });
+        },
+
+        View: {
+            RenderStatsDashboard: function()
+            {
+                $('.stats-dpd .stat-administradores').html(dpdCore.Model.Stats.administradores);
+                $('.stats-dpd .stat-consultasdpd').html(dpdCore.Model.Stats.consultasdpd);
+                $('.stats-dpd .stat-informevaloracion').html(dpdCore.Model.Stats.informevaloracion);
+                $('.stats-dpd .stat-notasinformativas').html(dpdCore.Model.Stats.notasinformativas);
+            }
+        }
+
+    },
+
+    Model: {
+
+        Stats:{
+            administradores: 0,
+            consultasdpd: 0,
+            informevaloracion: 0,
+            notasinformativas: 0,
         }
 
     },
@@ -329,7 +379,7 @@ let dpdCore = {
     /**
      * Carga los datos del listado de consultas al dpd 
      */
-    renderTabla: async function()
+    renderTabla: function()
     {
         if($('#listadoDpd').length)
         {
@@ -415,7 +465,7 @@ let dpdCore = {
                 }
 
             $('#listadoDpd').addClass('no-clicable');
-            await CoreUI.tableData.render("listadoDpd", "Dpd", "dpd/list");
+            CoreUI.tableData.render("listadoDpd", "Dpd", "dpd/list");
         }
         return true;
     }

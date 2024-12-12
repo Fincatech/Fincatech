@@ -5,7 +5,7 @@ namespace  Fincatech\Controller;
 use HappySoftware\Controller\HelperController;
 use Fincatech\Model\UsuarioModel;
 use Fincatech\Controller\ComunidadController;
-
+use HappySoftware\Database\DatabaseCore;
 use stdClass;
 
 class UsuarioController extends FrontController{
@@ -109,7 +109,14 @@ class UsuarioController extends FrontController{
             $datos['ibanliquidaciones'] = HelperController::NormalizeIBAN($datos['ibanliquidaciones']);
         }
 
-        return $this->UsuarioModel->Update($entidadPrincipal, $datos, $usuarioId); 
+        $result = $this->UsuarioModel->Update($entidadPrincipal, $datos, $usuarioId); 
+        //  Comprobamos si es un usuario de tipo contratista para actualizar el e-mail de la empresa
+        if((int)$datos['rolid'] == 6){
+            $empresaController = new EmpresaController();
+            //  Actualizamos el e-mail de la empresa asociada al usuario
+            $empresaController->UpdateEmail((int)$usuarioId, $datos['email']);
+        }
+        return $result;
     }
 
     public function getSchemaEntity()
@@ -312,6 +319,22 @@ class UsuarioController extends FrontController{
         $this->InitController('Comunidad');
         //  Update comunities to H (Historic) Status
         $this->ComunidadController->BulkChangeStatus('H', null, $usuarioId);         
+    }
+
+    /**
+     * Actualiza el e-mail del usuario
+     * @param int $userId ID del usuario a actualizar
+     * @param string $oldEmail E-mail antiguo
+     * @param string $newEmail Nuevo E-mail
+     */
+    public function UpdateUserEmail(int $userId, string $newEmail)
+    {
+        //  Saneamos los datos
+        $newEmail = DatabaseCore::PrepareDBString($newEmail);
+        //  Validamos que el email sea distinto y el id mayor q 1
+        $this->UsuarioModel->setEmail($newEmail)->setId($userId);
+        //  Actualizamos
+        $this->UsuarioModel->UpdateEmail();
     }
 
 }

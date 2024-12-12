@@ -1841,11 +1841,16 @@ class InvoiceController extends FrontController{
                     $errores++;
                 }
 
+                $cifComunidad = $comunidad['cif'];
+                $cifComunidad = trim(str_replace('-', '', $cifComunidad));
+                $cifComunidad = preg_replace('/\s+/', '', $cifComunidad);
+                $cifComunidad = preg_replace('/[[:space:]]+/u', '', $cifComunidad);
+                $cifComunidad = strtoupper(trim($cifComunidad));                
                 //  Validamos el CIF de la comunidad
-                $cifValido = HelperController::ValidarNIFCIF($comunidad['cif']);
+                $cifValido = HelperController::ValidarNIFCIF($cifComunidad);
                 if(!$cifValido){
                     $errores++;
-                    $cif = $etiquetaError . (trim($comunidad['cif']) == '' ? 'No tiene CIF/NIF' : $comunidad['cif']);
+                    $cif = $etiquetaError . ($comunidad['cif'] == '' ? 'No tiene CIF/NIF' : '[' . $cifComunidad . ']');
                 }else{
                     $cif = $comunidad['cif'];
                 }

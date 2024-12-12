@@ -5,6 +5,7 @@ var role = null;
 var showingLoadComunidades = false;
 
 //  Eventos del core
+//  El evento del core se dispara una vez cargado el modelo
 const eventCoreInitialized = new CustomEvent('coreInitialized');
 const eventModelLoaded = new CustomEvent('modelLoaded');
 
@@ -326,8 +327,8 @@ let core =
     p.then((result) =>{
       core.Events();
       let timer = setInterval(function() {
-          // Tu lógica aquí
-          console.log(core.actionModel);
+          //  Abrimos un hilo para ir comprobando si el modelo ha sido inicializado
+          console.log('actionModel: ' + core.actionModel);
           if (core.modelInitialized || ( core.actionModel != 'get' && core.actionModel != 'add') ) {
               clearInterval(timer); // Destruye el timer
               // Lógica adicional si la condición es verdadera
@@ -598,6 +599,9 @@ let core =
       console.log('eventModelLoaded');
     },
 
+    /**
+     * Inicializa el componente de formulario
+     */
     init: function()
     {
 
@@ -622,61 +626,72 @@ let core =
 
       if(core.modelId != "")
       {
-        
-        // apiFincatech.get(core.model.toLowerCase() + "/" + core.modelId).then( (result) =>{
-        apiFincatech.get(core.model + "/" + core.modelId).then( (result) =>{
+        console.log('Get: ' + core.model + ' --- Id: ' + core.modelId);
 
-          //  Primero controlamos el código de estado
-          var estado = JSON.parse(result)["status"];
-          if(estado.response === 'error')
-          {
-
-              if(estado.error === '403')
-                apiFincatech.getView('comunes','403','','.content .container-fluid');
-
-              return;
-
-          }
-
-          //  FIX: ORR Se coge el nombre de la entidad desde el propio schema
-          let res = JSON.parse(result);
-          let keys = Object.getOwnPropertyNames(res.data.schema);
-          //  Establecemos el nombre de la entidad desde el propio objecto del schema
-          core.model = keys[0];
-          core.Modelo.entity[core.model] = res["data"][core.model];
-
-          //  Mapeamos los datos en el formulario
-          core.Forms.mapData();
-          // core.Modelo.entity[core.model] = JSON.parse(result)["data"][core.model];
-          // console.log(core.Modelo.entity[core.model]);
-
-          //  Inicializamos el valor del campo de password a nulo para evitar que se carguen datos
-          if($('#password').length)
-            $('#password').val('');
-
-          //  Si no está definido, entonces dejamos por defecto el que viene
-              if(CoreUI.tituloModulo !== null)
+        let prm = new Promise(async(resolve, reject) => {
+          console.log(core.model.toLowerCase() + "/" + core.modelId);
+          await apiFincatech.get(core.model.toLowerCase() + "/" + core.modelId).then( (result) =>{
+            // apiFincatech.get(core.model + "/" + core.modelId).then( (result) =>{
+    
+              //  Primero controlamos el código de estado
+              var estado = JSON.parse(result)["status"];
+              if(estado.response === 'error')
               {
-                var tituloPantalla = '';
-
-                if(Array.isArray(CoreUI.tituloModulo))
-                {
-                  for(var i = 0; i<CoreUI.tituloModulo.length; i++)
-                  {
-                    tituloPantalla += (core.Modelo.entity[core.model][0][CoreUI.tituloModulo[i]]) + ' ' ;
-                  }
-                }else{
-                  tituloPantalla = core.Modelo.entity[core.model][0][CoreUI.tituloModulo];
-                }
-
-                CoreUI.Utils.setTituloPantalla(null, null, tituloPantalla);
+    
+                  if(estado.error === '403')
+                    apiFincatech.getView('comunes','403','','.content .container-fluid');
+    
+                  return;
+    
               }
-
-            //  Disparamos el evento de modelo cargado
-            core.Forms.triggerEventLoaded(null);
-
+    
+              //  FIX: ORR Se coge el nombre de la entidad desde el propio schema
+              let res = JSON.parse(result);
+              let keys = Object.getOwnPropertyNames(res.data.schema);
+              console.log('Model: ' + core.model);
+              console.log('Res: ' + res);
+              console.log('Keys: ' + keys);
+              //  Establecemos el nombre de la entidad desde el propio objecto del schema
+              core.model = keys[0];
+              core.Modelo.entity[core.model] = res["data"][core.model];
+    
+              //  Mapeamos los datos en el formulario
+              core.Forms.mapData();
+              core.Modelo.entity[core.model] = JSON.parse(result)["data"][core.model];
+              console.log(core.Modelo.entity[core.model]);
+    
+              //  Inicializamos el valor del campo de password a nulo para evitar que se carguen datos
+              if($('#password').length)
+                $('#password').val('');
+    
+              //  Si no está definido, entonces dejamos por defecto el que viene
+                  if(CoreUI.tituloModulo !== null)
+                  {
+                    var tituloPantalla = '';
+    
+                    if(Array.isArray(CoreUI.tituloModulo))
+                    {
+                      for(var i = 0; i < CoreUI.tituloModulo.length; i++)
+                      {
+                        tituloPantalla += (core.Modelo.entity[core.model][0][CoreUI.tituloModulo[i]]) + ' ' ;
+                      }
+                    }else{
+                      tituloPantalla = core.Modelo.entity[core.model][0][CoreUI.tituloModulo];
+                    }
+    
+                    CoreUI.Utils.setTituloPantalla(null, null, tituloPantalla);
+                  }
+    
+                //  Disparamos el evento de modelo cargado
+                core.Forms.triggerEventLoaded(null);
+    
+            });
         });
 
+
+
+      }else{
+        console.log('Modelo no tiene ID');
       }  
     },
 
@@ -738,7 +753,7 @@ let core =
       });
 
         promesaSelect.then(function(){
-          // console.log('------------ Fin carga selectdata ------------');
+          console.log('------------ Fin carga selectdata ------------');
           core.Forms.getModelo();
           return promesaSelect;
         }); 
@@ -752,63 +767,63 @@ let core =
         //  Vaciamos el combo
             $("body #" + elementoDOM).html("");
         //  Recuperamos los registros que correspondan según la entidad
-       let promSelect = new Promise( function(resolve, reject)
-        {
-           apiFincatech.get(`${entidad}/list?target=cbo`).then( (data) =>
-          // await apiFincatech.get(`${entidad}/list?target=cbo`).then( async (data) =>
+        let promSelect = new Promise( function(resolve, reject)
           {
-              var htmlOutput = "";
-              var result = JSON.parse(data);
-              responseData = result.data;
+            apiFincatech.get(`${entidad}/list?target=cbo`).then( (data) =>
+            // await apiFincatech.get(`${entidad}/list?target=cbo`).then( async (data) =>
+            {
+                var htmlOutput = "";
+                var result = JSON.parse(data);
+                responseData = result.data;
 
-              //  Comprobamos si el valor viene de una entidad asociada a la entidad principal
-              //  Para eso buscamos si hay un . en el string del keyField
-              if(keyField.indexOf('.') >= 0)
-              {
-                //  Actualizamos el valor de entidad para coger la que corresponde a la relación
-                var entidadSeleccionada = keyField.split(".");
-                entidad = entidadSeleccionada[0];
-                keyField = entidadSeleccionada[1];
-              }
+                //  Comprobamos si el valor viene de una entidad asociada a la entidad principal
+                //  Para eso buscamos si hay un . en el string del keyField
+                if(keyField.indexOf('.') >= 0)
+                {
+                  //  Actualizamos el valor de entidad para coger la que corresponde a la relación
+                  var entidadSeleccionada = keyField.split(".");
+                  entidad = entidadSeleccionada[0];
+                  keyField = entidadSeleccionada[1];
+                }
 
-              //  Comprobamos lo mismo pero para el campo valor
-              //  TODO: Evaluar si debe ir dentro del for por el hecho de ser un valor y no el key 
-              if(keyValue.indexOf('.') >= 0)
-              {
-                //  Actualizamos el valor de entidad para coger la que corresponde a la relación
-                var entidadSeleccionada = keyValue.split(".");
-                entidad = entidadSeleccionada[0];
-                keyValue = entidadSeleccionada[1];
-              }
+                //  Comprobamos lo mismo pero para el campo valor
+                //  TODO: Evaluar si debe ir dentro del for por el hecho de ser un valor y no el key 
+                if(keyValue.indexOf('.') >= 0)
+                {
+                  //  Actualizamos el valor de entidad para coger la que corresponde a la relación
+                  var entidadSeleccionada = keyValue.split(".");
+                  entidad = entidadSeleccionada[0];
+                  keyValue = entidadSeleccionada[1];
+                }
 
-              if(insertarOpcionSeleccionar)
-              {
-                htmlOutput = '<option value="-1" disabled selected="selected">Seleccione una opción</option>';
-                $("body #" + elementoDOM).append(htmlOutput);
-              }
-
-              // console.log('El: ' + responseData[entidad][keyValue]);
-              for(x = 0; x < responseData[entidad].length; x++)
-              {
-                  var valueId = responseData[entidad][x][keyValue];
-                  var value = responseData[entidad][x][keyField];
-                  htmlOutput = `<option value="${valueId}">${value}</option>`;
+                if(insertarOpcionSeleccionar)
+                {
+                  htmlOutput = '<option value="-1" disabled selected="selected">Seleccione una opción</option>';
                   $("body #" + elementoDOM).append(htmlOutput);
-              }
+                }
 
-              $('body #' + elementoDOM).select2({
-                theme: 'bootstrap4',
-                placeholder: "Seleccione una opción",
-              });
+                // console.log('El: ' + responseData[entidad][keyValue]);
+                for(x = 0; x < responseData[entidad].length; x++)
+                {
+                    var valueId = responseData[entidad][x][keyValue];
+                    var value = responseData[entidad][x][keyField];
+                    htmlOutput = `<option value="${valueId}">${value}</option>`;
+                    $("body #" + elementoDOM).append(htmlOutput);
+                }
 
-              // console.log('--- Ha recuperado los datos desde el WS ---');
-              resolve(true);
-          });
-       });
+                $('body #' + elementoDOM).select2({
+                  theme: 'bootstrap4',
+                  placeholder: "Seleccione una opción",
+                });
 
-       return promSelect.then(function(){
-         return true;
-       });
+                // console.log('--- Ha recuperado los datos desde el WS ---');
+                resolve(true);
+            });
+        });
+
+        return promSelect.then(function(){
+          return true;
+        });
     },
 
 

@@ -5,7 +5,8 @@
 <script type="text/javascript" src="<?php echo ASSETS; ?>vendor/node_modules/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript" src="<?php echo ASSETS; ?>vendor/node_modules/izimodal/js/iziModal.min.js"></script>
 <script src="<?php echo ASSETS; ?>vendor/node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
-
+<!-- Chart -->
+<!-- <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> -->
 <!-- Trumbowyg -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/trumbowyg.min.js" integrity="sha512-YJgZG+6o3xSc0k5wv774GS+W1gx0vuSI/kr0E0UylL/Qg/noNspPtYwHPN9q6n59CTR/uhgXfjDXLTRI+uIryg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/langs/es.js" integrity="sha512-yO6uFeei9Tlur9ddXMLUuoRJHuYRv3DY71XJg08avjYd7+5Umyevjnu7uCTrFzd8SXDDIt9ZEdaZEWzJfrxGdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -33,6 +34,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/plug-ins/2.1.8/features/scrollResize/dataTables.scrollResize.min.js"></script>
+<!-- <script src="https:////cdn.datatables.net/plug-ins/2.1.8/sorting/natural.js"></script> -->
 
 <!-- Moment -->
 <script src="<?php echo ASSETS_JS; ?>vendor/moment/moment.js"></script>

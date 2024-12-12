@@ -3146,9 +3146,9 @@ let facturacion = {
 }
 
 $(() =>{
-    if(core.model == 'Prefacturacion')
+    if(core.model == 'Prefacturacion' || core.model == 'Liquidaciones')
     {
-        // facturacion.Init();
+        facturacion.Init();
     }
 
     document.addEventListener('coreInitialized', function(event) {

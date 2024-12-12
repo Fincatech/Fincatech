@@ -27,6 +27,7 @@ define("security", [
                 "spa",
                 "sudo",
                 "usuario",
+                "stats",
             ] ,
             "permissions" => [
                 "create" => "all",
@@ -174,6 +175,7 @@ define("security", [
                 "comunidades",
                 "facturacion",
                 "sudo",
+                "stats",
             ],
             "permissions" => [
                 "create" => "all",

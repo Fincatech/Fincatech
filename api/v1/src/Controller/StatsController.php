@@ -4,6 +4,7 @@ namespace Fincatech\Controller;
 
 // Sustituir Model por el nombre del modelo real. Ej: UsuarioModel
 use Fincatech\Model\SpaModel;
+use Fincatech\Model\StatsModel;
 
 class StatsController extends FrontController{
 
@@ -12,7 +13,7 @@ class StatsController extends FrontController{
 
     public function __construct($params = null)
     {
-       $this->InitModel('Stats', $params);
+        $this->StatsModel = new StatsModel();
     }
 
     public function List($params = null)
@@ -33,6 +34,15 @@ class StatsController extends FrontController{
         $data['emailscertificados'] = number_format($this->StatsModel->TotalEmailsCertificados(),0,',','.');
         $data['emailsenviados'] = number_format($this->StatsModel->TotalEmailsEnviados(),0,',','.');
         return $data;
+    }
+
+    /**
+     * Estadísticas dashboard dpd
+     */
+    public function DPD()
+    {
+        $stats = $this->StatsModel->Dashboard();
+        return $stats[0];
     }
 
 }

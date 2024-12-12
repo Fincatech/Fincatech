@@ -108,9 +108,7 @@ class AutorizadoController extends FrontController{
 
     public function Get($id)
     {
-
         $autorizado = $this->UsuarioController->Get($id);
-
         if(!is_null($autorizado))
         {
             $autorizado['Autorizado'] = $autorizado['Usuario'];
@@ -118,9 +116,14 @@ class AutorizadoController extends FrontController{
             if($autorizado['Autorizado'][0]['idadministrador'] !== $this->getLoggedUserId())
             {
                 $autorizado['error'] = '403';
+            }else{
+                $keys = array_keys( $autorizado['schema'] );
+                $keys[ array_search( 'Usuario', $keys ) ] = 'Autorizado';
+            
+                $autorizado['schema'] = array_combine( $keys, $autorizado );                
             }
-        }
 
+        }
         return $autorizado;
     }
 

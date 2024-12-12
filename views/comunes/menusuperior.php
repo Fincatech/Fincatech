@@ -190,7 +190,7 @@
 
                             <!-- <div class="dropdown-divider"></div> -->
                             <a class="dropdown-item disabled" href="javascript:void(0);">Certificados digitales</a>
-                            <a class="dropdown-item d-none" href="<?php echo HOME_URL ;?>certificadodigital/solicitudes"><i class="align-middle mr-1" data-feather="lock"></i> Certificados digitales</a>
+                            <a class="dropdown-item" href="<?php echo HOME_URL ;?>certificadodigital/solicitudes"><i class="align-middle mr-1" data-feather="lock"></i> Certificados digitales</a>
                             <a class="dropdown-item" href="<?php echo HOME_URL ;?>certificados/dashboard"><i class="align-middle mr-1" data-feather="mail"></i> Envíos certificados</a>
 
                         <?php endif; ?>

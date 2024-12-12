@@ -260,7 +260,7 @@ let usuarioCore = {
 
                 //  Cargamos el listado de administradores
                     CoreUI.tableData.init();
-
+                    CoreUI.tableData.columns = [];
                 //  Nombre
                     CoreUI.tableData.addColumn( listado, "nombre", "NOMBRE");
 
@@ -280,7 +280,7 @@ let usuarioCore = {
                         var timeStamp;
                         var fechaCreacion;
 
-                        if(!row.lastlogin)
+                        if(!row.lastlogin || row.lastlogin == '0000-00-00 00:00:00')
                         {
                             timeStamp = '';
                             fechaCreacion = '<span class="badge badge-pill bg-danger text-white">Nunca</span>';
@@ -318,6 +318,7 @@ let usuarioCore = {
 
                 //  Cargamos el listado de administradores
                     CoreUI.tableData.init();
+                    CoreUI.tableData.columns = [];
 
                 //  Asignada
                     CoreUI.tableData.addColumn(listado, 
@@ -452,6 +453,22 @@ let usuarioCore = {
 
 }
 
+document.addEventListener('coreInitialized', function(event) {
+    console.log('coreInitialized Autorizado');
+    // comunidadesCore.renderTablaComunidadesAdministrador(core.modelId);
+    // usuarioCore.init(); 
+      
+});
+   
+document.addEventListener('modelLoaded', function(event) {
+    console.log('init modelLoaded usuario');
+    if(core.actionModel == 'get' && core.model.toLowerCase() == "autorizado"){
+        usuarioCore.init(); 
+        // let titulo = `${core.Modelo.entity['Autorizado'][0]['codigo']} - ${core.Modelo.entity['Comunidad'][0]['nombre']}`;
+        // CoreUI.Utils.setTituloPantalla(null, null, titulo);
+    }    
+});
+
 $(()=>{
-    usuarioCore.init();
+    usuarioCore.init(); 
 });

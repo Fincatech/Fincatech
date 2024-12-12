@@ -21,7 +21,7 @@
                         <?php endif; ?>
                         <?php if( !$App->isContratista() ): ?>
                             <a class="list-group-item list-group-item-action enlaceRGPD fincatech--rgpd" data-toggle="list" href="#rgpd" role="tab" aria-selected="false"><i class="bi bi-shield-lock mr-2"></i> RGPD</a>
-                            <!-- <a class="list-group-item list-group-item-action enlaceCertificadoDigital" data-toggle="list" href="#certificadodigital" role="tab" aria-selected="false"><i class="bi bi-patch-check mr-2"></i> Certificado Digital</a> -->
+                            <a class="list-group-item list-group-item-action enlaceCertificadoDigital" data-toggle="list" href="#certificadodigital" role="tab" aria-selected="false"><i class="bi bi-patch-check mr-2"></i> Certificado Digital</a>
                         <?php endif; ?>
                         <?php if( $App->isContratista() ): ?>
                             <a class="list-group-item list-group-item-action enlaceEmpresasExternas" data-toggle="list" href="#empresasexternascontratista" role="tab" aria-selected="false"><i class="bi bi-shop mr-2"></i> Empresas Concurrentes</a>
@@ -99,7 +99,7 @@
             <?php include('tabs/rgpd.php'); ?>
 
             <!-- CERTIFICADO DIGITAL -->
-            <?php //include('tabs/certificadodigital.php'); ?>
+            <?php include('tabs/certificadodigital.php'); ?>
 
 <?php endif; ?>
 

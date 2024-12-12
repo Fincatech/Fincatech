@@ -43,12 +43,12 @@
 
                         </div>   
                         
-                        <!-- Listados -->
+                        <!-- Gráficas -->
                         <div class="row">
 
-                            <!-- Facturas emitidas -->
+                            <!-- Evolución de facturación -->
                             <div class="col-12 col-md-6 col-lg-6 ps-3 pe-3">
-                                <?php $App->renderView('facturacion/partials/dashboard/facturas_emitidas'); ?>
+                                <?php $App->renderView('facturacion/partials/dashboard/stats/evolucion_facturacion'); ?>
                             </div>  
 
                             <!-- Facturas devueltas -->

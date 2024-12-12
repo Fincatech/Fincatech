@@ -75,8 +75,10 @@ let comunidadesCore = {
     /** Check access to cae and rgpd for community */
     checkAccess: async function()
     {
-        comunidadesCore.accessCae = core.Security.userData.mostrarcae;
-        comunidadesCore.accessRgpd = core.Security.userData.mostrarrgpd;
+        if(core.model.toLowerCase() == 'comunidad'){
+            comunidadesCore.accessCae = core.Security.userData.mostrarcae;
+            comunidadesCore.accessRgpd = core.Security.userData.mostrarrgpd;
+        }
     },
 
     // Gestión de eventos
@@ -1645,6 +1647,10 @@ let comunidadesCore = {
                     //  Nombre del proveedor
                         CoreUI.tableData.addColumn('listadoComunidadesProveedores', "empresa", 'Proveedor Asignado', null, 'text-left');
     
+                    //  Email
+                        CoreUI.tableData.addColumn('listadoComunidadesProveedores', "email", 'E-mail', null, 'text-left');
+    
+
                     // //  Estado del requerimiento
                     //     CoreUI.tableData.addColumn('listadoDocumentacionComunidadCae', 
                     //         function(row, type, val, meta)
@@ -1690,6 +1696,7 @@ function sleep(ms) {
 document.addEventListener('coreInitialized', function(event) {
     console.log('coreInitialized Comunidades');
     comunidadesCore.renderTablaComunidadesAdministrador(core.modelId);
+    comunidadesCore.events();
       
 });
    

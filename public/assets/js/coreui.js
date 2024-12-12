@@ -524,7 +524,17 @@ let CoreUI = {
             CoreUI.tableData.columns[id].push(columna);
         },
 
-        /** Añade la definición de una columna */
+        /**
+         * Añade la definición de una columna
+         * @param {*} id 
+         * @param {*} nombre Nombre de la columna
+         * @param {*} titulo Titulo
+         * @param {*} renderHTML HTML a renderizar
+         * @param {*} clase Clase que se va a aplicar al contenido
+         * @param {*} widthColumn Ancho de la columna
+         * @param {*} _render 
+         * @param {*} _type 
+         */
         addColumn: function(id, nombre, titulo, renderHTML, clase, widthColumn, _render = null, _type = null )
         {
             if(typeof CoreUI.tableData.columns[id] === 'undefined')
@@ -533,6 +543,15 @@ let CoreUI = {
             }
 
             var columna = {};
+
+            // if(renderHTML !== undefined && renderHTML !== null && (_render == undefined || _render == null)){
+            //     _render 
+            //     const numericPart = parseInt(data.match(/^\d+/)?.[0], 10) || Number.MAX_SAFE_INTEGER;
+            //     const textPart = data.replace(/^\d+/, '').toLowerCase();
+            //     // Devuelve un valor de ordenación compuesto
+            //     return JSON.stringify({ num: numericPart, text: textPart });
+            // }
+
             // console.log(!!nombre);
             //             nombre = typeof nombre === 'function' ? '' : nombre;
             // console.log(typeof nombre);
@@ -553,11 +572,24 @@ let CoreUI = {
                     }
                 };
             }else{
+
                 if(typeof nombre !== 'function' && typeof nombre !== 'object')
                 {
-                    columna = {"data": nombre, "name": nombre,  "className": clase, "width": widthColumn, "render": _render, "title":titulo};
+                    columna = {
+                        "data": nombre, 
+                        "name": nombre,  
+                        "className": clase, 
+                        "width": widthColumn, 
+                        "render": _render, 
+                        "title":titulo};
                 }else{
-                    columna = {"data": nombre, "className": clase, "width": widthColumn, "render": _render, "title":titulo};
+                    columna = {
+                        "data": nombre, 
+                        "className": clase, 
+                        "width": widthColumn, 
+                        "render": _render, 
+                        "title":titulo
+                    };
                 }
             }
 
@@ -910,10 +942,6 @@ let CoreUI = {
             let promesaTabla = new Promise( (resolve, reject) => {
                 // console.log(this.columns.length);
                 CoreUI.tableData.init();
-                if(allColumns === true)
-                {
-                    //  Nos traemos la definición de la entidad para poder generar las columnas de la tabla
-                }
 
                 var detailRows = [];
 
@@ -936,6 +964,8 @@ let CoreUI = {
                     "columnDefs": [{
                         "targets": CoreUI.tableData.columns[id].length -1,
                         "className": CoreUI.tableData.columns[id].className,
+                        "type": 'custom-alnum',
+                        targets: 0
                     }],
                     "drawCallback": function(settings){
                         feather.replace();
@@ -1302,4 +1332,39 @@ let CoreUI = {
 
 $(()=>{
     CoreUI.init;
+    // Plug-in para ordenación alfanumérica
+    $.extend($.fn.dataTable.ext.type.order, {
+        "custom-alnum-pre": function (data) {
+            // Maneja valores nulos, indefinidos y vacíos
+            // console.log(data);
+            return ;
+            // if (data == null || data === "") {
+            //     return { numPart: Infinity, textPart: "" };
+            // }
+    
+            // // Verificar si es una fecha válida
+            // const date = new Date(data);
+            // if (!isNaN(date.getTime())) {
+            //     return { numPart: date.getTime(), textPart: "" }; // Ordena por timestamp
+            // }
+    
+            // // Separar números y texto
+            // const matches = data.toString().match(/(\d+)|(\D+)/g);
+            // if (!matches) {
+            //     return { numPart: Infinity, textPart: data.toLowerCase() }; // No hay números, solo texto
+            // }
+    
+            // // Convertir la parte numérica a un número
+            // const numPart = matches[0] ? parseInt(matches[0], 10) : Infinity;
+            // const textPart = matches.slice(1).join("").toLowerCase(); // El resto es texto
+    
+            // return { numPart, textPart };
+        },
+        "custom-alnum-asc": function (a, b) {
+            return a.numPart - b.numPart || a.textPart.localeCompare(b.textPart);
+        },
+        "custom-alnum-desc": function (a, b) {
+            return b.numPart - a.numPart || b.textPart.localeCompare(a.textPart);
+        }
+    });
 });

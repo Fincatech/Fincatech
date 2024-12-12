@@ -595,7 +595,12 @@ class HelperController
     public static function ValidarNIFCIF($dni)
     {
 
-        $cif = strtoupper(trim($dni));
+        //  Eliminamos todos los posibles espacios y guiones que pueda tener el campo
+        $cif = trim(str_replace('-', '', $dni));
+        $cif = preg_replace('/\s+/', '', $cif);
+        $cif = preg_replace('/[[:space:]]+/u', '', $cif);
+        $cif = strtoupper(trim($cif));
+        
         for ($i = 0; $i < 9; $i ++){
           $num[$i] = substr($cif, $i, 1);
         }
